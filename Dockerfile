@@ -28,6 +28,9 @@ ARG BASE_IMAGE=speccompiler-core-base:latest
 # Published to GHCR as speccompiler-toolchain:latest.
 # =============================================================================
 FROM debian:${DEBIAN_TAG}-slim AS toolchain
+LABEL org.opencontainers.image.source="https://github.com/SpecIR/SpecCompiler" \
+      org.opencontainers.image.description="SpecCompiler toolchain (Lua, Pandoc, Deno, PlantUML)" \
+      org.opencontainers.image.licenses="MIT"
 
 # Install ALL build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -129,6 +132,9 @@ WORKDIR /workspace
 # Stage: runtime — production image with application code (default target)
 # =============================================================================
 FROM runtime-base AS runtime
+LABEL org.opencontainers.image.source="https://github.com/SpecIR/SpecCompiler" \
+      org.opencontainers.image.description="SpecCompiler - extensible type system for Markdown" \
+      org.opencontainers.image.licenses="MIT"
 COPY --chown=speccompiler:speccompiler src/    /opt/speccompiler/src/
 COPY --chown=speccompiler:speccompiler models/ /opt/speccompiler/models/
 

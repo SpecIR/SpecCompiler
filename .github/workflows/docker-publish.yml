@@ -3,9 +3,25 @@ name: Build, Test, and Publish
 on:
   push:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'models/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - 'assets/**'
+      - 'Dockerfile'
+      - '.github/workflows/docker-publish.yml'
     tags: ['v*']
   pull_request:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'models/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - 'assets/**'
+      - 'Dockerfile'
+      - '.github/workflows/docker-publish.yml'
 
 env:
   REGISTRY: ghcr.io
@@ -77,6 +93,17 @@ jobs:
           cache-from: type=gha,scope=toolchain
           cache-to: type=gha,mode=max,scope=toolchain
 
+      - name: Make toolchain package public
+        if: (steps.check.outputs.changed == 'true' || steps.image-exists.outputs.exists == 'false') && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -sf -X PATCH \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/orgs/${{ github.repository_owner }}/packages/container/speccompiler-toolchain" \
+            -d '{"visibility":"public"}' || echo "::warning::Could not set toolchain package visibility to public"
+
   build-and-test:
     needs: build-toolchain
     runs-on: ubuntu-latest
@@ -128,6 +155,18 @@ jobs:
           build-args: TOOLCHAIN_IMAGE=${{ env.TOOLCHAIN_IMAGE }}
           cache-from: type=gha,scope=main
           cache-to: type=gha,mode=max,scope=main
+
+      - name: Make package public
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PACKAGE_NAME=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+          curl -sf -X PATCH \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/orgs/${{ github.repository_owner }}/packages/container/${PACKAGE_NAME}" \
+            -d '{"visibility":"public"}' || echo "::warning::Could not set package visibility to public"
 
       - name: Run tests
         run: |
