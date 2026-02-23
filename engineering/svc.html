@@ -1,0 +1,6106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>svc_html5</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+</head>
+<body>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#SVC-001-sec1" id="toc-SVC-001-sec1"><span class="toc-section-number">1</span> Scope</a></li>
+<li><a href="#SVC-001-sec2" id="toc-SVC-001-sec2"><span class="toc-section-number">2</span> Verification Strategy</a></li>
+<li><a href="#SVC-001-sec3" id="toc-SVC-001-sec3"><span class="toc-section-number">3</span> Test Execution Matrix</a></li>
+<li><a href="#SVC-001-sec4" id="toc-SVC-001-sec4"><span class="toc-section-number">4</span> Test Results Matrix</a></li>
+<li><a href="#SVC-001-sec5" id="toc-SVC-001-sec5"><span class="toc-section-number">5</span> Traceability Matrix</a>
+<ul>
+<li><a href="#SVC-001-sec5.1" id="toc-SVC-001-sec5.1"><span class="toc-section-number">5.1</span> Deterministic Enforcement in
+VERIFY</a></li>
+</ul></li>
+<li><a href="#SVC-001-sec6" id="toc-SVC-001-sec6"><span class="toc-section-number">6</span> Pipeline Verification Cases</a></li>
+<li><a href="#SVC-001-sec7" id="toc-SVC-001-sec7"><span class="toc-section-number">7</span> Storage Verification Cases</a></li>
+<li><a href="#SVC-001-sec8" id="toc-SVC-001-sec8"><span class="toc-section-number">8</span> Types Verification Cases</a></li>
+<li><a href="#SVC-001-sec9" id="toc-SVC-001-sec9"><span class="toc-section-number">9</span> Extension Verification
+Cases</a></li>
+<li><a href="#SVC-001-sec10" id="toc-SVC-001-sec10"><span class="toc-section-number">10</span> Output Verification Cases</a></li>
+<li><a href="#SVC-001-sec11" id="toc-SVC-001-sec11"><span class="toc-section-number">11</span> Scope</a></li>
+</ul>
+</nav>
+<div id="SVC-001" class="spec-title" data-custom-style="Title">
+<p>SpecCompiler Core Verification</p>
+</div>
+<h1 data-number="1" data-pos="3:1-4:1" id="SVC-001-sec1"><span class="header-section-number">1</span> Scope</h1>
+<div data-pos="5:1-6:1">
+<p>This document defines verification cases for SpecCompiler Core
+requirements.</p>
+</div>
+<h1 data-number="2" data-pos="7:1-8:1" id="SVC-001-sec2"><span class="header-section-number">2</span> Verification Strategy</h1>
+<div data-pos="9:1-11:1">
+<p>Each VC uses one of four methods:</p>
+</div>
+<div data-pos="10:1-16:1">
+<ul>
+<li><div data-pos="10:3-11:1">
+<strong>Test</strong>: Automated or manual test execution
+</div></li>
+<li><div data-pos="11:3-12:1">
+<strong>Analysis</strong>: Code review or static analysis
+</div></li>
+<li><div data-pos="12:3-13:1">
+<strong>Inspection</strong>: Document or artifact review
+</div></li>
+<li><div data-pos="13:3-14:1">
+<strong>Demonstration</strong>: Live system demonstration
+</div></li>
+</ul>
+</div>
+<h1 data-number="3" data-pos="1:1-2:1" data-source-file="./verification/test_execution_matrix.md" id="SVC-001-sec3"><span class="header-section-number">3</span> Test
+Execution Matrix</h1>
+<div data-pos="3:1-5:1" data-source-file="./verification/test_execution_matrix.md">
+<p>This matrix is autogenerated from VC objects and relations in SpecIR
+during rendering. Do not manually maintain matrix rows in this
+document.</p>
+</div>
+<div data-pos="6:1-7:1" data-source-file="./verification/test_execution_matrix.md">
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>VC ID</strong></th>
+<th style="text-align: left;"><strong>HLR</strong></th>
+<th style="text-align: center;"><strong>Method</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><a href="#VC-001">VC-001</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-001">HLR-PIPE-001</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-002">VC-002</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-002">HLR-PIPE-002</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-003">VC-003</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-003">HLR-PIPE-003</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-004">VC-004</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-004">HLR-PIPE-004</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-005">VC-005</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-005">HLR-PIPE-005</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-006">VC-006</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-006">HLR-PIPE-006</a></td>
+<td style="text-align: center;">Inspection</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-007">VC-007</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-001">HLR-STOR-001</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-008">VC-008</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-002">HLR-STOR-002</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-009">VC-009</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-003">HLR-STOR-003</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-010">VC-010</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-004">HLR-STOR-004</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-011">VC-011</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-005">HLR-STOR-005</a></td>
+<td style="text-align: center;">Demonstration</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-012">VC-012</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-001">HLR-TYPE-001</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-013">VC-013</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-002">HLR-TYPE-002</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-014">VC-014</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-003">HLR-TYPE-003</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-005">HLR-TYPE-005</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-016">VC-016</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-004">HLR-TYPE-004</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-017">VC-017</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-006">HLR-TYPE-006</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-007">HLR-TYPE-007</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-019">VC-019</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-001">HLR-EXT-001</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-020">VC-020</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-002">HLR-EXT-002</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-021">VC-021</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-003">HLR-EXT-003</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-022">VC-022</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-004">HLR-EXT-004</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-023">VC-023</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-005">HLR-EXT-005</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-024">VC-024</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-006">HLR-EXT-006</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-007">HLR-EXT-007</a></td>
+<td style="text-align: center;">Inspection</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-026">VC-026</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-008">HLR-EXT-008</a></td>
+<td style="text-align: center;">Inspection</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-027">VC-027</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-003">HLR-OUT-003</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-028">VC-028</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-004">HLR-OUT-004</a></td>
+<td style="text-align: center;">Demonstration</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-029">VC-029</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-005">HLR-OUT-005</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-030">VC-030</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-006">HLR-OUT-006</a></td>
+<td style="text-align: center;">Demonstration</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-031">VC-031</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-032">VC-032</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-002">HLR-OUT-002</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-033">VC-033</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-006">HLR-STOR-006</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-OUT-001">VC-OUT-001</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-OUT-004">VC-OUT-004</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-PIPE-007">VC-PIPE-007</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-001">HLR-PIPE-001</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 data-number="4" data-pos="8:1-9:1" data-source-file="./verification/test_execution_matrix.md" id="SVC-001-sec4"><span class="header-section-number">4</span> Test
+Results Matrix</h1>
+<div data-pos="10:1-11:1" data-source-file="./verification/test_execution_matrix.md">
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>VC ID</strong></th>
+<th style="text-align: left;"><strong>VC Title</strong></th>
+<th style="text-align: left;"><strong>TR ID</strong></th>
+<th style="text-align: center;"><strong>Result</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><a href="#VC-002">VC-002</a></td>
+<td style="text-align: left;">Handler Registration</td>
+<td style="text-align: left;"><a href="#TR-002-01">TR-002-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-006">VC-006</a></td>
+<td style="text-align: left;">Context Propagation</td>
+<td style="text-align: left;"><a href="#TR-006-01">TR-006-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-007">VC-007</a></td>
+<td style="text-align: left;">SQLite Persistence</td>
+<td style="text-align: left;"><a href="#TR-007-01">TR-007-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-008">VC-008</a></td>
+<td style="text-align: left;">EAV Attribute Model</td>
+<td style="text-align: left;"><a href="#TR-008-01">TR-008-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-008">VC-008</a></td>
+<td style="text-align: left;">EAV Attribute Model</td>
+<td style="text-align: left;"><a href="#TR-008-02">TR-008-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-009">VC-009</a></td>
+<td style="text-align: left;">Build Cache</td>
+<td style="text-align: left;"><a href="#TR-009-01">TR-009-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-010">VC-010</a></td>
+<td style="text-align: left;">Output Cache</td>
+<td style="text-align: left;"><a href="#TR-010-01">TR-010-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-013">VC-013</a></td>
+<td style="text-align: left;">Spec Objects Container</td>
+<td style="text-align: left;"><a href="#TR-013-01">TR-013-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-013">VC-013</a></td>
+<td style="text-align: left;">Spec Objects Container</td>
+<td style="text-align: left;"><a href="#TR-013-02">TR-013-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-014">VC-014</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: left;"><a href="#TR-014-01">TR-014-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-014">VC-014</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: left;"><a href="#TR-014-02">TR-014-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-014">VC-014</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: left;"><a href="#TR-014-03">TR-014-03</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-014">VC-014</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: left;"><a href="#TR-014-04">TR-014-04</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-014">VC-014</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: left;"><a href="#TR-014-05">TR-014-05</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#TR-015-01">TR-015-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#TR-015-02">TR-015-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#TR-015-03">TR-015-03</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#TR-015-04">TR-015-04</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#TR-015-05">TR-015-05</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#TR-015-06">TR-015-06</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#TR-015-07">TR-015-07</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#TR-015-08">TR-015-08</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#TR-015-09">TR-015-09</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-016">VC-016</a></td>
+<td style="text-align: left;">Spec Views Container</td>
+<td style="text-align: left;"><a href="#TR-016-01">TR-016-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-016">VC-016</a></td>
+<td style="text-align: left;">Spec Views Container</td>
+<td style="text-align: left;"><a href="#TR-016-02">TR-016-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-016">VC-016</a></td>
+<td style="text-align: left;">Spec Views Container</td>
+<td style="text-align: left;"><a href="#TR-016-03">TR-016-03</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-017">VC-017</a></td>
+<td style="text-align: left;">Spec Attributes Container</td>
+<td style="text-align: left;"><a href="#TR-017-01">TR-017-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-017">VC-017</a></td>
+<td style="text-align: left;">Spec Attributes Container</td>
+<td style="text-align: left;"><a href="#TR-017-02">TR-017-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-017">VC-017</a></td>
+<td style="text-align: left;">Spec Attributes Container</td>
+<td style="text-align: left;"><a href="#TR-017-03">TR-017-03</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-017">VC-017</a></td>
+<td style="text-align: left;">Spec Attributes Container</td>
+<td style="text-align: left;"><a href="#TR-017-04">TR-017-04</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#TR-018-01">TR-018-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#TR-018-02">TR-018-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#TR-018-03">TR-018-03</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#TR-018-04">TR-018-04</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#TR-018-05">TR-018-05</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#TR-018-07">TR-018-07</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#TR-018-09">TR-018-09</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-019">VC-019</a></td>
+<td style="text-align: left;">Model Type Loading</td>
+<td style="text-align: left;"><a href="#TR-019-01">TR-019-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-019">VC-019</a></td>
+<td style="text-align: left;">Model Type Loading</td>
+<td style="text-align: left;"><a href="#TR-019-02">TR-019-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-019">VC-019</a></td>
+<td style="text-align: left;">Model Type Loading</td>
+<td style="text-align: left;"><a href="#TR-019-03">TR-019-03</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-019">VC-019</a></td>
+<td style="text-align: left;">Model Type Loading</td>
+<td style="text-align: left;"><a href="#TR-019-04">TR-019-04</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-020">VC-020</a></td>
+<td style="text-align: left;">Model Directory Structure</td>
+<td style="text-align: left;"><a href="#TR-020-01">TR-020-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-021">VC-021</a></td>
+<td style="text-align: left;">Handler Registration Interface</td>
+<td style="text-align: left;"><a href="#TR-021-01">TR-021-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-022">VC-022</a></td>
+<td style="text-align: left;">Type Definition Schema</td>
+<td style="text-align: left;"><a href="#TR-022-01">TR-022-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-023">VC-023</a></td>
+<td style="text-align: left;">Model Path Resolution</td>
+<td style="text-align: left;"><a href="#TR-023-01">TR-023-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-024">VC-024</a></td>
+<td style="text-align: left;">External Renderer Registration</td>
+<td style="text-align: left;"><a href="#TR-024-01">TR-024-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-024">VC-024</a></td>
+<td style="text-align: left;">External Renderer Registration</td>
+<td style="text-align: left;"><a href="#TR-024-02">TR-024-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#TR-025-01">TR-025-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#TR-025-02">TR-025-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#TR-025-03">TR-025-03</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#TR-025-04">TR-025-04</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#TR-025-05">TR-025-05</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#TR-025-06">TR-025-06</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#TR-025-07">TR-025-07</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#TR-025-08">TR-025-08</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#TR-025-09">TR-025-09</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-027">VC-027</a></td>
+<td style="text-align: left;">Float Numbering</td>
+<td style="text-align: left;"><a href="#TR-027-01">TR-027-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-028">VC-028</a></td>
+<td style="text-align: left;">Multi-Format Output</td>
+<td style="text-align: left;"><a href="#TR-028-01">TR-028-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-028">VC-028</a></td>
+<td style="text-align: left;">Multi-Format Output</td>
+<td style="text-align: left;"><a href="#TR-028-02">TR-028-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-028">VC-028</a></td>
+<td style="text-align: left;">Multi-Format Output</td>
+<td style="text-align: left;"><a href="#TR-028-03">TR-028-03</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-029">VC-029</a></td>
+<td style="text-align: left;">DOCX Generation</td>
+<td style="text-align: left;"><a href="#TR-029-01">TR-029-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-029">VC-029</a></td>
+<td style="text-align: left;">DOCX Generation</td>
+<td style="text-align: left;"><a href="#TR-029-02">TR-029-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-030">VC-030</a></td>
+<td style="text-align: left;">HTML5 Generation</td>
+<td style="text-align: left;"><a href="#TR-030-01">TR-030-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-030">VC-030</a></td>
+<td style="text-align: left;">HTML5 Generation</td>
+<td style="text-align: left;"><a href="#TR-030-02">TR-030-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-030">VC-030</a></td>
+<td style="text-align: left;">HTML5 Generation</td>
+<td style="text-align: left;"><a href="#TR-030-03">TR-030-03</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-031">VC-031</a></td>
+<td style="text-align: left;">Document Assembly</td>
+<td style="text-align: left;"><a href="#TR-031-01">TR-031-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-032">VC-032</a></td>
+<td style="text-align: left;">Float Resolution</td>
+<td style="text-align: left;"><a href="#TR-032-01">TR-032-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-033">VC-033</a></td>
+<td style="text-align: left;">EAV Pivot Views</td>
+<td style="text-align: left;"><a href="#TR-033-01">TR-033-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-OUT-001">VC-OUT-001</a></td>
+<td style="text-align: left;">Document Assembly</td>
+<td style="text-align: left;"><a href="#TR-OUT-001-01">TR-OUT-001-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-OUT-004">VC-OUT-004</a></td>
+<td style="text-align: left;">Render Decoration</td>
+<td style="text-align: left;"><a href="#TR-OUT-004-01">TR-OUT-004-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-PIPE-007">VC-PIPE-007</a></td>
+<td style="text-align: left;">Sourcepos Normalization</td>
+<td style="text-align: left;"><a href="#TR-PIPE-007-01">TR-PIPE-007-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 data-number="5" data-pos="12:1-13:1" data-source-file="./verification/test_execution_matrix.md" id="SVC-001-sec5"><span class="header-section-number">5</span>
+Traceability Matrix</h1>
+<div data-pos="14:1-15:1" data-source-file="./verification/test_execution_matrix.md">
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>HLR ID</strong></th>
+<th style="text-align: left;"><strong>HLR Title</strong></th>
+<th style="text-align: left;"><strong>VC ID</strong></th>
+<th style="text-align: left;"><strong>VC Title</strong></th>
+<th style="text-align: center;"><strong>Result</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-001">HLR-EXT-001</a></td>
+<td style="text-align: left;">Model-Specific Type Handler Loading</td>
+<td style="text-align: left;"><a href="#VC-019">VC-019</a></td>
+<td style="text-align: left;">Model Type Loading</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-001">HLR-EXT-001</a></td>
+<td style="text-align: left;">Model-Specific Type Handler Loading</td>
+<td style="text-align: left;"><a href="#VC-019">VC-019</a></td>
+<td style="text-align: left;">Model Type Loading</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-001">HLR-EXT-001</a></td>
+<td style="text-align: left;">Model-Specific Type Handler Loading</td>
+<td style="text-align: left;"><a href="#VC-019">VC-019</a></td>
+<td style="text-align: left;">Model Type Loading</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-001">HLR-EXT-001</a></td>
+<td style="text-align: left;">Model-Specific Type Handler Loading</td>
+<td style="text-align: left;"><a href="#VC-019">VC-019</a></td>
+<td style="text-align: left;">Model Type Loading</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-002">HLR-EXT-002</a></td>
+<td style="text-align: left;">Model Directory Structure</td>
+<td style="text-align: left;"><a href="#VC-020">VC-020</a></td>
+<td style="text-align: left;">Model Directory Structure</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-003">HLR-EXT-003</a></td>
+<td style="text-align: left;">Handler Registration Interface</td>
+<td style="text-align: left;"><a href="#VC-021">VC-021</a></td>
+<td style="text-align: left;">Handler Registration Interface</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-004">HLR-EXT-004</a></td>
+<td style="text-align: left;">Type Definition Schema</td>
+<td style="text-align: left;"><a href="#VC-022">VC-022</a></td>
+<td style="text-align: left;">Type Definition Schema</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-005">HLR-EXT-005</a></td>
+<td style="text-align: left;">Model Path Resolution</td>
+<td style="text-align: left;"><a href="#VC-023">VC-023</a></td>
+<td style="text-align: left;">Model Path Resolution</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-006">HLR-EXT-006</a></td>
+<td style="text-align: left;">External Renderer Registration</td>
+<td style="text-align: left;"><a href="#VC-024">VC-024</a></td>
+<td style="text-align: left;">External Renderer Registration</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-006">HLR-EXT-006</a></td>
+<td style="text-align: left;">External Renderer Registration</td>
+<td style="text-align: left;"><a href="#VC-024">VC-024</a></td>
+<td style="text-align: left;">External Renderer Registration</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-007">HLR-EXT-007</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-007">HLR-EXT-007</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-007">HLR-EXT-007</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-007">HLR-EXT-007</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-007">HLR-EXT-007</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-007">HLR-EXT-007</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-007">HLR-EXT-007</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-007">HLR-EXT-007</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-007">HLR-EXT-007</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: left;"><a href="#VC-025">VC-025</a></td>
+<td style="text-align: left;">Data View Generator Loading</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-EXT-008">HLR-EXT-008</a></td>
+<td style="text-align: left;">Handler Caching</td>
+<td style="text-align: left;"><a href="#VC-026">VC-026</a></td>
+<td style="text-align: left;">Handler Caching</td>
+<td style="text-align: center;">— Not Run</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a></td>
+<td style="text-align: left;">Document Assembly</td>
+<td style="text-align: left;"><a href="#VC-031">VC-031</a></td>
+<td style="text-align: left;">Document Assembly</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a></td>
+<td style="text-align: left;">Document Assembly</td>
+<td style="text-align: left;"><a href="#VC-OUT-001">VC-OUT-001</a></td>
+<td style="text-align: left;">Document Assembly</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a></td>
+<td style="text-align: left;">Document Assembly</td>
+<td style="text-align: left;"><a href="#VC-OUT-004">VC-OUT-004</a></td>
+<td style="text-align: left;">Render Decoration</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-002">HLR-OUT-002</a></td>
+<td style="text-align: left;">Float Resolution</td>
+<td style="text-align: left;"><a href="#VC-032">VC-032</a></td>
+<td style="text-align: left;">Float Resolution</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-003">HLR-OUT-003</a></td>
+<td style="text-align: left;">Float Numbering</td>
+<td style="text-align: left;"><a href="#VC-027">VC-027</a></td>
+<td style="text-align: left;">Float Numbering</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-004">HLR-OUT-004</a></td>
+<td style="text-align: left;">Multi-Format Output</td>
+<td style="text-align: left;"><a href="#VC-028">VC-028</a></td>
+<td style="text-align: left;">Multi-Format Output</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-004">HLR-OUT-004</a></td>
+<td style="text-align: left;">Multi-Format Output</td>
+<td style="text-align: left;"><a href="#VC-028">VC-028</a></td>
+<td style="text-align: left;">Multi-Format Output</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-004">HLR-OUT-004</a></td>
+<td style="text-align: left;">Multi-Format Output</td>
+<td style="text-align: left;"><a href="#VC-028">VC-028</a></td>
+<td style="text-align: left;">Multi-Format Output</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-005">HLR-OUT-005</a></td>
+<td style="text-align: left;">DOCX Generation</td>
+<td style="text-align: left;"><a href="#VC-029">VC-029</a></td>
+<td style="text-align: left;">DOCX Generation</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-005">HLR-OUT-005</a></td>
+<td style="text-align: left;">DOCX Generation</td>
+<td style="text-align: left;"><a href="#VC-029">VC-029</a></td>
+<td style="text-align: left;">DOCX Generation</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-006">HLR-OUT-006</a></td>
+<td style="text-align: left;">HTML5 Generation</td>
+<td style="text-align: left;"><a href="#VC-030">VC-030</a></td>
+<td style="text-align: left;">HTML5 Generation</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-006">HLR-OUT-006</a></td>
+<td style="text-align: left;">HTML5 Generation</td>
+<td style="text-align: left;"><a href="#VC-030">VC-030</a></td>
+<td style="text-align: left;">HTML5 Generation</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-006">HLR-OUT-006</a></td>
+<td style="text-align: left;">HTML5 Generation</td>
+<td style="text-align: left;"><a href="#VC-030">VC-030</a></td>
+<td style="text-align: left;">HTML5 Generation</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-001">HLR-PIPE-001</a></td>
+<td style="text-align: left;">Five-Phase Lifecycle</td>
+<td style="text-align: left;"><a href="#VC-001">VC-001</a></td>
+<td style="text-align: left;">Five-Phase Lifecycle</td>
+<td style="text-align: center;">— Not Run</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-001">HLR-PIPE-001</a></td>
+<td style="text-align: left;">Five-Phase Lifecycle</td>
+<td style="text-align: left;"><a href="#VC-PIPE-007">VC-PIPE-007</a></td>
+<td style="text-align: left;">Sourcepos Normalization</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-002">HLR-PIPE-002</a></td>
+<td style="text-align: left;">Handler Registration and
+Prerequisites</td>
+<td style="text-align: left;"><a href="#VC-002">VC-002</a></td>
+<td style="text-align: left;">Handler Registration</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-003">HLR-PIPE-003</a></td>
+<td style="text-align: left;">Topological Ordering via Kahn’s
+Algorithm</td>
+<td style="text-align: left;"><a href="#VC-003">VC-003</a></td>
+<td style="text-align: left;">Topological Ordering</td>
+<td style="text-align: center;">— Not Run</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-004">HLR-PIPE-004</a></td>
+<td style="text-align: left;">Phase Abort on VERIFY Errors</td>
+<td style="text-align: left;"><a href="#VC-004">VC-004</a></td>
+<td style="text-align: left;">Phase Abort on Errors</td>
+<td style="text-align: center;">— Not Run</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-005">HLR-PIPE-005</a></td>
+<td style="text-align: left;">Batch Dispatch for All Phases</td>
+<td style="text-align: left;"><a href="#VC-005">VC-005</a></td>
+<td style="text-align: left;">Batch Dispatch Across All Phases</td>
+<td style="text-align: center;">— Not Run</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-006">HLR-PIPE-006</a></td>
+<td style="text-align: left;">Context Creation and Propagation</td>
+<td style="text-align: left;"><a href="#VC-006">VC-006</a></td>
+<td style="text-align: left;">Context Propagation</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-001">HLR-STOR-001</a></td>
+<td style="text-align: left;">SQLite Persistence</td>
+<td style="text-align: left;"><a href="#VC-007">VC-007</a></td>
+<td style="text-align: left;">SQLite Persistence</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-002">HLR-STOR-002</a></td>
+<td style="text-align: left;">EAV Attribute Model</td>
+<td style="text-align: left;"><a href="#VC-008">VC-008</a></td>
+<td style="text-align: left;">EAV Attribute Model</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-002">HLR-STOR-002</a></td>
+<td style="text-align: left;">EAV Attribute Model</td>
+<td style="text-align: left;"><a href="#VC-008">VC-008</a></td>
+<td style="text-align: left;">EAV Attribute Model</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-003">HLR-STOR-003</a></td>
+<td style="text-align: left;">Build Cache</td>
+<td style="text-align: left;"><a href="#VC-009">VC-009</a></td>
+<td style="text-align: left;">Build Cache</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-004">HLR-STOR-004</a></td>
+<td style="text-align: left;">Output Cache</td>
+<td style="text-align: left;"><a href="#VC-010">VC-010</a></td>
+<td style="text-align: left;">Output Cache</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-005">HLR-STOR-005</a></td>
+<td style="text-align: left;">Incremental Rebuild Support</td>
+<td style="text-align: left;"><a href="#VC-011">VC-011</a></td>
+<td style="text-align: left;">Incremental Rebuild</td>
+<td style="text-align: center;">— Not Run</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-006">HLR-STOR-006</a></td>
+<td style="text-align: left;">EAV Pivot Views for External Queries</td>
+<td style="text-align: left;"><a href="#VC-033">VC-033</a></td>
+<td style="text-align: left;">EAV Pivot Views</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-001">HLR-TYPE-001</a></td>
+<td style="text-align: left;">Specifications Container</td>
+<td style="text-align: left;"><a href="#VC-012">VC-012</a></td>
+<td style="text-align: left;">Specifications Container</td>
+<td style="text-align: center;">— Not Run</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-002">HLR-TYPE-002</a></td>
+<td style="text-align: left;">Spec Objects Container</td>
+<td style="text-align: left;"><a href="#VC-013">VC-013</a></td>
+<td style="text-align: left;">Spec Objects Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-002">HLR-TYPE-002</a></td>
+<td style="text-align: left;">Spec Objects Container</td>
+<td style="text-align: left;"><a href="#VC-013">VC-013</a></td>
+<td style="text-align: left;">Spec Objects Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-003">HLR-TYPE-003</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: left;"><a href="#VC-014">VC-014</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-003">HLR-TYPE-003</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: left;"><a href="#VC-014">VC-014</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-003">HLR-TYPE-003</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: left;"><a href="#VC-014">VC-014</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-003">HLR-TYPE-003</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: left;"><a href="#VC-014">VC-014</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-003">HLR-TYPE-003</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: left;"><a href="#VC-014">VC-014</a></td>
+<td style="text-align: left;">Spec Floats Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-004">HLR-TYPE-004</a></td>
+<td style="text-align: left;">Spec Views Container</td>
+<td style="text-align: left;"><a href="#VC-016">VC-016</a></td>
+<td style="text-align: left;">Spec Views Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-004">HLR-TYPE-004</a></td>
+<td style="text-align: left;">Spec Views Container</td>
+<td style="text-align: left;"><a href="#VC-016">VC-016</a></td>
+<td style="text-align: left;">Spec Views Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-004">HLR-TYPE-004</a></td>
+<td style="text-align: left;">Spec Views Container</td>
+<td style="text-align: left;"><a href="#VC-016">VC-016</a></td>
+<td style="text-align: left;">Spec Views Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-005">HLR-TYPE-005</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-005">HLR-TYPE-005</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-005">HLR-TYPE-005</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-005">HLR-TYPE-005</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-005">HLR-TYPE-005</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-005">HLR-TYPE-005</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-005">HLR-TYPE-005</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-005">HLR-TYPE-005</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-005">HLR-TYPE-005</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: left;"><a href="#VC-015">VC-015</a></td>
+<td style="text-align: left;">Spec Relations Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-006">HLR-TYPE-006</a></td>
+<td style="text-align: left;">Spec Attributes Container</td>
+<td style="text-align: left;"><a href="#VC-017">VC-017</a></td>
+<td style="text-align: left;">Spec Attributes Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-006">HLR-TYPE-006</a></td>
+<td style="text-align: left;">Spec Attributes Container</td>
+<td style="text-align: left;"><a href="#VC-017">VC-017</a></td>
+<td style="text-align: left;">Spec Attributes Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-006">HLR-TYPE-006</a></td>
+<td style="text-align: left;">Spec Attributes Container</td>
+<td style="text-align: left;"><a href="#VC-017">VC-017</a></td>
+<td style="text-align: left;">Spec Attributes Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-006">HLR-TYPE-006</a></td>
+<td style="text-align: left;">Spec Attributes Container</td>
+<td style="text-align: left;"><a href="#VC-017">VC-017</a></td>
+<td style="text-align: left;">Spec Attributes Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-007">HLR-TYPE-007</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-007">HLR-TYPE-007</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-007">HLR-TYPE-007</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-007">HLR-TYPE-007</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-007">HLR-TYPE-007</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-007">HLR-TYPE-007</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-007">HLR-TYPE-007</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: left;"><a href="#VC-018">VC-018</a></td>
+<td style="text-align: left;">Type Validation</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 data-number="5.1" data-pos="16:1-17:1" data-source-file="./verification/test_execution_matrix.md" id="SVC-001-sec5.1"><span class="header-section-number">5.1</span>
+Deterministic Enforcement in VERIFY</h2>
+<div data-pos="18:1-25:1" data-source-file="./verification/test_execution_matrix.md">
+<ul>
+<li><div data-pos="18:3-19:1">
+<code data-pos="18:3-18:27">traceability_vc_to_hlr</code>: VC must trace
+to at least one HLR.
+</div></li>
+<li><div data-pos="19:3-20:1">
+<code data-pos="19:3-19:26">traceability_tr_to_vc</code>: TR must trace
+to at least one VC.
+</div></li>
+<li><div data-pos="20:3-21:1">
+<code data-pos="20:3-20:27">traceability_hlr_to_vc</code>: HLR must be
+covered by at least one VC (when VCs exist).
+</div></li>
+<li><div data-pos="21:3-22:1">
+<code data-pos="21:3-21:27">traceability_fd_to_csc</code>: FD must trace
+to at least one CSC when CSC entries exist.
+</div></li>
+<li><div data-pos="22:3-23:1">
+<code data-pos="22:3-22:27">traceability_fd_to_csu</code>: FD must trace
+to at least one CSU when CSU entries exist.
+</div></li>
+</ul>
+</div>
+<div data-pos="24:1-26:1" data-source-file="./verification/test_execution_matrix.md">
+<p>Projects control severity via <code data-pos="24:31-24:45">project.yaml</code> <code data-pos="24:46-24:58">validation</code> policy (<code data-pos="24:67-24:74">error</code>, <code data-pos="24:76-24:82">warn</code>, <code data-pos="24:84-24:92">ignore</code>) without custom check scripts. TP
+filename-to-VC mapping is also enforced by the test runner naming
+convention (<code data-pos="25:82-25:99">vc_*_&lt;seq&gt;_*.md</code>).</p>
+</div>
+<h1 data-number="6" data-pos="1:1-2:1" data-source-file="./verification/pipeline_vc.md" id="SVC-001-sec6"><span class="header-section-number">6</span> Pipeline Verification Cases</h1>
+<div class="spec-object">
+<section id="VC-001" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-001: Five-Phase
+Lifecycle</h3>
+</section>
+<div data-pos="5:1-6:1" data-source-file="./verification/pipeline_vc.md">
+<p>Verify that the <a href="srs.html#TERM-15" data-pos="5:17-5:29">Pipeline</a> executes all five phases in correct
+order.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm
+
+<a href="srs.html#TERM-19" data-pos="7:22-7:34">INITIALIZE Phase</a>
+,
+
+<a href="srs.html#TERM-20" data-pos="7:36-7:48">ANALYZE Phase</a>
+,
+
+<a href="srs.html#TERM-22" data-pos="7:50-7:62">TRANSFORM Phase</a>
+,
+
+<a href="srs.html#TERM-21" data-pos="7:64-7:76">VERIFY Phase</a>
+,
+
+<a href="srs.html#TERM-23" data-pos="7:78-7:90">EMIT Phase</a>
+
+execute
+
+sequentially
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="17:5-18:1">
+All 5 phases execute for every document
+</div></li>
+<li><div data-pos="18:5-19:1">
+Phase order is always INITIALIZE &lt; ANALYZE &lt; TRANSFORM &lt; VERIFY
+&lt; EMIT
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="12:5-13:1">
+Register handlers for all 5 phases that record execution timestamps
+</div></li>
+<li><div data-pos="13:5-14:1">
+Execute pipeline with test document
+</div></li>
+<li><div data-pos="14:5-15:1">
+Verify timestamps show strict ordering
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-PIPE-001" data-pos="20:17-20:34">HLR-PIPE-001</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-002" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-002: Handler
+Registration</h3>
+</section>
+<div data-pos="25:1-26:1" data-source-file="./verification/pipeline_vc.md">
+<p>Verify that <a href="srs.html#TERM-16" data-pos="25:13-25:25">Handler</a> are registered with required
+fields.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm
+
+handler
+
+registration
+
+validates
+
+name
+
+and
+
+<a href="srs.html#TERM-24" data-pos="27:62-27:74">Prerequisites</a>
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="38:5-39:1">
+Missing name throws “Handler must have a ‘name’ field”
+</div></li>
+<li><div data-pos="39:5-40:1">
+Missing prerequisites throws “Handler must have a ‘prerequisites’ field”
+</div></li>
+<li><div data-pos="40:5-41:1">
+Duplicate name throws “Handler already registered”
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="32:5-33:1">
+Attempt to register handler without name field
+</div></li>
+<li><div data-pos="33:5-34:1">
+Attempt to register handler without prerequisites field
+</div></li>
+<li><div data-pos="34:5-35:1">
+Attempt to register duplicate handler
+</div></li>
+<li><div data-pos="35:5-36:1">
+Verify each case throws appropriate error
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-PIPE-002" data-pos="42:17-42:34">HLR-PIPE-002</a>
+,
+
+<a href="sdd.html#LLR-PIPE-002-01" data-pos="42:36-42:56">LLR-PIPE-002-01</a>
+,
+
+<a href="sdd.html#LLR-PIPE-002-02" data-pos="42:58-42:78">LLR-PIPE-002-02</a>
+,
+
+<a href="sdd.html#LLR-PIPE-002-03" data-pos="42:80-42:100">LLR-PIPE-002-03</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-003" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-003: Topological
+Ordering</h3>
+</section>
+<div data-pos="47:1-48:1" data-source-file="./verification/pipeline_vc.md">
+<p>Verify <a href="srs.html#TERM-16" data-pos="47:8-47:20">Handler</a>
+execute in dependency order.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm
+
+<a href="srs.html#TERM-25" data-pos="49:22-49:34">Topological Sort</a>
+
+produces
+
+correct
+
+execution
+
+order
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="59:5-60:1">
+Handlers execute after all prerequisites complete
+</div></li>
+<li><div data-pos="60:5-61:1">
+Alphabetical tiebreaker when multiple handlers have same in-degree
+</div></li>
+<li><div data-pos="61:5-62:1">
+Cycle detection reports error
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="54:5-55:1">
+Register handlers A, B, C where B depends on A, C depends on B
+</div></li>
+<li><div data-pos="55:5-56:1">
+Execute phase and record execution order
+</div></li>
+<li><div data-pos="56:5-57:1">
+Verify order is A, B, C
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-PIPE-003" data-pos="63:17-63:34">HLR-PIPE-003</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-004" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-004: Phase Abort
+on Errors</h3>
+</section>
+<div data-pos="68:1-69:1" data-source-file="./verification/pipeline_vc.md">
+<p>Verify pipeline stops before EMIT if errors exist.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm EMIT is skipped when verification fails
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="80:5-81:1">
+diagnostics.has_errors() returns true after VERIFY
+</div></li>
+<li><div data-pos="81:5-82:1">
+TRANSFORM phase has already completed before VERIFY
+</div></li>
+<li><div data-pos="82:5-83:1">
+EMIT phase handlers never called
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="75:5-76:1">
+Create document with validation errors (missing required attribute)
+</div></li>
+<li><div data-pos="76:5-77:1">
+Execute pipeline
+</div></li>
+<li><div data-pos="77:5-78:1">
+Verify EMIT handlers are not invoked after VERIFY errors are reported
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-PIPE-004" data-pos="84:17-84:34">HLR-PIPE-004</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-005" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-005: Batch
+Dispatch Across All Phases</h3>
+</section>
+<div data-pos="89:1-90:1" data-source-file="./verification/pipeline_vc.md">
+<p>Verify that every phase uses batch-dispatched <code data-pos="89:47-89:59">on_{phase}</code> hooks.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm each handler hook receives the full contexts array for
+INITIALIZE, ANALYZE, TRANSFORM, VERIFY, and EMIT
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="102:5-103:1">
+Each <code data-pos="102:10-102:22">on_{phase}</code> hook is called
+exactly once per phase
+</div></li>
+<li><div data-pos="103:5-104:1">
+Every hook receives the full contexts array
+</div></li>
+<li><div data-pos="104:5-105:1">
+No <code data-pos="104:8-104:26">on_{phase}_batch</code> hooks are
+required
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="96:5-97:1">
+Create 3 test documents
+</div></li>
+<li><div data-pos="97:5-98:1">
+Register handler with <code data-pos="97:27-97:42">on_initialize</code>,
+<code data-pos="97:44-97:56">on_analyze</code>, <code data-pos="97:58-97:72">on_transform</code>, <code data-pos="97:74-97:85">on_verify</code>, and <code data-pos="97:91-97:100">on_emit</code> hooks that record call counts and
+context sizes
+</div></li>
+<li><div data-pos="98:5-99:1">
+Execute pipeline
+</div></li>
+<li><div data-pos="99:5-100:1">
+Verify each phase hook receives array with 3 contexts
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-PIPE-005" data-pos="106:17-106:34">HLR-PIPE-005</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-006" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-006: Context
+Propagation</h3>
+</section>
+<div data-pos="111:1-112:1" data-source-file="./verification/pipeline_vc.md">
+<p>Verify context object contains required fields.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm handlers receive complete context
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Inspection
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="123:5-124:1">
+context.doc contains DocumentWalker instance
+</div></li>
+<li><div data-pos="124:5-125:1">
+context.spec_id contains document identifier
+</div></li>
+<li><div data-pos="125:5-126:1">
+context.config contains preset configuration
+</div></li>
+<li><div data-pos="126:5-127:1">
+context.output_format contains primary format
+</div></li>
+<li><div data-pos="127:5-128:1">
+context.outputs contains format/path pairs
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="118:5-119:1">
+Examine context creation in pipeline.execute()
+</div></li>
+<li><div data-pos="119:5-120:1">
+Verify all documented fields are populated
+</div></li>
+<li><div data-pos="120:5-121:1">
+Check context passed to each handler
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-PIPE-006" data-pos="129:17-129:34">HLR-PIPE-006</a>
+,
+
+<a href="sdd.html#LLR-PIPE-006-01" data-pos="129:36-129:56">LLR-PIPE-006-01</a>
+,
+
+<a href="sdd.html#LLR-PIPE-006-02" data-pos="129:58-129:78">LLR-PIPE-006-02</a>
+,
+
+<a href="sdd.html#LLR-PIPE-006-03" data-pos="129:80-129:100">LLR-PIPE-006-03</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-PIPE-007" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-PIPE-007:
+Sourcepos Normalization</h3>
+</section>
+<div data-pos="134:1-135:1" data-source-file="./verification/pipeline_vc.md">
+<p>Verify inline tracking spans are stripped from AST while preserving
+block-level data-pos.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm that Pandoc sourcepos tracking spans (data-pos, wrapper
+attributes) are removed from inline content across all container types
+while Link elements receive transferred data-pos for diagnostic
+reporting.
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="146:5-147:1">
+No inline tracking spans with data-pos remain in output AST
+</div></li>
+<li><div data-pos="147:5-148:1">
+Text content (bold, italic) preserved without wrapper spans
+</div></li>
+<li><div data-pos="148:5-149:1">
+Adjacent Str tokens merged after span removal
+</div></li>
+<li><div data-pos="149:5-150:1">
+Block-level data-pos attributes preserved for diagnostics
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="141:5-142:1">
+Process test document with bold, italic, and linked text that generates
+tracking spans
+</div></li>
+<li><div data-pos="142:5-143:1">
+Execute pipeline through all five phases with JSON output
+</div></li>
+<li><div data-pos="143:5-144:1">
+Oracle verifies no tracking spans remain, text content preserved,
+adjacent Str tokens merged
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-PIPE-001" data-pos="151:17-151:34">HLR-PIPE-001</a>
+</dd>
+</dl>
+</div>
+</div>
+<h1 data-number="7" data-pos="1:1-2:1" data-source-file="./verification/storage_vc.md" id="SVC-001-sec7"><span class="header-section-number">7</span> Storage Verification Cases</h1>
+<div class="spec-object">
+<section id="VC-007" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-007: SQLite
+Persistence</h3>
+</section>
+<div data-pos="5:1-6:1" data-source-file="./verification/storage_vc.md">
+<p>Verify data persists correctly in <a href="srs.html#TERM-SQLITE" data-pos="5:35-5:51">SQLite Database</a> database.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm all content tables store and retrieve data accurately
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="17:5-18:1">
+Inserted data matches queried data exactly
+</div></li>
+<li><div data-pos="18:5-19:1">
+Foreign keys resolve to valid parent records
+</div></li>
+<li><div data-pos="19:5-20:1">
+Database survives process restart
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="12:5-13:1">
+Insert test data into specifications, spec_objects, spec_floats tables
+</div></li>
+<li><div data-pos="13:5-14:1">
+Query data back and compare with original
+</div></li>
+<li><div data-pos="14:5-15:1">
+Verify foreign key relationships are maintained
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-STOR-001" data-pos="21:17-21:34">HLR-STOR-001</a>
+,
+
+<a href="sdd.html#LLR-DB-007-01" data-pos="21:36-21:54">LLR-DB-007-01</a>
+,
+
+<a href="sdd.html#LLR-DB-007-02" data-pos="21:56-21:74">LLR-DB-007-02</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-008" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-008: EAV
+Attribute Model</h3>
+</section>
+<div data-pos="26:1-27:1" data-source-file="./verification/storage_vc.md">
+<p>Verify attributes store in correct typed columns.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm
+
+<a href="srs.html#TERM-EAV" data-pos="28:22-28:35">EAV Model</a>
+
+pattern
+
+correctly
+
+routes
+
+values
+
+to
+
+typed
+
+columns
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="39:5-40:1">
+STRING values populate string_value column only
+</div></li>
+<li><div data-pos="40:5-41:1">
+INTEGER values populate int_value column only
+</div></li>
+<li><div data-pos="41:5-42:1">
+ENUM values populate enum_ref column only
+</div></li>
+<li><div data-pos="42:5-43:1">
+Exactly one typed column is non-NULL per row
+</div></li>
+<li><div data-pos="43:5-44:1">
+Invalid values leave typed columns NULL for proof-view diagnostics
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="33:5-34:1">
+Run markdown-driven attribute probe through <code data-pos="33:49-33:59">test_cov</code> template
+</div></li>
+<li><div data-pos="34:5-35:1">
+Cast attributes across STRING, INTEGER, REAL, BOOLEAN, DATE, ENUM, XHTML
+</div></li>
+<li><div data-pos="35:5-36:1">
+Exercise <code data-pos="35:14-35:26">cast_all()</code> on pending rows
+with mixed valid/invalid values
+</div></li>
+<li><div data-pos="36:5-37:1">
+Verify only the appropriate typed columns are populated
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-STOR-002" data-pos="45:17-45:34">HLR-STOR-002</a>
+,
+
+<a href="sdd.html#LLR-DB-008-01" data-pos="45:36-45:54">LLR-DB-008-01</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-009" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-009: Build
+Cache</h3>
+</section>
+<div data-pos="50:1-51:1" data-source-file="./verification/storage_vc.md">
+<p>Verify <a href="srs.html#TERM-30" data-pos="50:8-50:20">Build
+Cache</a> tracks document changes.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm changed documents are rebuilt, unchanged are skipped
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="62:5-63:1">
+is_document_dirty() returns true for changed documents
+</div></li>
+<li><div data-pos="63:5-64:1">
+is_document_dirty() returns false for unchanged documents
+</div></li>
+<li><div data-pos="64:5-65:1">
+Include file changes propagate to root documents
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="57:5-58:1">
+Build project with 2 documents
+</div></li>
+<li><div data-pos="58:5-59:1">
+Modify one document
+</div></li>
+<li><div data-pos="59:5-60:1">
+Rebuild and verify only modified document is reprocessed
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-STOR-003" data-pos="66:17-66:34">HLR-STOR-003</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-010" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-010: Output
+Cache</h3>
+</section>
+<div data-pos="71:1-72:1" data-source-file="./verification/storage_vc.md">
+<p>Verify <a href="srs.html#TERM-31" data-pos="71:8-71:20">Output
+Cache</a> prevents redundant generation.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm unchanged outputs are not regenerated
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="83:5-84:1">
+is_output_current() returns true when input hash matches
+</div></li>
+<li><div data-pos="84:5-85:1">
+Pandoc invocation count is zero for unchanged outputs
+</div></li>
+<li><div data-pos="85:5-86:1">
+Cache updates after successful generation
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="78:5-79:1">
+Build project generating DOCX output
+</div></li>
+<li><div data-pos="79:5-80:1">
+Rebuild without changes
+</div></li>
+<li><div data-pos="80:5-81:1">
+Verify pandoc is not invoked for unchanged outputs
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-STOR-004" data-pos="87:17-87:34">HLR-STOR-004</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-011" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-011: Incremental
+Rebuild</h3>
+</section>
+<div data-pos="92:1-93:1" data-source-file="./verification/storage_vc.md">
+<p>Verify incremental rebuild reduces processing time.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm partial rebuilds are faster than full rebuilds
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Demonstration
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="105:5-106:1">
+Incremental build processes only changed documents
+</div></li>
+<li><div data-pos="106:5-107:1">
+Build time scales with changes, not project size
+</div></li>
+<li><div data-pos="107:5-108:1">
+Include graph correctly identifies dependencies
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="99:5-100:1">
+Build project with 10 documents (measure time T1)
+</div></li>
+<li><div data-pos="100:5-101:1">
+Modify 1 document
+</div></li>
+<li><div data-pos="101:5-102:1">
+Rebuild (measure time T2)
+</div></li>
+<li><div data-pos="102:5-103:1">
+Compare T2 &lt;&lt; T1
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-STOR-005" data-pos="109:17-109:34">HLR-STOR-005</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-033" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-033: EAV Pivot
+Views</h3>
+</section>
+<div data-pos="114:1-115:1" data-source-file="./verification/storage_vc.md">
+<p>Verify per-object-type SQL views pivot <a href="srs.html#TERM-EAV" data-pos="114:40-114:53">EAV Model</a> attributes into typed
+columns.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm eav_pivot module generates correct views for all datatypes used
+by model types, enabling external BI queries against flat relational
+views.
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="129:5-130:1">
+ENUM values resolve to human-readable keys via enum_values join
+</div></li>
+<li><div data-pos="130:5-131:1">
+STRING values accessible via pivoted string column
+</div></li>
+<li><div data-pos="131:5-132:1">
+XHTML values accessible via pivoted string column
+</div></li>
+<li><div data-pos="132:5-133:1">
+Sparse attributes produce NULL for missing values
+</div></li>
+<li><div data-pos="133:5-134:1">
+Objects with no attributes show NULL for all attribute columns
+</div></li>
+<li><div data-pos="134:5-135:1">
+WHERE filtering works on ENUM, STRING columns
+</div></li>
+<li><div data-pos="135:5-136:1">
+Different object types produce separate views with type-specific columns
+</div></li>
+<li><div data-pos="136:5-137:1">
+View naming follows view_{type_lower}_objects convention
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="123:5-124:1">
+Process a rich markdown fixture through the sw_docs pipeline
+</div></li>
+<li><div data-pos="124:5-125:1">
+Open the pipeline database after processing
+</div></li>
+<li><div data-pos="125:5-126:1">
+Query pivot views (view_hlr_objects, view_nfr_objects, etc.)
+</div></li>
+<li><div data-pos="126:5-127:1">
+Validate column mapping, NULL handling, enum resolution, WHERE filtering
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-STOR-006" data-pos="138:17-138:34">HLR-STOR-006</a>
+</dd>
+</dl>
+</div>
+</div>
+<h1 data-number="8" data-pos="1:1-2:1" data-source-file="./verification/types_vc.md" id="SVC-001-sec8"><span class="header-section-number">8</span> Types Verification Cases</h1>
+<div class="spec-object">
+<section id="VC-012" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-012:
+Specifications Container</h3>
+</section>
+<div data-pos="5:1-6:1" data-source-file="./verification/types_vc.md">
+<p>Verify specifications table stores document metadata.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm root documents are correctly stored
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="17:5-18:1">
+identifier is SHA1 of root_path
+</div></li>
+<li><div data-pos="18:5-19:1">
+long_name extracted from H1 header text
+</div></li>
+<li><div data-pos="19:5-20:1">
+type_ref matches header type prefix
+</div></li>
+<li><div data-pos="20:5-21:1">
+pid extracted from @PID syntax
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="12:5-13:1">
+Process document with H1 header containing type and PID
+</div></li>
+<li><div data-pos="13:5-14:1">
+Query specifications table
+</div></li>
+<li><div data-pos="14:5-15:1">
+Verify all fields populated correctly
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-TYPE-001" data-pos="22:17-22:34">HLR-TYPE-001</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-013" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-013: Spec Objects
+Container</h3>
+</section>
+<div data-pos="27:1-28:1" data-source-file="./verification/types_vc.md">
+<p>Verify spec_objects table stores header-based content.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm H2+ headers create spec_object records
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="39:5-40:1">
+Each H2+ header creates one record
+</div></li>
+<li><div data-pos="40:5-41:1">
+level matches header level (2 for H2, 3 for H3)
+</div></li>
+<li><div data-pos="41:5-42:1">
+file_seq preserves document order
+</div></li>
+<li><div data-pos="42:5-43:1">
+ast contains body content as JSON
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="34:5-35:1">
+Process document with H2, H3 headers
+</div></li>
+<li><div data-pos="35:5-36:1">
+Query spec_objects table
+</div></li>
+<li><div data-pos="36:5-37:1">
+Verify level, title_text, ast fields
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-TYPE-002" data-pos="44:17-44:34">HLR-TYPE-002</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-014" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-014: Spec Floats
+Container</h3>
+</section>
+<div data-pos="49:1-50:1" data-source-file="./verification/types_vc.md">
+<p>Verify spec_floats table stores numbered elements.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm code blocks create spec_float records
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="61:5-62:1">
+Each code block with type prefix creates one record
+</div></li>
+<li><div data-pos="62:5-63:1">
+label extracted from syntax (e.g., “fig:label”)
+</div></li>
+<li><div data-pos="63:5-64:1">
+number assigned during <a href="srs.html#TERM-23" data-pos="63:28-63:40">EMIT Phase</a> phase
+</div></li>
+<li><div data-pos="64:5-65:1">
+parent_object_ref links to containing object
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="56:5-57:1">
+Process document with figure, table, plantuml code blocks
+</div></li>
+<li><div data-pos="57:5-58:1">
+Query spec_floats table
+</div></li>
+<li><div data-pos="58:5-59:1">
+Verify label, type_ref, raw_ast fields
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-TYPE-003" data-pos="66:17-66:34">HLR-TYPE-003</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-015" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-015: Spec
+Relations Container</h3>
+</section>
+<div data-pos="71:1-72:1" data-source-file="./verification/types_vc.md">
+<p>Verify spec_relations table stores traceability links.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm @PID and #label links create relation records
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="84:5-85:1">
+Each link creates one relation record
+</div></li>
+<li><div data-pos="85:5-86:1">
+source_ref points to containing object
+</div></li>
+<li><div data-pos="86:5-87:1">
+target_text contains original link text
+</div></li>
+<li><div data-pos="87:5-88:1">
+target_ref populated during <a href="srs.html#TERM-20" data-pos="87:33-87:45">ANALYZE Phase</a> phase
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="78:5-79:1">
+Process document with <a href="@REQ-001" data-pos="78:27-78:43">text</a>
+and <a href="#fig-1" data-pos="78:48-78:62">text</a> links
+</div></li>
+<li><div data-pos="79:5-80:1">
+Process links with normalized/object-header syntax (<code data-pos="79:57-79:68">[@PID](@)</code>, <code data-pos="79:70-79:81">[#PID](@)</code>)
+</div></li>
+<li><div data-pos="80:5-81:1">
+Query spec_relations table
+</div></li>
+<li><div data-pos="81:5-82:1">
+Verify source_ref, target_text, type_ref fields
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-TYPE-005" data-pos="89:17-89:34">HLR-TYPE-005</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-016" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-016: Spec Views
+Container</h3>
+</section>
+<div data-pos="94:1-95:1" data-source-file="./verification/types_vc.md">
+<p>Verify spec_views table stores generated content.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm view code blocks create spec_view records
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="106:5-107:1">
+Each view code block creates one record
+</div></li>
+<li><div data-pos="107:5-108:1">
+view_type_ref matches view type
+</div></li>
+<li><div data-pos="108:5-109:1">
+resolved_ast populated during <a href="srs.html#TERM-22" data-pos="108:35-108:47">TRANSFORM Phase</a> phase
+</div></li>
+<li><div data-pos="109:5-110:1">
+resolved_data contains structured view data
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="101:5-102:1">
+Process document with <code data-pos="101:27-101:41">toc and </code>lof
+code blocks
+</div></li>
+<li><div data-pos="102:5-103:1">
+Query spec_views table
+</div></li>
+<li><div data-pos="103:5-104:1">
+Verify view_type_ref, resolved_ast fields
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-TYPE-004" data-pos="111:17-111:34">HLR-TYPE-004</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-017" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-017: Spec
+Attributes Container</h3>
+</section>
+<div data-pos="116:1-117:1" data-source-file="./verification/types_vc.md">
+<p>Verify spec_attribute_values table stores object properties.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm blockquote attributes create attribute_value records
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="128:5-129:1">
+Each attribute line creates one record
+</div></li>
+<li><div data-pos="129:5-130:1">
+owner_ref links to parent object
+</div></li>
+<li><div data-pos="130:5-131:1">
+datatype matches attribute definition
+</div></li>
+<li><div data-pos="131:5-132:1">
+Value stored in correct typed column
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="123:5-124:1">
+Process document with &gt; status: draft, &gt; priority: 1 attributes
+</div></li>
+<li><div data-pos="124:5-125:1">
+Query spec_attribute_values table
+</div></li>
+<li><div data-pos="125:5-126:1">
+Verify name, datatype, typed value columns
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-TYPE-006" data-pos="133:17-133:34">HLR-TYPE-006</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-018" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-018: Type
+Validation</h3>
+</section>
+<div data-pos="138:1-139:1" data-source-file="./verification/types_vc.md">
+<p>Verify proof views detect data integrity violations.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm validation catches invalid data
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="151:5-152:1">
+SD-102 violation reported for invalid enum
+</div></li>
+<li><div data-pos="152:5-153:1">
+SD-201 violation reported for missing required
+</div></li>
+<li><div data-pos="153:5-154:1">
+SD-301 violation reported for dangling reference
+</div></li>
+<li><div data-pos="154:5-155:1">
+SD-601/SD-602/SD-603 violations are reported deterministically for
+broken HLR-VC-TR chains (sw_docs model)
+</div></li>
+<li><div data-pos="155:5-156:1">
+SD-605 violation is reported when VC TP artifact path violates TP naming
+convention
+</div></li>
+<li><div data-pos="156:5-157:1">
+SD-606 violation is reported when an FD has no traceability link to a
+CSC
+</div></li>
+<li><div data-pos="157:5-158:1">
+SD-607 violation is reported when an FD has no traceability link to a
+CSU
+</div></li>
+<li><div data-pos="158:5-159:1">
+Error messages include file path and line number
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="145:5-146:1">
+Create document with invalid enum value (SD-102)
+</div></li>
+<li><div data-pos="146:5-147:1">
+Create document with missing required attribute (SD-201)
+</div></li>
+<li><div data-pos="147:5-148:1">
+Create document with dangling relation (SD-301)
+</div></li>
+<li><div data-pos="148:5-149:1">
+Run VERIFY phase, check diagnostics
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-TYPE-007" data-pos="160:17-160:34">HLR-TYPE-007</a>
+</dd>
+</dl>
+</div>
+</div>
+<h1 data-number="9" data-pos="1:1-2:1" data-source-file="./verification/extension_vc.md" id="SVC-001-sec9"><span class="header-section-number">9</span> Extension
+Verification Cases</h1>
+<div class="spec-object">
+<section id="VC-019" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-019: Model Type
+Loading</h3>
+</section>
+<div data-pos="5:1-6:1" data-source-file="./verification/extension_vc.md">
+<p>Verify <a href="srs.html#TERM-38" data-pos="5:8-5:20">Type Loader</a>
+discovers and loads model types.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm types from models/{model}/types/ are registered
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="17:5-18:1">
+All .lua files in types/ directories are loaded
+</div></li>
+<li><div data-pos="18:5-19:1">
+Type definitions inserted into correct tables
+</div></li>
+<li><div data-pos="19:5-20:1">
+Errors logged for invalid type modules
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="12:5-13:1">
+Create test model with object, float, relation types
+</div></li>
+<li><div data-pos="13:5-14:1">
+Call TypeLoader.load_model()
+</div></li>
+<li><div data-pos="14:5-15:1">
+Query type tables for registered types
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-EXT-001" data-pos="21:17-21:33">HLR-EXT-001</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-020" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-020: Model
+Directory Structure</h3>
+</section>
+<div data-pos="26:1-27:1" data-source-file="./verification/extension_vc.md">
+<p>Verify <a href="srs.html#TERM-38" data-pos="26:8-26:20">Type
+Loader</a> recognizes all type categories.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm KNOWN_CATEGORIES are all scanned
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="38:5-39:1">
+specifications/ types load to spec_specification_types
+</div></li>
+<li><div data-pos="39:5-40:1">
+objects/ types load to spec_object_types
+</div></li>
+<li><div data-pos="40:5-41:1">
+floats/ types load to spec_float_types
+</div></li>
+<li><div data-pos="41:5-42:1">
+relations/ types load to spec_relation_types
+</div></li>
+<li><div data-pos="42:5-43:1">
+views/ types load to spec_view_types
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="33:5-34:1">
+Examine TypeLoader.KNOWN_CATEGORIES constant
+</div></li>
+<li><div data-pos="34:5-35:1">
+Create types in each category directory
+</div></li>
+<li><div data-pos="35:5-36:1">
+Verify all are loaded
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-EXT-002" data-pos="44:17-44:33">HLR-EXT-002</a>
+,
+
+<a href="sdd.html#LLR-EXT-020-01" data-pos="44:35-44:54">LLR-EXT-020-01</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-021" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-021: Handler
+Registration Interface</h3>
+</section>
+<div data-pos="49:1-50:1" data-source-file="./verification/extension_vc.md">
+<p>Verify type modules can export handlers.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm M.handler is registered with pipeline
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="61:5-62:1">
+Handler registered if M.handler exists
+</div></li>
+<li><div data-pos="62:5-63:1">
+Handler prerequisites respected
+</div></li>
+<li><div data-pos="63:5-64:1">
+Handler invoked during appropriate phase
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="56:5-57:1">
+Create type module with M.handler export
+</div></li>
+<li><div data-pos="57:5-58:1">
+Load model
+</div></li>
+<li><div data-pos="58:5-59:1">
+Verify handler is registered in pipeline
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-EXT-003" data-pos="65:17-65:33">HLR-EXT-003</a>
+,
+
+<a href="sdd.html#LLR-EXT-021-01" data-pos="65:35-65:54">LLR-EXT-021-01</a>
+,
+
+<a href="sdd.html#LLR-EXT-021-02" data-pos="65:56-65:75">LLR-EXT-021-02</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-022" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-022: Type
+Definition Schema</h3>
+</section>
+<div data-pos="70:1-71:1" data-source-file="./verification/extension_vc.md">
+<p>Verify type modules follow required schema.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm type exports contain required fields
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="82:5-83:1">
+Valid types are inserted into category tables
+</div></li>
+<li><div data-pos="83:5-84:1">
+Missing-id schemas are skipped
+</div></li>
+<li><div data-pos="84:5-85:1">
+Category defaults are applied (for example float
+long_name/counter_group)
+</div></li>
+<li><div data-pos="85:5-86:1">
+Enum attribute values are persisted
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="77:5-78:1">
+Create valid and invalid type modules in a temporary model
+</div></li>
+<li><div data-pos="78:5-79:1">
+Load model through TypeLoader.load_model()
+</div></li>
+<li><div data-pos="79:5-80:1">
+Verify valid schemas register with defaults and invalid schemas are
+ignored
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-EXT-004" data-pos="87:17-87:33">HLR-EXT-004</a>
+,
+
+<a href="sdd.html#LLR-EXT-022-01" data-pos="87:35-87:54">LLR-EXT-022-01</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-023" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-023: Model Path
+Resolution</h3>
+</section>
+<div data-pos="92:1-93:1" data-source-file="./verification/extension_vc.md">
+<p>Verify model paths resolve correctly.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm SPECCOMPILER_HOME and project root are checked
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="104:5-105:1">
+SPECCOMPILER_HOME/models/{model}/ checked first
+</div></li>
+<li><div data-pos="105:5-106:1">
+Project root models/{model}/ checked second
+</div></li>
+<li><div data-pos="106:5-107:1">
+Error if model not found in either location
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="99:5-100:1">
+Set SPECCOMPILER_HOME to custom directory with model
+</div></li>
+<li><div data-pos="100:5-101:1">
+Call TypeLoader.load_model() with model present in both home and cwd
+</div></li>
+<li><div data-pos="101:5-102:1">
+Verify model found in SPECCOMPILER_HOME
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-EXT-005" data-pos="108:17-108:33">HLR-EXT-005</a>
+,
+
+<a href="sdd.html#LLR-EXT-023-01" data-pos="108:35-108:54">LLR-EXT-023-01</a>
+,
+
+<a href="sdd.html#LLR-EXT-023-02" data-pos="108:56-108:75">LLR-EXT-023-02</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-024" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-024: External
+Renderer Registration</h3>
+</section>
+<div data-pos="113:1-114:1" data-source-file="./verification/extension_vc.md">
+<p>Verify float types can declare external rendering needs.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm chart/renderer integration executes and injects view data via
+<code data-pos="116:3-116:21">core.data_loader</code> before rendering.
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="128:5-129:1">
+Floats with needs_external_render are queued for rendering
+</div></li>
+<li><div data-pos="129:5-130:1">
+External tools (PlantUML, ECharts) are invoked
+</div></li>
+<li><div data-pos="130:5-131:1">
+<code data-pos="130:5-130:11">view</code> data is injected into chart
+config for standard dataset and sankey flows
+</div></li>
+<li><div data-pos="131:5-132:1">
+Missing/invalid views do not abort render and leave input config intact
+</div></li>
+<li><div data-pos="132:5-133:1">
+Omitted <code data-pos="132:13-132:19">view</code> attributes preserve
+chart config with no injection side effects
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="121:5-122:1">
+Process markdown chart blocks with <code data-pos="121:40-121:50">view=...</code> attributes
+</div></li>
+<li><div data-pos="122:5-123:1">
+Verify model fallback (<code data-pos="122:28-122:43">model=sw_docs</code> -&gt; default <code data-pos="122:55-122:62">gauss</code>) is applied
+</div></li>
+<li><div data-pos="123:5-124:1">
+Verify dataset and sankey injection paths mutate chart JSON before
+render
+</div></li>
+<li><div data-pos="124:5-125:1">
+Verify invalid/missing views preserve original chart config while
+rendering continues
+</div></li>
+<li><div data-pos="125:5-126:1">
+Verify no-view and unknown-view-result paths return unchanged config
+without aborting EMIT
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-EXT-006" data-pos="134:17-134:33">HLR-EXT-006</a>
+,
+
+<a href="sdd.html#LLR-EXT-024-01" data-pos="134:35-134:54">LLR-EXT-024-01</a>
+,
+
+<a href="sdd.html#LLR-EXT-024-02" data-pos="134:56-134:75">LLR-EXT-024-02</a>
+,
+
+<a href="sdd.html#LLR-EXT-024-03" data-pos="134:77-134:96">LLR-EXT-024-03</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-025" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-025: Data View
+Generator Loading</h3>
+</section>
+<div data-pos="139:1-140:1" data-source-file="./verification/extension_vc.md">
+<p>Verify <a href="srs.html#TERM-35" data-pos="139:8-139:20">Data
+View</a> generators are loaded from model directories and injected into
+chart rendering.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm that data view modules in models/{model}/types/views/ are
+discovered and their generate() function produces data for chart
+consumers.
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Inspection
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="151:5-152:1">
+View modules loaded from models/{model}/types/views/
+</div></li>
+<li><div data-pos="152:5-153:1">
+Resolution tries specified model first, falls back to default
+</div></li>
+<li><div data-pos="153:5-154:1">
+generate() receives params table and DataManager instance
+</div></li>
+<li><div data-pos="154:5-155:1">
+Return value used as chart data source
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="146:5-147:1">
+Examine data_loader.load_view() resolution logic (model-first, default
+fallback)
+</div></li>
+<li><div data-pos="147:5-148:1">
+Verify generate(params, data) receives user parameters and DataManager
+instance
+</div></li>
+<li><div data-pos="148:5-149:1">
+Confirm returned dataset is passed to chart float rendering
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-EXT-007" data-pos="156:17-156:33">HLR-EXT-007</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-026" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-026: Handler
+Caching</h3>
+</section>
+<div data-pos="161:1-162:1" data-source-file="./verification/extension_vc.md">
+<p>Verify type handler loaders cache modules to avoid repeated
+loading.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm handler dispatchers maintain a cache keyed by model and
+type_ref, including negative caching for missing handlers.
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Inspection
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="174:5-175:1">
+Cache keyed by model:type_ref combination
+</div></li>
+<li><div data-pos="175:5-176:1">
+Second access to same type returns cached handler
+</div></li>
+<li><div data-pos="176:5-177:1">
+Failed lookup stores false (negative cache)
+</div></li>
+<li><div data-pos="177:5-178:1">
+No repeated require() for previously loaded types
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="168:5-169:1">
+Examine float_handlers, view_handlers, and inline_handlers dispatch
+modules
+</div></li>
+<li><div data-pos="169:5-170:1">
+Verify cache keyed by {model}:{type_ref}
+</div></li>
+<li><div data-pos="170:5-171:1">
+Confirm cache hit returns stored handler without re-loading
+</div></li>
+<li><div data-pos="171:5-172:1">
+Confirm failed lookups store false to prevent repeated require() calls
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-EXT-008" data-pos="179:17-179:33">HLR-EXT-008</a>
+</dd>
+</dl>
+</div>
+</div>
+<h1 data-number="10" data-pos="1:1-2:1" data-source-file="./verification/output_vc.md" id="SVC-001-sec10"><span class="header-section-number">10</span> Output Verification Cases</h1>
+<div class="spec-object">
+<section id="VC-031" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-031: Document
+Assembly</h3>
+</section>
+<div data-pos="5:1-6:1" data-source-file="./verification/output_vc.md">
+<p>Verify documents are correctly assembled from database.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm Assembler reconstructs complete document
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="17:5-18:1">
+Document title from specifications.header_ast
+</div></li>
+<li><div data-pos="18:5-19:1">
+All objects in file_seq order
+</div></li>
+<li><div data-pos="19:5-20:1">
+Floats embedded at correct positions
+</div></li>
+<li><div data-pos="20:5-21:1">
+Views materialized with resolved content
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="12:5-13:1">
+Process document through TRANSFORM phase
+</div></li>
+<li><div data-pos="13:5-14:1">
+Call Assembler.assemble_document()
+</div></li>
+<li><div data-pos="14:5-15:1">
+Verify output contains all spec_objects and spec_floats in order
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-OUT-001" data-pos="22:17-22:33">HLR-OUT-001</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-032" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-032: Float
+Resolution</h3>
+</section>
+<div data-pos="27:1-28:1" data-source-file="./verification/output_vc.md">
+<p>Verify floats are resolved with rendered content.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm raw_ast replaced with resolved_ast
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="39:5-40:1">
+PlantUML code blocks converted to SVG images
+</div></li>
+<li><div data-pos="40:5-41:1">
+ECharts blocks converted to PNG images
+</div></li>
+<li><div data-pos="41:5-42:1">
+Math blocks converted to OMML or MathML
+</div></li>
+<li><div data-pos="42:5-43:1">
+resolved_ast non-NULL after resolution
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="34:5-35:1">
+Process document with PlantUML float
+</div></li>
+<li><div data-pos="35:5-36:1">
+Run float_resolver
+</div></li>
+<li><div data-pos="36:5-37:1">
+Verify resolved_ast contains SVG image
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-OUT-002" data-pos="44:17-44:33">HLR-OUT-002</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-027" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-027: Float
+Numbering</h3>
+</section>
+<div data-pos="49:1-50:1" data-source-file="./verification/output_vc.md">
+<p>Verify floats receive sequential numbers.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm
+
+<a href="srs.html#TERM-28" data-pos="51:22-51:34">Counter Group</a>
+
+share
+
+numbering
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="61:5-62:1">
+Numbers assigned sequentially within counter_group
+</div></li>
+<li><div data-pos="62:5-63:1">
+FIGURE and CHART share same counter (both FIGURE group)
+</div></li>
+<li><div data-pos="63:5-64:1">
+TABLE has separate counter
+</div></li>
+<li><div data-pos="64:5-65:1">
+Numbers span across documents
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="56:5-57:1">
+Process 2 documents with figures and charts
+</div></li>
+<li><div data-pos="57:5-58:1">
+Run float_numbering
+</div></li>
+<li><div data-pos="58:5-59:1">
+Query spec_floats.number values
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-OUT-003" data-pos="66:17-66:33">HLR-OUT-003</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-028" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-028: Multi-Format
+Output</h3>
+</section>
+<div data-pos="71:1-72:1" data-source-file="./verification/output_vc.md">
+<p>Verify multiple output formats generated.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm DOCX and HTML5 both produced
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Demonstration
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="83:5-84:1">
+DOCX file generated at configured path
+</div></li>
+<li><div data-pos="84:5-85:1">
+HTML5 file generated at configured path
+</div></li>
+<li><div data-pos="85:5-86:1">
+Both contain same content
+</div></li>
+<li><div data-pos="86:5-87:1">
+Output cache tracks each format separately
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="78:5-79:1">
+Configure project with outputs: [{format: docx}, {format: html5}]
+</div></li>
+<li><div data-pos="79:5-80:1">
+Build project
+</div></li>
+<li><div data-pos="80:5-81:1">
+Verify both files created in build directory
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-OUT-004" data-pos="88:17-88:33">HLR-OUT-004</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-029" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-029: DOCX
+Generation</h3>
+</section>
+<div data-pos="93:1-94:1" data-source-file="./verification/output_vc.md">
+<p>Verify DOCX output uses reference document.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm styles applied from reference.docx
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="105:5-106:1">
+Preset files load and merge according to extends-chain precedence
+</div></li>
+<li><div data-pos="106:5-107:1">
+Circular and missing-base extends chains fail with deterministic errors
+</div></li>
+<li><div data-pos="107:5-108:1">
+Heading styles match reference document
+</div></li>
+<li><div data-pos="108:5-109:1">
+Custom styles (Caption, Code) applied correctly
+</div></li>
+<li><div data-pos="109:5-110:1">
+Page layout matches reference
+</div></li>
+<li><div data-pos="110:5-111:1">
+OOXML postprocessing applied
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="100:5-101:1">
+Execute markdown-driven preset loader probe with layered DOCX preset
+files
+</div></li>
+<li><div data-pos="101:5-102:1">
+Verify extends-chain merge, optional format styles, and validation
+behavior
+</div></li>
+<li><div data-pos="102:5-103:1">
+Verify preset lookup and style resolution for DOCX float/object
+rendering paths
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-OUT-005" data-pos="112:17-112:33">HLR-OUT-005</a>
+,
+
+<a href="sdd.html#LLR-OUT-029-01" data-pos="112:35-112:54">LLR-OUT-029-01</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-030" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-030: HTML5
+Generation</h3>
+</section>
+<div data-pos="117:1-118:1" data-source-file="./verification/output_vc.md">
+<p>Verify HTML5 output is web-ready.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm HTML5 includes navigation and styling
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Demonstration
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="129:5-130:1">
+HTML5 file renders correctly in browser
+</div></li>
+<li><div data-pos="130:5-131:1">
+Internal links (#anchors) navigate correctly
+</div></li>
+<li><div data-pos="131:5-132:1">
+CSS styles applied
+</div></li>
+<li><div data-pos="132:5-133:1">
+Search index generated if configured
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="124:5-125:1">
+Generate HTML5 output
+</div></li>
+<li><div data-pos="125:5-126:1">
+Open in browser
+</div></li>
+<li><div data-pos="126:5-127:1">
+Verify navigation, styling, and cross-references work
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-OUT-006" data-pos="134:17-134:33">HLR-OUT-006</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-OUT-001" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-OUT-001: Document
+Assembly</h3>
+</section>
+<div data-pos="139:1-140:1" data-source-file="./verification/output_vc.md">
+<p>Verify document structure, ordering, and float/view inclusion in
+assembled output.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm that the assembler produces a Pandoc document with correct
+specification title Div, section headers in document order, float
+captions, and consumed attribute blockquotes.
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="151:5-152:1">
+First block is spec title Div with correct PID
+</div></li>
+<li><div data-pos="152:5-153:1">
+Section headers appear in document order
+</div></li>
+<li><div data-pos="153:5-154:1">
+Float caption with class “speccompiler-caption” present
+</div></li>
+<li><div data-pos="154:5-155:1">
+Attribute-pattern blockquotes consumed by TRANSFORM
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="146:5-147:1">
+Process test document with specification header, two sections, a float
+with caption, and an attribute blockquote
+</div></li>
+<li><div data-pos="147:5-148:1">
+Execute pipeline through all five phases with JSON output
+</div></li>
+<li><div data-pos="148:5-149:1">
+Oracle verifies spec title Div, header order, caption presence, and
+attribute consumption
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-OUT-001" data-pos="156:17-156:33">HLR-OUT-001</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-OUT-004" class="unnumbered spec-object-header" data-custom-style="VCHeader">
+<h3 class="unnumbered" data-custom-style="VCHeader">VC-OUT-004: Render
+Decoration</h3>
+</section>
+<div data-pos="161:1-162:1" data-source-file="./verification/output_vc.md">
+<p>Verify header classes, bookmarks, and structural decorations in
+rendered output.</p>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm that render utilities apply correct CSS classes, bookmark
+anchors, and structural decorations to spec objects during EMIT phase.
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="173:5-174:1">
+Headers receive appropriate Div wrappers with type-based classes
+</div></li>
+<li><div data-pos="174:5-175:1">
+Bookmark anchors inserted for cross-reference navigation
+</div></li>
+<li><div data-pos="175:5-176:1">
+Structural decoration preserves document semantics
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="168:5-169:1">
+Process test document with typed spec objects
+</div></li>
+<li><div data-pos="169:5-170:1">
+Execute pipeline through all five phases with JSON output
+</div></li>
+<li><div data-pos="170:5-171:1">
+Oracle verifies Div wrappers, classes, and bookmark anchors
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-OUT-001" data-pos="177:17-177:33">HLR-OUT-001</a>
+</dd>
+</dl>
+</div>
+</div>
+<h1 data-number="11" data-pos="5:1-6:1" data-source-file="./trr.md" id="SVC-001-sec11"><span class="header-section-number">11</span>
+Scope</h1>
+<div data-pos="7:1-9:1" data-source-file="./trr.md">
+<p>This document contains test result objects generated from automated
+e2e test execution. Each TR traces to a Verification Case (VC) defined
+in the SVC.</p>
+</div>
+<div class="spec-object">
+<section id="TR-002-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-002-01: 002 01
+Handler Registration</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+101
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/pipeline/vc_002_01_handler_registration.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-002" data-pos="5:17-5:28">VC-002</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-006-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-006-01: 006 01
+Context Propagation</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+64
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/pipeline/vc_006_01_context_propagation.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-006" data-pos="19:17-19:28">VC-006</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-PIPE-007-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-PIPE-007-01: Pipe
+007 01 Sourcepos Compat</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+75
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_pipe_007_01_sourcepos_compat.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-PIPE-007" data-pos="33:17-33:33">VC-PIPE-007</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-007-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-007-01: 007 01 Db
+Persistence</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+132
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/database/vc_007_01_db_persistence.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-007" data-pos="47:17-47:28">VC-007</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-008-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-008-01: 008 01
+Cast Datatype Matrix</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+117
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/casting/vc_008_01_cast_datatype_matrix.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-008" data-pos="61:17-61:28">VC-008</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-008-02" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-008-02: 008 02
+Cast Negative</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+105
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/casting_negative/vc_008_02_cast_negative.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-008" data-pos="75:17-75:28">VC-008</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-009-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-009-01: 009 01
+Incremental Cache</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+492
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/pipeline/vc_009_01_incremental_cache.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-009" data-pos="89:17-89:28">VC-009</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-010-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-010-01: 010 01
+Incremental Multi Emit</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+1194
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/pipeline/vc_010_01_incremental_multi_emit.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-010" data-pos="103:17-103:28">VC-010</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-033-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-033-01: 033 01
+Eav Views</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+262
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/pivot/vc_033_01_eav_views.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-033" data-pos="117:17-117:28">VC-033</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-013-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-013-01: 013 01
+Document Walker</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+110
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_013_01_document_walker.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-013" data-pos="131:17-131:28">VC-013</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-013-02" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-013-02: 013 02
+Syntax Parsing</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+138
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/syntax/vc_013_02_syntax_parsing.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-013" data-pos="145:17-145:28">VC-013</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-014-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-014-01: 014 01
+Float Syntax</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+126
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/floats/vc_014_01_float_syntax.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-014" data-pos="159:17-159:28">VC-014</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-014-02" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-014-02: 014 02
+Float Tables</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+69
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/floats/vc_014_02_float_tables.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-014" data-pos="173:17-173:28">VC-014</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-014-03" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-014-03: 014 03
+Float Figures</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+76
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/floats/vc_014_03_float_figures.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-014" data-pos="187:17-187:28">VC-014</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-014-04" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-014-04: 014 04
+Float Base</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+71
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_014_04_float_base.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-014" data-pos="201:17-201:28">VC-014</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-014-05" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-014-05: 014 05
+Spec Floats</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+72
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_014_05_spec_floats.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-014" data-pos="215:17-215:28">VC-014</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-015-01: 015 01
+Relation Resolver</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+80
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_015_01_relation_resolver.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="229:17-229:28">VC-015</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-02" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-015-02: 015 02
+Relation Edges</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+87
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_015_02_relation_edges.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="243:17-243:28">VC-015</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-03" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-015-03: 015 03
+Links</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+133
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_03_links.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="257:17-257:28">VC-015</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-04" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-015-04: 015 04
+Xref</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+86
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_04_xref.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="271:17-271:28">VC-015</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-05" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-015-05: 015 05
+Citations</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+80
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_05_citations.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="285:17-285:28">VC-015</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-06" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-015-06: 015 06
+Scoped Resolution</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+80
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_06_scoped_resolution.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="299:17-299:28">VC-015</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-07" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-015-07: 015 07
+Attribute Scope Prefixes</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+89
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_07_attribute_scope_prefixes.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="313:17-313:28">VC-015</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-08" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-015-08: 015 08
+Scoped Label Resolution</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+93
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_08_scoped_label_resolution.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="327:17-327:28">VC-015</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-09" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-015-09: 015 09
+Section Xrefs</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+95
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_09_section_xrefs.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="341:17-341:28">VC-015</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-016-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-016-01: 016 01
+View Materializer</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+75
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_016_01_view_materializer.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-016" data-pos="355:17-355:28">VC-016</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-016-02" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-016-02: 016 02
+View Utils</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+73
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_016_02_view_utils.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-016" data-pos="369:17-369:28">VC-016</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-016-03" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-016-03: 016 03
+Inline Views</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+128
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/views/vc_016_03_inline_views.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-016" data-pos="383:17-383:28">VC-016</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-017-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-017-01: 017 01
+Attribute Caster</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+72
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_017_01_attribute_caster.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-017" data-pos="397:17-397:28">VC-017</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-017-02" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-017-02: 017 02
+Attribute Para Utils</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+75
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_017_02_attribute_para_utils.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-017" data-pos="411:17-411:28">VC-017</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-017-03" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-017-03: 017 03
+Attr Dedup</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+241
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sdn_types/vc_017_03_attr_dedup.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-017" data-pos="425:17-425:28">VC-017</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-017-04" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-017-04: 017 04
+Syntax Attributes</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+133
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/syntax/vc_017_04_syntax_attributes.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-017" data-pos="439:17-439:28">VC-017</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-018-01: 018 01 Db
+Validation</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+85
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/database/vc_018_01_db_validation.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="453:17-453:28">VC-018</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-02" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-018-02: 018 02
+Verify Object Attrs</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+251
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_02_verify_object_attrs.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="467:17-467:28">VC-018</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-03" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-018-03: 018 03
+Verify Floats</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+205
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_03_verify_floats.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="481:17-481:28">VC-018</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-04" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-018-04: 018 04
+Verify Relations</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+209
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_04_verify_relations.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="495:17-495:28">VC-018</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-05" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-018-05: 018 05
+Verify Views</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+178
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_05_verify_views.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="509:17-509:28">VC-018</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-07" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-018-07: 018 07
+Verify Invalid Spec Type</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+149
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_07_verify_invalid_spec_type.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="523:17-523:28">VC-018</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-09" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-018-09: 018 09
+Verify Inherited Enum</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+149
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_09_verify_inherited_enum.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="537:17-537:28">VC-018</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-019-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-019-01: 019 01
+Preset Load Chain</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+106
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/preset/vc_019_01_preset_load_chain.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-019" data-pos="551:17-551:28">VC-019</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-019-02" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-019-02: 019 02 Sf
+Type</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+209
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sdn_types/vc_019_02_sf_type.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-019" data-pos="565:17-565:28">VC-019</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-019-03" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-019-03: 019 03
+Nfr Type</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+214
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sdn_types/vc_019_03_nfr_type.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-019" data-pos="579:17-579:28">VC-019</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-019-04" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-019-04: 019 04
+Realizes Relation</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+202
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sdn_types/vc_019_04_realizes_relation.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-019" data-pos="593:17-593:28">VC-019</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-020-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-020-01: 020 01
+Model Directory Structure</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+101
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/extension/vc_020_01_model_directory_structure.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-020" data-pos="607:17-607:28">VC-020</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-021-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-021-01: 021 01
+Handler Registration Interface</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+65
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/extension/vc_021_01_handler_registration_interface.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-021" data-pos="621:17-621:28">VC-021</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-022-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-022-01: 022 01
+Type Definition Schema</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+67
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/extension/vc_022_01_type_definition_schema.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-022" data-pos="635:17-635:28">VC-022</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-023-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-023-01: 023 01
+Model Path Resolution</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+68
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/extension/vc_023_01_model_path_resolution.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-023" data-pos="649:17-649:28">VC-023</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-024-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-024-01: 024 01
+Plantuml</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+89
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/floats/vc_024_01_plantuml.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-024" data-pos="663:17-663:28">VC-024</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-024-02" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-024-02: 024 02
+Charts</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+112
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/floats/vc_024_02_charts.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-024" data-pos="677:17-677:28">VC-024</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-025-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-025-01: 025 01
+Data Views</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+146
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/floats/vc_025_01_data_views.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-025" data-pos="691:17-691:28">VC-025</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-025-02" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-025-02: 025 02
+View Registration</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+92
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/views/vc_025_02_view_registration.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-025" data-pos="705:17-705:28">VC-025</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-025-03" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-025-03: 025 03
+Traceability Matrix</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+244
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sw_docs-tests/vc_025_03_traceability_matrix.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-025" data-pos="719:17-719:28">VC-025</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-025-04" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-025-04: 025 04
+Test Results Matrix</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+189
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sw_docs-tests/vc_025_04_test_results_matrix.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-025" data-pos="733:17-733:28">VC-025</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-025-05" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-025-05: 025 05
+Traceability Matrix Block Empty</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+155
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sw_docs-tests/vc_025_05_traceability_matrix_block_empty.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-025" data-pos="747:17-747:28">VC-025</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-025-06" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-025-06: 025 06
+Traceability Matrix Textblock Empty</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+162
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sw_docs-tests/vc_025_06_traceability_matrix_textblock_empty.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-025" data-pos="761:17-761:28">VC-025</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-025-07" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-025-07: 025 07
+Test Results Matrix Block Empty</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+165
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sw_docs-tests/vc_025_07_test_results_matrix_block_empty.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-025" data-pos="775:17-775:28">VC-025</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-025-08" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-025-08: 025 08
+Test Results Matrix Textblock Empty</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+159
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sw_docs-tests/vc_025_08_test_results_matrix_textblock_empty.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-025" data-pos="789:17-789:28">VC-025</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-025-09" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-025-09: 025 09
+Test Execution Matrix</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+168
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sw_docs-tests/vc_025_09_test_execution_matrix.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-025" data-pos="803:17-803:28">VC-025</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-027-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-027-01: 027 01
+Float Numbering</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+81
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_027_01_float_numbering.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-027" data-pos="817:17-817:28">VC-027</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-028-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-028-01: 028 01
+Output Formats</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+135
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/output/vc_028_01_output_formats.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-028" data-pos="831:17-831:28">VC-028</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-028-02" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-028-02: 028 02
+Bibliography</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+81
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/output/vc_028_02_bibliography.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-028" data-pos="845:17-845:28">VC-028</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-028-03" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-028-03: 028 03
+Reqif Export</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+447
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/reqif/vc_028_03_reqif_export.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-028" data-pos="859:17-859:28">VC-028</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-029-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-029-01: 029 01
+Ooxml Schema Validation</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+341
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/ooxml/vc_029_01_ooxml_schema_validation.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-029" data-pos="873:17-873:28">VC-029</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-029-02" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-029-02: 029 02
+Ooxml Validator Selftest</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+241
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/ooxml/vc_029_02_ooxml_validator_selftest.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-029" data-pos="887:17-887:28">VC-029</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-030-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-030-01: 030 01
+Html Options</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+68
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/output/vc_030_01_html_options.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-030" data-pos="901:17-901:28">VC-030</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-030-02" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-030-02: 030 02
+Web Generation</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+114
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/webapp/vc_030_02_web_generation.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-030" data-pos="915:17-915:28">VC-030</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-030-03" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-030-03: 030 03
+Web Search</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+82
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/webapp/vc_030_03_web_search.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-030" data-pos="929:17-929:28">VC-030</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-031-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-031-01: 031 01
+Assembler</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+72
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_031_01_assembler.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-031" data-pos="943:17-943:28">VC-031</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-032-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-032-01: 032 01
+Caption Structure</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+105
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/floats/vc_032_01_caption_structure.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-032" data-pos="957:17-957:28">VC-032</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-OUT-001-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-OUT-001-01: Out
+001 01 Assembly Order</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+120
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/assembly/vc_out_001_01_assembly_order.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-OUT-001" data-pos="971:17-971:32">VC-OUT-001</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-OUT-004-01" class="unnumbered spec-object-header" data-custom-style="TRHeader">
+<h3 class="unnumbered" data-custom-style="TRHeader">TR-OUT-004-01: Out
+004 01 Render Utils</h3>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+73
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-02-23
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_out_004_01_render_utils.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-OUT-004" data-pos="985:17-985:32">VC-OUT-004</a>
+</dd>
+</dl>
+</div>
+</div>
+</body>
+</html>
