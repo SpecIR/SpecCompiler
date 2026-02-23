@@ -29,6 +29,9 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Lowercase toolchain image name
+        run: echo "TOOLCHAIN_IMAGE=${TOOLCHAIN_IMAGE,,}" >> $GITHUB_ENV
+
       - name: Check if toolchain files changed
         id: check
         run: |
@@ -84,8 +87,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Lowercase image name
-        run: echo "IMAGE_NAME=${IMAGE_NAME,,}" >> $GITHUB_ENV
+      - name: Lowercase image names
+        run: |
+          echo "IMAGE_NAME=${IMAGE_NAME,,}" >> $GITHUB_ENV
+          echo "TOOLCHAIN_IMAGE=${TOOLCHAIN_IMAGE,,}" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
