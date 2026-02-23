@@ -1,0 +1,217 @@
+name: Build, Test, and Publish
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  TOOLCHAIN_IMAGE: ghcr.io/${{ github.repository_owner }}/speccompiler-toolchain:latest
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Rebuild the toolchain image only when its source files change.
+  # Toolchain = Lua + Pandoc/GHC + Deno + PlantUML + all Lua native extensions.
+  # Normal source-code pushes skip this job entirely.
+  # ---------------------------------------------------------------------------
+  build-toolchain:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check if toolchain files changed
+        id: check
+        run: |
+          # Fallback to listing all files if there is no prior commit (first push)
+          CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git ls-tree --name-only -r HEAD)
+          if echo "$CHANGED" | grep -qE \
+            '^(Dockerfile|scripts/versions\.env|scripts/build\.sh|src/tools/amath/|src/tools/echarts-render\.ts|src/tools/mml2omml\.ts)'; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check if toolchain image exists in registry
+        id: image-exists
+        run: |
+          if docker manifest inspect ${{ env.TOOLCHAIN_IMAGE }} > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Docker Buildx
+        if: steps.check.outputs.changed == 'true' || steps.image-exists.outputs.exists == 'false'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: (steps.check.outputs.changed == 'true' || steps.image-exists.outputs.exists == 'false') && github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push toolchain
+        if: (steps.check.outputs.changed == 'true' || steps.image-exists.outputs.exists == 'false') && github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          target: toolchain
+          push: true
+          tags: ${{ env.TOOLCHAIN_IMAGE }}
+          cache-from: type=gha,scope=toolchain
+          cache-to: type=gha,mode=max,scope=toolchain
+
+  build-and-test:
+    needs: build-toolchain
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lowercase image name
+        run: echo "IMAGE_NAME=${IMAGE_NAME,,}" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,prefix=
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build and push
+        id: build-push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: runtime
+          push: ${{ github.event_name != 'pull_request' }}
+          load: ${{ github.event_name == 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: TOOLCHAIN_IMAGE=${{ env.TOOLCHAIN_IMAGE }}
+          cache-from: type=gha,scope=main
+          cache-to: type=gha,mode=max,scope=main
+
+      - name: Run tests
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}"
+
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            -e SPECCOMPILER_HOME=/workspace \
+            "${IMAGE}" \
+            sh -c '
+              [ -e vendor ] || ln -s /opt/speccompiler/vendor vendor
+              bash tests/run.sh --coverage
+            '
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: tests/reports/coverage/
+          retention-days: 30
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lowercase image name
+        run: echo "IMAGE_NAME=${IMAGE_NAME,,}" >> $GITHUB_ENV
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build documentation
+        run: |
+          mkdir -p release-docs/html5
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}" \
+            /opt/speccompiler/bin/speccompiler-core docs/engineering_docs/project.yaml
+          cp docs/engineering_docs/build/docx/*.docx release-docs/ 2>/dev/null || true
+          cp docs/engineering_docs/build/www/index.html release-docs/html5/engineering.html 2>/dev/null || true
+
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}" \
+            /opt/speccompiler/bin/speccompiler-core docs/user_docs/project.yaml
+          cp docs/user_docs/build/docx/*.docx release-docs/ 2>/dev/null || true
+          cp docs/user_docs/build/www/index.html release-docs/html5/manual.html 2>/dev/null || true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release-docs/*.docx
+            release-docs/html5/*.html
+            THIRD_PARTY_NOTICES
+          generate_release_notes: true
+          body: |
+            ## Docker Image
+
+            ```bash
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+            ```
+
+            ## Quick Install
+
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/scripts/remote_install.sh | bash
+            ```
+
+            Or clone and build locally (includes toolchain compilation):
+            ```bash
+            git clone https://github.com/${{ github.repository }}.git
+            bash SpecCompiler/scripts/install.sh
+            ```

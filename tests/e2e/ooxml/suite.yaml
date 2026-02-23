@@ -1,0 +1,8 @@
+# E2E Test Suite: OOXML Schema Validation
+# Verifies: VC-OOXML-001 (DOCX structural validity)
+
+project:
+  code: TEST_OOXML
+  name: OOXML Validation Tests
+
+output_format: json

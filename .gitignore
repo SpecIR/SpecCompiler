@@ -1,0 +1,30 @@
+# Build output (created by build.sh) — binaries, vendor libs, JRE
+dist/
+
+# Legacy locations (in case of leftover artifacts)
+vendor/
+jre/
+bin/
+
+# Build artifacts
+build/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Deno cache (if running locally)
+.deno/
+
+# Test reports (coverage, JUnit, HTML)
+tests/reports/
+
+# Test build outputs
+tests/e2e/*/build/

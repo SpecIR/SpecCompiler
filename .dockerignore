@@ -1,0 +1,34 @@
+# Git
+.git
+.gitignore
+.gitlab-ci.yml
+
+# IDE
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+
+# Documentation (not needed in image)
+docs/
+new_docs/
+*.md
+
+# Tests (run separately)
+tests/
+
+# Pre-built vendor artifacts (rebuilt inside Docker from source)
+vendor/
+bin/echarts-render
+bin/mml2omml
+
+# Build outputs
+audit_outputs/
+
+# CI files
+docker-compose.yml
+
+# OS files
+.DS_Store
+Thumbs.db

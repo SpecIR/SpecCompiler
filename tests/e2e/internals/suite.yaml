@@ -1,0 +1,12 @@
+# E2E Test Suite: Internals
+# Verifies internal pipeline behavior via real md+oracle tests.
+
+project:
+  code: TEST_INTERNALS
+  name: Internal Pipeline Behavior Tests
+
+output_format: json
+
+validation:
+  unresolved_relation: warn
+

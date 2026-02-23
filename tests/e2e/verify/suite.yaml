@@ -1,0 +1,21 @@
+# E2E Test Suite: Verify (Forbidden Errors)
+# Tests the policy_key-based proof view error detection system
+# Verifies: VC-VERIFY-001 through VC-VERIFY-004
+
+project:
+  code: TEST_VERIFY
+  name: Forbidden Error Detection Tests
+
+template: sw_docs
+output_format: json
+
+# Enable expect_errors mode: tests pass if expected errors are detected
+expect_errors: true
+
+# Test case to policy_key mapping:
+# - vc_verify_001_object_attrs.md -> missing_required, invalid_cast, invalid_enum (Object attribute violations)
+# - vc_verify_002_floats.md       -> float_orphan, float_duplicate_label, float_render_failure (Float violations)
+# - vc_verify_003_relations.md    -> unresolved_relation, ambiguous_relation (Relation violations)
+# - vc_verify_004_views.md        -> view_materialization_failure, view_query_error (View violations)
+# - vc_verify_005_spec_missing_required.md -> spec_missing_required (Specification missing required attribute)
+# - vc_verify_006_invalid_spec_type.md     -> spec_invalid_type (Invalid specification type)

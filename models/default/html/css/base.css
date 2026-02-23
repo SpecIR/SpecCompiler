@@ -1,0 +1,338 @@
+/**
+ * base.css
+ *
+ * Reset and base HTML element styles for SpecCompiler documentation.
+ * All colors use CSS custom properties set by the theme system.
+ */
+
+/* ============================================
+   Universal Reset
+   ============================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ============================================
+   Body & Root
+   ============================================ */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+}
+
+/* ============================================
+   Headings
+   ============================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 1.5rem 0 0.75rem;
+  line-height: 1.25;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+h1 {
+  font-size: 2rem;
+  margin-top: 0;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+h3 {
+  font-size: 1.25rem;
+  margin-top: 2rem;
+}
+
+h4 {
+  font-size: 1.125rem;
+  margin-top: 1.75rem;
+}
+
+h5 {
+  font-size: 1rem;
+}
+
+h6 {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* ============================================
+   Paragraphs
+   ============================================ */
+
+p {
+  margin: 0 0 1.125rem;
+}
+
+/* ============================================
+   Lists
+   ============================================ */
+
+ul, ol {
+  margin: 0 0 1rem;
+  padding-left: 2rem;
+}
+
+ul ul,
+ul ol,
+ol ul,
+ol ol {
+  margin-bottom: 0;
+}
+
+li {
+  margin: 0.375rem 0;
+}
+
+dl {
+  margin: 0 0 1.25rem;
+}
+
+dt {
+  font-weight: 700;
+  font-size: 0.8125rem;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-top: 0.75rem;
+}
+
+dt:first-child {
+  margin-top: 0;
+}
+
+dd {
+  margin: 0.375rem 0 0.625rem 1.5rem;
+}
+
+/* ============================================
+   Links
+   ============================================ */
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   Code
+   ============================================ */
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background-color: var(--color-code-bg);
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+  color: var(--color-text);
+}
+
+pre {
+  background-color: var(--color-code-bg);
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 0 0 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border: 1px solid var(--color-border);
+}
+
+/* Reset inline code styling when inside pre */
+pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+/* ============================================
+   Tables
+   ============================================ */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+}
+
+th {
+  background-color: var(--color-surface);
+  font-weight: 600;
+  text-align: left;
+}
+
+th, td {
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-border);
+}
+
+tr:hover td {
+  background-color: var(--color-surface-hover);
+}
+
+/* ============================================
+   Images & Figures
+   ============================================ */
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+figure {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ============================================
+   Blockquotes
+   ============================================ */
+
+blockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--color-accent);
+  background-color: var(--color-surface);
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================
+   Horizontal Rule
+   ============================================ */
+
+hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 2rem 0;
+}
+
+/* ============================================
+   Text Selection
+   ============================================ */
+
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-text-inverse);
+}
+
+::-moz-selection {
+  background-color: var(--color-accent);
+  color: var(--color-text-inverse);
+}
+
+/* ============================================
+   Keyboard Input
+   ============================================ */
+
+kbd {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  padding: 0.125rem 0.375rem;
+  box-shadow: 0 1px 0 var(--color-border);
+}
+
+/* ============================================
+   Abbreviations
+   ============================================ */
+
+abbr[title] {
+  text-decoration: underline dotted;
+  cursor: help;
+}
+
+/* ============================================
+   Strong & Emphasis
+   ============================================ */
+
+strong, b {
+  font-weight: 600;
+}
+
+em, i {
+  font-style: italic;
+}
+
+/* ============================================
+   Mark / Highlight
+   ============================================ */
+
+mark {
+  background-color: var(--color-highlight);
+  color: var(--color-text);
+  padding: 0.125rem 0.25rem;
+  border-radius: 2px;
+}
+
+/* ============================================
+   Small Text
+   ============================================ */
+
+small {
+  font-size: 0.875em;
+}
+
+/* ============================================
+   Subscript & Superscript
+   ============================================ */
+
+sub,
+sup {
+  font-size: 0.75em;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}

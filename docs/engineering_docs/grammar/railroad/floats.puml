@@ -1,0 +1,12 @@
+@startebnf
+title SpecCompiler: Floating Objects (spec_floats)
+(* Fenced code blocks with type:label become numbered, captioned elements *)
+(* The type must exist in the model's spec_float_types *)
+
+spec_floats = "```", FloatSig, [ FloatMeta ], Content, "```";
+
+FloatSig = FloatType, [ ".", Language ], ":", Label;
+
+FloatMeta = "{", { Key, "=", QuotedValue }, "}";
+
+@endebnf

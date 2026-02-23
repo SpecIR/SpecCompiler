@@ -1,0 +1,17 @@
+@startebnf
+title SpecCompiler: Relations (spec_relations)
+(* Standard Markdown links with special targets *)
+(* Relation type is inferred at parse time, not explicit in syntax *)
+
+spec_relations = PIDRef | LabelRef | ScopedRef;
+
+(* [HLR-001](@) - reference by Persistent Identifier *)
+PIDRef = "[", PID, "]", "(", "@", ")";
+
+(* [fig:diagram](#) or [diagram](#) - typed or plain cross-reference *)
+LabelRef = "[", [ TypePrefix, ":" ], Label, "]", "(", "#", ")";
+
+(* [REQ-001:fig:diagram](#) - scoped cross-reference *)
+ScopedRef = "[", Scope, ":", TypePrefix, ":", Label, "]", "(", "#", ")";
+
+@endebnf

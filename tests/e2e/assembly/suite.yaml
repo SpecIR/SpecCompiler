@@ -1,0 +1,11 @@
+# E2E Test Suite: Assembly
+# Verifies: Document assembly preserves file_seq order (not alphabetical from_file)
+
+project:
+  code: TEST_ASSEMBLY
+  name: Document Assembly Tests
+
+output_format: json
+
+# Test case mapping:
+# - vc_assembly_001_order.md -> Document ordering with includes

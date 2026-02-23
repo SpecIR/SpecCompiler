@@ -1,0 +1,12 @@
+# E2E Test Suite: Casting Negative Paths
+# Verifies markdown-driven cast failures surface invalid_cast diagnostics.
+
+project:
+  code: TEST_CASTING_NEG
+  name: Attribute Casting Negative Tests
+
+output_format: json
+expect_errors: true
+
+# Test case to VC mapping:
+# - vc_cast_neg_001_invalid_values.md -> VC-CAST-002 (Datatype cast failure diagnostics)

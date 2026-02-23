@@ -1,0 +1,16 @@
+# E2E Test Suite: ReqIF Export
+#
+# Exercises:
+# - ReqIF output dispatch (Lua emitter -> Python adapter)
+# - XHTML caching (reqif_xhtml EMIT handler)
+# - Datatype fixes: INT alias + unique ENUM datatypes (sw_docs template)
+
+project:
+  code: TEST_REQIF
+  name: ReqIF Export Tests
+
+template: sw_docs
+
+validation:
+  traceability_hlr_to_vc: ignore
+

@@ -1,0 +1,12 @@
+# E2E Test Suite: Syntax
+# Verifies: VC-SYNTAX-001, VC-SYNTAX-002
+
+project:
+  code: TEST_SYNTAX
+  name: Syntax Processing Tests
+
+output_format: json
+
+# Test case to VC mapping:
+# - vc_syntax_001_parsing.md   -> VC-SYNTAX-001 (Specification and Object Parsing)
+# - vc_syntax_002_attributes.md -> VC-SYNTAX-002 (Attribute and Include Processing)

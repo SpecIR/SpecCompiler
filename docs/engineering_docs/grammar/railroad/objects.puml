@@ -1,0 +1,12 @@
+@startebnf
+title SpecCompiler: SpecObject (spec_objects)
+(* Any header level 2-6 creates a traceable specification object *)
+(* The object accumulates content until the next header at equal or higher level *)
+
+spec_objects = "##...######", HeaderSig, ObjectBody;
+
+HeaderSig = [ TypeRef, ":" ], Text, [ "@", PID ];
+
+ObjectBody = { spec_attribute_values | spec_floats | spec_views | spec_relations | ProseBlock };
+
+@endebnf

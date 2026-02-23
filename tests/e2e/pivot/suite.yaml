@@ -1,0 +1,18 @@
+# E2E Test Suite: EAV Pivot Views
+# Verifies: VC-PIVOT-001
+# Uses sw_docs template for rich type system (HLR, NFR, VC, TR with diverse attributes)
+
+project:
+  code: TEST_PIVOT
+  name: EAV Pivot View Tests
+
+template: sw_docs
+output_format: json
+
+validation:
+  traceability_hlr_to_vc: ignore
+  traceability_vc_to_hlr: ignore
+  traceability_tr_to_vc: ignore
+
+# Test case to VC mapping:
+# - vc_pivot_001_eav_views.md -> VC-PIVOT-001 (EAV Pivot Views for External Queries)

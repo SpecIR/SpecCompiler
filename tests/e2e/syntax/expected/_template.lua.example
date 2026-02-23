@@ -1,0 +1,58 @@
+-- Template for Lua test oracles
+-- Copy this to expected/<test_name>.lua and customize
+
+return function(actual_doc, helpers)
+    -- Available helpers:
+    -- helpers.inlines(text)           - Parse text to inlines (uses commonmark_x)
+    -- helpers.blocks(text)            - Parse text to blocks
+    -- helpers.strip_tracking_spans(doc) - Remove data-pos spans from doc
+    -- helpers.assert_ast_equal(a, b, opts) - Compare ASTs
+    -- helpers.domain.SpecTitle(id, title) - Create spec title Div
+    -- helpers.domain.SpecHeader(level, id, title, opts) - Create spec header
+    -- helpers.domain.BodyPara(text, opts) - Create body paragraph
+    -- helpers.domain.AttributeBlock(attrs, opts) - Create attribute blockquote
+    -- helpers.domain.Requirement(opts) - Create full requirement structure
+
+    local D = helpers.domain
+    local I = helpers.inlines
+
+    -- Strip data-pos tracking and ignore remaining data-pos attrs
+    helpers.strip_tracking_spans(actual_doc)
+    helpers.options.ignore_data_pos = true
+
+    -- Build expected AST
+    local expected = pandoc.Pandoc(
+        {
+            -- Spec title
+            D.SpecTitle("SPEC-ID", "Specification Title"),
+
+            -- Header
+            pandoc.Header(1,
+                I("Section Title @SEC-ID"),
+                pandoc.Attr("SEC-ID", {}, {})
+            ),
+
+            -- Body paragraph wrapped in Div
+            pandoc.Div(
+                {pandoc.Para(I("Body text here."))},
+                pandoc.Attr("", {}, {})
+            ),
+
+            -- Attribute blockquote
+            pandoc.Div(
+                {pandoc.BlockQuote({
+                    pandoc.Div(
+                        {pandoc.Para(I("key: value"))},
+                        pandoc.Attr("", {}, {})
+                    )
+                })},
+                pandoc.Attr("", {}, {})
+            ),
+        },
+        pandoc.Meta({
+            title = pandoc.MetaInlines({pandoc.Str("Title")}),
+        })
+    )
+
+    return helpers.assert_ast_equal(actual_doc, expected, helpers.options)
+end

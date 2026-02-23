@@ -1,0 +1,351 @@
+/**
+ * syntax.css
+ *
+ * Pandoc syntax highlighting token colors for code blocks.
+ * All colors use CSS custom properties that adapt to light/dark themes.
+ */
+
+/* ============================================
+   Base Code Styling
+   ============================================ */
+
+code span {
+  color: inherit;
+}
+
+pre > code {
+  display: block;
+}
+
+/* ============================================
+   Pandoc Syntax Highlighting Classes
+   ============================================ */
+
+/* Keywords (if, else, return, function, class, etc.) */
+.kw {
+  color: var(--syntax-keyword);
+  font-weight: 600;
+}
+
+/* Data Types (int, string, bool, etc.) */
+.dt {
+  color: var(--syntax-type);
+}
+
+/* Decimal Values */
+.dv {
+  color: var(--syntax-number);
+}
+
+/* Base-N Numbers (hex, octal, binary) */
+.bn {
+  color: var(--syntax-number);
+}
+
+/* Float Numbers */
+.fl {
+  color: var(--syntax-number);
+}
+
+/* Character Literals */
+.ch {
+  color: var(--syntax-string);
+}
+
+/* String Literals */
+.st {
+  color: var(--syntax-string);
+}
+
+/* Verbatim Strings */
+.vs {
+  color: var(--syntax-string);
+}
+
+/* Special Strings (regex, etc.) */
+.ss {
+  color: var(--syntax-string);
+  font-weight: 500;
+}
+
+/* Comments */
+.co {
+  color: var(--syntax-comment);
+  font-style: italic;
+}
+
+/* Documentation Comments */
+.do {
+  color: var(--syntax-comment);
+  font-style: italic;
+}
+
+/* Annotations (@decorator, etc.) */
+.an {
+  color: var(--syntax-attribute);
+}
+
+/* Functions */
+.fu {
+  color: var(--syntax-function);
+  font-weight: 500;
+}
+
+/* Errors */
+.er {
+  color: var(--color-error);
+  text-decoration: underline wavy;
+}
+
+/* Warnings */
+.wa {
+  color: var(--color-warning);
+}
+
+/* Constants */
+.cn {
+  color: var(--syntax-number);
+  font-weight: 500;
+}
+
+/* Special Characters */
+.sc {
+  color: var(--syntax-string);
+}
+
+/* Imports (import, require, use, etc.) */
+.im {
+  color: var(--syntax-keyword);
+}
+
+/* Control Flow (if, else, while, for, switch, etc.) */
+.cf {
+  color: var(--syntax-keyword);
+  font-weight: 700;
+}
+
+/* Operators (+, -, *, /, =, ==, etc.) */
+.op {
+  color: var(--syntax-operator);
+}
+
+/* Built-in Functions/Types */
+.bu {
+  color: var(--syntax-builtin);
+  font-weight: 500;
+}
+
+/* Extensions */
+.ex {
+  color: var(--syntax-function);
+}
+
+/* Preprocessor Directives (#include, #define, etc.) */
+.pp {
+  color: var(--syntax-attribute);
+  font-weight: 500;
+}
+
+/* Attributes */
+.at {
+  color: var(--syntax-attribute);
+}
+
+/* Other (fallback) */
+.ot {
+  color: var(--syntax-variable);
+}
+
+/* Variables */
+.va {
+  color: var(--syntax-variable);
+}
+
+/* Region Markers */
+.re {
+  color: var(--syntax-comment);
+  font-style: italic;
+}
+
+/* Information Messages */
+.in {
+  color: var(--syntax-comment);
+  font-style: italic;
+  font-weight: 600;
+}
+
+/* Alerts */
+.al {
+  color: var(--color-error);
+  font-weight: 700;
+}
+
+/* ============================================
+   Line Numbers (if present)
+   ============================================ */
+
+/* Pandoc line numbers div */
+.linenodiv {
+  color: var(--color-text-muted);
+  border-right: 1px solid var(--color-border);
+  padding-right: 0.5rem;
+  margin-right: 0.75rem;
+  user-select: none;
+}
+
+/* Individual line numbers */
+.sourceLine {
+  position: relative;
+}
+
+.sourceLine::before {
+  content: attr(data-line-number);
+  position: absolute;
+  left: -2.5rem;
+  width: 2rem;
+  text-align: right;
+  color: var(--color-text-muted);
+  user-select: none;
+}
+
+/* Line highlighting */
+.sourceLine.highlighted {
+  background-color: var(--color-highlight);
+  display: block;
+  margin: 0 -1rem;
+  padding: 0 1rem;
+}
+
+/* ============================================
+   Code Block Enhancements
+   ============================================ */
+
+/* Language label (if present) */
+pre[data-language]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  background-color: var(--color-surface);
+  padding: 0.125rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid var(--color-border);
+}
+
+pre {
+  position: relative;
+}
+
+/* Copy button container (if added by JavaScript) */
+.code-toolbar {
+  position: relative;
+}
+
+.code-copy-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--color-text);
+  transition: all 0.15s ease;
+  font-family: var(--font-family);
+}
+
+.code-copy-button:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-accent);
+}
+
+.code-copy-button.copied {
+  background-color: var(--color-success);
+  color: white;
+  border-color: var(--color-success);
+}
+
+/* ============================================
+   Inline Code in Syntax Contexts
+   ============================================ */
+
+/* When inline code appears in headings, make it stand out less */
+h1 code, h2 code, h3 code, h4 code, h5 code, h6 code {
+  font-size: 0.9em;
+  padding: 0.0625rem 0.25rem;
+}
+
+/* When inline code appears in links */
+a code {
+  color: inherit;
+}
+
+/* ============================================
+   Diff Syntax (for git diffs, patches)
+   ============================================ */
+
+.diff {
+  background-color: var(--color-surface);
+}
+
+.diff .add {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: var(--color-success);
+}
+
+.diff .remove {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--color-error);
+}
+
+.diff .change {
+  background-color: rgba(234, 179, 8, 0.15);
+  color: var(--color-warning);
+}
+
+/* ============================================
+   Special Language Styles
+   ============================================ */
+
+/* JSON keys */
+.json .key {
+  color: var(--syntax-attribute);
+  font-weight: 500;
+}
+
+/* Markdown syntax */
+.markdown .heading {
+  color: var(--syntax-keyword);
+  font-weight: 600;
+}
+
+.markdown .link {
+  color: var(--color-accent);
+}
+
+.markdown .emphasis {
+  font-style: italic;
+}
+
+.markdown .strong {
+  font-weight: 600;
+}
+
+/* Shell/Bash prompts */
+.bash .prompt,
+.sh .prompt {
+  color: var(--color-text-muted);
+  user-select: none;
+}
+
+/* SQL keywords */
+.sql .keyword {
+  text-transform: uppercase;
+}

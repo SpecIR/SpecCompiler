@@ -1,0 +1,11 @@
+# E2E Test Suite: Casting
+# Verifies markdown-driven datatype casting paths in attribute processing.
+
+project:
+  code: TEST_CASTING
+  name: Attribute Casting Tests
+
+output_format: json
+
+# Test case to VC mapping:
+# - vc_cast_001_datatype_matrix.md -> VC-CAST-001 (Datatype cast matrix)

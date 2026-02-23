@@ -1,0 +1,40 @@
+# SpecCompiler Core - Engineering Documentation
+# Uses sw_docs model: SRS/SDD/SVC/DIC with full traceability enforcement
+
+project:
+  code: SPECCOMPILER
+  name: SpecCompiler Core Engineering Documentation
+
+template: sw_docs
+
+logging:
+  level: info
+  format: console
+  color: true
+
+validation:
+  spec_missing_required: warn
+
+output_dir: build/
+
+doc_files:
+  - srs.md
+  - sdd.md
+  - svc.md
+
+outputs:
+  - format: docx
+    path: build/docx/{spec_id}.docx
+  - format: html5
+    path: build/www/{spec_id}.html
+
+docx:
+  # reference_doc: assets/reference.docx
+
+html5:
+  number_sections: true
+  table_of_contents: true
+  toc_depth: 5
+  standalone: true
+  embed_resources: true
+  resource_path: build/www:.

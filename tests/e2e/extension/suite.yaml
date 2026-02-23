@@ -1,0 +1,14 @@
+# E2E Test Suite: Extension and Type Loader Contracts
+# Verifies: VC-020, VC-021, VC-022, VC-023
+
+project:
+  code: TEST_EXTENSION
+  name: Extension Type Loader Tests
+
+output_format: json
+
+# Test case to VC mapping:
+# - vc_ext_020_model_directory_structure.md   -> VC-020 (Model Directory Structure)
+# - vc_ext_021_handler_registration_interface.md -> VC-021 (Handler Registration Interface)
+# - vc_ext_022_type_definition_schema.md      -> VC-022 (Type Definition Schema)
+# - vc_ext_023_model_path_resolution.md       -> VC-023 (Model Path Resolution)

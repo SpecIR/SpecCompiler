@@ -1,0 +1,16 @@
+# E2E Test Suite: Floats
+# Verifies: VC-FLOAT-001 to VC-FLOAT-005
+
+project:
+  code: TEST_FLOATS
+  name: Float Processing Tests
+
+output_format: json
+
+# Test case to VC mapping:
+# - syntax.md       -> VC-FLOAT-001 (Float Syntax and Numbering)
+# - tables.md       -> VC-FLOAT-002 (Table Processing)
+# - plantuml.md     -> VC-FLOAT-003 (PlantUML Processing)
+# - figures_listings.md -> VC-FLOAT-004 (Figure and Listing Processing)
+# - charts.md       -> VC-FLOAT-005 (Chart Generation)
+# - vc_float_007_data_views.md -> VC-FLOAT-007 (Chart Data View Injection Paths)

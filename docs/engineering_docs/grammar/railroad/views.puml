@@ -1,0 +1,14 @@
+@startebnf
+title SpecCompiler: Views (spec_views)
+(* Views are dynamic queries materialized at build time *)
+(* Prefixes must be registered in spec_view_types *)
+
+spec_views = InlineView | BlockView;
+
+(* Inline: backtick view like `toc:` or `select: WHERE ...` *)
+InlineView = "`", ViewPrefix, ":", [ ViewContent ], "`";
+
+(* Block: fenced view like ```select:tbl-reqs ... ``` *)
+BlockView = "```", ViewPrefix, [ ":", Label ], ViewContent, "```";
+
+@endebnf

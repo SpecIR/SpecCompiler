@@ -1,0 +1,19 @@
+@startebnf
+title SpecCompiler: Attributes (spec_attribute_values)
+(* A blockquote becomes an attribute block when its first paragraph *)
+(* starts with Key followed by colon. Otherwise it is plain prose. *)
+(* Multiple attributes can share one blockquote. *)
+(* Continuation blocks between key: paragraphs extend the previous value. *)
+
+spec_attribute_values = ">", AttrEntry, { AttrEntry };
+
+(* Each attribute: a key: paragraph plus optional continuation *)
+AttrEntry = AttrPara, { ContinuationBlock };
+
+(* > key: value — Key matches [A-Za-z_][A-Za-z0-9_]* *)
+AttrPara = Key, ":", Value;
+
+(* Non-key blocks extend the preceding attribute's value *)
+ContinuationBlock = Paragraph | BulletList | OrderedList | Table;
+
+@endebnf

@@ -1,0 +1,12 @@
+# E2E Test Suite: Database
+# Verifies: VC-DB-001, VC-DB-002
+
+project:
+  code: TEST_DATABASE
+  name: Database Processing Tests
+
+output_format: json
+
+# Test case to VC mapping:
+# - vc_db_001_persistence.md -> VC-DB-001 (SQLite Persistence and EAV)
+# - vc_db_002_validation.md  -> VC-DB-002 (View Generation and Validation)

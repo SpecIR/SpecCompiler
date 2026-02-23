@@ -1,0 +1,29 @@
+{
+  "runtime": {
+    "version": "Lua 5.4",
+    "path": [
+      "?.lua",
+      "?/init.lua",
+      "src/?.lua",
+      "src/?/init.lua"
+    ]
+  },
+  "workspace": {
+    "library": ["src"],
+    "pathStrict": true,
+    "checkThirdParty": false
+  },
+  "diagnostics": {
+    "globals": ["pandoc", "PANDOC_VERSION", "PANDOC_API_VERSION"],
+    "disable": ["lowercase-global"],
+    "groupSeverity": {
+      "strong": "Warning"
+    }
+  },
+  "type": {
+    "castNumberToInteger": true
+  },
+  "completion": {
+    "callSnippet": "Replace"
+  }
+}

@@ -1,0 +1,467 @@
+/**
+ * layout.css
+ *
+ * Application shell layout for single-file SPA documentation.
+ * Includes header, sidebar, content area, and responsive behavior.
+ */
+
+/* ============================================
+   Smooth Theme Transitions
+   ============================================ */
+
+body,
+.header,
+.sidebar,
+.inspector,
+.content,
+.spec-object,
+.search-box,
+.search-result-item,
+.inspector-link,
+.inspector-artifact,
+.pane-toggle,
+.theme-toggle,
+.inspector-follow-toggle,
+.doc-selector-select {
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+/* ============================================
+   App Shell
+   ============================================ */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ============================================
+   Header
+   ============================================ */
+
+header.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--layout-header-height);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.header-brand {
+  font-weight: 600;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  margin-right: 1rem;
+  color: var(--color-text);
+}
+
+.header-brand a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.header-brand a:hover {
+  color: var(--color-accent);
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* ============================================
+   Main Content Area
+   ============================================ */
+
+.main {
+  display: flex;
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+
+@media (min-width: 769px) {
+  .main.nav-collapsed .sidebar {
+    display: none;
+  }
+
+  .main.inspector-collapsed .inspector {
+    display: none;
+  }
+}
+
+/* ============================================
+   Pane Resizers
+   ============================================ */
+
+.pane-resizer {
+  width: 6px;
+  flex: 0 0 6px;
+  cursor: col-resize;
+  position: relative;
+  background: transparent;
+  touch-action: none;
+}
+
+.pane-resizer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: var(--color-border);
+  transform: translateX(-50%);
+}
+
+.pane-resizer:hover::before,
+.pane-resizer.resizing::before {
+  width: 2px;
+  background: var(--color-accent);
+}
+
+body.is-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+@media (min-width: 769px) {
+  .main.nav-collapsed .pane-resizer-sidebar {
+    display: none;
+  }
+
+  .main.inspector-collapsed .pane-resizer-inspector {
+    display: none;
+  }
+}
+
+/* ============================================
+   Sidebar
+   ============================================ */
+
+.sidebar {
+  width: var(--layout-sidebar-width);
+  border-right: 1px solid var(--color-border);
+  position: sticky;
+  top: var(--layout-header-height);
+  height: calc(100vh - var(--layout-header-height));
+  background-color: var(--color-sidebar-bg);
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
+.sidebar-top {
+  padding: 1rem 1rem 0.75rem;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 5;
+  background-color: var(--color-sidebar-bg);
+}
+
+.sidebar-scroll {
+  padding: 0 1rem 1rem;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sidebar.shadow-top .sidebar-top {
+  box-shadow: 0 10px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* Sidebar toggle button (hamburger) - hidden on desktop */
+.sidebar-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1.25rem;
+  color: var(--color-text);
+  line-height: 1;
+  margin-right: 0.5rem;
+}
+
+.sidebar-toggle:hover {
+  color: var(--color-accent);
+}
+
+/* ============================================
+   Content Area
+   ============================================ */
+
+.content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  height: calc(100vh - var(--layout-header-height));
+  width: 100%;
+  background-color: var(--color-bg);
+}
+
+/* ============================================
+   Document Sections (show/hide behavior)
+   ============================================ */
+
+.doc-section {
+  display: none;
+}
+
+.doc-section.active {
+  display: block;
+  padding: 2.5rem 3rem;
+  max-width: var(--layout-content-width);
+  margin: 0 auto;
+}
+
+/* ============================================
+   Inspector (Right Pane)
+   ============================================ */
+
+.inspector {
+  width: var(--layout-inspector-width, 340px);
+  border-left: 1px solid var(--color-border);
+  position: sticky;
+  top: var(--layout-header-height);
+  height: calc(100vh - var(--layout-header-height));
+  background-color: var(--color-sidebar-bg);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.inspector-header {
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-sidebar-bg);
+}
+
+.inspector-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.inspector-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 1rem;
+  overscroll-behavior: contain;
+}
+
+/* ============================================
+   Responsive Design - Mobile/Tablet
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Show hamburger toggle on mobile */
+  .sidebar-toggle {
+    display: block;
+  }
+
+  /* Sidebar becomes fixed overlay on mobile */
+  .sidebar {
+    position: fixed;
+    top: var(--layout-header-height);
+    left: 0;
+    z-index: 50;
+    transform: translateX(-100%);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Show sidebar when open class is applied */
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Content takes full width on mobile */
+  .content {
+    width: 100%;
+  }
+
+  .doc-section.active {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  /* Reduce header padding on mobile */
+  header.header {
+    padding: 0 1rem;
+  }
+
+  .header-brand {
+    font-size: 0.8125rem;
+    margin-right: 0.5rem;
+  }
+
+  .breadcrumbs {
+    display: none;
+  }
+
+  .pane-toggle {
+    display: none;
+  }
+
+  /* Hide inspector on mobile */
+  .inspector {
+    display: none;
+  }
+
+  /* Resizers are desktop-only */
+  .pane-resizer {
+    display: none;
+  }
+}
+
+/* ============================================
+   Responsive Design - Small Mobile
+   ============================================ */
+
+@media (max-width: 480px) {
+  .doc-section.active {
+    padding: 0.75rem;
+  }
+
+  header.header {
+    padding: 0 0.75rem;
+  }
+
+  .sidebar {
+    width: 85vw;
+  }
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+
+@media print {
+  /* Hide interactive elements */
+  header.header,
+  .sidebar,
+  .inspector,
+  .pane-resizer,
+  .search-box,
+  .theme-toggle,
+  .sidebar-toggle,
+  .header-actions {
+    display: none !important;
+  }
+
+  /* Show all document sections */
+  .doc-section {
+    display: block !important;
+  }
+
+  .doc-section,
+  .doc-section.active {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Content takes full width for printing */
+  .content {
+    max-width: 100%;
+    padding: 0;
+    height: auto;
+    overflow: visible;
+  }
+
+  .main {
+    display: block;
+  }
+
+  /* Page breaks */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  figure, table, pre {
+    page-break-inside: avoid;
+  }
+
+  /* Remove shadows and borders for cleaner print */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
+
+/* ============================================
+   Scrollbar Styling (Webkit)
+   ============================================ */
+
+.sidebar::-webkit-scrollbar,
+.content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.content::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.content::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover,
+.content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-strong);
+}
+
+/* ============================================
+   Loading State
+   ============================================ */
+
+.content.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+
+.content-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 2rem;
+}
+
+.content-empty h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-text-muted);
+  border-bottom: none;
+}
+
+.content-empty p {
+  font-size: 0.875rem;
+  margin: 0;
+}

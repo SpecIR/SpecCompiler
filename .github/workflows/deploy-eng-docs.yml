@@ -1,0 +1,89 @@
+name: Deploy Engineering Documentation
+
+on:
+  push:
+    tags: ['eng-docs*']
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  deploy-eng-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lowercase image name
+        run: echo "IMAGE_NAME=${IMAGE_NAME,,}" >> $GITHUB_ENV
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run tests and generate TRR
+        run: |
+          # Run e2e tests with JUnit output
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            -e SPECCOMPILER_HOME=/workspace \
+            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" \
+            /workspace/tests/run.sh --junit || true
+
+          # Generate TRR markdown from JUnit XML
+          mkdir -p docs/engineering_docs/test_results
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            -e SPECCOMPILER_HOME=/workspace \
+            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" \
+            pandoc --lua-filter tests/helpers/trr_generator.lua \
+              --metadata junit_path=tests/reports/junit.xml \
+              --metadata output_path=docs/engineering_docs/test_results/tr.md \
+              < /dev/null
+
+      - name: Build engineering documentation
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" \
+            /opt/speccompiler/bin/speccompiler-core docs/engineering_docs/project.yaml
+
+      - name: Deploy to GitHub Pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Fetch gh-pages branch or create it
+          if git fetch origin gh-pages; then
+            git worktree add _gh-pages origin/gh-pages
+          else
+            git worktree add --orphan _gh-pages
+            cd _gh-pages && git checkout --orphan gh-pages && cd ..
+          fi
+
+          # Update only the engineering subdirectory
+          rm -rf _gh-pages/engineering
+          mkdir -p _gh-pages/engineering
+          cp docs/engineering_docs/build/www/* _gh-pages/engineering/
+          mkdir -p _gh-pages/engineering/downloads
+          cp docs/engineering_docs/build/docx/*.docx _gh-pages/engineering/downloads/
+
+          # Commit and push
+          cd _gh-pages
+          git add -A
+          git diff --cached --quiet && echo "No changes to deploy" && exit 0
+          git commit -m "Deploy engineering documentation from ${GITHUB_REF_NAME}"
+          git push origin HEAD:gh-pages

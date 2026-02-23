@@ -1,0 +1,13 @@
+# E2E Test Suite: Preset Loader
+# Verifies markdown-driven emitter path with template preset chain loading.
+
+project:
+  code: TEST_PRESET
+  name: Preset Loader Tests
+
+output_format: json
+docx:
+  preset: test_preset_default
+
+# Test case mapping:
+# - vc_preset_001_load_chain.md -> VC-PRESET-001 (Preset extends chain)

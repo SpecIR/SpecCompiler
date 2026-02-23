@@ -1,0 +1,17 @@
+@startebnf
+title SpecCompiler: Content Accumulation (ProseBlock)
+(* Any Markdown block that does not match a SpecCompiler pattern *)
+(* accumulates as content to the current Specification or SpecObject *)
+
+ProseBlock = Paragraph
+           | BulletList
+           | OrderedList
+           | DefinitionList
+           | BlockQuote
+           | Table
+           | CodeBlock
+           | HorizontalRule
+           | Figure
+           | Div;
+
+@endebnf

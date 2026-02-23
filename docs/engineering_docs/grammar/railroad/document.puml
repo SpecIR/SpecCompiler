@@ -1,0 +1,13 @@
+@startebnf
+title SpecCompiler: Document Structure
+(* What you type in Markdown to create specifications and objects *)
+
+Document = Specification;
+
+Specification = "#", HeaderSig, { spec_attribute_values | spec_objects | spec_floats | spec_views | ProseBlock };
+
+spec_objects = "##...######", HeaderSig, { spec_attribute_values | spec_floats | spec_views | ProseBlock };
+
+HeaderSig = [ TypeRef, ":" ], Text, [ "@", PID ];
+
+@endebnf

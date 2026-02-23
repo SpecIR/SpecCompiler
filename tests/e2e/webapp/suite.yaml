@@ -1,0 +1,12 @@
+# E2E Test Suite: Webapp
+# Verifies: VC-WEB-001, VC-WEB-003
+
+project:
+  code: TEST_WEBAPP
+  name: HTML5 Webapp Tests
+
+output_format: json
+
+# Test case to VC mapping:
+# - vc_web_001_generation.md -> VC-WEB-001 (Single-File Generation)
+# - vc_web_003_search.md -> VC-WEB-003 (FTS Search Functionality)

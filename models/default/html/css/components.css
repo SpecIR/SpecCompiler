@@ -1,0 +1,890 @@
+/**
+ * components.css
+ *
+ * UI components for SpecCompiler documentation including search, navigation,
+ * document selector, TOC, breadcrumbs, object cards, badges, and captions.
+ */
+
+/* ============================================
+   Search Box (in header)
+   ============================================ */
+
+.search-box {
+  display: flex;
+  max-width: 400px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.search-box input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  outline: none;
+  color: var(--color-text);
+  font-family: var(--font-family);
+}
+
+.search-box input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.search-box kbd {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  background-color: var(--color-bg);
+  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+/* ============================================
+   Search Results (in sidebar)
+   ============================================ */
+
+.search-results,
+.sidebar-search-results {
+  font-size: 0.8125rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.sidebar-search-results.is-empty {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.search-results-header {
+  position: sticky;
+  top: 0;
+  background-color: var(--color-sidebar-bg);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.5rem 0 0.75rem;
+  z-index: 10;
+}
+
+.search-results-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.search-results-filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.search-filter-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-filter-label {
+  width: 3.25rem;
+  flex: 0 0 auto;
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.search-filter-item select {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.75rem;
+  font-family: var(--font-family);
+  outline: none;
+}
+
+.search-filter-item select:focus {
+  border-color: var(--color-accent);
+}
+
+.search-filter-reset {
+  flex-shrink: 0;
+  padding: 0.375rem 0.625rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: var(--font-family);
+  width: 100%;
+}
+
+.search-filter-reset:hover {
+  border-color: var(--color-accent);
+}
+
+.search-results-empty {
+  padding: 1rem 0.75rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  text-align: center;
+  font-size: 0.8125rem;
+}
+
+.search-doc-group {
+  margin-bottom: 0.75rem;
+}
+
+.search-doc-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.375rem 0.5rem 0.25rem;
+}
+
+.search-result-item {
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  margin: 0.25rem 0;
+  transition: all 0.15s ease;
+}
+
+.search-result-item:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.search-result-title {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.25rem;
+  color: var(--color-text);
+}
+
+.search-badge {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  background-color: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  padding: 0.0625rem 0.25rem;
+  color: var(--color-text-muted);
+}
+
+.search-result-snippet {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+.search-result-snippet mark {
+  background-color: var(--color-highlight);
+  padding: 0 2px;
+  border-radius: 2px;
+  color: var(--color-text);
+}
+
+/* ============================================
+   Document Selector (in sidebar)
+   ============================================ */
+
+.doc-selector {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.doc-selector-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.doc-selector-select {
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-family: var(--font-family);
+  outline: none;
+}
+
+.doc-selector-select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+}
+
+/* ============================================
+   Sidebar TOC (Table of Contents)
+   ============================================ */
+
+.sidebar-toc {
+  font-size: 0.8125rem;
+}
+
+.sidebar-toc ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.sidebar-toc > nav > ul > li > ul {
+  padding-left: 0.75rem;
+}
+
+.sidebar-toc li {
+  margin: 0.1875rem 0;
+}
+
+.sidebar-toc a {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3125rem 0.5rem;
+  border-radius: 4px;
+  color: var(--color-text);
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-toc a:hover {
+  background-color: var(--color-surface);
+}
+
+.sidebar-toc a.active {
+  background-color: transparent;
+  color: var(--color-accent);
+  font-weight: 500;
+  border-left: 2px solid var(--color-accent);
+  padding-left: calc(0.5rem - 2px);
+  border-radius: 0 4px 4px 0;
+}
+
+.sidebar-toc .toc-section-number {
+  color: var(--color-text-muted);
+  margin-right: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.sidebar-toc a.active .toc-section-number {
+  color: var(--color-accent);
+  opacity: 0.7;
+}
+
+.sidebar-toc a.search-match {
+  background-color: var(--color-accent-light);
+  border-left: 2px solid var(--color-accent);
+  padding-left: calc(0.5rem - 2px);
+}
+
+/* Collapsible TOC */
+.toc-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 3px;
+  color: var(--color-text-muted);
+  transition: transform 0.15s ease, color 0.1s ease, background-color 0.1s ease;
+}
+
+.toc-toggle:hover {
+  color: var(--color-text);
+  background-color: var(--color-surface-hover);
+}
+
+.toc-toggle svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.toc-toggle-expanded {
+  transform: rotate(90deg);
+}
+
+.toc-children.collapsed {
+  display: none;
+}
+
+/* ============================================
+   Inspector
+   ============================================ */
+
+.inspector-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  font-weight: 700;
+}
+
+.inspector-empty {
+  color: var(--color-text-muted);
+  font-style: italic;
+  font-size: 0.875rem;
+}
+
+.inspector-section {
+  margin-bottom: 1rem;
+}
+
+.inspector-section h3 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  margin: 0 0 0.5rem;
+}
+
+.inspector-kv {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.inspector-kv dt {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.inspector-kv dd {
+  margin: 0;
+  color: var(--color-text);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.inspector-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+}
+
+.inspector-link {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  text-decoration: none;
+  color: var(--color-text);
+  padding: 0.375rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.inspector-link:hover {
+  border-color: var(--color-accent);
+  text-decoration: none;
+}
+
+.inspector-link .rel-type {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.inspector-action {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.inspector-artifacts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.inspector-artifact {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-surface);
+  padding: 0.5rem;
+}
+
+.inspector-artifact .inspector-kv {
+  margin-top: 0.5rem;
+}
+
+.inspector-raw-entry {
+  margin-top: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-bg);
+}
+
+.inspector-raw-entry summary {
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.inspector-raw-value {
+  margin: 0;
+  padding: 0.5rem;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-code-bg);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  max-height: 16rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ============================================
+   Breadcrumbs
+   ============================================ */
+
+.breadcrumbs {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.breadcrumbs a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+.breadcrumbs .separator {
+  color: var(--color-border);
+  margin: 0 0.25rem;
+}
+
+/* ============================================
+   Spec Object Cards
+   ============================================ */
+
+.spec-object {
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.spec-object-header {
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.spec-object-header h3,
+.spec-object-header h4 {
+  margin: 0 0 0.25rem;
+}
+
+.spec-object-id {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.spec-object-attributes {
+  font-size: 0.875rem;
+  margin-top: 0.75rem;
+}
+
+.spec-object-attributes dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.5rem 1.25rem;
+  margin: 0;
+}
+
+.spec-object-attributes dt {
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin: 0;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.spec-object-attributes dd {
+  margin: 0;
+  color: var(--color-text);
+}
+
+/* ============================================
+   Type Badges
+   ============================================ */
+
+.badge {
+  display: inline-block;
+  font-size: 0.6875rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badge-requirement {
+  background-color: var(--color-accent-light);
+  color: var(--color-accent);
+}
+
+.badge-design {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: var(--color-success);
+}
+
+.badge-test {
+  background-color: rgba(234, 179, 8, 0.15);
+  color: var(--color-warning);
+}
+
+.badge-issue {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--color-error);
+}
+
+.badge-info {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: var(--color-info);
+}
+
+/* ============================================
+   CSS Counters for Captions
+   ============================================ */
+
+body {
+  counter-reset: figure table listing equation chart plantuml;
+}
+
+/* Caption base styles */
+.caption {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0.5rem 0;
+  font-weight: 500;
+}
+
+.caption-label {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Figure captions */
+.caption-figure {
+  text-align: center;
+}
+
+.caption-num[data-counter="figure"]::before {
+  counter-increment: figure;
+  content: counter(figure);
+}
+
+/* Table captions */
+.caption-table {
+  text-align: center;
+}
+
+.caption-num[data-counter="table"]::before {
+  counter-increment: table;
+  content: counter(table);
+}
+
+/* Code listing captions */
+.caption-listing {
+  text-align: left;
+}
+
+.caption-num[data-counter="listing"]::before {
+  counter-increment: listing;
+  content: counter(listing);
+}
+
+/* Equation captions */
+.caption-equation {
+  text-align: center;
+}
+
+.caption-num[data-counter="equation"]::before {
+  counter-increment: equation;
+  content: counter(equation);
+}
+
+/* Chart captions */
+.caption-chart {
+  text-align: center;
+}
+
+.caption-num[data-counter="chart"]::before {
+  counter-increment: chart;
+  content: counter(chart);
+}
+
+/* PlantUML diagram captions */
+.caption-plantuml {
+  text-align: center;
+}
+
+.caption-num[data-counter="plantuml"]::before {
+  counter-increment: plantuml;
+  content: counter(plantuml);
+}
+
+/* ============================================
+   Float Containers
+   ============================================ */
+
+.equation-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-surface);
+  border-radius: 6px;
+}
+
+.equation-content {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.equation-number {
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  font-size: 0.875rem;
+  margin-left: 1rem;
+}
+
+.chart-container,
+.plantuml-container {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.listing-container {
+  margin: 1rem 0;
+}
+
+/* ============================================
+   Miscellaneous Elements
+   ============================================ */
+
+/* Invisible bookmarks for anchor links */
+.bookmark {
+  display: block;
+  position: relative;
+  top: calc(-1 * var(--layout-header-height));
+  visibility: hidden;
+}
+
+/* Highlight flash animation (for scroll-to-highlight) */
+.highlight-flash {
+  animation: flash-highlight 1.5s ease-out;
+}
+
+@keyframes flash-highlight {
+  0% {
+    background-color: var(--color-highlight);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Page break for printing */
+.page-break {
+  page-break-after: always;
+}
+
+/* Visual spacer */
+.spacer {
+  height: 1rem;
+}
+
+/* ============================================
+   Theme Toggle Button (in header)
+   ============================================ */
+
+.pane-toggle {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  padding: 0.45rem;
+  border-radius: 6px;
+  color: var(--color-text-muted);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.pane-toggle:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+.pane-toggle:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.theme-toggle {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 1.25rem;
+  color: var(--color-text-muted);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.theme-toggle:hover {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+.theme-toggle:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Theme icon visibility: show sun in dark mode, moon in light mode */
+.theme-icon-light {
+  display: inline;
+}
+.theme-icon-dark {
+  display: none;
+}
+[data-theme="dark"] .theme-icon-light {
+  display: none;
+}
+[data-theme="dark"] .theme-icon-dark {
+  display: inline;
+}
+
+/* ============================================
+   Inspector Back Button
+   ============================================ */
+
+.inspector-back-btn {
+  flex-shrink: 0;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 0.875rem;
+  line-height: 1;
+  font-family: var(--font-family);
+  transition: all 0.15s ease;
+}
+
+.inspector-back-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+.inspector-back-btn[hidden] {
+  display: none;
+}
+
+/* ============================================
+   Inspector Follow Toggle
+   ============================================ */
+
+.inspector-follow-toggle {
+  flex-shrink: 0;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: var(--font-family);
+  transition: all 0.15s ease;
+}
+
+.inspector-follow-toggle[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+}
+
+.inspector-follow-toggle:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}

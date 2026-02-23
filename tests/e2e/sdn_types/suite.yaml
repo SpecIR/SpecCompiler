@@ -1,0 +1,22 @@
+# SW Docs Model Type Tests
+# Tests for SF, NFR types and BELONGS, REALIZES relations
+# Verifies: VC-TYPE-001, VC-TYPE-002, VC-REL-004, VC-REL-005
+
+project:
+  code: TEST_SDN_TYPES
+  name: SW Docs Type System Tests
+
+template: sw_docs
+output_format: json
+
+validation:
+  traceability_hlr_to_vc: ignore
+  traceability_fd_to_csc: ignore
+  traceability_fd_to_csu: ignore
+
+# Test case to VC mapping:
+# - vc_type_001_sf.md        -> VC-TYPE-001 (Software Function Type)
+# - vc_type_002_nfr.md       -> VC-TYPE-002 (Non-Functional Requirement Type)
+# - vc_type_003_attr_dedup.md -> VC-TYPE-003 (Attribute Deduplication)
+# - vc_rel_004_belongs.md    -> VC-REL-004 (BELONGS Relation)
+# - vc_rel_005_realizes.md   -> VC-REL-005 (REALIZES Relation)

@@ -1,0 +1,21 @@
+# E2E Test Suite: Relations
+# Verifies: VC-REL-001, VC-REL-002, VC-REL-003, VC-REL-004, VC-REL-005, VC-REL-006, VC-REL-007
+
+project:
+  code: TEST_RELATIONS
+  name: Relation Processing Tests
+
+output_format: json
+
+# Test case to VC mapping:
+# - vc_rel_001_links.md    -> VC-REL-001 (Reference Link Syntax)
+# - vc_rel_002_xref.md     -> VC-REL-002 (Cross-Reference Resolution)
+# - vc_rel_003_citations.md -> VC-REL-003 (Citation Cross References)
+# - vc_rel_004_scoped_resolution.md -> VC-REL-004 (Scoped/normalized relation resolution)
+# - vc_rel_005_attribute_scope_prefixes.md -> VC-REL-005 (Attribute links, scoped floats, alias and ambiguity handling)
+# - vc_rel_006_scoped_label_resolution.md -> VC-REL-006 (Scoped # label resolution, closest-to-global)
+# - vc_rel_007_section_xrefs.md -> VC-REL-007 (Section cross-references via @ PID and # label)
+
+validation:
+  unresolved_relation: warn
+  ambiguous_relation: warn

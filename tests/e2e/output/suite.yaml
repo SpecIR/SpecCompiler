@@ -1,0 +1,24 @@
+# E2E Test Suite: Output
+# Verifies: VC-OUT-001, VC-OUT-002
+
+project:
+  code: TEST_OUTPUT
+  name: Output Generation Tests
+
+output_format: json
+bibliography: tests/e2e/output/references.bib
+
+html5:
+  standalone: true
+  embed_resources: true
+  section_divs: true
+  html_q_tags: true
+  email_obfuscation: references
+  number_sections: true
+  table_of_contents: true
+  toc_depth: 2
+
+# Test case to VC mapping:
+# - vc_out_001_formats.md    -> VC-OUT-001 (DOCX and Multi-Format Output)
+# - vc_out_002_bibliography.md -> VC-OUT-002 (Bibliography and Incremental Builds)
+# - vc_out_003_html_options.md -> VC-OUT-003 (HTML option and filter path exercise)

@@ -1,0 +1,12 @@
+# E2E Test Suite: Views
+# Verifies: VC-VIEW-001, VC-VIEW-002
+
+project:
+  code: TEST_VIEWS
+  name: View Processing Tests
+
+output_format: json
+
+# Test case to VC mapping:
+# - vc_view_001_inline.md      -> VC-VIEW-001 (Inline View Syntax)
+# - vc_view_002_registration.md -> VC-VIEW-002 (View Registration and Built-ins)

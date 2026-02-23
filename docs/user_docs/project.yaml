@@ -1,0 +1,34 @@
+# SpecCompiler Core - User Documentation
+# Uses default model: manuals and how-to guides
+
+project:
+  code: SPECCOMPILER
+  name: SpecCompiler Core User Documentation
+
+template: default
+
+logging:
+  level: info
+  format: console
+  color: true
+
+output_dir: build/
+
+doc_files:
+  - manual.md
+  - guides/creating-a-model.md
+  - guides/docx-customization.md
+
+outputs:
+  - format: docx
+    path: build/docx/{spec_id}.docx
+  - format: html5
+    path: build/www/{spec_id}.html
+
+html5:
+  number_sections: true
+  table_of_contents: true
+  toc_depth: 3
+  standalone: true
+  embed_resources: true
+  resource_path: build/www:.

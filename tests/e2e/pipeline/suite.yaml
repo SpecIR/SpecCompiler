@@ -1,0 +1,14 @@
+# E2E Test Suite: Pipeline Contracts
+# Verifies: VC-002, VC-006, VC-007, VC-008
+
+project:
+  code: TEST_PIPELINE
+  name: Pipeline Contract Tests
+
+output_format: json
+
+# Test case to VC mapping:
+# - vc_pipeline_002_handler_registration.md -> VC-002 (Handler Registration)
+# - vc_pipeline_006_context_propagation.md  -> VC-006 (Context Propagation)
+# - vc_pipeline_007_incremental_cache.md    -> VC-007 (Incremental build + output cache behavior)
+# - vc_pipeline_008_incremental_multi_emit.md -> VC-008 (Multi-doc EMIT completeness)
