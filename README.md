@@ -67,14 +67,14 @@ specc build docs/engineering_docs/project.yaml
 specc build docs/user_docs/project.yaml 
 ```
 
-`docs/user_docs/` contains user-facing documentation (installation, authoring syntax, configuration) serving as an example of the default type system applied to general technical publishing.
+[`docs/user_docs/`](docs/engineering_docs/)  contains user-facing documentation (installation, authoring syntax, configuration) serving as an example of the default type system applied to general technical publishing.
 
-`docs/engineering_docs/` contains a self-hosted engineering document set (SRS/SDD/SVC) illustrating how the system can be applied in regulated and safety-critical software.
+[`docs/engineering_docs/`](docs/engineering_docs/) contains a self-hosted engineering document set (SRS/SDD/SVC) illustrating how the system can be applied in regulated and safety-critical software.
 
-## Documentation
+## Online Documentation
 
-- **[Manual](docs/user_docs/manual.md)**, installation, authoring syntax, configuration (start here)
-- **[Engineering Specs](docs/engineering_docs/)**, SRS, SDD, SVC for SpecCompiler itself.
+- **[Manual](https://specir.github.io/SpecCompiler/manual/#/manual)**, installation, authoring syntax, configuration (start here)
+- **[Engineering Specs](https://specir.github.io/SpecCompiler/engineering/#/srs)**, SRS, SDD, SVC for SpecCompiler itself.
 
 ## How It Works
 
