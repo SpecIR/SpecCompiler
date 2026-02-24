@@ -49,12 +49,12 @@ The fundamental purpose of SpecCompiler is to prevent the occurrence of *finding
 
 ```bash
 git clone https://github.com/SpecIR/SpecCompiler.git
-cd speccompiler
+cd SpecCompiler
 ```
 
 Docker is recommended. (Linux/Mac/WSL2)
 ```bash
-bash scripts/install.sh
+bash scripts/remote_install.sh
 ```
 
 For native ubuntu/debian (builds all dependencies from source).
