@@ -100,23 +100,29 @@ local function ooxml_vertical_space(twips)
     }))
 end
 
----Generate OOXML for bookmark start.
+---Generate OOXML for bookmark as a zero-content paragraph.
+---Pandoc's DOCX writer drops standalone bookmarkStart/End elements,
+---so we wrap both in a single empty paragraph to ensure they survive.
+---The bookmark is a point bookmark (start+end at same location),
+---which is sufficient for PAGEREF (page number lookup) and hyperlink anchors.
 ---@param bm_id number Bookmark ID
 ---@param bm_name string Bookmark name
----@return string OOXML bookmark start
-local function ooxml_bookmark_start(bm_id, bm_name)
-    return xml.serialize_element(xml.node("w:bookmarkStart", {
-        ["w:id"] = tostring(bm_id),
-        ["w:name"] = bm_name,
-    }))
-end
-
----Generate OOXML for bookmark end.
----@param bm_id number Bookmark ID
----@return string OOXML bookmark end
-local function ooxml_bookmark_end(bm_id)
-    return xml.serialize_element(xml.node("w:bookmarkEnd", {
-        ["w:id"] = tostring(bm_id),
+---@return string OOXML paragraph containing bookmark
+local function ooxml_bookmark_paragraph(bm_id, bm_name)
+    return xml.serialize_element(xml.node("w:p", {}, {
+        xml.node("w:pPr", {}, {
+            xml.node("w:spacing", {["w:before"] = "0", ["w:after"] = "0", ["w:line"] = "20", ["w:lineRule"] = "exact"}),
+            xml.node("w:rPr", {}, {
+                xml.node("w:sz", {["w:val"] = "2"}),
+            }),
+        }),
+        xml.node("w:bookmarkStart", {
+            ["w:id"] = tostring(bm_id),
+            ["w:name"] = bm_name,
+        }),
+        xml.node("w:bookmarkEnd", {
+            ["w:id"] = tostring(bm_id),
+        }),
     }))
 end
 
@@ -299,15 +305,16 @@ local function convert_speccompiler_block(block)
     local text = block.text
 
     -- Handle bookmark-start:ID:NAME
+    -- Combines start+end into a single paragraph (Pandoc drops standalone bookmark elements)
     local bm_id, bm_name = text:match("^bookmark%-start:(%d+):(.+)$")
     if bm_id and bm_name then
-        return pandoc.RawBlock("openxml", ooxml_bookmark_start(tonumber(bm_id), bm_name))
+        return pandoc.RawBlock("openxml", ooxml_bookmark_paragraph(tonumber(bm_id), bm_name))
     end
 
-    -- Handle bookmark-end:ID
+    -- Handle bookmark-end:ID (already combined with bookmark-start above)
     local end_id = text:match("^bookmark%-end:(%d+)$")
     if end_id then
-        return pandoc.RawBlock("openxml", ooxml_bookmark_end(tonumber(end_id)))
+        return {}  -- Remove - handled in bookmark-start
     end
 
     -- Handle math-omml:OMML (for DOCX output)

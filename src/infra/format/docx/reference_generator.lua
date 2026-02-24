@@ -141,6 +141,29 @@ function M.merge_styles(styles_xml, preset)
     return result
 end
 
+---Update the default proofing language in styles.xml docDefaults.
+---Pandoc's default reference.docx has w:val="en-US" in docDefaults/rPrDefault,
+---which causes spell check squiggles for non-English documents.
+---This function updates it to match the document language.
+---@param styles_xml string The original styles.xml content
+---@param language string The language code (e.g., "pt-BR")
+---@return string updated_xml The updated styles.xml content
+function M.update_styles_language(styles_xml, language)
+    -- Isolate the docDefaults section to avoid modifying per-style w:lang elements
+    local before, doc_defaults, after = styles_xml:match("^(.-<w:docDefaults>)(.-)(</w:docDefaults>.*)$")
+    if not doc_defaults then
+        return styles_xml  -- No docDefaults found
+    end
+
+    -- Update w:val (primary language) in the lang element within docDefaults
+    doc_defaults = doc_defaults:gsub(
+        '(<w:lang[^/]*w:val=")[^"]*(")',
+        '%1' .. language .. '%2'
+    )
+
+    return before .. "<w:docDefaults>" .. doc_defaults .. "</w:docDefaults>" .. after
+end
+
 ---Update settings.xml with document language.
 ---@param settings_xml string The original settings.xml content
 ---@param language string The language code (e.g., "pt-BR")
@@ -277,6 +300,12 @@ function M.generate(options)
     -- Merge custom styles
     local merged_styles = M.merge_styles(styles_xml, preset)
     log("  Merged custom styles into styles.xml")
+
+    -- Update default proofing language in docDefaults
+    if language then
+        merged_styles = M.update_styles_language(merged_styles, language)
+        log(string.format("  Set docDefaults proofing language: %s", language))
+    end
 
     -- Write merged styles.xml
     styles_file = io.open(styles_path, "w")

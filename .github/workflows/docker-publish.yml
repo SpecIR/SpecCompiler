@@ -191,6 +191,10 @@ jobs:
           path: tests/reports/coverage/
           retention-days: 30
 
+      - name: Fix coverage paths for Codecov
+        if: always()
+        run: sed -i 's|SF:/workspace/|SF:|g' tests/reports/coverage/merged.lcov
+
       - name: Upload coverage to Codecov
         if: always()
         uses: codecov/codecov-action@v5
