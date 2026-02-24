@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://github.com/SpecIR/SpecCompiler/actions/workflows/docker-publish.yml"><img src="https://github.com/SpecIR/SpecCompiler/actions/workflows/docker-publish.yml/badge.svg" alt="CI"></a>
-  <a href="https://codecov.io/gh/SpecIR/SpecCompiler"><img src="https://codecov.io/gh/SpecIR/SpecCompiler/graph/badge.svg" alt="Coverage"></a>
+  <a href="https://codecov.io/gh/SpecIR/SpecCompiler"><img src="https://codecov.io/gh/SpecIR/SpecCompiler/branch/main/graph/badge.svg?token=GC8S08LK2G" alt="Coverage"></a>
   <a href="https://github.com/SpecIR/SpecCompiler/blob/main/LICENSE"><img src="https://img.shields.io/github/license/SpecIR/SpecCompiler" alt="License"></a>
   <img src="https://img.shields.io/badge/status-alpha-orange" alt="Status: Alpha">
 </p>
