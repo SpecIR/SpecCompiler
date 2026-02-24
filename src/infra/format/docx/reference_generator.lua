@@ -161,7 +161,8 @@ function M.update_styles_language(styles_xml, language)
         '%1' .. language .. '%2'
     )
 
-    return before .. "<w:docDefaults>" .. doc_defaults .. "</w:docDefaults>" .. after
+    -- before already ends with "<w:docDefaults>", after starts with "</w:docDefaults>"
+    return before .. doc_defaults .. after
 end
 
 ---Update settings.xml with document language.
