@@ -75,7 +75,7 @@ specc build docs/user_docs/project.yaml
 
 ## Online Documentation
 
-- **[Manual](https://specir.github.io/SpecCompiler/manual/#/manual)**, installation, authoring syntax, configuration (start here)
+- **[Manual](https://specir.github.io/SpecCompiler/manual/#/manual)**, installation, authoring syntax, configuration [(start here)](https://github.com/SpecIR/SpecCompiler/releases/download/v/manual.docx)
 - **[Engineering Specs](https://specir.github.io/SpecCompiler/engineering/#/srs)**, SRS, SDD, SVC for SpecCompiler itself.
 
 ## How It Works
