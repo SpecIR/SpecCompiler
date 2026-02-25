@@ -129,11 +129,8 @@ record() {
     sleep 0.8
 
     # ═════════════════════════════════════════════════════
-    #  Act 1 — Show spec with invalid status, build fails
+    #  Act 1 — Build fails (invalid status + missing trace)
     # ═════════════════════════════════════════════════════
-    type_cmd "cat srs.md"
-    sleep 2
-
     type_cmd "specc build project.yaml"
     wait_for "Pipeline aborted"
     sleep 3
@@ -144,7 +141,7 @@ record() {
 
     # -- Fix status in srs.md: :%s/Pending/Draft/ --
     type_cmd "vim srs.md"
-    sleep 1
+    sleep 2.5
 
     type_text ":%s/Pending/Draft/" 0.05
     send_enter
@@ -177,10 +174,6 @@ record() {
     type_text ":wq" 0.08
     send_enter
     sleep 0.6
-
-    # Show the updated VC file
-    type_cmd "cat svc.md"
-    sleep 2.5
 
     # Final build — should succeed
     type_cmd "specc build project.yaml"
