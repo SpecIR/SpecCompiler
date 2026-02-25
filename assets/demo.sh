@@ -73,6 +73,7 @@ logging:
 output_dir: build
 doc_files:
   - srs.md
+  - svc.md
 YAML
 
     cat > "$DEMO_DIR/srs.md" << 'MD'
@@ -85,19 +86,17 @@ The system shall authenticate users via OAuth 2.0.
 > status: Pending
 MD
 
-    # svc.md — valid VC that VERIFIES HLR @0013 (used in Act 2 after fixing srs.md)
+    # svc.md — VC without traceability (added in Act 2)
     cat > "$DEMO_DIR/svc.md" << 'MD'
 # SVC: Login Verification
 
-## VC: Verify Authentication 
+## VC: Verify Authentication
 
 Verify the authentication flow works end to end.
 
 > objective: Confirm OAuth 2.0 login succeeds
 
 > verification_method: Test
-
-> traceability: [0013](@)
 MD
 }
 
@@ -140,7 +139,7 @@ record() {
     sleep 3
 
     # ═════════════════════════════════════════════════════
-    #  Act 2 — Fix status:Pending → Draft + add VC, success
+    #  Act 2 — Fix status:Pending → Draft + add traceability, success
     # ═════════════════════════════════════════════════════
 
     # -- Fix status in srs.md: :%s/Pending/Draft/ --
@@ -157,23 +156,20 @@ record() {
     send_enter
     sleep 0.6
 
-    # -- Add svc.md to project.yaml --
-    type_cmd "vim project.yaml"
+    # -- Add traceability to svc.md --
+    type_cmd "vim svc.md"
     sleep 1
 
-    # G → last line (  - srs.md), yy → yank, p → paste below
+    # G → last line, o → open line below (insert mode)
     send_key "G"
     sleep 0.2
-    send_key "y"
-    sleep 0.1
-    send_key "y"
-    sleep 0.2
-    send_key "p"
-    sleep 0.4
+    send_key "o"
+    sleep 0.3
 
-    # :s/srs/svc/ → change srs to svc on current line
-    type_text ":s/srs/svc/" 0.05
+    # Enter for blank line, then type the traceability attribute
     send_enter
+    sleep 0.2
+    type_text "> traceability: [0013](@)" 0.04
     sleep 0.4
 
     send_escape
@@ -182,7 +178,7 @@ record() {
     send_enter
     sleep 0.6
 
-    # Show the VC file
+    # Show the updated VC file
     type_cmd "cat svc.md"
     sleep 2.5
 
