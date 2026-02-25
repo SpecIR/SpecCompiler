@@ -126,10 +126,7 @@ M.object = {
     id = "HLR",
     long_name = "High-Level Requirement",
     extends = "TRACEABLE",
-    pid_prefix = "HLR",
-    pid_format = "%s-%03d",
     attributes = {
-        { name = "priority", type = "ENUM", values = { "High", "Mid", "Low" } },
         { name = "rationale", type = "XHTML" },
     }
 }
@@ -146,7 +143,7 @@ VALUES ('HLR', 'High-Level Requirement', ...);
 
 **2. Middle-end (SpecCompiler).** Lower the AST into SpecIR (SQLite), apply type
 rules, and assemble the transformed AST. For the two-file spec above, the
-middle-end produces:
+middle-end produces the following relations:
 
 ```sql
 -- Specification (from the # heading)
@@ -174,7 +171,7 @@ Type-checking is then a query against the IR. For example, the proof view
 And `traceability_hlr_to_vc` finds HLRs that are never the target of a
 VERIFIES relation.
 
-**3. Backend (Pandoc writer).** Render the assembled AST via the Pandoc CLI.
+**3. Backend (Pandoc writer).** If no violations are found render the AST to selected formats.
 
 **4. Post-processing (optional).** Format-specific adjustments to the emitted artifacts. For example, OOXML tweaks in DOCX output or packaging sqlite.js in HTML.
 
