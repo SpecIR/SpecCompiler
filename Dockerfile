@@ -116,7 +116,7 @@ ENV SPECCOMPILER_HOME=/opt/speccompiler
 ENV SPECCOMPILER_DIST=/opt/speccompiler
 ENV DENO_DIR=/opt/speccompiler/vendor/deno_cache
 ENV LD_LIBRARY_PATH="/opt/speccompiler/vendor/lua/lib"
-ENV LUA_PATH="/opt/speccompiler/src/?.lua;/opt/speccompiler/src/?/init.lua;/opt/speccompiler/?.lua;/opt/speccompiler/?/init.lua;/opt/speccompiler/vendor/?.lua;/opt/speccompiler/vendor/?/init.lua;/opt/speccompiler/vendor/slaxml/?.lua"
+ENV LUA_PATH="/opt/speccompiler/src/?.lua;/opt/speccompiler/src/?/init.lua;/opt/speccompiler/?.lua;/opt/speccompiler/?/init.lua;/opt/speccompiler/vendor/?.lua;/opt/speccompiler/vendor/?/init.lua;/opt/speccompiler/vendor/slaxml/?.lua;/opt/speccompiler/tests/?.lua;/opt/speccompiler/tests/?/init.lua"
 ENV LUA_CPATH="/opt/speccompiler/vendor/?.so;/opt/speccompiler/vendor/?/?.so"
 ENV PATH="/opt/speccompiler/bin:${PATH}"
 ENV HOME=/home/speccompiler
@@ -137,6 +137,7 @@ LABEL org.opencontainers.image.source="https://github.com/SpecIR/SpecCompiler" \
       org.opencontainers.image.licenses="MIT"
 COPY --chown=speccompiler:speccompiler src/    /opt/speccompiler/src/
 COPY --chown=speccompiler:speccompiler models/ /opt/speccompiler/models/
+COPY --chown=speccompiler:speccompiler tests/  /opt/speccompiler/tests/
 
 # =============================================================================
 # Stage: codeonly — fast overlay of src/ and models/ onto runtime-base.
@@ -146,3 +147,4 @@ COPY --chown=speccompiler:speccompiler models/ /opt/speccompiler/models/
 FROM ${BASE_IMAGE} AS codeonly
 COPY --chown=speccompiler:speccompiler src/    /opt/speccompiler/src/
 COPY --chown=speccompiler:speccompiler models/ /opt/speccompiler/models/
+COPY --chown=speccompiler:speccompiler tests/  /opt/speccompiler/tests/

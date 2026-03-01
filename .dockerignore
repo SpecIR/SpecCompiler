@@ -15,8 +15,9 @@ docs/
 new_docs/
 *.md
 
-# Tests (run separately)
-tests/
+# Test data (e2e test documents, not needed in runtime image)
+tests/e2e/
+tests/reports/
 
 # Pre-built vendor artifacts (rebuilt inside Docker from source)
 vendor/
