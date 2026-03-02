@@ -126,11 +126,19 @@ else
     cp src/liblua.a "$LUA_PREFIX/lib/liblua5.4.a"
 
     # Build shared library from the static archive (all objects have -fPIC)
-    gcc -shared -o "$LUA_PREFIX/lib/liblua5.4.so" \
+    # Version script provides the LUA_5.4 symbol version that Pandoc expects
+    # (matching Debian's liblua5.4 convention)
+    cat > lua5.4.map << 'MAPEOF'
+LUA_5.4 {
+    global: *;
+};
+MAPEOF
+    gcc -shared -o "$LUA_PREFIX/lib/liblua5.4.so.0" \
         -Wl,--whole-archive src/liblua.a -Wl,--no-whole-archive \
+        -Wl,--soname,liblua5.4.so.0 \
+        -Wl,--version-script=lua5.4.map \
         -lm -ldl
-    # Create versioned symlink matching Debian soname convention (pandoc's +system-lua expects liblua5.4.so.0)
-    ln -sf "liblua5.4.so" "$LUA_PREFIX/lib/liblua5.4.so.0"
+    ln -sf "liblua5.4.so.0" "$LUA_PREFIX/lib/liblua5.4.so"
 
     # Install interpreter (useful for testing)
     cp src/lua "$PREFIX/bin/lua5.4"
@@ -498,6 +506,7 @@ export LUA_PATH="${SPECCOMPILER_HOME}/src/?.lua;${SPECCOMPILER_HOME}/src/?/init.
 export LUA_CPATH="${SPECCOMPILER_DIST}/vendor/?.so;${SPECCOMPILER_DIST}/vendor/?/?.so;${LUA_CPATH:-}"
 export LD_LIBRARY_PATH="${SPECCOMPILER_DIST}/vendor/lua/lib:${LD_LIBRARY_PATH:-}"
 export DENO_DIR="${SPECCOMPILER_DIST}/vendor/deno_cache"
+export PATH="${SPECCOMPILER_DIST}/bin:${PATH}"
 if [ "$1" = "build" ]; then shift; fi
 PROJECT_FILE="${1:-project.yaml}"
 if [ ! -f "$PROJECT_FILE" ]; then

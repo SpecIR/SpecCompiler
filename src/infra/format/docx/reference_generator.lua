@@ -35,28 +35,20 @@ end
 ---@return string|nil data Binary data of reference.docx
 ---@return string|nil error Error message if failed
 function M.get_pandoc_default_reference()
-    -- Create temp file for output
-    local temp_file = os.tmpname() .. ".docx"
-
-    local _, err = exec(string.format(
-        'pandoc --print-default-data-file reference.docx > "%s"',
-        temp_file
-    ))
-
-    if err then
-        os.remove(temp_file)
-        return nil, "Failed to get Pandoc default reference.docx: " .. err
+    -- Pipe binary data directly from pandoc stdout.
+    -- stderr is discarded to prevent linker warnings (e.g. liblua5.4.so version info)
+    -- from corrupting the binary output.
+    local handle = io.popen("pandoc --print-default-data-file reference.docx 2>/dev/null")
+    if not handle then
+        return nil, "Failed to execute pandoc"
     end
 
-    local f = io.open(temp_file, "rb")
-    if not f then
-        os.remove(temp_file)
-        return nil, "Failed to read Pandoc default reference.docx"
-    end
+    local data = handle:read("*a")
+    local ok = handle:close()
 
-    local data = f:read("*a")
-    f:close()
-    os.remove(temp_file)
+    if not ok or not data or #data == 0 then
+        return nil, "Failed to get Pandoc default reference.docx"
+    end
 
     return data, nil
 end
