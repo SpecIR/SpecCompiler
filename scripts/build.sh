@@ -98,7 +98,8 @@ if [ "$SKIP_SYSTEM_DEPS" = false ]; then
         build-essential cmake git curl unzip ca-certificates pkg-config \
         libreadline-dev libgmp-dev libffi-dev zlib1g-dev \
         libzip-dev \
-        peg default-jdk-headless graphviz
+        peg default-jdk-headless graphviz \
+        python3 python3-pip
 else
     echo "[1/8] Skipping system dependencies (--skip-system-deps)"
 fi
@@ -452,6 +453,17 @@ else
     write_version "$PREFIX/vendor/luacov/.version" "$LUACOV_VERSION"
 fi
 
+# --- reqif (Python, for ReqIF export) ---
+REQIF_MARKER="$PREFIX/vendor/python/.reqif_installed"
+if [ "$FORCE" = false ] && [ -f "$REQIF_MARKER" ]; then
+    echo "  reqif already installed, skipping"
+else
+    echo "  Installing reqif (Python)..."
+    python3 -m pip install --target="$PREFIX/vendor/python" --no-cache-dir --upgrade reqif 2>/dev/null \
+        || python3 -m pip install --break-system-packages --target="$PREFIX/vendor/python" --no-cache-dir --upgrade reqif
+    touch "$REQIF_MARKER"
+fi
+
 # Cleanup temp directory
 cd "$REPO_DIR"
 [ -n "$BUILD_TMP" ] && rm -rf "$BUILD_TMP"
@@ -506,6 +518,7 @@ export LUA_PATH="${SPECCOMPILER_HOME}/src/?.lua;${SPECCOMPILER_HOME}/src/?/init.
 export LUA_CPATH="${SPECCOMPILER_DIST}/vendor/?.so;${SPECCOMPILER_DIST}/vendor/?/?.so;${LUA_CPATH:-}"
 export LD_LIBRARY_PATH="${SPECCOMPILER_DIST}/vendor/lua/lib:${LD_LIBRARY_PATH:-}"
 export DENO_DIR="${SPECCOMPILER_DIST}/vendor/deno_cache"
+export PYTHONPATH="${SPECCOMPILER_DIST}/vendor/python${PYTHONPATH:+:$PYTHONPATH}"
 export PATH="${SPECCOMPILER_DIST}/bin:${PATH}"
 if [ "$1" = "build" ]; then shift; fi
 PROJECT_FILE="${1:-project.yaml}"

@@ -143,26 +143,26 @@ All dependency versions are pinned in `scripts/versions.env`.
 
 ### Building the Image
 
-Run the Docker installer from the repository root:
+Build the Docker image and install the wrapper from the repository root:
 
 ```src.bash:src-build-image{caption="Build and install via Docker"}
+bash scripts/docker_build.sh
 bash scripts/install.sh
 ```
 
-This performs three steps:
+`docker_build.sh` executes a multi-stage Docker build:
 
-1. **Docker build** -- Executes a multi-stage Docker build:
-   - **Toolchain** -- Compiles Lua, Pandoc (with GHC), and native Lua extensions (luv, lsqlite3, zip) from source. Builds Deno TypeScript utilities. Downloads and wraps PlantUML with a minimal JRE. This stage is cached and only rebuilt when `scripts/versions.env`, `scripts/build.sh`, or `src/tools/` change.
-   - **Runtime-base** -- Copies only runtime artifacts into a lean Debian Bookworm image without build tools. Installs runtime dependencies (Python/reqif, graphviz, lcov). This is the stable base for code-only updates.
-   - **Runtime** -- Overlays `src/` and `models/` onto runtime-base to produce the final image.
-2. **Wrapper generation** -- Creates a `specc` `abbrev: Command-Line Interface (CLI)` command at `~/.local/bin/specc`.
-3. **Config** -- Writes the image reference to `~/.config/speccompiler/env`.
+- **Toolchain** -- Compiles Lua, Pandoc (with GHC), and native Lua extensions (luv, lsqlite3, zip) from source. Builds Deno TypeScript utilities. Downloads and wraps PlantUML with a minimal JRE. This stage is cached and only rebuilt when `scripts/versions.env`, `scripts/build.sh`, or `src/tools/` change.
+- **Runtime-base** -- Copies only runtime artifacts into a lean Debian Bookworm image without build tools. Installs runtime dependencies (Python/reqif, graphviz, lcov). This is the stable base for code-only updates.
+- **Runtime** -- Overlays `src/` and `models/` onto runtime-base to produce the final image.
 
-The installer supports three modes:
+`install.sh` installs the `specc` `abbrev: Command-Line Interface (CLI)` wrapper at `~/.local/bin/specc` and writes the image reference to `~/.config/speccompiler/env`. If a local image exists it is used automatically; otherwise, the GHCR image is pulled on first use.
 
-- **Default** (`bash scripts/install.sh`) -- Builds the full image if not present.
-- **Force** (`bash scripts/install.sh --force`) -- Rebuilds everything from scratch, including the toolchain.
-- **Code-only** (`bash scripts/install.sh --code-only`) -- Updates only `src/` and `models/` layers without recompiling the toolchain. Always builds from the stable `runtime-base` image, preventing Docker layer accumulation. Dangling images from previous builds are automatically pruned.
+The build script supports three modes:
+
+- **Default** (`bash scripts/docker_build.sh`) -- Builds the full image if not present.
+- **Force** (`bash scripts/docker_build.sh --force`) -- Rebuilds everything from scratch, including the toolchain.
+- **Code-only** (`bash scripts/docker_build.sh --code-only`) -- Updates only `src/` and `models/` layers without recompiling the toolchain. Always builds from the stable `runtime-base` image, preventing Docker layer accumulation. Dangling images from previous builds are automatically pruned.
 
 ### Verifying Installation
 

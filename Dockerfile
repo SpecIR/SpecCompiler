@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential cmake git curl unzip ca-certificates pkg-config \
     libreadline-dev libgmp-dev libffi-dev zlib1g-dev \
     libzip-dev peg default-jdk-headless graphviz \
+    python3 python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy ONLY the files build.sh actually reads during the build.
@@ -73,8 +74,8 @@ FROM ${TOOLCHAIN_IMAGE} AS builder
 # =============================================================================
 FROM debian:${DEBIAN_TAG}-slim AS runtime-base
 
-# Runtime-only packages (no -dev packages, no build tools)
-# pip is installed temporarily to pull reqif, then purged to save ~130 MB.
+# Runtime-only packages (no -dev packages, no build tools).
+# Python packages (reqif) are vendored by build.sh into vendor/python/.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgmp10 \
     libffi8 \
@@ -87,10 +88,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zip \
     unzip \
     python3 \
-    python3-pip \
-    && python3 -m pip install --break-system-packages --no-cache-dir reqif \
-    && apt-get purge -y python3-pip \
-    && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Create an unprivileged runtime user.
@@ -104,9 +101,11 @@ WORKDIR /opt/speccompiler
 COPY --from=builder /opt/speccompiler/bin/     ./bin/
 COPY --from=builder /opt/speccompiler/vendor/  ./vendor/
 COPY --from=builder /opt/speccompiler/jre/     ./jre/
-# Ensure liblua5.4.so.0 symlink exists (pandoc compiled with +system-lua expects this soname)
-RUN ln -sf /opt/speccompiler/vendor/lua/lib/liblua5.4.so \
-           /opt/speccompiler/vendor/lua/lib/liblua5.4.so.0
+# Ensure liblua5.4.so.0 exists (pandoc compiled with +system-lua expects this soname).
+# The builder already creates .so.0 as the real file and .so as a symlink to it,
+# so this is a no-op when COPY preserves symlinks — but acts as a safety net.
+RUN test -e /opt/speccompiler/vendor/lua/lib/liblua5.4.so.0 \
+    || ln -s liblua5.4.so /opt/speccompiler/vendor/lua/lib/liblua5.4.so.0
 
 # Ensure /opt/speccompiler/bin is on PATH even in login shells (which reset PATH via /etc/profile)
 RUN echo 'export PATH="/opt/speccompiler/bin:$PATH"' > /etc/profile.d/specc.sh
@@ -115,6 +114,7 @@ RUN echo 'export PATH="/opt/speccompiler/bin:$PATH"' > /etc/profile.d/specc.sh
 ENV SPECCOMPILER_HOME=/opt/speccompiler
 ENV SPECCOMPILER_DIST=/opt/speccompiler
 ENV DENO_DIR=/opt/speccompiler/vendor/deno_cache
+ENV PYTHONPATH="/opt/speccompiler/vendor/python"
 ENV LD_LIBRARY_PATH="/opt/speccompiler/vendor/lua/lib"
 ENV LUA_PATH="/opt/speccompiler/src/?.lua;/opt/speccompiler/src/?/init.lua;/opt/speccompiler/?.lua;/opt/speccompiler/?/init.lua;/opt/speccompiler/vendor/?.lua;/opt/speccompiler/vendor/?/init.lua;/opt/speccompiler/vendor/slaxml/?.lua;/opt/speccompiler/tests/?.lua;/opt/speccompiler/tests/?/init.lua"
 ENV LUA_CPATH="/opt/speccompiler/vendor/?.so;/opt/speccompiler/vendor/?/?.so"
@@ -141,7 +141,7 @@ COPY --chown=speccompiler:speccompiler tests/  /opt/speccompiler/tests/
 
 # =============================================================================
 # Stage: codeonly — fast overlay of src/ and models/ onto runtime-base.
-# Used by: scripts/install.sh --code-only
+# Used by: scripts/docker_build.sh --code-only
 # Always builds from runtime-base (fixed layer count), never from itself.
 # =============================================================================
 FROM ${BASE_IMAGE} AS codeonly

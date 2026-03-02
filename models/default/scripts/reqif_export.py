@@ -32,6 +32,18 @@ def _ensure_reqif_on_path() -> None:
     except ModuleNotFoundError:
         pass
 
+    # Check vendored Python packages (installed by build.sh into vendor/python/)
+    dist_dir = os.environ.get("SPECCOMPILER_DIST", "")
+    if dist_dir:
+        vendor_python = os.path.join(dist_dir, "vendor", "python")
+        if os.path.isdir(vendor_python):
+            sys.path.insert(0, vendor_python)
+            try:
+                import reqif  # noqa: F401
+                return
+            except ModuleNotFoundError:
+                pass
+
     repo_root = _repo_root_from_this_file()
     candidate = os.path.join(repo_root, "reqif")
     if os.path.isdir(candidate):

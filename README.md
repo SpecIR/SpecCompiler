@@ -47,18 +47,23 @@ The fundamental purpose of SpecCompiler is to prevent the occurrence of *finding
 
 ### Install
 
+Docker is recommended. One-liner (Linux/Mac/WSL2):
+```bash
+curl -fsSL https://raw.githubusercontent.com/SpecIR/SpecCompiler/main/scripts/install.sh | bash
+```
+
+Or clone and build the Docker image locally:
 ```bash
 git clone https://github.com/SpecIR/SpecCompiler.git
 cd SpecCompiler
+bash scripts/docker_build.sh
+bash scripts/install.sh
 ```
 
-Docker is recommended. (Linux/Mac/WSL2)
+For native ubuntu/debian (builds all dependencies from source):
 ```bash
-bash scripts/remote_install.sh
-```
-
-For native ubuntu/debian (builds all dependencies from source).
-```bash
+git clone https://github.com/SpecIR/SpecCompiler.git
+cd SpecCompiler
 bash scripts/build.sh --install
 ```
 

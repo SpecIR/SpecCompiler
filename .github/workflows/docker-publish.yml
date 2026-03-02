@@ -255,20 +255,20 @@ jobs:
             THIRD_PARTY_NOTICES
           generate_release_notes: true
           body: |
+            ## Install
+
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/scripts/install.sh | bash
+            ```
+
+            Or clone and build locally:
+            ```bash
+            git clone https://github.com/${{ github.repository }}.git
+            cd SpecCompiler && bash scripts/docker_build.sh && bash scripts/install.sh
+            ```
+
             ## Docker Image
 
             ```bash
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-            ```
-
-            ## Quick Install
-
-            ```bash
-            curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/scripts/remote_install.sh | bash
-            ```
-
-            Or clone and build locally (includes toolchain compilation):
-            ```bash
-            git clone https://github.com/${{ github.repository }}.git
-            bash SpecCompiler/scripts/install.sh
             ```

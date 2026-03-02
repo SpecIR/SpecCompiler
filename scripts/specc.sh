@@ -33,8 +33,14 @@ check_docker() {
         echo "Install Docker: https://docs.docker.com/get-docker/"
         exit 1
     fi
-    if ! docker info &> /dev/null; then
-        echo -e "${RED}Error: Docker daemon is not running${NC}"
+    local docker_err
+    if ! docker_err=$(docker info 2>&1 >/dev/null); then
+        echo -e "${RED}Error: Cannot connect to Docker${NC}"
+        echo "$docker_err" | tail -1
+        echo ""
+        echo "Possible fixes:"
+        echo "  sudo systemctl start docker"
+        echo "  sudo usermod -aG docker \$USER  (then log out and back in)"
         exit 1
     fi
 }
