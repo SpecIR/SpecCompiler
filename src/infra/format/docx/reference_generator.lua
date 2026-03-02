@@ -112,6 +112,26 @@ function M.merge_styles(styles_xml, preset)
         existing_ids[style_id] = true
     end
 
+    -- Auto-generate linked character styles for paragraph styles.
+    -- Pandoc's default reference.docx includes HeadingXChar styles with theme
+    -- formatting that conflicts with custom paragraph styles in MS Word.
+    -- We replace them with character styles that mirror the paragraph style's rPr.
+    if preset.paragraph_styles then
+        for _, style in ipairs(preset.paragraph_styles) do
+            local char_id = style.id .. "Char"
+            if existing_ids[char_id] and not custom_styles[char_id] then
+                custom_styles[char_id] = style_builder.build_character_style_xml({
+                    id = char_id,
+                    name = style.name .. " Char",
+                    based_on = "DefaultParagraphFont",
+                    link = style.id,
+                    font = style.font,
+                    lang = style.lang,
+                })
+            end
+        end
+    end
+
     local result = styles_xml
 
     -- Replace existing styles

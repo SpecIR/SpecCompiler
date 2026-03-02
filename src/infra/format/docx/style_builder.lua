@@ -366,6 +366,11 @@ function M.build_character_style_xml(style)
         table.insert(children, xml.node("w:basedOn", { ["w:val"] = style.based_on }))
     end
 
+    -- Link to paragraph style (for linked char styles like Heading1Char)
+    if style.link then
+        table.insert(children, xml.node("w:link", { ["w:val"] = style.link }))
+    end
+
     -- Quick format
     table.insert(children, xml.node("w:qFormat"))
 
