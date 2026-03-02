@@ -331,16 +331,19 @@ function M.inject_section_references(content, references, log, options)
 
     for _, sectPr in ipairs(sectPrs) do
         -- Build set of existing references
+        -- Note: SLAXML stores local name in kid.name (e.g., "headerReference")
+        -- and prefix in kid.nsPrefix (e.g., "w"), so compare with local name only.
         local existing = {}
         local has_titlePg = false
         for _, kid in ipairs(sectPr.kids or {}) do
-            if kid.name == "w:headerReference" then
+            local local_name = kid.name or ""
+            if local_name == "headerReference" then
                 local hdr_type = xml.get_attr(kid, "w:type")
                 if hdr_type then existing["header:" .. hdr_type] = true end
-            elseif kid.name == "w:footerReference" then
+            elseif local_name == "footerReference" then
                 local ftr_type = xml.get_attr(kid, "w:type")
                 if ftr_type then existing["footer:" .. ftr_type] = true end
-            elseif kid.name == "w:titlePg" then
+            elseif local_name == "titlePg" then
                 has_titlePg = true
             end
         end
