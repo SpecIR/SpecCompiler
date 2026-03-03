@@ -239,6 +239,24 @@ function M.build_pPr(style)
         end
     end
 
+    -- Tab stops (w:tabs)
+    if style.tab_stops then
+        local tab_children = {}
+        for _, tab in ipairs(style.tab_stops) do
+            local tab_attrs = {
+                ["w:val"] = tab.type or "left",
+                ["w:pos"] = tostring(M.to_twips(tab.pos)),
+            }
+            if tab.leader then
+                tab_attrs["w:leader"] = tab.leader
+            end
+            table.insert(tab_children, xml.node("w:tab", tab_attrs))
+        end
+        if #tab_children > 0 then
+            table.insert(children, xml.node("w:tabs", nil, tab_children))
+        end
+    end
+
     -- Paragraph borders (pBdr)
     if style.borders then
         local border_children = {}

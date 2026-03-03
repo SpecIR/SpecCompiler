@@ -16,6 +16,7 @@
 local M = {}
 
 local Queries = require("db.queries")
+local xml = require("infra.format.xml")
 
 M.view = {
     id = "ABBREV_LIST",
@@ -23,6 +24,7 @@ M.view = {
     description = "List of all abbreviations defined in the document",
     inline_prefix = "abbrev_list",
     aliases = { "sigla_list", "acronym_list" },
+    materializer_type = "abbrev_list",
 }
 
 -- ============================================================================
@@ -40,13 +42,12 @@ end
 -- Data Generation
 -- ============================================================================
 
----Generate sorted abbreviation list from database.
+---Get sorted abbreviation list from database.
 ---Queries spec_views for ABBREV entries.
----@param params table Parameters (unused)
 ---@param data DataManager Database instance
 ---@param spec_id string Specification identifier
 ---@return table entries Array of {abbrev, meaning} sorted alphabetically
-function M.generate(params, data, spec_id)
+function M.get_list(data, spec_id)
     local abbrevs = data:query_all(Queries.content.views_by_type, {
         spec_id = spec_id,
         view_type = "ABBREV"
@@ -75,6 +76,50 @@ function M.generate(params, data, spec_id)
     end)
 
     return parsed
+end
+
+-- ============================================================================
+-- OOXML Generation
+-- ============================================================================
+
+---Generate OOXML paragraphs for abbreviation list.
+---@param data DataManager Database instance
+---@param spec_id string Specification identifier
+---@return string OOXML content
+function M.generate_list_ooxml(data, spec_id)
+    local abbrevs = M.get_list(data, spec_id)
+
+    if #abbrevs == 0 then
+        local empty_p = xml.node("w:p", {}, {
+            xml.node("w:r", {}, {
+                xml.node("w:t", {}, { xml.text("No abbreviations defined.") })
+            })
+        })
+        return xml.serialize_element(empty_p)
+    end
+
+    local style_id = "AbbreviationItem"
+    local parts = {}
+
+    for _, a in ipairs(abbrevs) do
+        local p = xml.node("w:p", {}, {
+            xml.node("w:pPr", {}, {
+                xml.node("w:pStyle", { ["w:val"] = style_id })
+            }),
+            xml.node("w:r", {}, {
+                xml.node("w:t", {}, { xml.text(a.abbrev) })
+            }),
+            xml.node("w:r", {}, {
+                xml.node("w:tab")
+            }),
+            xml.node("w:r", {}, {
+                xml.node("w:t", {}, { xml.text(a.meaning) })
+            })
+        })
+        table.insert(parts, xml.serialize_element(p))
+    end
+
+    return table.concat(parts, "\n")
 end
 
 -- ============================================================================
@@ -116,7 +161,7 @@ M.handler = {
             return nil
         end
 
-        local entries = M.generate({}, data, spec_id)
+        local entries = M.get_list(data, spec_id)
         if #entries == 0 then
             return pandoc.Para{pandoc.Str("[No abbreviations defined]")}
         end

@@ -78,8 +78,10 @@ function M.header(ctx, pandoc, db, options)
         table.insert(header_content, pandoc.Str(type_ref))
     end
 
-    -- Create header with appropriate level
-    local level = ctx.header_level or 2
+    -- Create header with appropriate level.
+    -- Shift by -1 for consistency with section.lua: markdown ## (level 2) becomes
+    -- Heading 1 in DOCX, since the H1 document title is rendered as a Div.
+    local level = math.max((ctx.header_level or 2) - 1, 1)
     local header = pandoc.Header(level, header_content)
 
     -- Apply custom-style based on type (e.g., "HLRHeader", "LLRHeader")
@@ -203,8 +205,17 @@ function M.body(ctx, pandoc, db, options)
 
     -- Include original content blocks first (the body/description text)
     local original_blocks = ctx.original_blocks or {}
+    local body_blocks = {}
     for _, block in ipairs(original_blocks) do
-        table.insert(blocks, block)
+        table.insert(body_blocks, block)
+    end
+
+    -- Wrap body content in SpecObjectBody styled Div for custom indent
+    if #body_blocks > 0 then
+        local body_div = pandoc.Div(body_blocks, pandoc.Attr("", {"spec-object-body"}, {
+            ["custom-style"] = "SpecObjectBody"
+        }))
+        table.insert(blocks, body_div)
     end
 
     -- Render attributes after body content
