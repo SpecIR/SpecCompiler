@@ -218,8 +218,18 @@ M.handler = {
             return nil
         end
 
-        -- Abbreviation list generates block content - inline Code cannot be replaced with blocks.
-        -- Return a placeholder or nil to keep the original code element.
+        local data = ctx.data
+        local spec_id = ctx.spec_id or "default"
+
+        if data then
+            local entries = M.get_list(data, spec_id)
+            if #entries == 0 then
+                return { pandoc.Str("[No abbreviations defined]") }
+            end
+        end
+
+        -- Non-empty abbreviation list generates block content (Table).
+        -- Inline Code cannot be replaced with blocks.
         -- Use ``` abbrev_list: ``` code block syntax for actual list rendering.
         return { pandoc.Str("[ABBREVIATION LIST]") }
     end,
