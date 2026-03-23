@@ -2,9 +2,9 @@
 
 ### VC: Five-Phase Lifecycle @VC-001
 
-Verify that the [TERM-15](@) executes all five phases in correct order.
+Verify that the [dic:pipeline](#) executes all five phases in correct order.
 
-> objective: Confirm [TERM-19](@), [TERM-20](@), [TERM-22](@), [TERM-21](@), [TERM-23](@) execute sequentially
+> objective: Confirm [dic:initialize-phase](#), [dic:analyze-phase](#), [dic:transform-phase](#), [dic:verify-phase](#), [dic:emit-phase](#) execute sequentially
 
 > verification_method: Test
 
@@ -17,14 +17,14 @@ Verify that the [TERM-15](@) executes all five phases in correct order.
 > - All 5 phases execute for every document
 > - Phase order is always INITIALIZE < ANALYZE < TRANSFORM < VERIFY < EMIT
 
-> traceability: [HLR-PIPE-001](@)
+> traceability: [HLR-PIPE-001](@), [LLR-020](@), [LLR-021](@), [LLR-022](@)
 
 
 ### VC: Handler Registration @VC-002
 
-Verify that [TERM-16](@) are registered with required fields.
+Verify that [dic:handler](#) are registered with required fields.
 
-> objective: Confirm handler registration validates name and [TERM-24](@)
+> objective: Confirm handler registration validates name and [dic:prerequisites](#)
 
 > verification_method: Test
 
@@ -44,9 +44,9 @@ Verify that [TERM-16](@) are registered with required fields.
 
 ### VC: Topological Ordering @VC-003
 
-Verify [TERM-16](@) execute in dependency order.
+Verify [dic:handler](#) execute in dependency order.
 
-> objective: Confirm [TERM-25](@) produces correct execution order
+> objective: Confirm [dic:topological-sort](#) produces correct execution order
 
 > verification_method: Test
 
@@ -60,7 +60,7 @@ Verify [TERM-16](@) execute in dependency order.
 > - Alphabetical tiebreaker when multiple handlers have same in-degree
 > - Cycle detection reports error
 
-> traceability: [HLR-PIPE-003](@)
+> traceability: [HLR-PIPE-003](@), [LLR-023](@), [LLR-024](@), [LLR-025](@)
 
 
 ### VC: Phase Abort on Errors @VC-004
@@ -81,7 +81,7 @@ Verify pipeline stops before EMIT if errors exist.
 > - TRANSFORM phase has already completed before VERIFY
 > - EMIT phase handlers never called
 
-> traceability: [HLR-PIPE-004](@)
+> traceability: [HLR-PIPE-004](@), [LLR-026](@), [LLR-027](@)
 
 
 ### VC: Batch Dispatch Across All Phases @VC-005
@@ -103,7 +103,7 @@ Verify that every phase uses batch-dispatched `on_{phase}` hooks.
 > - Every hook receives the full contexts array
 > - No `on_{phase}_batch` hooks are required
 
-> traceability: [HLR-PIPE-005](@)
+> traceability: [HLR-PIPE-005](@), [LLR-028](@), [LLR-029](@)
 
 
 ### VC: Context Propagation @VC-006
@@ -148,4 +148,97 @@ Verify inline tracking spans are stripped from AST while preserving block-level 
 > - Adjacent Str tokens merged after span removal
 > - Block-level data-pos attributes preserved for diagnostics
 
-> traceability: [HLR-PIPE-001](@)
+> traceability: [HLR-PIPE-007](@), [LLR-030](@), [LLR-031](@), [LLR-032](@), [LLR-033](@), [LLR-034](@), [LLR-035](@)
+
+
+### VC: CommonSpec Input Parsing @VC-PIPE-008
+
+Verify that each [dic:commonspec](#) annotation type produces the correct [dic:intermediate-representation](#) record.
+
+> objective: Confirm that H1 headers, H2-H6 headers, blockquote attributes, fenced code blocks, Markdown links, and inline code are lowered into the correct SpecIR content tables
+
+> verification_method: Test
+
+> approach:
+> - Process a test document containing all six annotation types
+> - Query each content table (specifications, spec_objects, spec_floats, spec_attribute_values, spec_relations, spec_views)
+> - Verify correct record count and field values for each annotation type
+
+> pass_criteria:
+> - H1 headers produce exactly one `specifications` record with correct type_ref and pid
+> - H2-H6 headers produce `spec_objects` records with correct type inference (explicit, implicit alias, default)
+> - Blockquote lines produce `spec_attribute_values` records with correct name, value, and datatype
+> - Fenced code blocks with type class produce `spec_floats` records with correct type_ref and raw_content
+> - Links with `(@)` targets produce `spec_relations` records with correct target_text
+> - Inline code with `type:` prefix produces `spec_views` records with correct view_type_ref
+
+> traceability: [HLR-PIPE-007](@), [LLR-030](@), [LLR-031](@), [LLR-032](@), [LLR-033](@), [LLR-034](@), [LLR-035](@)
+
+
+### VC: Include File Expansion @VC-PIPE-009
+
+Verify that `.include` code blocks are expanded with correct content and that circular includes are detected.
+
+> objective: Confirm recursive include expansion, path resolution, and cycle detection
+
+> verification_method: Test
+
+> approach:
+> - Create a document with nested includes (A includes B, B includes C)
+> - Execute pipeline and verify all three files' content appears in the specification
+> - Create a circular include and verify error is reported
+> - Verify include paths resolve relative to the including file's directory
+
+> pass_criteria:
+> - Content from all included files appears in correct document order
+> - Include paths resolve relative to the including file, not the project root
+> - Circular includes produce a diagnostic error
+> - Source position tracking attributes are present on included content
+
+> traceability: [HLR-PIPE-008](@), [LLR-036](@), [LLR-037](@), [LLR-038](@)
+
+
+### VC: PID Auto-Generation @VC-PIPE-010
+
+Verify that spec objects without explicit `@PID` receive auto-generated PIDs.
+
+> objective: Confirm PID generation format, collision avoidance, and composite hierarchy
+
+> verification_method: Test
+
+> approach:
+> - Create a document with typed objects lacking `@PID` annotations
+> - Execute pipeline through ANALYZE phase
+> - Query `spec_objects.pid` values and verify format matches type definition
+> - Create a document with both explicit and auto-generated PIDs; verify no collisions
+
+> pass_criteria:
+> - Auto-generated PIDs match the type's `pid_prefix` and `pid_format` (e.g., "HLR-001")
+> - [dic:composite-object-type](#) objects receive hierarchical PIDs (e.g., "SRS-sec1.2")
+> - Explicit `@PID` annotations are never overwritten
+> - No duplicate PIDs exist across all specifications
+
+> traceability: [HLR-PIPE-009](@), [LLR-039](@), [LLR-040](@), [LLR-041](@), [LLR-042](@)
+
+
+### VC: Relation Type Inference @VC-PIPE-011
+
+Verify that relations are resolved with correct type inference and [dic:specificity-scoring](#) scoring.
+
+> objective: Confirm constraint-based matching, same-spec preference, and ambiguity detection
+
+> verification_method: Test
+
+> approach:
+> - Create documents with relations matching different specificity levels
+> - Execute pipeline through ANALYZE phase
+> - Query `spec_relations` for resolved `type_ref` and `target_ref` values
+> - Create an ambiguous case (two types with equal specificity) and verify ambiguity flag
+
+> pass_criteria:
+> - Relations resolve to the most specific matching type (highest constraint score)
+> - Same-specification targets are preferred over cross-specification targets
+> - Ambiguous relations (tied specificity) have `is_ambiguous = 1`
+> - Unresolved relations have `is_unresolved = 1` with NULL target_ref
+
+> traceability: [HLR-PIPE-010](@), [LLR-043](@), [LLR-044](@), [LLR-045](@), [LLR-046](@)

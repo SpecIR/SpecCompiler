@@ -8,7 +8,7 @@ local Queries = require("db.queries")
 
 local M = {
     name = "fts_indexer",
-    prerequisites = { "reqif_xhtml" }  -- Runs after ReqIF XHTML cache (if enabled)
+    prerequisites = {}
 }
 
 -- ============================================================================

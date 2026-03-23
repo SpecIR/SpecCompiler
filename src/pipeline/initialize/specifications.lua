@@ -10,6 +10,7 @@ local logger = require("infra.logger")
 local pid_utils = require("pipeline.shared.pid_utils")
 local Queries = require("db.queries")
 local attribute_para = require("pipeline.shared.attribute_para_utils")
+local cache_registry = require("pipeline.shared.cache_registry")
 
 local M = {
     name = "specifications",
@@ -63,6 +64,7 @@ function M.clear_cache()
     default_object_type_cache = nil
     default_spec_type_cache = nil
 end
+cache_registry.register(M.clear_cache)
 
 ---Strip @PID from the end of a Header's inline content list.
 ---Walks backwards to remove trailing Str("@PID") and preceding Space elements.
@@ -169,15 +171,6 @@ local function blocks_to_json(blocks)
     return pandoc.json.encode(blocks)
 end
 
----Check if a BlockQuote contains attribute definitions.
----@param blockquote table Pandoc BlockQuote block
----@return boolean True if blockquote is an attribute block
-local function is_attribute_blockquote(blockquote)
-    local paras = attribute_para.collect_paragraphs(blockquote)
-    if #paras == 0 then return false end
-    return attribute_para.is_attribute_para(paras[1])
-end
-
 ---Extract body blocks from an L1 section (blocks after header, excluding attributes).
 ---Returns blocks that sit between the specification header/metadata and the first L2 header.
 ---These are root-level content blocks (view inlines, paragraphs, etc.) that are not
@@ -194,7 +187,7 @@ local function extract_spec_body_blocks(section_blocks)
             goto continue
         end
         -- Skip attribute BlockQuotes (version, status, etc.)
-        if block.t == "BlockQuote" and is_attribute_blockquote(block) then
+        if block.t == "BlockQuote" and attribute_para.is_attribute_blockquote(block) then
             goto continue
         end
         -- Skip Div-wrapped attribute blockquotes (sourcepos compat)
@@ -204,7 +197,7 @@ local function extract_spec_body_blocks(section_blocks)
                 div_content = div_content[2]
             end
             if #div_content == 1 and div_content[1].t == "BlockQuote"
-                and is_attribute_blockquote(div_content[1]) then
+                and attribute_para.is_attribute_blockquote(div_content[1]) then
                 goto continue
             end
         end

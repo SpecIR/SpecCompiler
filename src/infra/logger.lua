@@ -227,12 +227,10 @@ end
 --- Convenience methods for logs
 function M.info(msg, extra) M.log("info", msg, extra) end
 function M.debug(msg, extra) M.log("debug", msg, extra) end
-function M.progress(msg, current, total) M.log("progress", msg, {current=current, total=total}) end
 
 --- Convenience methods for diagnostics
 function M.error(msg, source, line) M.diagnostic("error", msg, source, line) end
 function M.warning(msg, source, line) M.diagnostic("warning", msg, source, line) end
-function M.success(msg) M.diagnostic("info", msg) end
 
 ---Create a log adapter with conventional log.debug(), log.info(), etc. methods.
 ---Used by modules that prefer object-style logging.
@@ -263,6 +261,40 @@ function M.create_adapter(level)
         error = function(fmt, ...)
             if threshold <= LEVELS.ERROR then
                 local msg = select("#", ...) > 0 and string.format(fmt, ...) or tostring(fmt)
+                M.diagnostic("error", msg)
+            end
+        end
+    }
+end
+
+---Create a diagnostic-aware log adapter.
+---Routes debug/info to operational logs, warn/error to diagnostics (if available) or logger.
+---@param diagnostics table|nil Diagnostics object with :warn() and :error() methods
+---@param category string Diagnostic category (e.g., "RENDER", "FLOAT", "EMIT")
+---@return table log Logger with debug/info/warn/error methods
+function M.create_diagnostic_adapter(diagnostics, category)
+    return {
+        debug = function(fmt, ...)
+            local msg = select("#", ...) > 0 and string.format(fmt, ...) or tostring(fmt)
+            M.log("debug", msg)
+        end,
+        info = function(fmt, ...)
+            local msg = select("#", ...) > 0 and string.format(fmt, ...) or tostring(fmt)
+            M.log("info", msg)
+        end,
+        warn = function(fmt, ...)
+            local msg = select("#", ...) > 0 and string.format(fmt, ...) or tostring(fmt)
+            if diagnostics then
+                diagnostics:warn(nil, nil, category, msg)
+            else
+                M.diagnostic("warning", msg)
+            end
+        end,
+        error = function(fmt, ...)
+            local msg = select("#", ...) > 0 and string.format(fmt, ...) or tostring(fmt)
+            if diagnostics then
+                diagnostics:error(nil, nil, category, msg)
+            else
                 M.diagnostic("error", msg)
             end
         end

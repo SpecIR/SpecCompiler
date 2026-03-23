@@ -8,7 +8,7 @@
 
 The multi-format publication function encompasses the TRANSFORM and EMIT pipeline phases,
 covering content rendering, view materialization, external subprocess rendering,
-document assembly from the [TERM-IR](@) database, [TERM-04](@) numbering and resolution, and
+document assembly from the [dic:intermediate-representation](#) database, [dic:float](#) numbering and resolution, and
 parallel output generation via Pandoc.
 
 **TRANSFORM Phase**: Prepares content for output through four handler stages:
@@ -58,7 +58,7 @@ fulfilling multi-format output requirements:
 - [CSU-041](@): Replaces view placeholder blocks with materialized content from the
   TRANSFORM phase. Views are expanded inline as formatted tables, lists, or custom
   structures depending on view type. Additionally, populates FTS5 virtual tables
-  (`fts_objects`, `fts_attributes`, `fts_floats`) for [TERM-FTS](@) in the web
+  (`fts_objects`, `fts_attributes`, `fts_floats`) for [dic:full-text-search](#) in the web
   application, converting AST to plain text and indexing searchable fields with Porter
   stemming.
 
@@ -191,6 +191,126 @@ PC --> T: output files
 H -> H: run postprocessors
 @enduml
 ```
+
+#### LLR: DOCX Preset Loader Resolves, Merges, And Validates Preset Chains @LLR-OUT-029-01
+
+DOCX preset loading shall resolve preset paths, merge extends chains deterministically, and reject malformed or cyclic preset definitions.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-005](@)
+
+#### LLR: Assembler Queries by File Sequence @LLR-070
+
+Given a [dic:specification](#) identifier, [csu:document-assembler](#) shall query `spec_objects` ordered by `file_seq`, producing a Pandoc Block list in document order.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-001](@)
+
+#### LLR: Include Header Level Adjustment @LLR-071
+
+Given a [dic:spec-object](#) from an included file with header level offset, [csu:document-assembler](#) shall adjust the Pandoc Header level to maintain correct document hierarchy.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-001](@)
+
+#### LLR: Float and View Placeholder Insertion @LLR-072
+
+Given [dic:spec-float](#) and [dic:spec-view](#) positions, [csu:document-assembler](#) shall insert [dic:placeholder-block](#)s at correct `file_seq` positions for downstream resolution.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-001](@)
+
+#### LLR: Float Placeholder Label Matching @LLR-073
+
+Given a [dic:placeholder-block](#) in the assembled document, [csu:float-emitter](#) shall match its `label` against `spec_floats` records to retrieve the `resolved_ast`.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-002](@)
+
+#### LLR: Float Semantic Div Wrapping @LLR-074
+
+Given a resolved [dic:spec-float](#), [csu:float-emitter](#) shall wrap it in a Pandoc Div with semantic classes (`speccompiler-float`, [dic:counter-group](#)-specific class) and a bookmark anchor identifier.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-002](@)
+
+#### LLR: Failed Float Error Placeholder @LLR-075
+
+Given a [dic:spec-float](#) with NULL `resolved_ast` (failed [dic:external-renderer](#)), [csu:float-emitter](#) shall preserve an error placeholder block with [dic:diagnostic-record](#) message.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-002](@)
+
+#### LLR: Monotonic Float Numbering @LLR-076
+
+Given all [dic:spec-float](#)s across all [dic:specification](#)s ordered by `file_seq`, [csu:float-numbering](#) shall assign monotonically increasing `number` within each [dic:counter-group](#), starting at 1.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-003](@)
+
+#### LLR: Shared Counter Group Numbering @LLR-077
+
+When float types share a [dic:counter-group](#) (e.g., FIGURE, CHART, PLANTUML share "FIGURE"), [csu:float-numbering](#) shall use a single numbering sequence.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-003](@)
+
+#### LLR: Output Cache Skip @LLR-078
+
+Given an assembled Pandoc document and output config, [csu:emitter-orchestrator](#) shall call [csu:output-cache](#) `is_output_current()` and skip format generation when it returns `true`.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-004](@)
+
+#### LLR: Intermediate JSON Cleanup @LLR-079
+
+After Pandoc format conversion completes, [csu:emitter-orchestrator](#) shall remove the intermediate JSON file from the build directory.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-004](@)
+
+#### LLR: HTML5 Resource Embedding @LLR-080
+
+When `embed_resources: true` is set in project.yaml `html5:` config, [csu:pandoc-cli-builder](#) shall add `--embed-resources` to Pandoc CLI args, producing single-file HTML5 output.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-006](@)
+
+#### LLR: HTML5 Search Index Bundling @LLR-081
+
+When [dic:full-text-search](#) tables are populated, [csu:html5-postprocessor](#) HTML5 postprocessor shall bundle the search index JSON into the output.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-006](@)
+
+#### LLR: FTS5 Table Creation with Porter Stemming @LLR-082
+
+During [dic:emit-phase](#) phase, [csu:fts-indexer](#) shall create FTS5 virtual tables (`fts_objects`, `fts_attributes`, `fts_floats`) with `tokenize='porter'`.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-007](@)
+
+#### LLR: AST to Plain Text for FTS Indexing @LLR-083
+
+Given [dic:spec-object](#) body [dic:abstract-syntax-tree](#), [csu:fts-indexer](#) shall convert to plain text via Pandoc `utils.stringify()` before inserting into the [dic:full-text-search](#) index.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-007](@)
 
 ---
 

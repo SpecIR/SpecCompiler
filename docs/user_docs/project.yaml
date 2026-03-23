@@ -21,9 +21,9 @@ doc_files:
 
 outputs:
   - format: docx
-    path: build/docx/{spec_id}.docx
+    path: docx/{spec_id}.docx
   - format: html5
-    path: build/www/{spec_id}.html
+    path: www/{spec_id}.html
 
 html5:
   number_sections: true

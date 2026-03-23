@@ -6,30 +6,30 @@
 
 **Allocation:** Realized by [CSC-001](@) (Core Runtime) through [CSU-005](@) (Build Engine) and [CSU-006](@) (Pipeline Orchestrator), with handlers registered via [CSC-003](@) (Pipeline Handlers). Phase-specific handlers are organized in [CSC-008](@) (Analyze Handlers), [CSC-010](@) (Initialize Handlers), and [CSC-012](@) (Transform Handlers), with shared utilities in [CSC-011](@) (Shared Pipeline Utilities).
 
-The [TERM-15](@) execution orchestration function manages the five-phase document processing
+The [dic:pipeline](#) execution orchestration function manages the five-phase document processing
 lifecycle from initial Pandoc hook entry through final output generation. It encompasses
-[TERM-16](@) registration, dependency-based execution ordering, context propagation, and
+[dic:handler](#) registration, dependency-based execution ordering, context propagation, and
 phase abort logic.
 
 **Entry Point**: The Pandoc filter ([CSU-005](@)) hooks into the Pandoc Meta callback, extracts
 project metadata via [CSU-009](@), and invokes the build engine. The engine creates the
 database, initializes the data manager, loads the model via [CSU-008](@), processes
-document files (with [TERM-30](@) checks), and delegates to the pipeline orchestrator.
+document files (with [dic:build-cache](#) checks), and delegates to the pipeline orchestrator.
 
-**Handler Registration**: During model loading, [CSU-008](@) registers each handler with the Pipeline Orchestrator [CSU-006](@), which enforces the registration contract by validating that every handler declares both a `name` and a `[TERM-24](@)` field before accepting registration. The orchestrator rejects duplicate handler names — attempting to register a handler whose name already exists raises an immediate error. Accepted handlers are stored in a lookup table keyed by name for O(1) retrieval during phase execution. Each handler implements phase hooks using the naming convention `on_{phase}` (e.g., `on_initialize`, `on_analyze`, `on_transform`, `on_verify`, `on_emit`). All hooks receive the full contexts array: `on_{phase}(data, contexts, diagnostics)`.
+**Handler Registration**: During model loading, [CSU-008](@) registers each handler with the Pipeline Orchestrator [CSU-006](@), which enforces the registration contract by validating that every handler declares both a `name` and a `[dic:prerequisites](#)` field before accepting registration. The orchestrator rejects duplicate handler names — attempting to register a handler whose name already exists raises an immediate error. Accepted handlers are stored in a lookup table keyed by name for O(1) retrieval during phase execution. Each handler implements phase hooks using the naming convention `on_{phase}` (e.g., `on_initialize`, `on_analyze`, `on_transform`, `on_verify`, `on_emit`). All hooks receive the full contexts array: `on_{phase}(data, contexts, diagnostics)`.
 
-**[TERM-25](@)**: Before executing each phase, the Pipeline Orchestrator [CSU-006](@) applies Kahn's algorithm to produce a deterministic handler execution order. Only handlers that implement an `on_{phase}` hook for the current phase participate in the sort; handlers without a relevant hook are skipped entirely. The algorithm begins by building a dependency graph restricted to participants and initializing an in-degree count for each node. Nodes with zero in-degree — handlers whose prerequisites are already satisfied — seed a processing queue. At each step the algorithm dequeues the first node, appends it to the sorted output, and decrements the in-degree of all its dependents; any dependent whose in-degree reaches zero is enqueued. Alphabetical tie-breaking is applied at every dequeue step so that handlers at the same dependency depth are always emitted in the same order, guaranteeing deterministic output across runs. After the queue is exhausted, if the sorted list length is less than the participant count a dependency cycle exists and is reported as an error.
+**[dic:topological-sort](#)**: Before executing each phase, the Pipeline Orchestrator [CSU-006](@) applies Kahn's algorithm to produce a deterministic handler execution order. Only handlers that implement an `on_{phase}` hook for the current phase participate in the sort; handlers without a relevant hook are skipped entirely. The algorithm begins by building a dependency graph restricted to participants and initializing an in-degree count for each node. Nodes with zero in-degree — handlers whose prerequisites are already satisfied — seed a processing queue. At each step the algorithm dequeues the first node, appends it to the sorted output, and decrements the in-degree of all its dependents; any dependent whose in-degree reaches zero is enqueued. Alphabetical tie-breaking is applied at every dequeue step so that handlers at the same dependency depth are always emitted in the same order, guaranteeing deterministic output across runs. After the queue is exhausted, if the sorted list length is less than the participant count a dependency cycle exists and is reported as an error.
 
 > For example, if INITIALIZE has three handlers — `specifications` (no prerequisites), `spec_objects` (prerequisite: `specifications`), and `spec_floats` (prerequisite: `specifications`) — the sort produces `[specifications, spec_floats, spec_objects]`, with `spec_floats` and `spec_objects` ordered alphabetically since both depend only on `specifications`.
 
 **Phase Execution**: The pipeline executes five phases in order:
 
-1. **[TERM-19](@)** — Parse Pandoc [TERM-AST](@) into [TERM-IR](@) database tables (specifications,
+1. **[dic:initialize-phase](#)** — Parse Pandoc [dic:abstract-syntax-tree](#) into [dic:intermediate-representation](#) database tables (specifications,
    spec_objects, attributes, spec_floats, spec_views, spec_relations)
-2. **[TERM-20](@)** — Resolve cross-references and infer relation types
-3. **[TERM-22](@)** — Render content, materialize views, execute external renderers
-4. **[TERM-21](@)** — Run proof views and collect diagnostics
-5. **[TERM-23](@)** — Assemble documents and generate output files
+2. **[dic:analyze-phase](#)** — Resolve cross-references and infer relation types
+3. **[dic:transform-phase](#)** — Render content, materialize views, execute external renderers
+4. **[dic:verify-phase](#)** — Run proof views and collect diagnostics
+5. **[dic:emit-phase](#)** — Assemble documents and generate output files
 
 All phases use the same dispatch model: for each handler in sorted order, the Pipeline Orchestrator [CSU-006](@) calls the handler's `on_{phase}(data, contexts, diagnostics)` hook once with the full set of contexts. Handlers are responsible for iterating over contexts internally. Each handler invocation is bracketed by `uv.hrtime()` calls at nanosecond precision to record its duration, and the orchestrator also records the aggregate duration of each phase, providing two-level performance visibility (handler-level and phase-level).
 
@@ -157,6 +157,320 @@ end
 P --> E: diagnostics
 @enduml
 ```
+
+#### LLR: Handler Registration Requires Name @LLR-PIPE-002-01
+
+Pipeline handler registration shall reject handlers that do not
+provide a non-empty `name` field.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-002](@)
+
+#### LLR: Handler Registration Requires Prerequisites @LLR-PIPE-002-02
+
+Pipeline handler registration shall reject handlers that do not
+provide a `prerequisites` array.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-002](@)
+
+#### LLR: Duplicate Handler Names Are Rejected @LLR-PIPE-002-03
+
+Pipeline handler registration shall reject duplicate handler
+names within the same pipeline instance.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-002](@)
+
+#### LLR: Base Context Fields Are Propagated @LLR-PIPE-006-01
+
+Pipeline execution shall propagate the base context fields
+(`validation`, `build_dir`, `log`, `output_format`, `template`, `reference_doc`,
+`docx`, `project_root`, `outputs`, `html5`, `bibliography`, `csl`) to handlers.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-006](@)
+
+#### LLR: Document Context Is Attached Per Document @LLR-PIPE-006-02
+
+Pipeline execution shall attach `doc` and `spec_id` for each
+processed document context passed to handlers.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-006](@)
+
+#### LLR: Project Context Exists Without Documents @LLR-PIPE-006-03
+
+Pipeline execution shall create a fallback project context when
+the document list is empty, with `doc=nil` and a derived `spec_id`.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-006](@)
+
+#### LLR: Phase Execution Order @LLR-020
+
+Given registered [dic:handler](#)s, [csu:pipeline-orchestrator](#) shall execute phases in fixed order:
+[dic:initialize-phase](#) → [dic:analyze-phase](#) → [dic:transform-phase](#) → [dic:verify-phase](#) → [dic:emit-phase](#).
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-001](@)
+
+#### LLR: Phase Hook Filtering @LLR-021
+
+Given the [dic:handler](#) set for a [dic:phase](#), [csu:pipeline-orchestrator](#) shall invoke only
+those declaring an `on_{phase}` hook for that phase.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-001](@)
+
+#### LLR: No EMIT After Abort @LLR-022
+
+When `diagnostics:has_errors()` returns true after [dic:verify-phase](#), [csu:pipeline-orchestrator](#)
+shall not execute [dic:emit-phase](#) phase handlers.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-001](@)
+
+#### LLR: Topological Sort Phase Filtering @LLR-023
+
+Given a [dic:phase](#) name and the [dic:handler](#) registry, [csu:pipeline-orchestrator](#) shall
+build the [dic:topological-sort](#) dependency graph from only those handlers declaring an
+`on_{phase}` hook, producing an ordered execution list.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-003](@)
+
+#### LLR: Alphabetic Tie-Breaking @LLR-024
+
+When multiple [dic:handler](#)s have no dependency ordering between them,
+[csu:pipeline-orchestrator](#) shall sort them alphabetically by `name`, producing deterministic
+output.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-003](@)
+
+#### LLR: Circular Dependency Reporting @LLR-025
+
+When a cyclic [dic:prerequisites](#) graph is detected, [csu:pipeline-orchestrator](#) shall report an
+error listing the remaining unordered handler names.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-003](@)
+
+#### LLR: TRANSFORM Completes Before Abort Check @LLR-026
+
+[csu:build-engine](#) shall complete all [dic:transform-phase](#) phase handlers before checking
+`has_errors()` for abort, ensuring transforms are applied before validation
+results are inspected.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-004](@)
+
+#### LLR: Abort Logs Error Count @LLR-027
+
+When aborting execution before [dic:emit-phase](#), [csu:build-engine](#) shall log the error
+count via [csu:logger](#).
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-004](@)
+
+#### LLR: Full Contexts Array Dispatch @LLR-028
+
+Given a document context array, [csu:pipeline-orchestrator](#) shall pass the full array to each
+[dic:handler](#)'s `on_{phase}` hook in a single call.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-005](@)
+
+#### LLR: Handler Hook Signature @LLR-029
+
+[csu:pipeline-orchestrator](#) shall invoke phase hooks with signature
+`on_{phase}(data, contexts, diagnostics)` where `data` is a [csu:data-manager](#)
+instance, `contexts` is the array, and `diagnostics` is a [csu:diagnostics-collector](#) instance.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-005](@)
+
+#### LLR: L1 Headers Register as Specifications @LLR-030
+
+Given a Pandoc Header at level 1 in the [dic:abstract-syntax-tree](#), [csu:specification-parser](#) shall parse
+the optional `TYPE:` prefix and `@`[dic:project-identifier](#) suffix and insert one
+[dic:specification](#) record into the `specifications` table with `identifier` derived
+from filename, `type_ref` validated against the [dic:type-registry](#), and `header_ast`
+storing the serialized [dic:abstract-syntax-tree](#).
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-007](@)
+
+#### LLR: L2-H6 Headers Register as Spec Objects @LLR-031
+
+Given a Pandoc Header at level 2–6, [csu:object-parser](#) shall insert one [dic:spec-object](#)
+record with type resolved via explicit `TYPE:` prefix → [dic:type-alias](#) lookup →
+default fallback.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-007](@)
+
+#### LLR: Blockquotes Register as Attributes @LLR-032
+
+Given Pandoc BlockQuote lines matching `> key: value`, [csu:attribute-parser](#) shall insert
+[dic:attribute](#) records in `spec_attribute_values` linked to the enclosing
+[dic:spec-object](#) via `owner_object_id`.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-007](@)
+
+#### LLR: Code Blocks Register as Floats @LLR-033
+
+Given a Pandoc CodeBlock with `syntax:label` class, [csu:float-parser](#) shall insert
+one [dic:spec-float](#) record with `type_ref` resolved from [dic:type-alias](#), `label`,
+and `raw_content`.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-007](@)
+
+#### LLR: Links Register as Relations @LLR-034
+
+Given a Pandoc Link with `(@)` or `(#)` target, [csu:relation-parser](#) shall insert one
+[dic:spec-relation](#) record with `target_text` and [dic:relation-selector](#) preserved for
+downstream resolution.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-007](@)
+
+#### LLR: Content-Addressable Identifiers and Document Order @LLR-035
+
+For any [dic:intermediate-representation](#) record, [csu:object-parser](#) and [csu:hash-utilities](#) shall compute
+`identifier` as SHA1 hash of source context and assign `file_seq` preserving
+document order.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-007](@)
+
+#### LLR: Include Path Resolution @LLR-036
+
+Given `.include` CodeBlock paths, [csu:include-expansion-filter](#) shall resolve each path relative
+to the including file's directory.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-008](@)
+
+#### LLR: Circular Include Detection @LLR-037
+
+When recursive include traversal detects a cycle, [csu:include-expansion-filter](#) shall raise an
+error with the include chain path before performing any expansion.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-008](@)
+
+#### LLR: Source Position Injection @LLR-038
+
+After expanding included content, [csu:include-expansion-filter](#) shall inject `data-source-file`
+and `data-pos` attributes into expanded blocks for diagnostic tracing.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-008](@)
+
+#### LLR: Non-Composite PID Format @LLR-039
+
+Given a non-[dic:composite-object-type](#) [dic:spec-object](#) without explicit
+`@`[dic:project-identifier](#), the pid_generator shall produce a [dic:project-identifier](#) using
+`pid_prefix` + `pid_format` from the [dic:type](#) definition (e.g.,
+`HLR-%03d` → `HLR-001`).
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-009](@)
+
+#### LLR: Composite Hierarchical PID @LLR-040
+
+Given a [dic:composite-object-type](#) [dic:spec-object](#) without explicit `@`[dic:project-identifier](#),
+the pid_generator shall produce a hierarchical [dic:project-identifier](#) qualified by the
+[dic:specification](#) PID (e.g., `SRS-sec1.2.3`).
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-009](@)
+
+#### LLR: Explicit PID Preservation @LLR-041
+
+Given a [dic:spec-object](#) with explicit `@`[dic:project-identifier](#) annotation, the
+pid_generator shall preserve the PID unchanged.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-009](@)
+
+#### LLR: PID Collision Detection @LLR-042
+
+After generating a [dic:project-identifier](#), the pid_generator shall check for collisions
+across all [dic:specification](#)s, raising an error if a duplicate is found.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-009](@)
+
+#### LLR: Relation Type Constraint Filtering @LLR-043
+
+Given an unresolved [dic:spec-relation](#) and the [dic:type-registry](#), [csu:relation-type-inferrer](#) shall
+filter candidate relation types by [dic:relation-selector](#), `source_attribute`,
+source `type_ref`, and target `type_ref` constraints.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-010](@)
+
+#### LLR: NULL Constraints Are Wildcards @LLR-044
+
+When a candidate relation type has a NULL constraint, [csu:relation-type-inferrer](#) shall treat
+it as a wildcard matching any value, adding 0 to the [dic:specificity-scoring](#) score.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-010](@)
+
+#### LLR: Specificity Tie Marks Ambiguity @LLR-045
+
+When multiple candidates achieve equal highest [dic:specificity-scoring](#),
+[csu:relation-type-inferrer](#) shall mark the [dic:spec-relation](#) as ambiguous.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-010](@)
+
+#### LLR: Same-Specification Target Preference @LLR-046
+
+When resolving target candidates, [csu:resolution-queries](#) shall prefer targets in the same
+[dic:specification](#) over cross-specification targets.
+
+> verification_method: Test
+
+> traceability: [HLR-PIPE-010](@)
 
 ---
 

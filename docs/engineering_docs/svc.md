@@ -37,5 +37,9 @@ verification/output_vc.md
 ```
 
 ```{.include}
+verification/audit_vc.md
+```
+
+```{.include}
 trr.md
 ```

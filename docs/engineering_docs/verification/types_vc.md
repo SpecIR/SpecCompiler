@@ -19,7 +19,7 @@ Verify specifications table stores document metadata.
 > - type_ref matches header type prefix
 > - pid extracted from @PID syntax
 
-> traceability: [HLR-TYPE-001](@)
+> traceability: [HLR-TYPE-001](@), [LLR-055](@), [LLR-056](@)
 
 
 ### VC: Spec Objects Container @VC-013
@@ -41,7 +41,7 @@ Verify spec_objects table stores header-based content.
 > - file_seq preserves document order
 > - ast contains body content as JSON
 
-> traceability: [HLR-TYPE-002](@)
+> traceability: [HLR-TYPE-002](@), [LLR-057](@), [LLR-058](@), [LLR-059](@)
 
 
 ### VC: Spec Floats Container @VC-014
@@ -60,10 +60,10 @@ Verify spec_floats table stores numbered elements.
 > pass_criteria:
 > - Each code block with type prefix creates one record
 > - label extracted from syntax (e.g., "fig:label")
-> - number assigned during [TERM-23](@) phase
+> - number assigned during [dic:emit-phase](#) phase
 > - parent_object_ref links to containing object
 
-> traceability: [HLR-TYPE-003](@)
+> traceability: [HLR-TYPE-003](@), [LLR-060](@), [LLR-061](@)
 
 
 ### VC: Spec Relations Container @VC-015
@@ -84,9 +84,9 @@ Verify spec_relations table stores traceability links.
 > - Each link creates one relation record
 > - source_ref points to containing object
 > - target_text contains original link text
-> - target_ref populated during [TERM-20](@) phase
+> - target_ref populated during [dic:analyze-phase](#) phase
 
-> traceability: [HLR-TYPE-005](@)
+> traceability: [HLR-TYPE-005](@), [LLR-064](@), [LLR-065](@)
 
 
 ### VC: Spec Views Container @VC-016
@@ -105,10 +105,10 @@ Verify spec_views table stores generated content.
 > pass_criteria:
 > - Each view code block creates one record
 > - view_type_ref matches view type
-> - resolved_ast populated during [TERM-22](@) phase
+> - resolved_ast populated during [dic:transform-phase](#) phase
 > - resolved_data contains structured view data
 
-> traceability: [HLR-TYPE-004](@)
+> traceability: [HLR-TYPE-004](@), [LLR-062](@), [LLR-063](@)
 
 
 ### VC: Spec Attributes Container @VC-017
@@ -130,7 +130,7 @@ Verify spec_attribute_values table stores object properties.
 > - datatype matches attribute definition
 > - Value stored in correct typed column
 
-> traceability: [HLR-TYPE-006](@)
+> traceability: [HLR-TYPE-006](@), [LLR-066](@), [LLR-067](@)
 
 
 ### VC: Type Validation @VC-018
@@ -157,4 +157,4 @@ Verify proof views detect data integrity violations.
 > - SD-607 violation is reported when an FD has no traceability link to a CSU
 > - Error messages include file path and line number
 
-> traceability: [HLR-TYPE-007](@)
+> traceability: [HLR-TYPE-007](@), [LLR-068](@), [LLR-069](@)

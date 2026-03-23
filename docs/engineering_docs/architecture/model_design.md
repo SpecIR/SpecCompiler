@@ -2,11 +2,11 @@
 
 ### FD: Type System and Domain Model Definition @FD-005
 
-**Allocation:** Realized by [CSC-018](@) (Default Filters), [CSC-019](@) (Default Postprocessors), [CSC-021](@) (Default Styles), [CSC-022](@) (Default Float Types), [CSC-023](@) (Default Relation Types), and [CSC-024](@) (Default View Types).
+> traceability: [SF-003](@), [CSC-018](@), [CSC-019](@), [CSC-021](@), [CSC-022](@), [CSC-023](@), [CSC-024](@)
 
 The type system and domain model definition function encompasses the default model
 components that provide base type definitions, format-specific processing, and style
-configuration. These components are loaded by the [TERM-38](@) ([CSU-008](@)) during the
+configuration. These components are loaded by the [dic:type-loader](#) ([CSU-008](@)) during the
 model discovery phase described in [FD-002](@) and collectively define the foundational
 capabilities that all domain models inherit and extend.
 
@@ -121,7 +121,6 @@ loop for each view type
 end
 
 TL -> DB: propagate_inherited_attributes()
-TL -> DB: propagate_inherited_relation_properties()
 TL --> E: types and handlers registered
 deactivate TL
 
@@ -143,6 +142,126 @@ note right: DOCX: Letter, margins,\nfonts, heading styles\nHTML: Inter, JetBrain
 E -> E: generate reference.docx
 @enduml
 ```
+
+#### LLR: Specification Identifier from Filename @LLR-055
+
+Given a source file path, [csu:specification-parser](#) shall derive the [dic:specification](#) `identifier` from the filename without extension.
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-001](@)
+
+#### LLR: Unknown Specification Type Fallback @LLR-056
+
+When a L1 header declares an unknown `type_ref`, [csu:specification-parser](#) shall fall back to the default [dic:type](#) or emit a [dic:diagnostic-record](#) warning via [csu:diagnostics-collector](#).
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-001](@)
+
+#### LLR: Spec Object Content-Addressable ID @LLR-057
+
+Given source path, start_line, and title_text, [csu:object-parser](#) and [csu:hash-utilities](#) shall compute the [dic:spec-object](#) `identifier` as SHA1 hash of the concatenation.
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-002](@)
+
+#### LLR: Spec Object Type Resolution Order @LLR-058
+
+Given L2-H6 header text, [csu:object-parser](#) shall resolve the [dic:type](#) in order: explicit `TYPE:` prefix → [dic:type-alias](#) lookup in [dic:type-registry](#) → default type.
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-002](@)
+
+#### LLR: Spec Object Label Format @LLR-059
+
+Given a resolved [dic:spec-object](#), [csu:object-parser](#) shall format the `label` field as `{type_lower}:{title_slug}` for `(#)` cross-referencing.
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-002](@)
+
+#### LLR: Float Short Identifier Format @LLR-060
+
+Given a float source context, [csu:float-parser](#) and [csu:hash-utilities](#) shall compute the [dic:spec-float](#) `identifier` in short format `float-{8-char-sha1}` for DOCX bookmark compatibility.
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-003](@)
+
+#### LLR: Float Type Alias Resolution @LLR-061
+
+Given a CodeBlock class string, [csu:float-parser](#) shall resolve the [dic:spec-float](#) `type_ref` from [dic:type-alias](#) entries in `spec_float_types` (e.g., "csv" → "TABLE").
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-003](@)
+
+#### LLR: External Render Delegation @LLR-062
+
+When a [dic:spec-view](#) has `needs_external_render = 1` in `spec_view_types`, [csu:view-materializer](#) shall delegate it to the registered [dic:external-renderer](#).
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-004](@)
+
+#### LLR: Inline View Syntax @LLR-063
+
+Given Inline Code with `type: content` format, [csu:view-parser](#) shall insert a [dic:spec-view](#) record with `view_type_ref` and `raw_ast`.
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-004](@)
+
+#### LLR: PID and Label Selector Resolution @LLR-064
+
+Given a `(@)` [dic:relation-selector](#), [csu:resolution-queries](#) shall resolve via `spec_objects.pid`; given `(#)` [dic:relation-selector](#), [csu:resolution-queries](#) shall resolve via `spec_objects.label` or `spec_floats.label`.
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-005](@)
+
+#### LLR: Default Relation Type Selection @LLR-065
+
+When no explicit relation type is provided, [csu:relation-type-inferrer](#) shall select the default [dic:spec-relation](#) type where `is_default = 1` AND `link_selector` matches in `spec_relation_types`.
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-005](@)
+
+#### LLR: ENUM Attribute Resolution @LLR-066
+
+Given an ENUM [dic:attribute](#) raw_value, [csu:attribute-caster](#) shall resolve it against the `enum_values` table and populate the `enum_ref` foreign key.
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-006](@)
+
+#### LLR: XHTML AST Preservation @LLR-067
+
+Given an XHTML [dic:attribute](#) raw_value, [csu:attribute-parser](#) shall preserve the Pandoc [dic:abstract-syntax-tree](#) serialization in the `ast` column as JSON.
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-006](@)
+
+#### LLR: Proof View Registration @LLR-068
+
+Given a [dic:proof-view](#) SQL string, [csu:proof-loader](#) shall register it as a `CREATE VIEW` in the [dic:specir](#) database during the [dic:verify-phase](#) phase.
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-007](@)
+
+#### LLR: Proof Policy Severity Resolution @LLR-069
+
+Given a [dic:proof-policy](#) `policy_key` and project.yaml configuration, [csu:validation-policy](#) shall return severity (`error`, `warn`, `ignore`) controlling [dic:diagnostic-record](#) emission.
+
+> verification_method: Test
+
+> traceability: [HLR-TYPE-007](@)
 
 ---
 

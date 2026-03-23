@@ -8,6 +8,9 @@
 ---  3. Use OutputWriter to write via Pandoc CLI
 ---  4. Postprocessor handles template-specific modifications
 ---
+---Note: ReqIF export is no longer handled here. Use the standalone
+---`python -m reqif.specir` CLI for ReqIF ↔ SpecIR interoperability.
+---
 ---@module emitter
 local Writer = require("infra.format.writer")
 local Assembler = require("pipeline.emit.assembler")
@@ -135,7 +138,6 @@ local function prepare_emit_tasks(documents, output_cache, diagnostics, log)
     local tasks = {}
     local task_metadata = {}
     local format_json_paths = {}
-    local reqif_tasks = {}
 
     log.debug("[EMIT] on_emit called with %d document(s) in this batch", #documents)
 
@@ -182,17 +184,6 @@ local function prepare_emit_tasks(documents, output_cache, diagnostics, log)
             local output_dir = output_path:match("^(.+)/[^/]+$")
             if output_dir then
                 task_runner.ensure_dir(output_dir)
-            end
-
-            if output.format == "reqif" then
-                reqif_tasks[#reqif_tasks + 1] = {
-                    spec_id = d.spec_id,
-                    db_path = d.config.db_file or ((d.config.output_dir or "build") .. "/specir.db"),
-                    output_path = output_path,
-                    template = d.config.template or "default",
-                    project_root = d.config.project_root or ".",
-                }
-                goto continue_output
             end
 
             local format_config = build_format_config(d, output, log)
@@ -256,7 +247,7 @@ local function prepare_emit_tasks(documents, output_cache, diagnostics, log)
         ::continue_doc::
     end
 
-    return tasks, task_metadata, format_json_paths, reqif_tasks
+    return tasks, task_metadata, format_json_paths
 end
 
 local function process_emit_results(results, task_metadata, output_cache, diagnostics, log)
@@ -371,80 +362,6 @@ local function finalize_postprocessors(outputs_by_format, contexts, log)
     end
 end
 
-local function resolve_reqif_exporter_script(template, log)
-    local speccompiler_home = pandoc_cli.get_speccompiler_home()
-    template = template or "default"
-
-    local candidate = string.format("%s/models/%s/scripts/reqif_export.py", speccompiler_home, template)
-    if task_runner.file_exists(candidate) then
-        return candidate
-    end
-
-    local fallback = string.format("%s/models/default/scripts/reqif_export.py", speccompiler_home)
-    if task_runner.file_exists(fallback) then
-        return fallback
-    end
-
-    log.error("[REQIF] Exporter script not found (tried: %s, %s)", candidate, fallback)
-    return nil
-end
-
-local function dispatch_reqif_tasks(reqif_tasks, output_cache, diagnostics, log, outputs_by_format)
-    if not reqif_tasks or #reqif_tasks == 0 then
-        return
-    end
-
-    if not task_runner.command_exists("python3") then
-        log.error("[REQIF] python3 not found in PATH; cannot generate ReqIF outputs")
-        if diagnostics then
-            diagnostics:error(nil, nil, "EMIT", "ReqIF generation requires python3 in PATH.")
-        end
-        return
-    end
-
-    for _, task in ipairs(reqif_tasks) do
-        local script = resolve_reqif_exporter_script(task.template, log)
-        if not script then
-            if diagnostics then
-                diagnostics:error(nil, nil, "EMIT", "ReqIF exporter script not found for template: " .. tostring(task.template))
-            end
-            goto continue_reqif
-        end
-
-        local db_path = task.db_path
-        if db_path and not db_path:match("^/") and task.project_root then
-            db_path = task.project_root .. "/" .. db_path
-        end
-
-        local ok, stdout, stderr, exit_code = task_runner.spawn_sync("python3", {
-            script,
-            "--db", db_path,
-            "--output", task.output_path,
-            "--spec-id", task.spec_id
-        }, { timeout = 120000, cwd = task.project_root, log = log })
-
-        if ok then
-            output_cache:update_cache(task.spec_id, task.output_path)
-            log.info("Generated reqif: %s", task.output_path)
-            outputs_by_format.reqif = outputs_by_format.reqif or { paths = {} }
-            outputs_by_format.reqif.paths[#outputs_by_format.reqif.paths + 1] = task.output_path
-        else
-            log.error("Failed to generate reqif for %s: exit_code=%d", task.spec_id, exit_code or -1)
-            if stderr and stderr ~= "" then
-                log.error("ReqIF exporter stderr: %s", stderr)
-            end
-            if diagnostics then
-                diagnostics:error(nil, nil, "EMIT", string.format(
-                    "ReqIF generation failed for %s (exit %d): %s",
-                    task.spec_id, exit_code or -1, stderr or ""
-                ))
-            end
-        end
-
-        ::continue_reqif::
-    end
-end
-
 -- ============================================================================
 -- Pipeline Handler
 -- ============================================================================
@@ -470,7 +387,7 @@ function M.on_emit(data, contexts, diagnostics)
         return
     end
 
-    local tasks, task_metadata, format_json_paths, reqif_tasks = prepare_emit_tasks(documents, output_cache, diagnostics, log)
+    local tasks, task_metadata, format_json_paths = prepare_emit_tasks(documents, output_cache, diagnostics, log)
 
     local outputs_by_format = {}
 
@@ -481,7 +398,6 @@ function M.on_emit(data, contexts, diagnostics)
         cleanup_intermediate_json(format_json_paths, log)
     end
 
-    dispatch_reqif_tasks(reqif_tasks, output_cache, diagnostics, log, outputs_by_format)
     finalize_postprocessors(outputs_by_format, contexts, log)
 end
 

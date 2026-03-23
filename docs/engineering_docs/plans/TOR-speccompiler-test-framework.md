@@ -1,12 +1,22 @@
 # Tool Operational Requirements -- SpecCompiler Test Framework
 
-| Field | Value |
-|---|---|
-| Document ID | TOR-STF-001 |
-| Revision | Draft A |
-| Date | 2026-02-07 |
-| Tool Name | SpecCompiler Test Framework |
-| Scope | E2E, model suites, reports, coverage |
+```list-table:tbl-tor-stf-meta{caption="Document metadata"}
+> header-rows: 1
+> aligns: l,l
+
+* - Field
+  - Value
+* - Document ID
+  - TOR-STF-001
+* - Revision
+  - Draft A
+* - Date
+  - 2026-02-07
+* - Tool Name
+  - SpecCompiler Test Framework
+* - Scope
+  - E2E, model suites, reports, coverage
+```
 
 ## 1. Purpose and Scope
 
@@ -19,7 +29,7 @@ In scope:
 - JUnit and coverage report generation.
 
 Out of scope:
-- Core SpecCompiler functional requirements (covered by `docs/plans/TOR-speccompiler-core.md`).
+- Core SpecCompiler functional requirements.
 
 ## 2. Tool Overview
 
@@ -95,6 +105,12 @@ Primary entry points:
 **TOR-STF-024:** Each test file name shall follow `vc_*` convention and map to a verification case (VC).
 
 **TOR-STF-025:** VCs shall trace to HLRs (and LLRs when present) in release documentation.
+
+### 3.8 Mutation Testing
+
+**TOR-STF-026:** The framework shall provide an independent mutation testing tool (`tests/mutation/mutate.sh`) that is not discovered or invoked by the main test runner.
+
+**TOR-STF-027:** Mutation testing shall support SQL proof view mutations (in-memory) and Lua source mutations (on-disk with backup/restore safety).
 
 ## 4. Environment Requirements
 

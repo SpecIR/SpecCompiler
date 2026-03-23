@@ -7,6 +7,7 @@
 ---
 ---@module view_materializer
 local Queries = require("db.queries")
+local cache_registry = require("pipeline.shared.cache_registry")
 
 local M = {
     name = "view_materializer",
@@ -142,6 +143,7 @@ function M.clear_cache()
     view_abbrev_type_cache = {}
     view_materializer_type_cache = {}
 end
+cache_registry.register(M.clear_cache)
 
 -- ============================================================================
 -- Transform Phase

@@ -258,6 +258,8 @@ end
 ---       spacing: { before, after, line, lineRule } }
 ---   header: table|nil - { shading: string (fill color), bold: bool,
 ---       remove_shading: bool, cell_borders: table }
+---   spacing_after: string|nil - minimum w:before (twips) on the paragraph
+---       following each table (e.g. "200" for ~10pt gap)
 ---@param log table Logger instance
 ---@return string Modified document.xml content
 function M.format_tables(content, config, log)
@@ -304,6 +306,42 @@ function M.format_tables(content, config, log)
         -- Apply header row formatting
         if config.header then
             apply_header_formatting(tbl, config.header)
+        end
+
+        -- Add spacing after the table by ensuring next sibling paragraph has w:before
+        if config.spacing_after then
+            local parent = tbl.parent
+            if parent then
+                -- Use el (element-only children) to skip whitespace text nodes
+                local kids = parent.el or parent.kids
+                if kids then
+                    for idx, node in ipairs(kids) do
+                        if node == tbl then
+                            -- Find next element sibling (skip text nodes)
+                            local next_el = kids[idx + 1]
+                            if next_el and next_el.name == "p" then
+                                local pPr = xml.find_child(next_el, "w:pPr")
+                                if not pPr then
+                                    pPr = xml.node("w:pPr")
+                                    xml.insert_child(next_el, pPr, 1)
+                                end
+                                local sp = xml.find_child(pPr, "w:spacing")
+                                if sp then
+                                    local cur = tonumber(xml.get_attr(sp, "w:before") or "0")
+                                    if cur < tonumber(config.spacing_after) then
+                                        xml.set_attr(sp, "w:before", config.spacing_after)
+                                    end
+                                else
+                                    xml.add_child(pPr, xml.node("w:spacing", {
+                                        ["w:before"] = config.spacing_after,
+                                    }))
+                                end
+                            end
+                            break
+                        end
+                    end
+                end
+            end
         end
 
         formatted = formatted + 1

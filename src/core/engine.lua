@@ -146,184 +146,121 @@ local function check_reference_cache(db, project_info, log)
     end
 end
 
----Run build for a project (from project.yaml metadata).
----This is the main entry point called by filter.lua via Meta(meta).
----@param project_info table Project configuration from config.extract_metadata()
-function M.run_project(project_info)
-    -- Reset module-level pipeline caches from any prior run.
-    -- In production each invocation is a fresh Pandoc process, but test oracles
-    -- (and future re-entrant callers) may invoke run_project multiple times
-    -- in the same process with different templates/databases.
+---Reset all module-level caches from prior runs.
+---Required for re-entrant engine.run_project calls in tests.
+---Uses cache_registry for handler caches; ProofLoader has its own reset.
+local function reset_pipeline_caches()
     local ProofLoader = require("core.proof_loader")
     ProofLoader.reset()
-    require("pipeline.initialize.attributes").clear_cache()
-    require("pipeline.initialize.specifications").clear_cache()
-    require("pipeline.initialize.spec_floats").clear_cache()
-    require("pipeline.initialize.spec_views").clear_cache()
-    require("pipeline.initialize.spec_relations").clear_cache()
-    require("pipeline.analyze.relation_analyzer").clear_cache()
-    require("pipeline.transform.view_materializer").clear_cache()
+    local cache_registry = require("pipeline.shared.cache_registry")
+    cache_registry.clear_all()
+end
 
-    -- Configure logger from project.yaml settings (with env var override)
-    local logging_config = project_info.logging or {}
-    local env_level = os.getenv("SPECCOMPILER_LOG_LEVEL")
-    if env_level then
-        logging_config.level = env_level
-    end
-    logger.configure(logging_config)
-
-    -- Create log adapter with configured settings
-    local log = logger.create_adapter(logging_config.level or "INFO")
-    local diag = Diagnostics.new(log)
-
-    -- Log startup info
-    log.info("Starting SpecCompiler...")
-    log.info("Template: %s", project_info.template or "default")
-    log.info("Output directory: %s", project_info.output_dir)
-    log.info("Documents to process: %d", #project_info.files)
-
-    -- Ensure output directory exists (using portable luv-based mkdir)
-    task_runner.ensure_dir(project_info.output_dir)
-
-    -- Databases are transient build artifacts. If an older specir.db exists
-    -- with an incompatible schema, delete it so the new schema can initialize.
-    local function db_schema_compatible(db_file)
-        if not db_file or not task_runner.file_exists(db_file) then
-            return true
-        end
-
-        local ok, sqlite = pcall(require, "lsqlite3")
-        if not ok or not sqlite then
-            -- If sqlite isn't available here, don't risk deleting.
-            return true
-        end
-
-        local db0 = sqlite.open(db_file)
-        if not db0 then
-            return false
-        end
-
-        local has_id = false
-        -- New schema uses INTEGER PRIMARY KEY `id` on spec_objects.
-        for row in db0:nrows("PRAGMA table_info(spec_objects)") do
-            if row and row.name == "id" then
-                has_id = true
-                break
-            end
-        end
-
-        db0:close()
-        return has_id
+---Check if existing database has compatible schema.
+---@param db_file string Path to database file
+---@return boolean
+local function db_schema_compatible(db_file)
+    if not db_file or not task_runner.file_exists(db_file) then
+        return true
     end
 
-    if project_info.db_file and task_runner.file_exists(project_info.db_file) then
-        if not db_schema_compatible(project_info.db_file) then
-            log.warn("specir.db schema mismatch detected, rebuilding: %s", project_info.db_file)
-            os.remove(project_info.db_file)
+    local ok, sqlite = pcall(require, "lsqlite3")
+    if not ok or not sqlite then
+        return true
+    end
+
+    local db0 = sqlite.open(db_file)
+    if not db0 then
+        return false
+    end
+
+    local has_id = false
+    for row in db0:nrows("PRAGMA table_info(spec_objects)") do
+        if row and row.name == "id" then
+            has_id = true
+            break
         end
     end
 
-    -- Create database in output directory
-    local db = DbHandler.new({
-        db_file = project_info.db_file,
-        log = log
-    })
+    db0:close()
+    return has_id
+end
 
-    -- Check and rebuild reference.docx if preset has changed
-    check_reference_cache(db, project_info, log)
-
-    local data = DataManager.new(db, log)
-
-    -- Create pipeline
-    local pipeline = Pipeline.new({
-        log = log,
-        diagnostics = diag,
-        data = data,
-        validation = project_info.validation,
-        project_info = project_info
-    })
-
-    -- Register core handlers (INITIALIZE phase)
+---Register all core pipeline handlers.
+---@param pipeline Pipeline
+local function register_core_handlers(pipeline)
+    -- INITIALIZE phase
     pipeline:register_handler(require("pipeline.initialize.specifications"))
     pipeline:register_handler(require("pipeline.initialize.spec_objects"))
+    pipeline:register_handler(require("pipeline.initialize.structural_relations"))
     pipeline:register_handler(require("pipeline.initialize.spec_floats"))
     pipeline:register_handler(require("pipeline.initialize.spec_relations"))
     pipeline:register_handler(require("pipeline.initialize.spec_views"))
     pipeline:register_handler(require("pipeline.initialize.attributes"))
-
-    -- Register PID generator (ANALYZE phase, runs before relation_analyzer)
+    -- ANALYZE phase
     pipeline:register_handler(require("pipeline.analyze.pid_generator"))
-
-    -- Register relation analyzer (ANALYZE phase, type-driven resolution + inference)
     pipeline:register_handler(require("pipeline.analyze.relation_analyzer"))
-
-    -- Register verify handler (VERIFY phase)
+    -- VERIFY phase
     pipeline:register_handler(require("pipeline.verify.verify_handler"))
-
-    -- Register view materializer handler (TRANSFORM phase, pre-computes view data)
+    -- TRANSFORM phase
     pipeline:register_handler(require("pipeline.transform.view_materializer"))
-
-    -- Register float resolver handler (TRANSFORM phase)
     pipeline:register_handler(require("pipeline.transform.spec_floats"))
-
-    -- Register external render handler (TRANSFORM phase, runs after float resolver)
     pipeline:register_handler(require("pipeline.transform.external_render_handler"))
-
-    -- Register specification render handler (TRANSFORM phase, renders document title)
     pipeline:register_handler(require("pipeline.transform.specification_render_handler"))
-
-    -- Register spec object render handler (TRANSFORM phase, invokes type handlers)
     pipeline:register_handler(require("pipeline.transform.spec_object_render_handler"))
-
-    -- Register float numbering (TRANSFORM phase, assigns numbers before link rewriting)
     pipeline:register_handler(require("pipeline.emit.float_numbering"))
-
-    -- Register relation link rewriter (TRANSFORM phase, rewrites AST links after resolution)
     pipeline:register_handler(require("pipeline.transform.relation_link_rewriter"))
-
-    -- Register FTS indexer (EMIT phase - populates FTS tables for web app search)
+    -- EMIT phase
     pipeline:register_handler(require("pipeline.emit.fts_indexer"))
-
-    -- Register emitter (EMIT phase - format-agnostic, handles docx, html5, markdown, json)
     pipeline:register_handler(require("pipeline.emit.emitter"))
+end
 
-    -- Load model types based on template
+---Load model types and proof views, initialize database views.
+---@param data DataManager
+---@param pipeline Pipeline
+---@param template string Model template name
+local function load_models(data, pipeline, template)
+    local ProofLoader = require("core.proof_loader")
+
     TypeLoader.load_model(data, pipeline, "default")
-    if project_info.template and project_info.template ~= "default" then
-        TypeLoader.load_model(data, pipeline, project_info.template)
+    if template and template ~= "default" then
+        TypeLoader.load_model(data, pipeline, template)
     end
 
-    -- Load proof views from models (after types are loaded)
     ProofLoader.load_model("default")
-    if project_info.template and project_info.template ~= "default" then
-        ProofLoader.load_model(project_info.template)
+    if template and template ~= "default" then
+        ProofLoader.load_model(template)
     end
     ProofLoader.create_views(data)
 
-    -- Generate EAV pivot views (after types are loaded)
     local schema_init = require("db.schema.init")
     schema_init.initialize_views(data)
+end
 
-    -- Process all documents (with incremental build caching)
+---Parse and prepare documents for the pipeline, with incremental build caching.
+---@param project_info table Project configuration
+---@param data DataManager
+---@param log table Logger adapter
+---@return table walkers Array of DocumentWalker objects (dirty docs)
+---@return table cached_spec_ids Array of spec_ids for cached docs
+---@return table pending_cache_updates Deferred cache updates
+local function process_documents(project_info, data, log)
     local cache = build_cache.new(data)
     local walkers = {}
     local cached_count = 0
-    local cached_spec_ids = {}  -- Track cached doc spec_ids for EMIT phase
-    local pending_cache_updates = {}  -- Deferred until after successful pipeline execution
+    local cached_spec_ids = {}
+    local pending_cache_updates = {}
 
     for i, file_path in ipairs(project_info.files) do
-        -- Compute current file hash
         local current_hash, hash_err = hash_utils.sha1_file(file_path)
         if not current_hash then
             error("Failed to hash " .. file_path .. ": " .. (hash_err or "unknown"))
         end
 
-        -- Check if document (and its includes) need rebuilding
         local include_hashes = compute_include_hashes(data, file_path)
         local is_dirty = cache:is_document_dirty_with_includes(file_path, current_hash, include_hashes)
 
         if not is_dirty then
-            -- Document unchanged - skip parsing, use cached DB state
             log.info("[%d/%d] Cached: %s", i, #project_info.files, file_path)
             cached_count = cached_count + 1
             local spec_id = file_path:match("([^/]+)%.md$") or ("doc_" .. i)
@@ -338,36 +275,27 @@ function M.run_project(project_info)
             error("Failed to read " .. file_path .. ": " .. (err or "unknown"))
         end
 
-        -- Parse with pandoc.read() directly (no subprocess!)
         local doc = pandoc.read(content, "commonmark_x+sourcepos")
-
-        -- Strip inline tracking spans for Pandoc version independence
         sourcepos_compat.normalize(doc)
 
-        -- Expand includes in document
         local doc_dir = dirname(file_path)
         local processed = { [file_path] = true }
-
         local includes
         doc, includes = include_handler.expand_includes(
             doc, doc_dir, file_path, processed, log
         )
 
-        -- Collect include entries (build graph updated after pipeline succeeds)
         local include_entries = {}
         for _, inc in ipairs(includes) do
             table.insert(include_entries, { path = inc.path, hash = inc.sha1 })
         end
 
-        -- Buffer cache update: hash + build_graph deferred until after pipeline
-        -- This prevents stale cache entries when a later document errors.
         table.insert(pending_cache_updates, {
             file_path = file_path,
             hash = current_hash,
             includes = include_entries
         })
 
-        -- Create document walker (needed for TRANSFORM and EMIT phases)
         local spec_id = file_path:match("([^/]+)%.md$") or ("doc_" .. i)
         local walker = DocumentWalker.new(doc, {
             spec_id = spec_id,
@@ -382,9 +310,16 @@ function M.run_project(project_info)
         log.info("Skipped %d cached document(s)", cached_count)
     end
 
-    -- Execute pipeline with all document walkers
-    pipeline:execute(walkers, { cached_spec_ids = cached_spec_ids })
+    return walkers, cached_spec_ids, pending_cache_updates, cache
+end
 
+---Apply deferred cache updates and clean up resources.
+---@param diag Diagnostics
+---@param pending_cache_updates table Deferred updates
+---@param cache table Build cache
+---@param data DataManager
+---@param db table Database handler
+local function finalize(diag, pending_cache_updates, cache, data, db)
     -- Apply deferred cache updates ONLY after successful verification.
     -- If verification found errors, don't update hashes — this forces
     -- re-processing on the next build so cross-doc relations get a fresh
@@ -393,7 +328,6 @@ function M.run_project(project_info)
         for _, update in ipairs(pending_cache_updates) do
             cache:update_document_hash(update.file_path, update.hash)
             cache:update_build_graph(update.file_path, update.includes)
-            -- Track includes in build graph (for compute_include_hashes on next build)
             for _, inc in ipairs(update.includes) do
                 include_handler.track_include(data, update.file_path, inc.path, inc.hash)
             end
@@ -402,17 +336,79 @@ function M.run_project(project_info)
 
     -- Break reference chain so SQLite connection releases fully.
     -- cache → data → db → sqlite holds the connection alive after close on WSL2.
-    cache = nil
-    pending_cache_updates = nil
+    cache = nil  -- luacheck: ignore
+    pending_cache_updates = nil  -- luacheck: ignore
 
-    -- Close database connection for clean exit
     db:close()
-
-    -- Force garbage collection to finalize any lingering SQLite userdata
+    -- Two GC cycles needed: first cycle marks userdata for finalization,
+    -- second cycle collects it. Ensures SQLite file handles are fully released
+    -- before the next engine.run_project opens the same DB path (ZFS/COW FS).
     collectgarbage("collect")
+    collectgarbage("collect")
+end
 
-    -- Sync filesystem to ensure files are flushed (helps with WSL2/Windows interop)
-    os.execute("sync")
+---Run build for a project (from project.yaml metadata).
+---This is the main entry point called by filter.lua via Meta(meta).
+---@param project_info table Project configuration from config.extract_metadata()
+function M.run_project(project_info)
+    reset_pipeline_caches()
+
+    -- Configure logger from project.yaml settings (with env var override)
+    local logging_config = project_info.logging or {}
+    local env_level = os.getenv("SPECCOMPILER_LOG_LEVEL")
+    if env_level then
+        logging_config.level = env_level
+    end
+    logger.configure(logging_config)
+
+    local log = logger.create_adapter(logging_config.level or "INFO")
+    local diag = Diagnostics.new(log)
+
+    log.info("Starting SpecCompiler...")
+    log.info("Template: %s", project_info.template or "default")
+    log.info("Output directory: %s", project_info.output_dir)
+    log.info("Documents to process: %d", #project_info.files)
+
+    task_runner.ensure_dir(project_info.output_dir)
+
+    -- Ensure database schema is compatible (delete and rebuild if not)
+    if project_info.db_file and task_runner.file_exists(project_info.db_file) then
+        if not db_schema_compatible(project_info.db_file) then
+            log.warn("specir.db schema mismatch detected, rebuilding: %s", project_info.db_file)
+            os.remove(project_info.db_file)
+        end
+    end
+
+    local db = DbHandler.new({ db_file = project_info.db_file, log = log })
+    check_reference_cache(db, project_info, log)
+    local data = DataManager.new(db, log)
+
+    local pipeline = Pipeline.new({
+        log = log,
+        diagnostics = diag,
+        data = data,
+        validation = project_info.validation,
+        project_info = project_info
+    })
+
+    register_core_handlers(pipeline)
+    load_models(data, pipeline, project_info.template)
+
+    -- Parse documents and run pipeline.
+    -- Wrap in pcall so the DB handle is always closed, even on pipeline errors.
+    local run_ok, run_err = pcall(function()
+        local walkers, cached_spec_ids, pending_cache_updates, cache = process_documents(project_info, data, log)
+        pipeline:execute(walkers, { cached_spec_ids = cached_spec_ids })
+        finalize(diag, pending_cache_updates, cache, data, db)
+    end)
+
+    if not run_ok then
+        -- finalize() was not reached — close DB to release file handle
+        pcall(db.close, db)
+        collectgarbage("collect")
+        collectgarbage("collect")
+        error(run_err)
+    end
 
     if not diag:has_errors() then
         log.info("SpecCompiler build complete. Processed %d document(s).", #project_info.files)

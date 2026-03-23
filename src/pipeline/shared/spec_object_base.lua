@@ -10,6 +10,7 @@
 local M = {}
 
 local render_utils = require("pipeline.shared.render_utils")
+local ast_utils = require("pipeline.shared.ast_utils")
 
 -- ============================================================================
 -- Utilities
@@ -112,24 +113,6 @@ function M.render_attributes(ctx, pandoc, db, attr_order)
     local items = {}
     local rendered = {}  -- Track which attributes we've rendered
 
-    -- Helper to decode AST JSON to Pandoc content (inlines or blocks)
-    local function decode_ast(ast_json)
-        if not ast_json or ast_json == "" then return nil, nil end
-        local result = pandoc.json.decode(ast_json)
-        if result and type(result) == "table" and #result > 0 then
-            -- Check if result contains blocks (Para, Plain, etc.) or inlines
-            local first = result[1]
-            if first and first.t and (first.t == "Para" or first.t == "Plain" or first.t == "BulletList") then
-                -- Multi-block content
-                return result, "blocks"
-            else
-                -- Array of inlines
-                return result, "inlines"
-            end
-        end
-        return nil, nil
-    end
-
     -- Helper to add an attribute item
     local function add_item(name)
         local attr_data = attrs[name]
@@ -149,7 +132,7 @@ function M.render_attributes(ctx, pandoc, db, attr_order)
 
             -- Try to use AST for rich content (links, formatting)
             local def_content
-            local ast_content, content_type = decode_ast(ast_json)
+            local ast_content, content_type = ast_utils.decode_with_type(ast_json)
             if ast_content and #ast_content > 0 then
                 if content_type == "blocks" then
                     -- Multi-block content (Para, BulletList, etc.) - use directly

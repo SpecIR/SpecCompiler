@@ -6,9 +6,9 @@
 
 **Allocation:** Realized by [CSC-002](@) (Database Persistence) through [CSU-012](@) (Data Manager) and [CSU-010](@) (Build Cache). The database schema is defined in [CSC-006](@) (DB Schema), queries in [CSC-005](@) (DB Queries), and materialized views in [CSC-007](@) (DB Views).
 
-The [TERM-IR](@) persistence function manages the [TERM-SQLITE](@) database that stores all parsed
+The [dic:intermediate-representation](#) persistence function manages the [dic:sqlite-database](#) database that stores all parsed
 specification content and provides cache coherency for incremental builds. It encompasses
-schema management, the [TERM-EAV](@) storage model, build caching, and output
+schema management, the [dic:eav-model](#) storage model, build caching, and output
 caching.
 
 **SQLite Persistence**: The data manager ([CSU-012](@)) wraps all database operations,
@@ -33,7 +33,7 @@ rather than as columns, enabling dynamic schema extension through model definiti
 Each attribute row references its parent entity (object or float), attribute definition,
 and stores the value as text with type casting at query time.
 
-**[TERM-30](@)**: The build cache ([CSU-010](@)) tracks document content hashes in the
+**[dic:build-cache](#)**: The build cache ([CSU-010](@)) tracks document content hashes in the
 `source_files` table. Before parsing a document, the engine computes its SHA1 hash and
 compares against the stored value. Unchanged documents skip parsing entirely and reuse
 their cached SpecIR state. To support incremental builds, the
@@ -45,7 +45,7 @@ If an include file is missing, the hash returns nil, which forces a cache miss a
 document rebuild. The resulting path-to-hash map is compared against the stored values; any
 mismatch invalidates the cache and triggers reparsing of the root document.
 
-**[TERM-31](@)**: The output cache tracks generated output files and their input hashes.
+**[dic:output-cache](#)**: The output cache tracks generated output files and their input hashes.
 Before generating an output file, the emitter checks whether the input hash matches
 the stored value. If current, the output generation is skipped. This provides incremental
 output generation independent of the build cache.
@@ -151,6 +151,113 @@ else stale
 end
 @enduml
 ```
+
+#### LLR: DataManager Rollback Cancels Staged Inserts @LLR-DB-007-01
+
+`DataManager.begin_transaction()` followed by facade insert calls
+and `DataManager.rollback()` shall leave no persisted staged rows.
+
+> verification_method: Test
+
+> traceability: [HLR-STOR-001](@)
+
+#### LLR: DataManager CRUD Facade Persists Canonical IR Rows @LLR-DB-007-02
+
+DataManager facade methods (`insert_specification`,
+`insert_object`, `insert_float`, `insert_relation`, `insert_view`,
+`insert_attribute_value`, `query_all`, `query_one`, `execute`) shall persist
+and retrieve canonical IR rows in content tables.
+
+> verification_method: Test
+
+> traceability: [HLR-STOR-001](@)
+
+#### LLR: Attribute Casting Persists Typed Columns For Valid Pending Rows @LLR-DB-008-01
+
+Attribute casting shall map raw attribute values to the correct
+typed columns (`string_value`, `int_value`, `real_value`, `bool_value`,
+`date_value`, `enum_ref`) and skip updates for invalid casts.
+
+> verification_method: Test
+
+> traceability: [HLR-STOR-002](@)
+
+#### LLR: Build Cache Clean on Hash Match @LLR-047
+
+Given a document path and its current SHA1 hash, [csu:build-cache](#)
+`is_document_dirty()` shall query the [dic:build-cache](#) `source_files` table and
+return `false` when the stored `sha1` matches.
+
+> verification_method: Test
+
+> traceability: [HLR-STOR-003](@)
+
+#### LLR: Build Cache Dirty on Missing Entry @LLR-048
+
+Given a document path not present in the [dic:build-cache](#) `source_files` table,
+[csu:build-cache](#) `is_document_dirty()` shall return `true`.
+
+> verification_method: Test
+
+> traceability: [HLR-STOR-003](@)
+
+#### LLR: Output Cache Stale on Hash Mismatch @LLR-049
+
+Given a spec_id, output_path, and current [dic:processed-intermediate-representation](#) hash, [csu:output-cache](#)
+`is_output_current()` shall return `false` when the stored `pir_hash` in the
+[dic:output-cache](#) differs.
+
+> verification_method: Test
+
+> traceability: [HLR-STOR-004](@)
+
+#### LLR: Output Cache Stale on Missing File @LLR-050
+
+When the output file does not exist on disk, [csu:output-cache](#) `is_output_current()`
+shall return `false` regardless of hash match.
+
+> verification_method: Test
+
+> traceability: [HLR-STOR-004](@)
+
+#### LLR: Include-Aware Dirty Check @LLR-051
+
+Given a root document path, [csu:build-cache](#) `is_document_dirty_with_includes()`
+shall check both the root hash and all [dic:build-graph](#) `node_sha1` entries,
+returning `true` if any differs.
+
+> verification_method: Test
+
+> traceability: [HLR-STOR-005](@)
+
+#### LLR: Build Graph Refresh After Build @LLR-052
+
+After a successful build, [csu:build-cache](#) and [csu:build-queries](#) `update_build_graph()`
+shall delete old [dic:build-graph](#) rows for `root_path` and insert the
+current include tree.
+
+> verification_method: Test
+
+> traceability: [HLR-STOR-005](@)
+
+#### LLR: EAV Pivot View Naming @LLR-053
+
+Given [dic:type-registry](#) `spec_object_types` entries, [csu:eav-pivot-views](#) shall generate
+[dic:eav-model](#) pivot views named `view_{type_lower}_objects` with one column per
+registered attribute.
+
+> verification_method: Test
+
+> traceability: [HLR-STOR-006](@)
+
+#### LLR: No Pivot View for Composites @LLR-054
+
+Given a [dic:composite-object-type](#) `spec_object_types` entry, [csu:eav-pivot-views](#) shall not
+generate a pivot view.
+
+> verification_method: Test
+
+> traceability: [HLR-STOR-006](@)
 
 ---
 

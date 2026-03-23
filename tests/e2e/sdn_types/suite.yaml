@@ -13,6 +13,7 @@ validation:
   traceability_hlr_to_vc: ignore
   traceability_fd_to_csc: ignore
   traceability_fd_to_csu: ignore
+  traceability_hlr_allocation: ignore
 
 # Test case to VC mapping:
 # - vc_type_001_sf.md        -> VC-TYPE-001 (Software Function Type)

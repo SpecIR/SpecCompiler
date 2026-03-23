@@ -54,6 +54,9 @@ local function build_relation_lookup(data, spec_id)
     local relations = data:query_all(Queries.resolution.select_resolved_relations_with_targets, { spec_id = spec_id })
 
     for _, r in ipairs(relations or {}) do
+        -- Skip structural relations (no link in AST to rewrite)
+        if not r.target_text then goto continue_relation end
+
         local key = tostring(r.source_object_id) .. "|" .. r.link_selector .. "|" .. r.target_text
 
         if r.object_pid then
@@ -104,6 +107,7 @@ local function build_relation_lookup(data, spec_id)
                 end
             end
         end
+        ::continue_relation::
     end
     return lookup
 end

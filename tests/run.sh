@@ -24,6 +24,7 @@ if [ ! -x "$PANDOC_CMD" ]; then
 fi
 export LUA_PATH="${SPECCOMPILER_HOME}/src/?.lua;${SPECCOMPILER_HOME}/src/?/init.lua;${SPECCOMPILER_HOME}/?.lua;${SPECCOMPILER_HOME}/?/init.lua;${DIST_DIR}/vendor/?.lua;${DIST_DIR}/vendor/?/init.lua;${DIST_DIR}/vendor/slaxml/?.lua;${SPECCOMPILER_HOME}/tests/?.lua;${SPECCOMPILER_HOME}/tests/?/init.lua;${LUA_PATH:-}"
 export LUA_CPATH="${DIST_DIR}/vendor/?.so;${DIST_DIR}/vendor/?/?.so;${LUA_CPATH:-}"
+export PATH="${DIST_DIR}/bin:${PATH}"
 
 # Parse arguments
 SUITE=""
@@ -105,7 +106,7 @@ get_suites() {
             | sort \
             | while read -r suite_dir; do basename "$suite_dir"; done
 
-        find models -maxdepth 3 -type f -path "*/tests/suite.yaml" 2>/dev/null \
+        find -L models -maxdepth 3 -type f -path "*/tests/suite.yaml" 2>/dev/null \
             | sort \
             | while read -r suite_yaml; do
                 model_dir="$(dirname "$(dirname "$suite_yaml")")"

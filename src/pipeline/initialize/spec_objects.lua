@@ -32,6 +32,11 @@ function M.on_initialize(data, contexts, diagnostics)
         local source_path = ctx.source_path or "unknown"
         local parsed_headers = ctx.parsed_headers
 
+        -- Guard: specifications handler must run before spec_objects (sets ctx.parsed_headers)
+        if ctx.doc and not parsed_headers then
+            error("spec_objects: ctx.parsed_headers is nil — specifications handler must run first (check prerequisites)")
+        end
+
         if parsed_headers then
             table.insert(spec_ids, spec_id)
             if not labels_by_spec[spec_id] then

@@ -5,10 +5,9 @@ local M = {}
 
 M.relation = {
     id = "BELONGS",
-    extends = "PID_REF",
     long_name = "Belongs To",
-    description = "Requirement belongs to a functional grouping",
-    source_attribute = "belongs_to",
+    description = "Requirement belongs to a functional grouping (inferred from document hierarchy)",
+    is_structural = 1,
     source_type_ref = "HLR",
     target_type_ref = "SF",
 }

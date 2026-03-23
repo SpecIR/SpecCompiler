@@ -1,5 +1,5 @@
 -- Test oracle for VC-TYPE-001: Software Function Type
--- Verifies SF objects are created with correct attributes and BELONGS relations
+-- Verifies SF objects are created with correct attributes and structural BELONGS relations
 
 return function(actual_doc, helpers)
     helpers.strip_tracking_spans(actual_doc)
@@ -19,7 +19,6 @@ return function(actual_doc, helpers)
     -- 2. Count object headers recursively (objects may be nested in Div wrappers)
     local sf_count = 0
     local hlr_count = 0
-    local belongs_links = 0
 
     actual_doc:walk({
         Header = function(header)
@@ -28,12 +27,6 @@ return function(actual_doc, helpers)
                 sf_count = sf_count + 1
             elseif id:match("^HLR%-") then
                 hlr_count = hlr_count + 1
-            end
-        end,
-        Link = function(link)
-            local target = link.target or ""
-            if target:match("SF%-") then
-                belongs_links = belongs_links + 1
             end
         end
     })
@@ -48,9 +41,53 @@ return function(actual_doc, helpers)
         err(string.format("Expected 3 HLR headers, got %d", hlr_count))
     end
 
-    -- 3. Verify BELONGS relations exist (one per HLR)
-    if belongs_links < 3 then
-        err(string.format("Expected at least 3 BELONGS links to SF, got %d", belongs_links))
+    -- 3. Verify BELONGS relations in the SpecIR database
+    --    Structural relations are inferred from header nesting, not explicit links.
+    local sqlite3 = require("lsqlite3")
+    local db = sqlite3.open(helpers.db_file, sqlite3.OPEN_READONLY)
+    if not db then
+        err("Could not open test database: " .. tostring(helpers.db_file))
+    else
+        -- Count BELONGS relations
+        local belongs_count = 0
+        local belongs = {}
+        for row in db:nrows([[
+            SELECT so_src.pid AS source_pid, so_tgt.pid AS target_pid
+            FROM spec_relations r
+            JOIN spec_objects so_src ON r.source_object_id = so_src.id
+            JOIN spec_objects so_tgt ON r.target_object_id = so_tgt.id
+            WHERE r.type_ref = 'BELONGS'
+        ]]) do
+            belongs_count = belongs_count + 1
+            table.insert(belongs, row.source_pid .. " -> " .. row.target_pid)
+        end
+
+        if belongs_count ~= 3 then
+            err(string.format("Expected 3 BELONGS relations in IR, got %d: %s",
+                belongs_count, table.concat(belongs, ", ")))
+        end
+
+        -- Verify specific mappings
+        local expected_mappings = {
+            ["HLR-AUTH-001"] = "SF-AUTH",
+            ["HLR-AUTH-002"] = "SF-AUTH",
+            ["HLR-DATA-001"] = "SF-DATA",
+        }
+        for _, rel in ipairs(belongs) do
+            local src, tgt = rel:match("(.+) %-> (.+)")
+            if src and expected_mappings[src] then
+                if expected_mappings[src] ~= tgt then
+                    err(string.format("BELONGS: %s should point to %s, got %s",
+                        src, expected_mappings[src], tgt))
+                end
+                expected_mappings[src] = nil  -- mark as verified
+            end
+        end
+        for src, tgt in pairs(expected_mappings) do
+            err(string.format("Missing BELONGS relation: %s -> %s", src, tgt))
+        end
+
+        db:close()
     end
 
     if #errors > 0 then

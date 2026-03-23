@@ -2,15 +2,15 @@
 
 ### SF: Specification Persistence @SF-002
 
-[TERM-SQLITE](@)-based storage with incremental build support and output caching.
+[dic:sqlite-database](#)-based storage with incremental build support and output caching.
 
 > description: Groups requirements for the persistence layer including ACID-compliant
-> storage, [TERM-EAV](@) attribute model, [TERM-30](@), [TERM-31](@), and incremental rebuild support.
+> storage, [dic:eav-model](#) attribute model, [dic:build-cache](#), [dic:output-cache](#), and incremental rebuild support.
 
 > rationale: Reliable persistence with change detection enables efficient rebuilds
 > for large specification projects.
 
-### HLR: SQLite Persistence @HLR-STOR-001
+#### HLR: SQLite Persistence @HLR-STOR-001
 
 The system shall persist all specification data to SQLite database with ACID guarantees.
 
@@ -24,9 +24,8 @@ The system shall persist all specification data to SQLite database with ACID gua
 
 > status: Approved
 
-> belongs_to: [SF-002](@)
 
-### HLR: EAV Attribute Model @HLR-STOR-002
+#### HLR: EAV Attribute Model @HLR-STOR-002
 
 The system shall store spec object attributes using Entity-Attribute-Value pattern.
 
@@ -41,9 +40,8 @@ The system shall store spec object attributes using Entity-Attribute-Value patte
 
 > status: Approved
 
-> belongs_to: [SF-002](@)
 
-### HLR: Build Cache @HLR-STOR-003
+#### HLR: Build Cache @HLR-STOR-003
 
 The system shall maintain a build cache for document hash tracking.
 
@@ -56,9 +54,8 @@ The system shall maintain a build cache for document hash tracking.
 
 > status: Approved
 
-> belongs_to: [SF-002](@)
 
-### HLR: Output Cache @HLR-STOR-004
+#### HLR: Output Cache @HLR-STOR-004
 
 The system shall cache output generation state with P-IR hash and timestamps.
 
@@ -73,9 +70,8 @@ The system shall cache output generation state with P-IR hash and timestamps.
 
 > status: Approved
 
-> belongs_to: [SF-002](@)
 
-### HLR: EAV Pivot Views for External Queries @HLR-STOR-006
+#### HLR: EAV Pivot Views for External Queries @HLR-STOR-006
 
 The system shall generate per-object-type SQL views that pivot the EAV attribute model into typed columns for external BI queries.
 
@@ -97,9 +93,8 @@ The system shall generate per-object-type SQL views that pivot the EAV attribute
 
 > status: Approved
 
-> belongs_to: [SF-002](@)
 
-### HLR: Incremental Rebuild Support @HLR-STOR-005
+#### HLR: Incremental Rebuild Support @HLR-STOR-005
 
 The system shall support incremental rebuilds via build graph tracking.
 
@@ -114,4 +109,3 @@ The system shall support incremental rebuilds via build graph tracking.
 
 > status: Approved
 
-> belongs_to: [SF-002](@)

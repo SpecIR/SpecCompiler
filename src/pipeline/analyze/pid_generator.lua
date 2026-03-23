@@ -2,8 +2,7 @@
 ---ANALYZE phase handler that generates PIDs for objects without explicit @PID.
 ---Runs BEFORE relation_analyzer so PIDs are available for resolution.
 ---
----Detects sibling patterns (prefix, format, max_seq) from explicit PIDs,
----then generates sequential PIDs for objects with pid IS NULL.
+---Uses each type's pid_prefix and pid_format to generate sequential PIDs.
 ---Composite types get hierarchical PIDs qualified by spec PID (e.g., SRS-sec1.2.3).
 ---Specifications without explicit @PID get auto-generated PIDs from type_ref.
 ---
@@ -140,7 +139,7 @@ local function generate_hierarchical_pids(data, spec_id)
 end
 
 ---Auto-generate PIDs for objects without explicit PIDs.
----Groups objects by (specification_ref, type_ref) to detect sibling patterns.
+---Uses the type's pid_prefix and pid_format for sequential numbering.
 ---Composite types use hierarchical numbering (sec1.2.3).
 ---@param data DataManager
 ---@param contexts table Array of Context objects
@@ -174,69 +173,40 @@ function M.on_analyze(data, contexts, diagnostics)
                 goto next_group
             end
 
-            -- Get all objects of this type, ordered by file_seq
-            local siblings = data:query_all(Queries.pid.siblings_by_spec_type,
+            -- Get objects that need PIDs
+            local objects = data:query_all(Queries.pid.objects_needing_pid,
                 { spec_id = spec_id, type_ref = type_ref })
 
-            if not siblings or #siblings == 0 then goto next_group end
+            if not objects or #objects == 0 then goto next_group end
 
-            -- Check if any objects need PIDs
-            local needs_pid = false
-            for _, sib in ipairs(siblings) do
-                if not sib.pid or sib.pid == "" then
-                    needs_pid = true
-                    break
-                end
-            end
+            -- Get type's PID settings
+            local type_info = data:query_one(Queries.pid.type_pid_info, { type_ref = type_ref })
+            local prefix = (type_info and type_info.pid_prefix) or type_ref
+            local format_str = (type_info and type_info.pid_format) or "%s-%03d"
 
-            if not needs_pid then goto next_group end
-
-            -- Detect pattern from explicit-PID siblings
-            local explicit_siblings = {}
-            for _, sib in ipairs(siblings) do
-                if sib.pid and sib.pid ~= "" then
-                    local prefix, seq, fmt = pid_utils.parse_pid_pattern(sib.pid)
-                    table.insert(explicit_siblings, {
-                        pid_prefix = prefix,
-                        pid_sequence = seq,
-                        pid_format = fmt
-                    })
-                end
-            end
-
-            local prefix, format_str, max_seq, conflict = pid_utils.detect_sibling_pattern(explicit_siblings)
-
-            -- If no pattern detected, use type_ref as prefix with default format
-            if not prefix and not format_str then
-                prefix = type_ref
-                format_str = "%s-%03d"
-                max_seq = 0
-            end
+            -- Find max existing sequence to avoid collisions
+            local seq_row = data:query_one(Queries.pid.max_seq_by_spec_type,
+                { spec_id = spec_id, type_ref = type_ref })
+            local next_seq = (seq_row and seq_row.max_seq or 0) + 1
 
             -- Generate PIDs for objects without explicit PID
-            local next_seq = max_seq + 1
-            for _, sib in ipairs(siblings) do
-                if not sib.pid or sib.pid == "" then
-                    local auto_pid = pid_utils.generate_next_pid(prefix, format_str, next_seq)
+            for _, obj in ipairs(objects) do
+                local auto_pid = pid_utils.generate_next_pid(prefix, format_str, next_seq)
 
-                    -- Parse the generated PID to get prefix/sequence
-                    local gen_prefix, gen_seq, _ = pid_utils.parse_pid_pattern(auto_pid)
+                data:execute(Queries.pid.update_object_pid, {
+                    id = obj.id,
+                    pid = auto_pid,
+                    prefix = prefix,
+                    seq = next_seq
+                })
 
-                    data:execute(Queries.pid.update_object_pid, {
-                        id = sib.id,
-                        pid = auto_pid,
-                        prefix = gen_prefix,
-                        seq = gen_seq
-                    })
+                logger.debug(string.format(
+                    "Auto-generated PID '%s' for '%s' at %s:%d",
+                    auto_pid, obj.title_text or "", obj.from_file or "unknown", obj.start_line or 0
+                ))
 
-                    logger.debug(string.format(
-                        "Auto-generated PID '%s' for '%s' at %s:%d",
-                        auto_pid, sib.title_text or "", sib.from_file or "unknown", sib.start_line or 0
-                    ))
-
-                    next_seq = next_seq + 1
-                    total_generated = total_generated + 1
-                end
+                next_seq = next_seq + 1
+                total_generated = total_generated + 1
             end
 
             ::next_group::

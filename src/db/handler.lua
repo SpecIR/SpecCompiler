@@ -9,9 +9,16 @@ function M.new(config)
     self.log = config.log
     self.sqlite = sqlite
     self.db = sqlite.open(config.db_file)
-    -- Use DELETE journal mode to avoid WAL/SHM file issues on WSL2.
-    -- SpecCompiler is single-process, so WAL's concurrent-read benefit is unused.
-    self.db:exec("PRAGMA journal_mode=DELETE;")
+    -- Disable journaling entirely: the SpecIR database is rebuilt from source
+    -- on each run, so crash recovery and durability are unnecessary.
+    -- Eliminates journal file I/O that causes SQLITE_IOERR on ZFS/COW filesystems.
+    self.db:exec("PRAGMA journal_mode=OFF;")
+    self.db:exec("PRAGMA synchronous=OFF;")
+    -- Keep temp tables in memory to avoid /tmp I/O contention.
+    self.db:exec("PRAGMA temp_store=MEMORY;")
+    -- Retry on SQLITE_BUSY for up to 2s instead of failing immediately.
+    -- Guards against transient file-handle contention in test runners.
+    self.db:exec("PRAGMA busy_timeout=2000;")
     return self
 end
 

@@ -244,23 +244,6 @@ M.update_attribute_ast = [[
     UPDATE spec_attribute_values SET ast = :ast WHERE id = :id
 ]]
 
--- Get XHTML attributes needing conversion for ReqIF
-M.select_xhtml_attributes_by_spec = [[
-    SELECT id, ast
-    FROM spec_attribute_values
-    WHERE specification_ref = :spec_id
-      AND datatype = 'XHTML'
-      AND ast IS NOT NULL
-      AND ast != ''
-]]
-
--- Update attribute XHTML value (ReqIF cache)
-M.update_attribute_xhtml = [[
-    UPDATE spec_attribute_values
-    SET xhtml_value = :xhtml_value
-    WHERE id = :id
-]]
-
 -- ============================================================================
 -- Float Numbering
 -- ============================================================================
@@ -351,26 +334,6 @@ M.select_floats_by_type = [[
     ORDER BY file_seq
 ]]
 
--- Build SELECT for floats by multiple type references (dynamic IN clause).
----@param type_refs table Array of type references
----@return string sql SQL query string
----@return table params Parameter table with spec_id + type_N keys
-function M.build_floats_by_types(type_refs)
-    local placeholders = {}
-    local params = {}
-    for i, type_ref in ipairs(type_refs) do
-        placeholders[i] = ":type_" .. i
-        params["type_" .. i] = type_ref
-    end
-    local sql = string.format([[
-        SELECT id, type_ref, raw_content, pandoc_attributes, from_file, label, caption, file_seq, anchor
-        FROM spec_floats
-        WHERE type_ref IN (%s) AND specification_ref = :spec_id
-        ORDER BY file_seq
-    ]], table.concat(placeholders, ", "))
-    return sql, params
-end
-
 -- ============================================================================
 -- External Rendering
 -- ============================================================================
@@ -416,20 +379,6 @@ M.select_composite_objects_by_spec = [[
       AND so.pid IS NOT NULL AND so.pid != ''
       AND so.ast IS NOT NULL
       AND so.specification_ref = :spec_id
-]]
-
--- Get objects for XHTML conversion (ReqIF)
-M.select_objects_for_xhtml = [[
-    SELECT id, ast
-    FROM spec_objects
-    WHERE specification_ref = :spec_id
-]]
-
--- Update object XHTML content (ReqIF cache)
-M.update_object_xhtml = [[
-    UPDATE spec_objects
-    SET content_xhtml = :content_xhtml
-    WHERE id = :id
 ]]
 
 -- ============================================================================

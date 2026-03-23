@@ -2,7 +2,7 @@
 
 ### Overview
 
-SpecCompiler uses a layered architecture with the engine orchestrating a five-phase [TERM-15](@) that processes documents through registered [TERM-16](@).
+SpecCompiler uses a layered architecture with the engine orchestrating a five-phase [dic:pipeline](#) that processes documents through registered [dic:handler](#).
 
 ```plantuml:comp-pipeline
 @startuml

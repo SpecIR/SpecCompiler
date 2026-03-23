@@ -8,20 +8,22 @@ local M = {}
 -- RELATION TYPE RESOLUTION
 -- ============================================================================
 
--- Get relation inference rules from spec_relation_types
--- Rules define when relations are auto-inferred from attributes or types
--- Returns all 4 quadruple components: (selector, source, attr, target)
+-- Get relation inference rules from spec_relation_types (leaf types only).
+-- Resolves inherited link_selector via COALESCE so children without their own
+-- selector use the parent's value (e.g., VERIFIES inherits "@" from PID_REF).
 M.inference_rules = [[
     SELECT
-        identifier as rel_type,
-        link_selector as selector,
-        source_type_ref as source,
-        target_type_ref as target,
-        source_attribute as attr
-    FROM spec_relation_types
-    WHERE identifier NOT IN (
+        t.identifier as rel_type,
+        COALESCE(t.link_selector, p.link_selector) as selector,
+        t.source_type_ref as source,
+        t.target_type_ref as target,
+        t.source_attribute as attr
+    FROM spec_relation_types t
+    LEFT JOIN spec_relation_types p ON t.extends = p.identifier
+    WHERE t.identifier NOT IN (
         SELECT DISTINCT extends FROM spec_relation_types WHERE extends IS NOT NULL
     )
+      AND COALESCE(t.is_structural, 0) = 0
 ]]
 
 -- ============================================================================
@@ -53,19 +55,6 @@ M.float_type_from_prefix = [[
     SELECT identifier FROM spec_float_types
     WHERE LOWER(identifier) = :prefix
        OR (aliases IS NOT NULL AND aliases LIKE :like_pattern)
-]]
-
--- Infer relation type from target float type
--- Finds relation types that target the given float type
-M.relation_type_from_target_float = [[
-    SELECT identifier FROM spec_relation_types
-    WHERE link_selector = '#'
-      AND (
-          target_type_ref = :target_type
-          OR target_type_ref LIKE :target_pattern_start
-          OR target_type_ref LIKE :target_pattern_end
-          OR target_type_ref LIKE :target_pattern_mid
-      )
 ]]
 
 -- ============================================================================
@@ -423,6 +412,43 @@ M.insert_relation = [[
         :target_text, :target_object_id, :target_float_id,
         :type_ref, :from_file, :link_line, :source_attribute, :link_selector
     )
+]]
+
+-- ============================================================================
+-- STRUCTURAL RELATION INFERENCE
+-- ============================================================================
+
+-- Get structural relation type definitions (is_structural = 1).
+-- Used by structural_relations handler to create hierarchy-inferred relations.
+M.structural_relation_types = [[
+    SELECT identifier, source_type_ref, target_type_ref
+    FROM spec_relation_types
+    WHERE is_structural = 1
+]]
+
+-- Find nearest ancestor of a specific type by header precedence.
+-- The structural parent is the most recent preceding object at a higher header
+-- level with the matching type. This works because headers form a stack-based
+-- nesting: the nearest higher-level header of the target type is the parent.
+-- Does NOT use end_line (which represents body extent, not structural scope).
+M.find_structural_ancestor = [[
+    SELECT id FROM spec_objects
+    WHERE specification_ref = :spec_id
+      AND from_file = :from_file
+      AND start_line < :start_line
+      AND level < :level
+      AND type_ref = :target_type
+    ORDER BY start_line DESC
+    LIMIT 1
+]]
+
+-- Get source objects for structural relation inference.
+-- Returns objects of a specific type within a specification.
+M.objects_by_spec_and_type = [[
+    SELECT id, from_file, start_line, level
+    FROM spec_objects
+    WHERE specification_ref = :spec_id
+      AND type_ref = :source_type
 ]]
 
 return M

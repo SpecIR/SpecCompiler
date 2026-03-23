@@ -12,9 +12,6 @@ logging:
   format: console
   color: true
 
-validation:
-  spec_missing_required: warn
-
 output_dir: build/
 
 doc_files:
@@ -24,9 +21,9 @@ doc_files:
 
 outputs:
   - format: docx
-    path: build/docx/{spec_id}.docx
+    path: docx/{spec_id}.docx
   - format: html5
-    path: build/www/{spec_id}.html
+    path: www/{spec_id}.html
 
 docx:
   # reference_doc: assets/reference.docx

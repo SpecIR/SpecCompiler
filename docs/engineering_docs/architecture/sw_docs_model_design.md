@@ -137,7 +137,6 @@ end
 
 TL -> DB: propagate_inherited_attributes()
 note right: TRACEABLE.status propagated\nto HLR, LLR, FD, CSC, CSU, etc.
-TL -> DB: propagate_inherited_relation_properties()
 TL --> E: sw_docs types registered
 deactivate TL
 

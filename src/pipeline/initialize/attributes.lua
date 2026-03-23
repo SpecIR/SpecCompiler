@@ -10,6 +10,7 @@ local hash_utils = require("infra.hash_utils")
 local cache_utils = require("pipeline.shared.cache_utils")
 local DT = require("core.datatypes")
 local Queries = require("db.queries")
+local cache_registry = require("pipeline.shared.cache_registry")
 
 local M = {
     name = "attributes",
@@ -43,6 +44,7 @@ function M.clear_cache()
     attr_def:clear()
     default_object_type:clear()
 end
+cache_registry.register(M.clear_cache)
 
 ---Look up attribute definition to get datatype.
 ---@param data DataManager

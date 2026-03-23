@@ -9,7 +9,7 @@ local M = {}
 
 M.relation = {
     id = "XREF_DIC",
-    extends = "PID_REF",
+    extends = "LABEL_REF",
     long_name = "Dictionary Reference",
     description = "Cross-reference to a dictionary entry",
     target_type_ref = "DIC",

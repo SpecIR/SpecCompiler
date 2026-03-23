@@ -14,9 +14,8 @@ return function(actual_doc, helpers)
         return false, table.concat(errors, "\n")
     end
 
-    -- Derive paths from db_file (tests/e2e/ooxml/build/specir.db)
-    local build_dir = helpers.db_file:match("(.+/)")
-    local suite_dir = build_dir:gsub("build/$", "")
+    local build_dir = helpers.build_dir .. "/"
+    local suite_dir = helpers.suite_dir .. "/"
     local test_name = "vc_029_01_ooxml_schema_validation"
     local docx_path = build_dir .. test_name .. ".docx"
 

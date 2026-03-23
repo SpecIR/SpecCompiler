@@ -26,7 +26,7 @@ This manual is itself a complete working example of a SpecCompiler document auth
 
 ### What is SpecCompiler?
 
-SpecCompiler is a document processing pipeline that transforms structured Markdown specifications into multiple output formats (DOCX, HTML5). It provides:
+SpecCompiler is the reference compiler for **CommonSpec**, a structured Markdown language for typed, traceable specifications. It lowers CommonSpec into SpecIR (a SQLite-backed intermediate representation) and generates multiple output formats (DOCX, HTML5, ReqIF). It provides:
 
 - **Structured authoring**: Define requirements, designs, and verification cases using a consistent syntax.
 - **Traceability**: Link objects together with `abbrev: Project Identifier (PID)` and `#label` references.
@@ -41,7 +41,7 @@ This manual covers:
 
 - Installation and verification of the SpecCompiler-Core Docker image (see [MANUAL-sec2](@)).
 - Configuration of project files (`project.yaml`) as described in [section:project-configuration](#).
-- Authoring specification documents using the SpecCompiler Markdown syntax ([MANUAL-sec4](@)).
+- Authoring specification documents using CommonSpec syntax ([MANUAL-sec4](@)).
 - Invocation of the tool and interpretation of its outputs ([section:invocation](#)).
 - Verification diagnostics and error code reference.
 - Incremental build behavior and cache management.
@@ -261,9 +261,9 @@ doc_files:               # Markdown files to process, in order
 # ============================================================================
 outputs:
   - format: docx
-    path: build/docx/{spec_id}.docx
+    path: docx/{spec_id}.docx
   - format: html5
-    path: build/www/{spec_id}.html
+    path: www/{spec_id}.html
 
 # ============================================================================
 # DOCX Configuration (OPTIONAL)
@@ -332,7 +332,7 @@ csl: ieee.csl
 
 ## Document Authoring
 
-SpecCompiler extends standard Markdown with a structured overlay for specification documents. The syntax uses existing Markdown constructs (headers, blockquotes, code blocks, links) with specific patterns that the pipeline recognizes.
+CommonSpec extends standard Markdown with six constructs for specification documents. The syntax uses existing Markdown constructs (headers, blockquotes, code blocks, links) with specific patterns that the pipeline recognizes. See the CommonSpec Language Specification for the formal definition.
 
 ### Specifications
 

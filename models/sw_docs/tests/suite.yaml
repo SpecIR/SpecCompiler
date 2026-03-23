@@ -13,6 +13,7 @@ validation:
   traceability_hlr_to_vc: ignore
   traceability_vc_to_hlr: ignore
   traceability_tr_to_vc: ignore
+  traceability_hlr_allocation: ignore
 
 # Test case to VC mapping:
 # - vc_web_004_traceability_matrix.md -> VC-WEB-004 (Traceability Matrix View Rendering)

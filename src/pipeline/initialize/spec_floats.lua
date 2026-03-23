@@ -9,6 +9,7 @@ local logger = require("infra.logger")
 local label_utils = require("pipeline.shared.label_utils")
 local hash_utils = require("infra.hash_utils")
 local Queries = require("db.queries")
+local cache_registry = require("pipeline.shared.cache_registry")
 
 local M = {
     name = "spec_floats_initialize",
@@ -66,6 +67,7 @@ function M.clear_cache()
     alias_cache = {}
     prefix_cache = {}
 end
+cache_registry.register(M.clear_cache)
 
 ---Generate anchor for a float based on scope.
 ---Anchors are formatted as:

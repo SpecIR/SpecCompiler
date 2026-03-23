@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS spec_object_types (
   is_default INTEGER DEFAULT 0,
 
   -- Default PID prefix for auto-generation (e.g., "HLR", "VC")
-  -- When objects of this type have no @PID and no sibling pattern,
+  -- When objects of this type have no @PID,
   -- use this prefix to generate PIDs like "HLR-001", "HLR-002"
   pid_prefix TEXT,
 
@@ -155,6 +155,12 @@ CREATE TABLE IF NOT EXISTS spec_relation_types (
   -- Attribute name for inference. When set, relation is inferred from attribute.
   -- E.g., source_attribute='allocated_to' creates relation when object has that attr
   source_attribute TEXT,
+
+  -- Boolean (0/1): Is this relation inferred from document hierarchy?
+  -- 1 = relation created by finding nearest ancestor of target_type_ref
+  --     using header-level containment (start_line/end_line/level)
+  -- 0 = relation created from explicit links in content or attributes (default)
+  is_structural INTEGER DEFAULT 0,
 
   FOREIGN KEY (source_type_ref) REFERENCES spec_object_types(identifier),
   FOREIGN KEY (target_type_ref) REFERENCES spec_object_types(identifier)

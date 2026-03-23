@@ -453,14 +453,15 @@ else
     write_version "$PREFIX/vendor/luacov/.version" "$LUACOV_VERSION"
 fi
 
-# --- reqif (Python, for ReqIF export) ---
+# --- reqif (Python, for ReqIF interop — fork with specir subpackage) ---
 REQIF_MARKER="$PREFIX/vendor/python/.reqif_installed"
+REQIF_REPO="https://github.com/crisclacerda/reqif.git"
 if [ "$FORCE" = false ] && [ -f "$REQIF_MARKER" ]; then
     echo "  reqif already installed, skipping"
 else
-    echo "  Installing reqif (Python)..."
-    python3 -m pip install --target="$PREFIX/vendor/python" --no-cache-dir --upgrade reqif 2>/dev/null \
-        || python3 -m pip install --break-system-packages --target="$PREFIX/vendor/python" --no-cache-dir --upgrade reqif
+    echo "  Installing reqif (from fork: $REQIF_REPO)..."
+    python3 -m pip install --target="$PREFIX/vendor/python" --no-cache-dir --upgrade "git+${REQIF_REPO}@main" 2>/dev/null \
+        || python3 -m pip install --break-system-packages --target="$PREFIX/vendor/python" --no-cache-dir --upgrade "git+${REQIF_REPO}@main"
     touch "$REQIF_MARKER"
 fi
 

@@ -75,7 +75,8 @@ local function register_relation_type(data, schema)
         link_selector = schema.link_selector,
         source_attribute = schema.source_attribute,
         source_type_ref = schema.source_type_ref,
-        target_type_ref = schema.target_type_ref
+        target_type_ref = schema.target_type_ref,
+        is_structural = schema.is_structural and 1 or 0
     })
 end
 
@@ -280,33 +281,6 @@ local function propagate_inherited_attributes(data)
     end
 end
 
----Propagate link_selector from parent relation types to children through extends.
----After all modules are loaded, each child relation type that has extends but no
----link_selector receives the parent's link_selector value.
----@param data DataManager
-local function propagate_inherited_relation_properties(data)
-    if type(data.query_all) ~= "function" then return end
-
-    local extends_rows = data:query_all([[
-        SELECT identifier AS child_type, extends AS parent_type
-        FROM spec_relation_types
-        WHERE extends IS NOT NULL AND link_selector IS NULL
-    ]], {})
-
-    if not extends_rows or #extends_rows == 0 then return end
-
-    for _, row in ipairs(extends_rows) do
-        data:execute([[
-            UPDATE spec_relation_types
-            SET link_selector = (
-                SELECT link_selector FROM spec_relation_types
-                WHERE identifier = :parent
-            )
-            WHERE identifier = :child AND link_selector IS NULL
-        ]], { parent = row.parent_type, child = row.child_type })
-    end
-end
-
 ---Register a specific type module into the IR database.
 ---Supports explicit type exports (M.float, M.relation, M.object, M.view, M.specification).
 ---@param data DataManager
@@ -459,7 +433,13 @@ function M.load_model(data, pipeline, model_name)
                 pipeline:register_handler(module.handler)
             end
         else
-            error(module) -- module contains the error message
+            -- Views are optional extensions; warn instead of erroring
+            local category = type_path:match("^([^.]+)%.")
+            if category == "views" then
+                io.stderr:write("WARN  Skipping view module: " .. type_path .. " (load failed)\n")
+            else
+                error(module) -- module contains the error message
+            end
         end
     end
 
@@ -467,7 +447,6 @@ function M.load_model(data, pipeline, model_name)
     -- attributes defined on base types (e.g. TRACEABLE.status) are visible
     -- on child types (e.g. HLR) for validation and casting.
     propagate_inherited_attributes(data)
-    propagate_inherited_relation_properties(data)
 end
 
 return M

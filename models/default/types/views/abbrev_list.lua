@@ -25,6 +25,7 @@ M.view = {
     inline_prefix = "abbrev_list",
     aliases = { "sigla_list", "acronym_list" },
     materializer_type = "abbrev_list",
+    view_subtype_ref = "ABBREV",
 }
 
 -- ============================================================================
@@ -82,7 +83,8 @@ end
 -- OOXML Generation
 -- ============================================================================
 
----Generate OOXML paragraphs for abbreviation list.
+---Generate OOXML table for abbreviation list.
+---Produces a two-column table with header row (Abbreviation | Description).
 ---@param data DataManager Database instance
 ---@param spec_id string Specification identifier
 ---@return string OOXML content
@@ -98,28 +100,103 @@ function M.generate_list_ooxml(data, spec_id)
         return xml.serialize_element(empty_p)
     end
 
-    local style_id = "AbbreviationItem"
-    local parts = {}
+    -- Build table rows
+    local rows = {}
 
+    -- Header row
+    local header_row = xml.node("w:tr", {}, {
+        xml.node("w:tc", {}, {
+            xml.node("w:tcPr", {}, {
+                xml.node("w:tcW", { ["w:type"] = "pct", ["w:w"] = "1500" }),
+            }),
+            xml.node("w:p", {}, {
+                xml.node("w:pPr", {}, {
+                    xml.node("w:spacing", { ["w:before"] = "40", ["w:after"] = "40" }),
+                }),
+                xml.node("w:r", {}, {
+                    xml.node("w:rPr", {}, { xml.node("w:b") }),
+                    xml.node("w:t", {}, { xml.text("Abbreviation") }),
+                }),
+            }),
+        }),
+        xml.node("w:tc", {}, {
+            xml.node("w:tcPr", {}, {
+                xml.node("w:tcW", { ["w:type"] = "pct", ["w:w"] = "3500" }),
+            }),
+            xml.node("w:p", {}, {
+                xml.node("w:pPr", {}, {
+                    xml.node("w:spacing", { ["w:before"] = "40", ["w:after"] = "40" }),
+                }),
+                xml.node("w:r", {}, {
+                    xml.node("w:rPr", {}, { xml.node("w:b") }),
+                    xml.node("w:t", {}, { xml.text("Description") }),
+                }),
+            }),
+        }),
+    })
+    table.insert(rows, header_row)
+
+    -- Data rows
     for _, a in ipairs(abbrevs) do
-        local p = xml.node("w:p", {}, {
-            xml.node("w:pPr", {}, {
-                xml.node("w:pStyle", { ["w:val"] = style_id })
+        local row = xml.node("w:tr", {}, {
+            xml.node("w:tc", {}, {
+                xml.node("w:tcPr", {}, {
+                    xml.node("w:tcW", { ["w:type"] = "pct", ["w:w"] = "1500" }),
+                }),
+                xml.node("w:p", {}, {
+                    xml.node("w:pPr", {}, {
+                        xml.node("w:spacing", { ["w:before"] = "20", ["w:after"] = "20" }),
+                    }),
+                    xml.node("w:r", {}, {
+                        xml.node("w:rPr", {}, { xml.node("w:b") }),
+                        xml.node("w:t", {}, { xml.text(a.abbrev) }),
+                    }),
+                }),
             }),
-            xml.node("w:r", {}, {
-                xml.node("w:t", {}, { xml.text(a.abbrev) })
+            xml.node("w:tc", {}, {
+                xml.node("w:tcPr", {}, {
+                    xml.node("w:tcW", { ["w:type"] = "pct", ["w:w"] = "3500" }),
+                }),
+                xml.node("w:p", {}, {
+                    xml.node("w:pPr", {}, {
+                        xml.node("w:spacing", { ["w:before"] = "20", ["w:after"] = "20" }),
+                    }),
+                    xml.node("w:r", {}, {
+                        xml.node("w:t", {}, { xml.text(a.meaning) }),
+                    }),
+                }),
             }),
-            xml.node("w:r", {}, {
-                xml.node("w:tab")
-            }),
-            xml.node("w:r", {}, {
-                xml.node("w:t", {}, { xml.text(a.meaning) })
-            })
         })
-        table.insert(parts, xml.serialize_element(p))
+        table.insert(rows, row)
     end
 
-    return table.concat(parts, "\n")
+    -- Assemble table children: tblPr + tblGrid + all rows
+    local children = {
+        xml.node("w:tblPr", {}, {
+            xml.node("w:tblStyle", { ["w:val"] = "TableGrid" }),
+            xml.node("w:tblW", { ["w:type"] = "pct", ["w:w"] = "5000" }),
+            xml.node("w:tblLook", {
+                ["w:val"] = "04A0",
+                ["w:firstRow"] = "1",
+                ["w:lastRow"] = "0",
+                ["w:firstColumn"] = "0",
+                ["w:lastColumn"] = "0",
+                ["w:noHBand"] = "0",
+                ["w:noVBand"] = "1",
+            }),
+        }),
+        xml.node("w:tblGrid", {}, {
+            xml.node("w:gridCol", { ["w:w"] = "2700" }),
+            xml.node("w:gridCol", { ["w:w"] = "6656" }),
+        }),
+    }
+    for _, row in ipairs(rows) do
+        table.insert(children, row)
+    end
+
+    local tbl = xml.node("w:tbl", {}, children)
+
+    return xml.serialize_element(tbl)
 end
 
 -- ============================================================================

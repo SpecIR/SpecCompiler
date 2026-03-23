@@ -63,12 +63,26 @@ M.distinct_types_by_spec = [[
     WHERE specification_ref = :spec_id
 ]]
 
--- Get sibling objects of same type for pattern detection and PID generation
-M.siblings_by_spec_type = [[
-    SELECT id, pid, pid_prefix, pid_sequence, pid_auto_generated,
-           title_text, from_file, start_line
+-- Get type's PID generation settings (prefix and format)
+M.type_pid_info = [[
+    SELECT pid_prefix, pid_format FROM spec_object_types
+    WHERE identifier = :type_ref
+]]
+
+-- Get max PID sequence for a type within a specification
+M.max_seq_by_spec_type = [[
+    SELECT COALESCE(MAX(pid_sequence), 0) AS max_seq
     FROM spec_objects
     WHERE specification_ref = :spec_id AND type_ref = :type_ref
+      AND pid_sequence IS NOT NULL
+]]
+
+-- Get objects of same type that need PID generation
+M.objects_needing_pid = [[
+    SELECT id, title_text, from_file, start_line
+    FROM spec_objects
+    WHERE specification_ref = :spec_id AND type_ref = :type_ref
+      AND (pid IS NULL OR pid = '')
     ORDER BY file_seq
 ]]
 

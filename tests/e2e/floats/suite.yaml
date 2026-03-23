@@ -7,6 +7,10 @@ project:
 
 output_format: json
 
+# Test model overlays: prepended to package.path so test-only modules
+# (e.g. view fixtures) resolve before production models.
+extra_lua_paths: tests/e2e/floats
+
 # Test case to VC mapping:
 # - syntax.md       -> VC-FLOAT-001 (Float Syntax and Numbering)
 # - tables.md       -> VC-FLOAT-002 (Table Processing)

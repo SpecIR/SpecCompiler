@@ -2,7 +2,7 @@
 
 ### VC: Model Type Loading @VC-019
 
-Verify [TERM-38](@) discovers and loads model types.
+Verify [dic:type-loader](#) discovers and loads model types.
 
 > objective: Confirm types from models/{model}/types/ are registered
 
@@ -18,12 +18,12 @@ Verify [TERM-38](@) discovers and loads model types.
 > - Type definitions inserted into correct tables
 > - Errors logged for invalid type modules
 
-> traceability: [HLR-EXT-001](@)
+> traceability: [HLR-EXT-001](@), [LLR-094](@)
 
 
 ### VC: Model Directory Structure @VC-020
 
-Verify [TERM-38](@) recognizes all type categories.
+Verify [dic:type-loader](#) recognizes all type categories.
 
 > objective: Confirm KNOWN_CATEGORIES are all scanned
 
@@ -136,7 +136,7 @@ Verify float types can declare external rendering needs.
 
 ### VC: Data View Generator Loading @VC-025
 
-Verify [TERM-35](@) generators are loaded from model directories and injected into chart rendering.
+Verify [dic:data-view](#) generators are loaded from model directories and injected into chart rendering.
 
 > objective: Confirm that data view modules in models/{model}/types/views/ are discovered and their generate() function produces data for chart consumers.
 
@@ -153,7 +153,7 @@ Verify [TERM-35](@) generators are loaded from model directories and injected in
 > - generate() receives params table and DataManager instance
 > - Return value used as chart data source
 
-> traceability: [HLR-EXT-007](@)
+> traceability: [HLR-EXT-007](@), [LLR-095](@)
 
 
 ### VC: Handler Caching @VC-026
@@ -176,4 +176,4 @@ Verify type handler loaders cache modules to avoid repeated loading.
 > - Failed lookup stores false (negative cache)
 > - No repeated require() for previously loaded types
 
-> traceability: [HLR-EXT-008](@)
+> traceability: [HLR-EXT-008](@), [LLR-096](@)

@@ -2,19 +2,19 @@
 
 ### SF: Extension Framework @SF-005
 
-Model-based extensibility for type [TERM-16](@), renderers, and [TERM-35](@).
+Model-based extensibility for type [dic:handler](#), renderers, and [dic:data-view](#).
 
 > description: Groups requirements for the extension mechanism that enables custom models
-> to provide type handlers, [TERM-34](@), data view generators, and style presets.
+> to provide type handlers, [dic:external-renderer](#), data view generators, and style presets.
 
 > rationale: Extensibility through model directories enables domain-specific customization
 > without modifying the core pipeline.
 
-### HLR: Model-Specific Type Handler Loading @HLR-EXT-001
+#### HLR: Model-Specific Type Handler Loading @HLR-EXT-001
 
 The system shall load type-specific handlers from model directories.
 
-> description: Type handlers control how specification content is rendered during the [TERM-22](@) phase. The loading mechanism supports:
+> description: Type handlers control how specification content is rendered during the [dic:transform-phase](#) phase. The loading mechanism supports:
 >
 > - **Object types**: Loaded from `models/{model}/types/objects/{type}.lua`
 > - **Specification types**: Loaded from `models/{model}/types/specifications/{type}.lua`
@@ -27,9 +27,8 @@ The system shall load type-specific handlers from model directories.
 
 > status: Approved
 
-> belongs_to: [SF-005](@)
 
-### HLR: Model Directory Structure @HLR-EXT-002
+#### HLR: Model Directory Structure @HLR-EXT-002
 
 The system shall organize model content in a standardized directory hierarchy.
 
@@ -55,9 +54,8 @@ The system shall organize model content in a standardized directory hierarchy.
 
 > status: Approved
 
-> belongs_to: [SF-005](@)
 
-### HLR: Handler Registration Interface @HLR-EXT-003
+#### HLR: Handler Registration Interface @HLR-EXT-003
 
 Type handlers shall provide standardized registration interfaces for pipeline integration.
 
@@ -84,9 +82,8 @@ Type handlers shall provide standardized registration interfaces for pipeline in
 
 > status: Approved
 
-> belongs_to: [SF-005](@)
 
-### HLR: Type Definition Schema @HLR-EXT-004
+#### HLR: Type Definition Schema @HLR-EXT-004
 
 Type definitions shall declare metadata schema that controls registration and behavior.
 
@@ -135,9 +132,8 @@ Type definitions shall declare metadata schema that controls registration and be
 
 > status: Approved
 
-> belongs_to: [SF-005](@)
 
-### HLR: Model Path Resolution @HLR-EXT-005
+#### HLR: Model Path Resolution @HLR-EXT-005
 
 The system shall resolve model paths using environment configuration with fallback.
 
@@ -161,9 +157,8 @@ The system shall resolve model paths using environment configuration with fallba
 
 > status: Approved
 
-> belongs_to: [SF-005](@)
 
-### HLR: External Renderer Registration @HLR-EXT-006
+#### HLR: External Renderer Registration @HLR-EXT-006
 
 External renderers shall register callbacks for task preparation and result handling.
 
@@ -186,9 +181,8 @@ External renderers shall register callbacks for task preparation and result hand
 
 > status: Approved
 
-> belongs_to: [SF-005](@)
 
-### HLR: Data View Generator Loading @HLR-EXT-007
+#### HLR: Data View Generator Loading @HLR-EXT-007
 
 The system shall load data view generators from model directories for chart data injection.
 
@@ -220,9 +214,8 @@ The system shall load data view generators from model directories for chart data
 
 > status: Approved
 
-> belongs_to: [SF-005](@)
 
-### HLR: Handler Caching @HLR-EXT-008
+#### HLR: Handler Caching @HLR-EXT-008
 
 The system shall cache loaded type handlers to avoid repeated module loading.
 
@@ -255,4 +248,3 @@ The system shall cache loaded type handlers to avoid repeated module loading.
 
 > status: Approved
 
-> belongs_to: [SF-005](@)

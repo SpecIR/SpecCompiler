@@ -47,9 +47,5 @@ architecture/sw_docs_model_design.md
 ```
 
 ```{.include}
-architecture/low_level_requirements.md
-```
-
-```{.include}
 architecture/software_decomposition.md
 ```

@@ -13,6 +13,8 @@ local M = {
 
 local logger = require("infra.logger")
 local attribute_para = require("pipeline.shared.attribute_para_utils")
+local render_utils = require("pipeline.shared.render_utils")
+local ast_utils = require("pipeline.shared.ast_utils")
 local Queries = require("db.queries")
 
 -- Cache of loaded type handlers by type_ref
@@ -83,30 +85,8 @@ local function get_object_attributes(data, object_id)
     return attrs
 end
 
----Decode stored AST JSON back to Pandoc blocks.
----@param ast_json string JSON-encoded AST
----@return table|nil blocks Array of Pandoc blocks
-local function decode_ast(ast_json)
-    if not ast_json or ast_json == "" or ast_json == "[]" then
-        return {}
-    end
-
-    local result = pandoc.json.decode(ast_json)
-    if result then
-        -- Check if result is a full Pandoc document (has pandoc-api-version or blocks)
-        if result["pandoc-api-version"] or result.blocks then
-            return result.blocks or {}
-        elseif result.t then
-            -- Single block, wrap in array
-            return { result }
-        else
-            -- Array of blocks
-            return result
-        end
-    end
-
-    return nil
-end
+-- decode_ast: use ast_utils.decode_blocks (shared utility)
+local decode_ast = ast_utils.decode_blocks
 
 ---Filter out Header blocks from an array of blocks.
 ---The stored AST includes the section header, but type handlers create their own
@@ -126,18 +106,6 @@ local function filter_headers(blocks)
     return filtered
 end
 
----Check if a BlockQuote contains attribute definitions.
----A blockquote is an attribute block if its first Para matches the
----attribute pattern (word followed by colon). Each attribute needs
----its own blockquote; multiple attributes in one blockquote are not supported.
----@param blockquote table Pandoc BlockQuote block
----@return boolean is_attribute_block True if blockquote is an attribute block
-local function is_attribute_blockquote(blockquote)
-    local paras = attribute_para.collect_paragraphs(blockquote)
-    if #paras == 0 then return false end
-    return attribute_para.is_attribute_para(paras[1])
-end
-
 ---Filter out attribute BlockQuotes from an array of blocks.
 ---Attributes are extracted during INITIALIZE phase and rendered by spec_object_base.
 ---The raw blockquotes should not appear in the rendered output.
@@ -150,7 +118,7 @@ local function filter_attribute_blockquotes(blocks)
         local block_type = block.t or (block.tag) or ""
 
         -- Check if block is a BlockQuote containing only attributes
-        if block_type == "BlockQuote" and is_attribute_blockquote(block) then
+        if block_type == "BlockQuote" and attribute_para.is_attribute_blockquote(block) then
             -- Skip this attribute blockquote
             logger.debug("Filtered attribute blockquote")
         elseif block_type == "Div" then
@@ -162,7 +130,7 @@ local function filter_attribute_blockquotes(blocks)
             -- If Div contains only an attribute blockquote, skip it
             local is_attr_div = false
             if #div_content == 1 and div_content[1].t == "BlockQuote" then
-                if is_attribute_blockquote(div_content[1]) then
+                if attribute_para.is_attribute_blockquote(div_content[1]) then
                     is_attr_div = true
                 end
             end
@@ -185,32 +153,8 @@ local function unwrap_spec_object_divs(blocks)
     local result = {}
     for _, block in ipairs(blocks) do
         local block_type = block.t or (block.tag) or ""
-        local is_wrapper = false
 
-        if block_type == "Div" then
-            local attrs = block.attr
-            local classes = {}
-            if attrs then
-                if type(attrs.classes) == "table" then
-                    classes = attrs.classes
-                elseif attrs[2] and type(attrs[2]) == "table" then
-                    classes = attrs[2]
-                end
-            elseif block.c and block.c[1] then
-                local attr = block.c[1]
-                if type(attr[2]) == "table" then
-                    classes = attr[2]
-                end
-            end
-            for _, c in ipairs(classes) do
-                if c == "spec-object" then
-                    is_wrapper = true
-                    break
-                end
-            end
-        end
-
-        if is_wrapper then
+        if block_type == "Div" and render_utils.block_has_class(block, "spec-object") then
             -- Extract children to top level
             local children = block.content or (block.c and block.c[2]) or {}
             for _, child in ipairs(children) do
@@ -234,39 +178,9 @@ local function filter_spec_object_attr_divs(blocks)
     local filtered = {}
     for _, block in ipairs(blocks) do
         local block_type = block.t or (block.tag) or ""
-        local skip = false
-
-        if block_type == "Div" then
-            -- Check classes for spec-object-attributes
-            -- Pandoc Div structure: {attr, content} where attr = {id, classes, kvpairs}
-            local attrs = block.attr
-            local classes = {}
-
-            if attrs then
-                -- Handle both userdata (Pandoc Attr) and table formats
-                if type(attrs.classes) == "table" then
-                    classes = attrs.classes
-                elseif attrs[2] and type(attrs[2]) == "table" then
-                    classes = attrs[2]
-                end
-            elseif block.c and block.c[1] then
-                -- Legacy/alternative format: block.c = {attr, content}
-                local attr = block.c[1]
-                if type(attr[2]) == "table" then
-                    classes = attr[2]
-                end
-            end
-
-            for _, c in ipairs(classes) do
-                if c == "spec-object-attributes" then
-                    skip = true
-                    logger.debug("Filtered existing spec-object-attributes Div")
-                    break
-                end
-            end
-        end
-
-        if not skip then
+        if block_type == "Div" and render_utils.block_has_class(block, "spec-object-attributes") then
+            logger.debug("Filtered existing spec-object-attributes Div")
+        else
             table.insert(filtered, block)
         end
     end
@@ -284,38 +198,9 @@ local function filter_spec_object_headers(blocks)
     local filtered = {}
     for _, block in ipairs(blocks) do
         local block_type = block.t or (block.tag) or ""
-        local skip = false
-
-        if block_type == "Div" then
-            -- Check classes for spec-object-header
-            local attrs = block.attr
-            local classes = {}
-
-            if attrs then
-                -- Handle both userdata (Pandoc Attr) and table formats
-                if type(attrs.classes) == "table" then
-                    classes = attrs.classes
-                elseif attrs[2] and type(attrs[2]) == "table" then
-                    classes = attrs[2]
-                end
-            elseif block.c and block.c[1] then
-                -- Legacy/alternative format: block.c = {attr, content}
-                local attr = block.c[1]
-                if type(attr[2]) == "table" then
-                    classes = attr[2]
-                end
-            end
-
-            for _, c in ipairs(classes) do
-                if c == "spec-object-header" then
-                    skip = true
-                    logger.debug("Filtered existing spec-object-header Div (idempotent transform)")
-                    break
-                end
-            end
-        end
-
-        if not skip then
+        if block_type == "Div" and render_utils.block_has_class(block, "spec-object-header") then
+            logger.debug("Filtered existing spec-object-header Div (idempotent transform)")
+        else
             table.insert(filtered, block)
         end
     end
@@ -327,32 +212,7 @@ end
 ---@param contexts Context[]
 ---@param diagnostics Diagnostics
 function M.on_transform(data, contexts, diagnostics)
-    local log = {
-        debug = function(msg, ...)
-            local formatted = select("#", ...) > 0 and string.format(msg, ...) or tostring(msg)
-            logger.debug(formatted)
-        end,
-        info = function(msg, ...)
-            local formatted = select("#", ...) > 0 and string.format(msg, ...) or tostring(msg)
-            logger.info(formatted)
-        end,
-        warn = function(msg, ...)
-            local formatted = select("#", ...) > 0 and string.format(msg, ...) or tostring(msg)
-            if diagnostics then
-                diagnostics:warn(nil, nil, "RENDER", formatted)
-            else
-                logger.warning(formatted)
-            end
-        end,
-        error = function(msg, ...)
-            local formatted = select("#", ...) > 0 and string.format(msg, ...) or tostring(msg)
-            if diagnostics then
-                diagnostics:error(nil, nil, "RENDER", formatted)
-            else
-                logger.error(formatted)
-            end
-        end,
-    }
+    local log = logger.create_diagnostic_adapter(diagnostics, "RENDER")
 
     data:begin_transaction()
     for _, ctx in ipairs(contexts) do
@@ -382,7 +242,11 @@ function M.on_transform(data, contexts, diagnostics)
                 -- - Spec-object-attributes divs: prevent duplicate attribute rendering
                 local decoded_blocks = decode_ast(obj.ast) or {}
                 local unwrapped = unwrap_spec_object_divs(decoded_blocks)
-                local body_blocks = filter_spec_object_headers(filter_spec_object_attr_divs(filter_attribute_blockquotes(filter_headers(unwrapped))))
+                -- Sequential filtering: remove elements that type handlers will recreate
+                local body_blocks = filter_headers(unwrapped)
+                body_blocks = filter_attribute_blockquotes(body_blocks)
+                body_blocks = filter_spec_object_attr_divs(body_blocks)
+                body_blocks = filter_spec_object_headers(body_blocks)
 
                 local render_ctx = {
                     spec_object = obj,

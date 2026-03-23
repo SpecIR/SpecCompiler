@@ -2,6 +2,8 @@
 ---Model-agnostic dispatch to view handlers registered in spec_view_types.
 ---
 ---@module inline_handlers
+local cache_registry = require("pipeline.shared.cache_registry")
+
 local M = {}
 
 -- Cache for inline view handlers queried from spec_view_types (per model)
@@ -86,5 +88,6 @@ end
 function M.clear_cache()
     inline_handlers_cache = {}
 end
+cache_registry.register(M.clear_cache)
 
 return M

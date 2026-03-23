@@ -1,4 +1,4 @@
-<p align="center"><em>SpecCompiler is an extensible type system for Markdown.</em></p>
+<p align="center"><em>CommonSpec is a structured Markdown language for typed, traceable specifications.</em></p>
 
 <p align="center">
   <img src="assets/logo.jpg" alt="SpecCompiler logo" width="160"/>
@@ -11,16 +11,18 @@
   <img src="https://img.shields.io/badge/status-alpha-orange" alt="Status: Alpha">
 </p>
 
-## SpecIR & SpecCompiler
+## CommonSpec, SpecIR & SpecCompiler
 
-SpecIR is a typed relational intermediate representation for textual specifications.
+**CommonSpec** is a structured Markdown language for authoring typed, traceable specifications. It extends standard Markdown with six constructs — specifications, objects, floats, attributes, relations, and views — that give documents a formal type system.
 
-SpecCompiler is its reference implementation. It lowers Markdown into SpecIR and executes declarative structural constraints over the resulting model.
+**SpecIR** is a typed relational intermediate representation stored in SQLite. CommonSpec compiles into SpecIR. Other formats (ReqIF, DOORS CSV) can also encode and decode into SpecIR, making it a universal interchange hub for specification data.
 
-By imposing a type system on Markdown SpecCompiler guarantees referential and schema integrity: detecting invalid object kinds, missing mandatory attributes and traceability gaps at **compile time**.
+**SpecCompiler** is the reference compiler. It lowers CommonSpec into SpecIR and executes declarative structural constraints over the resulting model.
 
-> "The fundamental purpose of a type system is to prevent 
-> the occurrence of execution errors during the running of 
+By imposing a type system on Markdown, SpecCompiler guarantees referential and schema integrity: detecting invalid object kinds, missing mandatory attributes, and traceability gaps at **compile time**.
+
+> "The fundamental purpose of a type system is to prevent
+> the occurrence of execution errors during the running of
 > a program." Cardelli, [Type Systems](http://lucacardelli.name/Papers/TypeSystems.pdf)
 
 The fundamental purpose of SpecCompiler is to prevent the occurrence of *findings* during the review of a specification.
@@ -28,7 +30,7 @@ The fundamental purpose of SpecCompiler is to prevent the occurrence of *finding
 ### See It in Action
 
 <p align="center">
-  <img src="assets/demo.gif" alt="SpecCompiler demo: writing specs, catching type errors, and compiling to DOCX" width="700"/>
+  <img src="assets/demo.gif" alt="SpecCompiler demo: writing CommonSpec, catching type errors, and compiling to DOCX" width="700"/>
 </p>
 
 <p align="center"><em>Well-typed specifications don't go wrong.</em></p>
@@ -70,15 +72,20 @@ bash scripts/build.sh --install
 Build the docs.
 
 ```bash
+specc build docs/commonspec/project.yaml
+specc build docs/specir/project.yaml
+specc build docs/user_docs/project.yaml
 specc build docs/engineering_docs/project.yaml
-specc build docs/user_docs/project.yaml 
 ```
 
-[`docs/user_docs/`](docs/engineering_docs/)  contains user-facing documentation (installation, authoring syntax, configuration) serving as an example of the default type system applied to general technical publishing.
+## Documentation
 
-[`docs/engineering_docs/`](docs/engineering_docs/) contains a self-hosted engineering document set (SRS/SDD/SVC) illustrating how the system can be applied in regulated and safety-critical software.
+- **[CommonSpec Language Specification](docs/commonspec/)** — formal language definition, syntax, and type system.
+- **[SpecIR Schema Specification](docs/specir/)** — intermediate representation, database schema, and public API views.
+- **[User Manual](docs/user_docs/)** — installation, authoring, configuration, and troubleshooting.
+- **[Engineering Specs](docs/engineering_docs/)** — self-hosted SRS/SDD/SVC for SpecCompiler itself.
 
-## Online Documentation
+### Online
 
 - **[Manual](https://specir.github.io/SpecCompiler/manual/#/manual)**, installation, authoring syntax, configuration [(start here)](https://github.com/SpecIR/SpecCompiler/releases/download/v/manual.docx)
 - **[Engineering Specs](https://specir.github.io/SpecCompiler/engineering/#/srs)**, SRS, SDD, SVC for SpecCompiler itself.
@@ -87,7 +94,7 @@ specc build docs/user_docs/project.yaml
 
 ### A Minimal Spec
 
-**srs.md** — a requirement:
+**srs.md** — a requirement in CommonSpec:
 
 ```markdown
 # SRS: Login Service
@@ -102,7 +109,7 @@ The system shall authenticate users via OAuth 2.0.
 **svc.md** — a verification case that covers it:
 
 ```markdown
-# SVC: Login Verification 
+# SVC: Login Verification
 
 ## VC: Verify Authentication
 
@@ -115,12 +122,12 @@ Verify the authentication flow works end to end.
 > traceability: [0013](@)
 ```
 
-### Pandoc + SQLite Middle-End
+### CommonSpec → SpecIR → Output
 
 SpecCompiler runs as a Pandoc Lua filter and adds a SQLite middle-end between Pandoc's reader and writer:
 
 **0. Type loading (Γ).** Before any document is parsed, SpecCompiler reads
-type definitions from Lua modules and INSERTs them into the IR. A type defines
+type definitions from Lua modules and INSERTs them into SpecIR. A type defines
 what a spec object *is*: its identifier, display name, PID format, and typed
 attributes.
 
@@ -144,11 +151,11 @@ INSERT INTO spec_object_types (identifier, long_name, ...)
 VALUES ('HLR', 'High-Level Requirement', ...);
 ```
 
-**1. Frontend (Pandoc reader).** Parse `commonmark_x` into Pandoc AST.
+**1. Frontend (Pandoc reader).** Parse CommonSpec (`commonmark_x`) into Pandoc AST.
 
 **2. Middle-end (SpecCompiler).** Lower the AST into SpecIR (SQLite), apply type
 rules, and assemble the transformed AST. For the two-file spec above, the
-middle-end produces the following relations:
+middle-end produces the following SpecIR entries:
 
 ```sql
 -- Specification (from the # heading)
@@ -170,7 +177,7 @@ INSERT INTO spec_relations
 VALUES ('svc', 2, '0013', 'VERIFIES', '@', 'traceability');
 ```
 
-Type-checking is then a query against the IR. For example, the proof view
+Type-checking is then a query against SpecIR. For example, the proof view
 `invalid_cast` checks whether `'Pending'` is a legal value for
 `TRACEABLE.status` — it is not (only Draft, Review, Approved, Implemented are).
 And `traceability_hlr_to_vc` finds HLRs that are never the target of a

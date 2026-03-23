@@ -189,9 +189,13 @@ function M.extract_metadata(meta)
         outputs = {}
         for _, output in ipairs(meta.outputs) do
             if output.format and output.path then
+                local raw_path = utils.stringify(output.path)
+                if not path.is_absolute(raw_path) then
+                    raw_path = path.join({output_dir, raw_path})
+                end
                 table.insert(outputs, {
                     format = utils.stringify(output.format),
-                    path = utils.stringify(output.path)
+                    path = raw_path
                 })
             end
         end

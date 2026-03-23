@@ -2,7 +2,7 @@
 
 ### Overview
 
-The Specification [TERM-IR](@) (SpecIR) is implemented as a [TERM-SQLITE](@) schema composed from:
+The Specification [dic:intermediate-representation](#) (SpecIR) is implemented as a [dic:sqlite-database](#) schema composed from:
 
 - `src/db/schema/types.lua`
 - `src/db/schema/content.lua`

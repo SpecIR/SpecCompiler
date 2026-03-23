@@ -2,8 +2,8 @@
 
 This chapter defines decomposition and design allocation using MIL-STD-498 nomenclature:
 
-- `CSC` ([TERM-36](@)) identifies structural subsystems/layers.
-- `CSU` ([TERM-37](@)) identifies concrete implementation units.
+- `CSC` ([dic:csc-computer-software-component](#)) identifies structural subsystems/layers.
+- `CSU` ([dic:csu-computer-software-unit](#)) identifies concrete implementation units.
 
 > **Note:** Software Functions (SF) are defined in the SRS alongside their
 > constituent HLRs. Functional Descriptions (FD) trace to SFs via the REALIZES
@@ -67,7 +67,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Main orchestrator that wires together the pipeline, database, [TERM-38](@), file walker, [TERM-30](@), and output emission to run a full SpecCompiler project build across all documents.
+> description: Main orchestrator that wires together the pipeline, database, [dic:type-loader](#), file walker, [dic:build-cache](#), and output emission to run a full SpecCompiler project build across all documents.
 
 > traceability: [CSC-001](@)
 
@@ -317,7 +317,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Dynamically generates per-object-type SQL views that pivot the [TERM-EAV](@) into typed columns for external BI queries (e.g., SELECT * FROM view_hlr_objects WHERE status = 'approved'). These views are not used by internal pipeline code, which queries the raw EAV tables directly. See HLR-STOR-006.
+> description: Dynamically generates per-object-type SQL views that pivot the [dic:eav-model](#) into typed columns for external BI queries (e.g., SELECT * FROM view_hlr_objects WHERE status = 'approved'). These views are not used by internal pipeline code, which queries the raw EAV tables directly. See HLR-STOR-006.
 
 > traceability: [CSC-007](@)
 

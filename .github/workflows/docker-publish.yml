@@ -228,23 +228,26 @@ jobs:
       - name: Build documentation
         run: |
           mkdir -p release-docs/html5
-          docker run --rm \
-            --user "$(id -u):$(id -g)" \
-            -v "${{ github.workspace }}:/workspace" \
-            -w /workspace \
-            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}" \
-            /opt/speccompiler/bin/speccompiler-core docs/engineering_docs/project.yaml
+          for project in \
+            docs/engineering_docs/project.yaml \
+            docs/user_docs/project.yaml \
+            docs/commonspec/project.yaml \
+            docs/specir/project.yaml; do
+            docker run --rm \
+              --user "$(id -u):$(id -g)" \
+              -v "${{ github.workspace }}:/workspace" \
+              -w /workspace \
+              "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}" \
+              /opt/speccompiler/bin/speccompiler-core "$project"
+          done
           cp docs/engineering_docs/build/docx/*.docx release-docs/ 2>/dev/null || true
           cp docs/engineering_docs/build/www/index.html release-docs/html5/engineering.html 2>/dev/null || true
-
-          docker run --rm \
-            --user "$(id -u):$(id -g)" \
-            -v "${{ github.workspace }}:/workspace" \
-            -w /workspace \
-            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}" \
-            /opt/speccompiler/bin/speccompiler-core docs/user_docs/project.yaml
           cp docs/user_docs/build/docx/*.docx release-docs/ 2>/dev/null || true
           cp docs/user_docs/build/www/index.html release-docs/html5/manual.html 2>/dev/null || true
+          cp docs/commonspec/build/docx/*.docx release-docs/ 2>/dev/null || true
+          cp docs/commonspec/build/www/index.html release-docs/html5/commonspec.html 2>/dev/null || true
+          cp docs/specir/build/docx/*.docx release-docs/ 2>/dev/null || true
+          cp docs/specir/build/www/index.html release-docs/html5/specir.html 2>/dev/null || true
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

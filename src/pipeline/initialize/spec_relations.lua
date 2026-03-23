@@ -1,6 +1,7 @@
 local logger = require("infra.logger")
 local Queries = require("db.queries")
 local hash_utils = require("infra.hash_utils")
+local cache_registry = require("pipeline.shared.cache_registry")
 
 local M = {
     name = "spec_relations",
@@ -17,6 +18,7 @@ local alias_cache = {}
 function M.clear_cache()
     alias_cache = {}
 end
+cache_registry.register(M.clear_cache)
 
 ---Resolve a type prefix to its canonical float type identifier.
 ---Queries the spec_float_types table for matching identifiers or aliases.

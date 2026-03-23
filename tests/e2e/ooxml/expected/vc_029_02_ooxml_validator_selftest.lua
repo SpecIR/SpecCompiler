@@ -9,9 +9,8 @@ return function(_, helpers)
     -- Resolve all paths to absolute to avoid issues with os.execute('cd ...')
     local cwd = io.popen("pwd"):read("*l") .. "/"
 
-    -- Derive paths
-    local build_dir = helpers.db_file:match("(.+/)")
-    local suite_dir = build_dir:gsub("build/$", "")
+    local build_dir = helpers.build_dir .. "/"
+    local suite_dir = helpers.suite_dir .. "/"
     local test_name = "vc_029_02_ooxml_validator_selftest"
     local docx_path = cwd .. build_dir .. test_name .. ".docx"
     local docx_db = cwd .. build_dir .. "selftest_" .. tostring(os.clock()):gsub("%.", "") .. ".db"

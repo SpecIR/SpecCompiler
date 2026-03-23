@@ -2,7 +2,7 @@
 
 ### Overview
 
-SpecCompiler uses a dynamic type system where models define available types for objects, [TERM-04](@), relations, and views.
+SpecCompiler uses a dynamic type system where models define available types for objects, [dic:float](#), relations, and views.
 
 ```plantuml:comp-types{caption="Type System Architecture (COMP-002)"}
 @startuml
@@ -77,17 +77,33 @@ return M
 
 ### Type Categories
 
-| Category | Database Table | Key Fields |
-|----------|---------------|------------|
-| Specifications | spec_specification_types | id, long_name, extends, is_default |
-| Objects | spec_object_types | id, long_name, extends, is_default (HLR, FD, CSC, CSU, VC, etc.) |
-| Floats | spec_float_types | id, long_name, counter_group, needs_external_render |
-| Relations | spec_relation_types | id, source_type_ref, target_type_ref, link_selector |
-| Views | spec_view_types | id, materializer_type, counter_group |
+```list-table:tbl-type-system-categories{caption="Type categories and database tables"}
+> header-rows: 1
+> aligns: l,l,l
+
+* - Category
+  - Database Table
+  - Key Fields
+* - Specifications
+  - spec_specification_types
+  - id, long_name, extends, is_default
+* - Objects
+  - spec_object_types
+  - id, long_name, extends, is_default (HLR, FD, CSC, CSU, VC, etc.)
+* - Floats
+  - spec_float_types
+  - id, long_name, counter_group, needs_external_render
+* - Relations
+  - spec_relation_types
+  - id, source_type_ref, target_type_ref, link_selector
+* - Views
+  - spec_view_types
+  - id, materializer_type, counter_group
+```
 
 ### Loading Process
 
-1. [TERM-38](@) scans models/{model}/types/{category}/
+1. [dic:type-loader](#) scans models/{model}/types/{category}/
 2. Each .lua file is loaded and checked for exports
 3. Type definitions registered in corresponding DB tables
 4. Handlers registered with pipeline if present

@@ -9,7 +9,9 @@ local Queries = require("db.queries")
 local M = {}
 
 ---Decode AST JSON back to proper Pandoc blocks.
----Uses pandoc.read with JSON format to ensure proper object reconstruction.
+---NOTE: This intentionally uses pandoc.read() (not pandoc.json.decode) to reconstruct
+---proper Pandoc userdata objects needed for pandoc.write() in the EMIT phase.
+---Other phases use ast_utils.decode_blocks() which produces Lua tables.
 ---@param ast_json string JSON-encoded AST
 ---@return table|nil blocks Array of Pandoc blocks, or nil on error
 local function decode_ast(ast_json)

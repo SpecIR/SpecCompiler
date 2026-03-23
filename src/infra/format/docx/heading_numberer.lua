@@ -69,7 +69,7 @@ local function build_level(level)
     end
 
     -- w:lvlRestart (optional, only when restarting on a higher level change)
-    if level.restart_level then
+    if level.restart_level ~= nil then
         table.insert(children, xml.node("w:lvlRestart", {
             ["w:val"] = tostring(level.restart_level)
         }))

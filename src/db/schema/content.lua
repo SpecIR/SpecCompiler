@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS spec_objects (
   pid_sequence INTEGER,
 
   -- Boolean (0/1): Was this PID auto-generated?
-  -- 1 = PID was not provided by author, generated from sibling pattern
+  -- 1 = PID was not provided by author, auto-generated from type definition
   -- 0 = PID was explicitly provided via @PID syntax
   pid_auto_generated INTEGER DEFAULT 0,
 
@@ -131,8 +131,7 @@ CREATE TABLE IF NOT EXISTS spec_objects (
   -- Used to reconstruct object during EMIT phase
   ast JSON,
 
-  -- Cached HTML5 rendering of ast (populated by reqif_xhtml EMIT handler)
-  -- Used by ReqIF exporter for ReqIF.Text XHTML attribute values
+  -- HTML5 body content (used by reqif.specir for ReqIF interoperability)
   content_xhtml TEXT,
 
   FOREIGN KEY (specification_ref) REFERENCES specifications(identifier),
@@ -419,8 +418,7 @@ CREATE TABLE IF NOT EXISTS spec_attribute_values (
   -- XHTML = rich content stored in ast column
   datatype TEXT NOT NULL,
 
-  -- Cached HTML5 rendering of ast (populated by reqif_xhtml EMIT handler)
-  -- Used by ReqIF exporter for XHTML-typed attribute values
+  -- HTML5 rendering of XHTML attribute (used by reqif.specir for ReqIF interoperability)
   xhtml_value TEXT,
 
   FOREIGN KEY (specification_ref) REFERENCES specifications(identifier),

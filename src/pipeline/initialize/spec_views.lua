@@ -7,6 +7,7 @@
 ---@module spec_views
 local Queries = require("db.queries")
 local hash_utils = require("infra.hash_utils")
+local cache_registry = require("pipeline.shared.cache_registry")
 
 local M = {
     name = "spec_views",
@@ -76,6 +77,7 @@ function M.clear_cache()
     prefix_to_type_cache = nil
     dedicated_prefixes_cache = nil
 end
+cache_registry.register(M.clear_cache)
 
 ---Parse inline view syntax from code elements
 ---Supports: `toc:`, `lof:`, `symbol: Class.method`, `math: expr`, `abbrev: Name (ABBR)`

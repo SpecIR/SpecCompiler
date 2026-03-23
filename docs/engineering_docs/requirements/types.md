@@ -2,7 +2,7 @@
 
 ### SF: Type System @SF-003
 
-Dynamic type system providing typed containers for [SpecIR-01](@), [SpecIR-02](@), [SpecIR-03](@), [SpecIR-06](@), [SpecIR-05](@), and [SpecIR-04](@).
+Dynamic type system providing typed containers for [dic:specification](#), [dic:spec-object](#), [dic:spec-float](#), [dic:spec-view](#), [dic:spec-relation](#), and [dic:attribute](#).
 
 > description: Groups requirements for the six core containers that store parsed specification
 > data plus the proof-view validation framework.
@@ -10,11 +10,11 @@ Dynamic type system providing typed containers for [SpecIR-01](@), [SpecIR-02](@
 > rationale: A typed container model enables schema validation, type-specific rendering,
 > and data integrity checking through SQL proof views.
 
-### HLR: Specifications Container @HLR-TYPE-001
+#### HLR: Specifications Container @HLR-TYPE-001
 
 The type system shall provide a specifications container for registering document-level specification records.
 
-> description: The `specifications` table stores metadata for each specification document parsed during [TERM-19](@) phase:
+> description: The `specifications` table stores metadata for each specification document parsed during [dic:initialize-phase](#) phase:
 >
 > - `identifier`: Unique specification ID derived from filename (e.g., "srs-main")
 > - `root_path`: Source file path for the specification
@@ -28,9 +28,8 @@ The type system shall provide a specifications container for registering documen
 
 > status: Approved
 
-> belongs_to: [SF-003](@)
 
-### HLR: Spec Objects Container @HLR-TYPE-002
+#### HLR: Spec Objects Container @HLR-TYPE-002
 
 The type system shall provide a spec_objects container for hierarchical specification objects.
 
@@ -54,9 +53,8 @@ The type system shall provide a spec_objects container for hierarchical specific
 
 > status: Approved
 
-> belongs_to: [SF-003](@)
 
-### HLR: Spec Floats Container @HLR-TYPE-003
+#### HLR: Spec Floats Container @HLR-TYPE-003
 
 The type system shall provide a spec_floats container for numbered floating content (figures, tables, listings).
 
@@ -68,7 +66,7 @@ The type system shall provide a spec_floats container for numbered floating cont
 > - `from_file`: Source file path
 > - `file_seq`: Document order for numbering
 > - `label`: User-provided label for cross-referencing
-> - `number`: Sequential number within counter_group (assigned in [TERM-22](@))
+> - `number`: Sequential number within counter_group (assigned in [dic:transform-phase](#))
 > - `caption`: Caption text from attributes
 > - `raw_content`: Original code block text
 > - `raw_ast`: Serialized Pandoc CodeBlock (JSON)
@@ -76,15 +74,14 @@ The type system shall provide a spec_floats container for numbered floating cont
 > - `attributes`: JSON-serialized attributes (caption, source, language)
 > - `syntax_key`: Original class syntax for backend matching
 >
-> [TERM-28](@) share numbering (e.g., FIGURE, CHART, PLANTUML all increment "FIGURE" counter).
+> [dic:counter-group](#) share numbering (e.g., FIGURE, CHART, PLANTUML all increment "FIGURE" counter).
 
 > rationale: Type aliasing supports user-friendly syntax (e.g., `csv:data` instead of `TABLE:data`). Counter groups enable semantic grouping of related float types under a single numbering sequence.
 
 > status: Approved
 
-> belongs_to: [SF-003](@)
 
-### HLR: Spec Views Container @HLR-TYPE-004
+#### HLR: Spec Views Container @HLR-TYPE-004
 
 The type system shall provide a spec_views container for data-driven view definitions.
 
@@ -97,15 +94,14 @@ The type system shall provide a spec_views container for data-driven view defini
 > - `file_seq`: Document order sequence number
 > - `raw_ast`: View definition content (SQL query, symbol path, expression)
 >
-> View types with `needs_external_render = 1` in `spec_view_types` are delegated to specialized renderers. Inline views use `type: content` syntax (e.g., `symbol: Class.method`).
+> View types with `needs_external_render = 1` in `spec_view_types` are delegated to specialized renderers. Inline views use `TypeRef: content` syntax (e.g., `symbol: Class.method`).
 
 > rationale: Separating view definitions from rendering enables format-agnostic processing. External render delegation supports complex transformations (PlantUML, charts) without core handler changes.
 
 > status: Approved
 
-> belongs_to: [SF-003](@)
 
-### HLR: Spec Relations Container @HLR-TYPE-005
+#### HLR: Spec Relations Container @HLR-TYPE-005
 
 The type system shall provide a spec_relations container for tracking links between specification elements.
 
@@ -115,7 +111,7 @@ The type system shall provide a spec_relations container for tracking links betw
 > - `specification_ref`: Foreign key to parent specification
 > - `source_ref`: Foreign key to source spec_object
 > - `target_text`: Raw link target from syntax (e.g., "REQ-001", "fig:diagram")
-> - `target_ref`: Resolved target identifier (populated in [TERM-20](@) phase)
+> - `target_ref`: Resolved target identifier (populated in [dic:analyze-phase](#) phase)
 > - `type_ref`: Relation type from `spec_relation_types` (e.g., "TRACES", "XREF_FIGURE")
 > - `from_file`: Source file path
 >
@@ -125,9 +121,8 @@ The type system shall provide a spec_relations container for tracking links betw
 
 > status: Approved
 
-> belongs_to: [SF-003](@)
 
-### HLR: Spec Attributes Container @HLR-TYPE-006
+#### HLR: Spec Attributes Container @HLR-TYPE-006
 
 The type system shall provide a spec_attributes container for structured metadata on specification objects.
 
@@ -149,13 +144,12 @@ The type system shall provide a spec_attributes container for structured metadat
 
 > status: Approved
 
-> belongs_to: [SF-003](@)
 
-### HLR: Type Validation @HLR-TYPE-007
+#### HLR: Type Validation @HLR-TYPE-007
 
 The type system shall provide proof views that detect data integrity violations across all specification containers.
 
-> description: Proof views are SQL queries registered in the [TERM-21](@) phase that check for constraint violations:
+> description: Proof views are SQL queries registered in the [dic:verify-phase](#) phase that check for constraint violations:
 >
 > - Specification-level (missing required attributes, invalid types)
 > - Object-level (missing required, cardinality, cast failures, invalid enum/date, bounds)
@@ -169,4 +163,3 @@ The type system shall provide proof views that detect data integrity violations 
 
 > status: Approved
 
-> belongs_to: [SF-003](@)

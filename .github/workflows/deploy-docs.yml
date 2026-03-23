@@ -1,15 +1,15 @@
-name: Deploy Engineering Documentation
+name: Deploy Documentation
 
 on:
   push:
-    tags: ['eng-docs*']
+    tags: ['docs*']
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  deploy-eng-docs:
+  deploy-docs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -30,7 +30,7 @@ jobs:
 
       - name: Run tests and generate TRR
         run: |
-          # Run e2e tests with JUnit output
+          # Run e2e tests with JUnit output (needed for engineering docs TRR)
           docker run --rm \
             --user "$(id -u):$(id -g)" \
             -v "${{ github.workspace }}:/workspace" \
@@ -52,14 +52,22 @@ jobs:
               --metadata output_path=docs/engineering_docs/test_results/tr.md \
               < /dev/null
 
-      - name: Build engineering documentation
+      - name: Build all documentation
         run: |
-          docker run --rm \
-            --user "$(id -u):$(id -g)" \
-            -v "${{ github.workspace }}:/workspace" \
-            -w /workspace \
-            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" \
-            /opt/speccompiler/bin/speccompiler-core docs/engineering_docs/project.yaml
+          for project in \
+            docs/engineering_docs/project.yaml \
+            docs/user_docs/project.yaml \
+            docs/commonspec/project.yaml \
+            docs/specir/project.yaml; do
+            echo "::group::Building $project"
+            docker run --rm \
+              --user "$(id -u):$(id -g)" \
+              -v "${{ github.workspace }}:/workspace" \
+              -w /workspace \
+              "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" \
+              /opt/speccompiler/bin/speccompiler-core "$project"
+            echo "::endgroup::"
+          done
 
       - name: Deploy to GitHub Pages
         run: |
@@ -74,16 +82,33 @@ jobs:
             cd _gh-pages && git checkout --orphan gh-pages && cd ..
           fi
 
-          # Update only the engineering subdirectory
+          # Engineering docs
           rm -rf _gh-pages/engineering
-          mkdir -p _gh-pages/engineering
-          cp docs/engineering_docs/build/www/* _gh-pages/engineering/
           mkdir -p _gh-pages/engineering/downloads
+          cp docs/engineering_docs/build/www/* _gh-pages/engineering/
           cp docs/engineering_docs/build/docx/*.docx _gh-pages/engineering/downloads/
+
+          # User docs
+          rm -rf _gh-pages/manual
+          mkdir -p _gh-pages/manual/downloads
+          cp docs/user_docs/build/www/* _gh-pages/manual/
+          cp docs/user_docs/build/docx/*.docx _gh-pages/manual/downloads/
+
+          # CommonSpec language specification
+          rm -rf _gh-pages/commonspec
+          mkdir -p _gh-pages/commonspec/downloads
+          cp docs/commonspec/build/www/* _gh-pages/commonspec/
+          cp docs/commonspec/build/docx/*.docx _gh-pages/commonspec/downloads/
+
+          # SpecIR schema specification
+          rm -rf _gh-pages/specir
+          mkdir -p _gh-pages/specir/downloads
+          cp docs/specir/build/www/* _gh-pages/specir/
+          cp docs/specir/build/docx/*.docx _gh-pages/specir/downloads/
 
           # Commit and push
           cd _gh-pages
           git add -A
           git diff --cached --quiet && echo "No changes to deploy" && exit 0
-          git commit -m "Deploy engineering documentation from ${GITHUB_REF_NAME}"
+          git commit -m "Deploy documentation from ${GITHUB_REF_NAME}"
           git push origin HEAD:gh-pages

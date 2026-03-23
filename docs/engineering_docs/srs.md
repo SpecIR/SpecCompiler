@@ -6,7 +6,7 @@
 
 This document defines the high-level requirements for SpecCompiler , a document processing pipeline for structured specifications.
 
-The document is organized in two parts. The first part defines the SpecIR data model, the six core types that the [TERM-15](@) operates on. The second part specifies the functional requirements, grouped into System Features ([SF-001](@) through [SF-006](@)), each decomposed into High-Level Requirements.
+The document is organized in two parts. The first part defines the SpecIR data model, the six core types that the [dic:pipeline](#) operates on. The second part specifies the functional requirements, grouped into System Features ([SF-001](@) through [SF-006](@)), each decomposed into High-Level Requirements.
 
 ```{.include}
 dic.md
@@ -14,7 +14,7 @@ dic.md
 
 ## Functional Requirements
 
-With the data model established, the following sections define the functional requirements for SpecCompiler Core. Requirements are organized into System Features (SF), each covering a distinct functional domain. Every SF is decomposed into [TERM-HLR](@)s that state what the system shall do.
+With the data model established, the following sections define the functional requirements for SpecCompiler Core. Requirements are organized into System Features (SF), each covering a distinct functional domain. Every SF is decomposed into [dic:high-level-requirement](#)s that state what the system shall do.
 
 ```{.include}
 requirements/pipeline.md
@@ -28,7 +28,7 @@ requirements/storage.md
 requirements/types.md
 ```
 
-The type system described above is not fixed at compile time. The following section defines how [TERM-33](@) directories extend it with custom object types, float renderers, [TERM-35](@) generators, and style presets.
+The type system described above is not fixed at compile time. The following section defines how [dic:model](#) directories extend it with custom object types, float renderers, [dic:data-view](#) generators, and style presets.
 
 ```{.include}
 requirements/extension.md

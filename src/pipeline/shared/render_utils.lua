@@ -95,4 +95,36 @@ function M.add_blocks(blocks, source)
     end
 end
 
+---Extract CSS classes from a Pandoc block's attributes.
+---Handles both userdata (Pandoc Attr) and table formats.
+---@param block table Pandoc block (typically Div or Header)
+---@return table classes Array of class strings
+function M.get_block_classes(block)
+    local attrs = block.attr
+    if attrs then
+        if type(attrs.classes) == "table" then
+            return attrs.classes
+        elseif attrs[2] and type(attrs[2]) == "table" then
+            return attrs[2]
+        end
+    elseif block.c and block.c[1] then
+        local attr = block.c[1]
+        if type(attr[2]) == "table" then
+            return attr[2]
+        end
+    end
+    return {}
+end
+
+---Check if a block has a specific CSS class.
+---@param block table Pandoc block (typically Div or Header)
+---@param class_name string Class to check
+---@return boolean
+function M.block_has_class(block, class_name)
+    for _, c in ipairs(M.get_block_classes(block)) do
+        if c == class_name then return true end
+    end
+    return false
+end
+
 return M

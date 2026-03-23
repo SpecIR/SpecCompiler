@@ -2,7 +2,7 @@
 
 ### VC: SQLite Persistence @VC-007
 
-Verify data persists correctly in [TERM-SQLITE](@) database.
+Verify data persists correctly in [dic:sqlite-database](#) database.
 
 > objective: Confirm all content tables store and retrieve data accurately
 
@@ -25,7 +25,7 @@ Verify data persists correctly in [TERM-SQLITE](@) database.
 
 Verify attributes store in correct typed columns.
 
-> objective: Confirm [TERM-EAV](@) pattern correctly routes values to typed columns
+> objective: Confirm [dic:eav-model](#) pattern correctly routes values to typed columns
 
 > verification_method: Test
 
@@ -47,7 +47,7 @@ Verify attributes store in correct typed columns.
 
 ### VC: Build Cache @VC-009
 
-Verify [TERM-30](@) tracks document changes.
+Verify [dic:build-cache](#) tracks document changes.
 
 > objective: Confirm changed documents are rebuilt, unchanged are skipped
 
@@ -63,12 +63,12 @@ Verify [TERM-30](@) tracks document changes.
 > - is_document_dirty() returns false for unchanged documents
 > - Include file changes propagate to root documents
 
-> traceability: [HLR-STOR-003](@)
+> traceability: [HLR-STOR-003](@), [LLR-047](@), [LLR-048](@)
 
 
 ### VC: Output Cache @VC-010
 
-Verify [TERM-31](@) prevents redundant generation.
+Verify [dic:output-cache](#) prevents redundant generation.
 
 > objective: Confirm unchanged outputs are not regenerated
 
@@ -84,7 +84,7 @@ Verify [TERM-31](@) prevents redundant generation.
 > - Pandoc invocation count is zero for unchanged outputs
 > - Cache updates after successful generation
 
-> traceability: [HLR-STOR-004](@)
+> traceability: [HLR-STOR-004](@), [LLR-049](@), [LLR-050](@)
 
 
 ### VC: Incremental Rebuild @VC-011
@@ -106,12 +106,12 @@ Verify incremental rebuild reduces processing time.
 > - Build time scales with changes, not project size
 > - Include graph correctly identifies dependencies
 
-> traceability: [HLR-STOR-005](@)
+> traceability: [HLR-STOR-005](@), [LLR-051](@), [LLR-052](@)
 
 
 ### VC: EAV Pivot Views @VC-033
 
-Verify per-object-type SQL views pivot [TERM-EAV](@) attributes into typed columns.
+Verify per-object-type SQL views pivot [dic:eav-model](#) attributes into typed columns.
 
 > objective: Confirm eav_pivot module generates correct views for all
 > datatypes used by model types, enabling external BI queries against
@@ -135,4 +135,4 @@ Verify per-object-type SQL views pivot [TERM-EAV](@) attributes into typed colum
 > - Different object types produce separate views with type-specific columns
 > - View naming follows view_{type_lower}_objects convention
 
-> traceability: [HLR-STOR-006](@)
+> traceability: [HLR-STOR-006](@), [LLR-053](@), [LLR-054](@)

@@ -174,17 +174,18 @@ end
 -- ============================================
 
 local domain_labels = {
-    PIPE = "Pipeline",
-    STOR = "Storage",
-    TYPE = "Types",
-    EXT  = "Extension",
-    OUT  = "Output",
-    SDN  = "SW Docs Model",
-    WEB  = "HTML5 Postprocessor",
-    DEF  = "Default Model",
+    PIPE  = "Pipeline",
+    STOR  = "Storage",
+    TYPE  = "Types",
+    EXT   = "Extension",
+    OUT   = "Output",
+    AUDIT = "Audit",
+    SDN   = "SW Docs Model",
+    WEB   = "HTML5 Postprocessor",
+    DEF   = "Default Model",
 }
 
-local domain_order = { "PIPE", "STOR", "TYPE", "EXT", "OUT", "SDN", "WEB", "DEF" }
+local domain_order = { "PIPE", "STOR", "TYPE", "EXT", "OUT", "AUDIT", "SDN", "WEB", "DEF" }
 
 local function get_domain(vc_pid)
     -- Check for explicit domain prefix (e.g., VC-PIPE-007, VC-OUT-001)

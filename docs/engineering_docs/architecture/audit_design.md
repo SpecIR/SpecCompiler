@@ -19,7 +19,7 @@ compared against stored values to detect changes. SHA1 hashing uses Pandoc's bui
 
 **Document Change Detection**: Each document's content is hashed and compared against the
 `source_files` table. Unchanged documents (same content hash and include hashes) skip
-parsing and reuse cached [TERM-IR](@) state, providing significant performance improvement
+parsing and reuse cached [dic:intermediate-representation](#) state, providing significant performance improvement
 for large projects.
 
 **Structured Logging**: NDJSON (Newline-Delimited JSON) logging provides machine-parseable
@@ -46,49 +46,113 @@ for errors after VERIFY and aborts before EMIT if any exist.
 
 **Proof Views — Entity-Based Taxonomy**
 
-Proof views follow the SpecIR 5-tuple: **S** (Specification), **O** (Object), **F** ([TERM-04](@)), **R** (Relation), **V** (View). Each proof is identified by its `policy_key`.
+Proof views follow the SpecIR 5-tuple: **S** (Specification), **O** (Object), **F** ([dic:float](#)), **R** (Relation), **V** (View). Each proof is identified by its `policy_key`.
 
 *Specification Proofs (S)*
 
-| Policy Key | View Name | Validates |
-|------------|-----------|-----------|
-| `spec_missing_required` | view_spec_missing_required | Required spec attributes present |
-| `spec_invalid_type` | view_spec_invalid_type | Specification type is valid |
+```list-table:tbl-proof-spec{caption="Specification proof views"}
+> header-rows: 1
+> aligns: l,l,l
+
+* - Policy Key
+  - View Name
+  - Validates
+* - `spec_missing_required`
+  - view_spec_missing_required
+  - Required spec attributes present
+* - `spec_invalid_type`
+  - view_spec_invalid_type
+  - Specification type is valid
+```
 
 *Spec Object Proofs (O)*
 
-| Policy Key | View Name | Validates |
-|------------|-----------|-----------|
-| `object_missing_required` | view_object_missing_required | Required object attributes present |
-| `object_cardinality_over` | view_object_cardinality_over | Attribute count <= max_occurs |
-| `object_cast_failures` | view_object_cast_failures | Attribute value casts to declared type |
-| `object_invalid_enum` | view_object_invalid_enum | Enum value exists in enum_values |
-| `object_invalid_date` | view_object_invalid_date | Date format is YYYY-MM-DD |
-| `object_bounds_violation` | view_object_bounds_violation | Numeric values within min/max bounds |
-| `object_duplicate_pid` | view_object_duplicate_pid | PID is globally unique |
+```list-table:tbl-proof-object{caption="Spec object proof views"}
+> header-rows: 1
+> aligns: l,l,l
+
+* - Policy Key
+  - View Name
+  - Validates
+* - `object_missing_required`
+  - view_object_missing_required
+  - Required object attributes present
+* - `object_cardinality_over`
+  - view_object_cardinality_over
+  - Attribute count <= max_occurs
+* - `object_cast_failures`
+  - view_object_cast_failures
+  - Attribute value casts to declared type
+* - `object_invalid_enum`
+  - view_object_invalid_enum
+  - Enum value exists in enum_values
+* - `object_invalid_date`
+  - view_object_invalid_date
+  - Date format is YYYY-MM-DD
+* - `object_bounds_violation`
+  - view_object_bounds_violation
+  - Numeric values within min/max bounds
+* - `object_duplicate_pid`
+  - view_object_duplicate_pid
+  - PID is globally unique
+```
 
 *Spec Float Proofs (F)*
 
-| Policy Key | View Name | Validates |
-|------------|-----------|-----------|
-| `float_orphan` | view_float_orphan | Float has a parent object |
-| `float_duplicate_label` | view_float_duplicate_label | Float labels unique per specification |
-| `float_render_failure` | view_float_render_failure | External render succeeded |
-| `float_invalid_type` | view_float_invalid_type | Float type is registered |
+```list-table:tbl-proof-float{caption="Spec float proof views"}
+> header-rows: 1
+> aligns: l,l,l
+
+* - Policy Key
+  - View Name
+  - Validates
+* - `float_orphan`
+  - view_float_orphan
+  - Float has a parent object
+* - `float_duplicate_label`
+  - view_float_duplicate_label
+  - Float labels unique per specification
+* - `float_render_failure`
+  - view_float_render_failure
+  - External render succeeded
+* - `float_invalid_type`
+  - view_float_invalid_type
+  - Float type is registered
+```
 
 *Spec Relation Proofs (R)*
 
-| Policy Key | View Name | Validates |
-|------------|-----------|-----------|
-| `relation_unresolved` | view_relation_unresolved | Link target resolves |
-| `relation_dangling` | view_relation_dangling | Target ref points to existing object |
-| `relation_ambiguous` | view_relation_ambiguous | Float reference is unambiguous |
+```list-table:tbl-proof-relation{caption="Spec relation proof views"}
+> header-rows: 1
+> aligns: l,l,l
+
+* - Policy Key
+  - View Name
+  - Validates
+* - `relation_unresolved`
+  - view_relation_unresolved
+  - Link target resolves
+* - `relation_dangling`
+  - view_relation_dangling
+  - Target ref points to existing object
+* - `relation_ambiguous`
+  - view_relation_ambiguous
+  - Float reference is unambiguous
+```
 
 *Spec View Proofs (V)*
 
-| Policy Key | View Name | Validates |
-|------------|-----------|-----------|
-| `view_materialization_failure` | view_view_materialization_failure | View materialization succeeded |
+```list-table:tbl-proof-view{caption="Spec view proof views"}
+> header-rows: 1
+> aligns: l,l,l
+
+* - Policy Key
+  - View Name
+  - Validates
+* - `view_materialization_failure`
+  - view_view_materialization_failure
+  - View materialization succeeded
+```
 
 **Component Interaction**
 
@@ -201,3 +265,99 @@ end
 VH -> VH: store verification_result\nin contexts
 @enduml
 ```
+
+#### LLR: Deferred Hash Update on Success @LLR-084
+
+When build completes with no [dic:verify-phase](#) errors, [csu:build-engine](#) shall update
+[dic:build-cache](#) `source_files` hashes via [csu:build-cache](#); when errors are present,
+hashes shall not be updated.
+
+> verification_method: Test
+
+> traceability: [HLR-AUDIT-001](@)
+
+#### LLR: Cache Hit Skips Pipeline @LLR-085
+
+When all `source_files` and [dic:build-graph](#) hashes match current content,
+[csu:build-engine](#) shall skip [dic:pipeline](#) processing and reuse cached [dic:intermediate-representation](#)
+state.
+
+> verification_method: Test
+
+> traceability: [HLR-AUDIT-001](@)
+
+#### LLR: Include Dependencies Recorded in Build Graph @LLR-086
+
+During include expansion, [csu:include-expansion-filter](#) shall record `root_path`, `node_path`,
+and `node_sha1` for each included file into the [dic:build-graph](#) table via
+[csu:build-cache](#).
+
+> verification_method: Test
+
+> traceability: [HLR-AUDIT-002](@)
+
+#### LLR: Circular Include Error Before Expansion @LLR-087
+
+When an include path is already in the processed-file set, [csu:include-expansion-filter](#) shall
+raise an error with the circular include chain path before performing any
+expansion.
+
+> verification_method: Test
+
+> traceability: [HLR-AUDIT-002](@)
+
+#### LLR: Diagnostic Record Structure @LLR-088
+
+Given a `diagnostics:error(file, line, code, msg)` or `diagnostics:warn(...)`
+call from any [dic:handler](#), [csu:diagnostics-collector](#) shall store a [dic:diagnostic-record](#)
+record with `file` (path), `line` (int), `code` (string), and `msg` (string).
+
+> verification_method: Test
+
+> traceability: [HLR-AUDIT-003](@)
+
+#### LLR: Diagnostic Code Domain Prefix Format @LLR-089
+
+[dic:diagnostic-record](#) codes shall follow domain prefix + number format (e.g.,
+`SD-102` invalid enum, `SD-301` dangling reference) enabling machine-parseable
+classification via [csu:diagnostics-collector](#).
+
+> verification_method: Test
+
+> traceability: [HLR-AUDIT-003](@)
+
+#### LLR: NDJSON Log Output Format @LLR-090
+
+Given non-TTY output, [csu:logger](#) shall emit one [dic:newline-delimited-json](#) object per
+line with fields `level`, `message`, `timestamp`, and optional context.
+
+> verification_method: Test
+
+> traceability: [HLR-AUDIT-004](@)
+
+#### LLR: NO_COLOR Compliance @LLR-091
+
+Given TTY output with `NO_COLOR` environment variable set, [csu:logger](#) shall
+suppress ANSI color codes in console mode.
+
+> verification_method: Test
+
+> traceability: [HLR-AUDIT-004](@)
+
+#### LLR: Deterministic Float Numbering by File Sequence @LLR-092
+
+[csu:float-numbering](#) shall determine [dic:spec-float](#) numbering solely by `file_seq`
+ordering, which is stable across builds for identical input.
+
+> verification_method: Test
+
+> traceability: [HLR-AUDIT-005](@)
+
+#### LLR: Hash-Only Cache Invalidation @LLR-093
+
+[csu:build-cache](#) shall base [dic:build-cache](#) dirty checks solely on SHA1 content hashes,
+never on filesystem timestamps or mtime.
+
+> verification_method: Test
+
+> traceability: [HLR-AUDIT-005](@)

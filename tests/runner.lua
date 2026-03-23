@@ -76,7 +76,7 @@ end
 
 local function list_dirs(path)
     local dirs = {}
-    local handle = io.popen("find " .. path .. " -maxdepth 1 -type d 2>/dev/null | sort")
+    local handle = io.popen("find -L " .. path .. " -maxdepth 1 -type d 2>/dev/null | sort")
     if handle then
         for line in handle:lines() do
             if line ~= path then
@@ -289,15 +289,24 @@ local function find_expected_file(suite_dir, test_name)
     return nil, nil
 end
 
+-- Resolve tmpdir once for DB files (avoids ZFS CoW pressure on near-full pools)
+local test_db_dir = os.getenv("SPECCOMPILER_TEST_DB_DIR")
+if not test_db_dir then
+    local tmpdir = os.getenv("TMPDIR") or os.getenv("XDG_RUNTIME_DIR") or "/tmp"
+    test_db_dir = tmpdir .. "/speccompiler_test_dbs"
+    os.execute("mkdir -p " .. test_db_dir)
+end
+
 local function run_speccompiler(input_file, suite_dir, test_name, output_format)
     local build_dir = suite_dir .. "/build"
     local output_file = build_dir .. "/" .. test_name .. "." .. output_format
-    local db_file = build_dir .. "/specir.db"
+    -- Per-test DB in tmpfs avoids ZFS CoW write amplification on near-full pools.
+    -- Also eliminates WAL/handle contention between sequential tests.
+    local db_file = test_db_dir .. "/" .. test_name .. ".db"
 
     mkdir_p(build_dir)
 
-    -- Remove stale DB and journal files from previous test
-    -- (oracle keeps DB alive between runs; WAL/SHM can cause corruption on WSL2)
+    -- Remove stale DB and journal files from previous run of this test
     os.remove(db_file)
     os.remove(db_file .. "-wal")
     os.remove(db_file .. "-shm")
@@ -329,12 +338,30 @@ local function run_speccompiler(input_file, suite_dir, test_name, output_format)
         csl = suite_config.csl
     }
 
+    -- Apply suite-level extra_lua_paths (for test model overlays)
+    local saved_package_path = nil
+    if suite_config.extra_lua_paths then
+        saved_package_path = package.path
+        local extra = ""
+        for path in suite_config.extra_lua_paths:gmatch("[^;,]+") do
+            path = path:match("^%s*(.-)%s*$")  -- trim
+            local abs = speccompiler_home_local .. "/" .. path
+            extra = extra .. abs .. "/?.lua;" .. abs .. "/?/init.lua;"
+        end
+        package.path = extra .. package.path
+    end
+
     -- Run SpecCompiler directly (same process = coverage works!)
     -- Capture diagnostics return value from engine.run_project
     local diag = nil
     local ok, err = pcall(function()
         diag = engine.run_project(project_info)
     end)
+
+    -- Restore package.path
+    if saved_package_path then
+        package.path = saved_package_path
+    end
 
     -- DB file is kept alive for oracle access (cleaned by clean_build_dirs)
 
@@ -557,7 +584,9 @@ local function run_test(suite_dir, input_file)
             -- Pass diagnostics for expect_errors mode
             diagnostics = diag,
             expect_errors = true,
-            db_file = db_file
+            db_file = db_file,
+            build_dir = suite_dir .. "/build",
+            suite_dir = suite_dir
         }
 
         -- Execute assertion with nil document (no output generated)
@@ -617,7 +646,9 @@ local function run_test(suite_dir, input_file)
                 collect_all = true,
                 max_mismatches = 50
             },
-            db_file = db_file
+            db_file = db_file,
+            build_dir = suite_dir .. "/build",
+            suite_dir = suite_dir
         }
 
         -- Execute assertion
@@ -691,6 +722,11 @@ local function run_suite(suite_dir, suite_name_override)
         end
 
         local _, vc_id, _, vc_err = extract_vc_from_filename(test_name)
+
+        -- Force GC before each test to release stale SQLite handles.
+        -- Without this, ZFS/copy-on-write filesystems can hit SQLITE_IOERR
+        -- when a new DB is created before the old handle is fully released.
+        collectgarbage("collect")
 
         -- Track test duration
         local start_time = os.clock()

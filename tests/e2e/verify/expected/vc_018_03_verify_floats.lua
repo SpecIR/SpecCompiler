@@ -42,6 +42,36 @@ return function(actual_doc, helpers)
             end
         end
 
+        -- Verify float_orphan count is exactly 1 (only the top-level orphan)
+        if detected_codes["float_orphan"] and detected_codes["float_orphan"] ~= 1 then
+            err(string.format(
+                "Expected exactly 1 float_orphan diagnostic, got %d",
+                detected_codes["float_orphan"]))
+        end
+
+        -- Verify from_file alignment via database query (confirms the SQL
+        -- predicate so.from_file = sf.from_file matched correctly)
+        if helpers.db_file then
+            local ok, sqlite3 = pcall(require, "lsqlite3")
+            if ok and sqlite3 then
+                local db = sqlite3.open(helpers.db_file, sqlite3.OPEN_READONLY)
+                if db then
+                    local orphan_count = 0
+                    for row in db:nrows("SELECT * FROM view_float_orphan") do
+                        orphan_count = orphan_count + 1
+                    end
+                    db:close()
+
+                    if orphan_count == 0 then
+                        err("view_float_orphan returned 0 rows -- from_file alignment may be broken")
+                    elseif orphan_count > 1 then
+                        err(string.format(
+                            "view_float_orphan returned %d rows, expected 1", orphan_count))
+                    end
+                end
+            end
+        end
+
         -- Report what was detected (for debugging)
         if #test_errors > 0 then
             local detected_list = {}

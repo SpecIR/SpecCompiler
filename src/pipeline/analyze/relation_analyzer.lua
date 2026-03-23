@@ -1,19 +1,18 @@
 ---Relation Analyzer Handler for SpecCompiler.
 ---Pipeline handler for ANALYZE phase.
 ---
----Unified handler that replaces both relation_resolver and relation_type_inferrer.
----Implements type-driven resolution: the type's extends chain determines which
----resolver to use, not the link selector. The selector is purely an inference
----dimension.
+---Type-driven relation analysis: filter, resolve, score, pick.
 ---
----Three-phase algorithm per relation:
----  Phase 1: Match candidate types using 3 dimensions (selector, source_attr, source_type)
----  Phase 2: Group candidates by resolver root, call each unique resolver once
----  Phase 3: Re-score with full 4 dimensions (add target_type), pick winner
+---For each unresolved relation:
+---  1. Filter: find relation types whose constraints are compatible
+---  2. Resolve: call the resolver (determined by extends chain) to find the target
+---  3. Score: count matching non-NULL constraints across all 4 dimensions
+---  4. Pick: highest specificity wins; ties mark the relation ambiguous
 ---
 ---@module relation_analyzer
 local logger = require("infra.logger")
 local Queries = require("db.queries")
+local cache_registry = require("pipeline.shared.cache_registry")
 
 local M = {
     name = "relation_analyzer",
@@ -31,13 +30,15 @@ function M.clear_cache()
     inference_rules_cache = nil
     resolver_root_cache = nil
 end
+cache_registry.register(M.clear_cache)
 
 -- ============================================================================
 -- Inference Rules
 -- ============================================================================
 
 ---Load relation inference rules from the database.
----Rules are matched by selector/source_attribute/source_type/target_type specificity.
+---Each rule defines a constraint pattern: {selector, source, attr, target}.
+---NULL constraints act as wildcards (match anything but don't add specificity).
 ---@param data DataManager
 ---@return table rules Array of {source, target, attr, rel_type, selector}
 local function load_inference_rules(data)
@@ -126,76 +127,55 @@ local function csv_matches(csv_or_scalar, value, case_insensitive)
 end
 
 -- ============================================================================
--- Phase 1: Candidate Types (3-dimension match)
+-- Step 1: Filter Candidates
 -- ============================================================================
 
----Match candidate types using 3 dimensions: selector, source_attribute, source_type.
----Target_type is excluded because the target is not yet resolved.
+---Filter relation types whose pre-resolution constraints are compatible.
+---Checks selector, source_attribute, and source_type (target_type is deferred
+---until after resolution). NULL constraints are wildcards — they always match.
 ---@param rules table Inference rules
 ---@param link_selector string|nil Link selector
 ---@param source_attribute string|nil Source attribute name
 ---@param source_type string|nil Source object type
 ---@param resolver_root_map table Type ID → resolver root ID
----@return table candidates Array of {rule, partial_specificity, has_target_constraint, resolver_root}
-local function match_candidate_types(rules, link_selector, source_attribute, source_type, resolver_root_map)
+---@return table candidates Array of {rule, resolver_root}
+local function filter_candidates(rules, link_selector, source_attribute, source_type, resolver_root_map)
     local candidates = {}
 
     for _, rule in ipairs(rules) do
-        local specificity = 0
-        local matches = true
-
-        -- 1. Selector
-        if rule.selector ~= nil then
-            if csv_matches(rule.selector, link_selector, false) then
-                specificity = specificity + 1
-            else
-                matches = false
-            end
+        if rule.selector ~= nil and not csv_matches(rule.selector, link_selector, false) then
+            goto skip
+        end
+        if rule.attr ~= nil and not csv_matches(rule.attr, source_attribute, true) then
+            goto skip
+        end
+        if rule.source ~= nil and not csv_matches(rule.source, source_type, false) then
+            goto skip
         end
 
-        -- 2. Source attribute
-        if matches and rule.attr ~= nil then
-            if csv_matches(rule.attr, source_attribute, true) then
-                specificity = specificity + 1
-            else
-                matches = false
-            end
-        end
+        table.insert(candidates, {
+            rule = rule,
+            resolver_root = resolver_root_map[rule.rel_type]
+        })
 
-        -- 3. Source type
-        if matches and rule.source ~= nil then
-            if csv_matches(rule.source, source_type, false) then
-                specificity = specificity + 1
-            else
-                matches = false
-            end
-        end
-
-        if matches then
-            table.insert(candidates, {
-                rule = rule,
-                partial_specificity = specificity,
-                has_target_constraint = (rule.target ~= nil),
-                resolver_root = resolver_root_map[rule.rel_type]
-            })
-        end
+        ::skip::
     end
 
     return candidates
 end
 
 -- ============================================================================
--- Phase 2: Type-Driven Resolution
+-- Step 2: Resolve Targets
 -- ============================================================================
 
----Group candidates by resolver root, call each unique resolver once.
+---Call each unique resolver once (grouped by resolver root).
 ---@param data DataManager
----@param candidates table Candidates from Phase 1
+---@param candidates table Candidates from filter step
 ---@param spec_id string Specification ID
 ---@param target_text string Raw link target text
 ---@param source_object_id integer|nil Source object ID
 ---@return table resolver_results Map of resolver_root → {target, is_ambiguous}
-local function resolve_with_candidates(data, candidates, spec_id, target_text, source_object_id)
+local function resolve_targets(data, candidates, spec_id, target_text, source_object_id)
     local resolver_results = {}
     local seen_roots = {}
 
@@ -217,13 +197,14 @@ local function resolve_with_candidates(data, candidates, spec_id, target_text, s
 end
 
 -- ============================================================================
--- Phase 3: Full Score + Pick (4-dimension match)
+-- Step 3: Score and Pick Winner
 -- ============================================================================
 
----Score candidates with full 4 dimensions and pick the winner.
----Candidates whose target_type_ref constraint doesn't match are eliminated.
----@param candidates table Candidates from Phase 1
----@param resolver_results table Results from Phase 2 (resolver_root → {target, is_ambiguous})
+---Score candidates across all 4 constraint dimensions and pick the winner.
+---Specificity = count of non-NULL constraints that matched. Higher wins.
+---Candidates whose target_type constraint doesn't match are eliminated.
+---@param candidates table Filtered candidates
+---@param resolver_results table resolver_root → {target, is_ambiguous}
 ---@return string|nil inferred_type The winning type identifier
 ---@return string|nil tie_a First tied type (if ambiguous)
 ---@return string|nil tie_b Second tied type (if ambiguous)
@@ -233,18 +214,24 @@ local function score_and_pick(candidates, resolver_results)
 
     for _, c in ipairs(candidates) do
         local resolved = c.resolver_root and resolver_results[c.resolver_root] or nil
-        local specificity = c.partial_specificity
+        local specificity = 0
 
-        if c.has_target_constraint then
+        -- Count each non-NULL constraint that matched (filtering already
+        -- verified selector, attr, and source — just count them here)
+        if c.rule.selector ~= nil then specificity = specificity + 1 end
+        if c.rule.attr ~= nil then specificity = specificity + 1 end
+        if c.rule.source ~= nil then specificity = specificity + 1 end
+
+        -- Target type: verify match (requires resolution) and count
+        if c.rule.target ~= nil then
             if resolved then
-                local target_type = resolved.target.type_ref
-                if csv_matches(c.rule.target, target_type, false) then
+                if csv_matches(c.rule.target, resolved.target.type_ref, false) then
                     specificity = specificity + 1
                 else
-                    goto skip  -- Target type doesn't match constraint
+                    goto skip  -- target type doesn't match constraint
                 end
             else
-                goto skip  -- Has target constraint but resolution failed
+                goto skip  -- has target constraint but resolution failed
             end
         end
 
@@ -268,7 +255,7 @@ local function score_and_pick(candidates, resolver_results)
     end
 
     if #scored > 0 then
-        return scored[1].rule.rel_type, nil, nil, scored[1].resolved
+        return scored[1].rule.rel_type, nil, false, scored[1].resolved
     end
 
     return nil, nil, nil, nil
@@ -302,51 +289,37 @@ end
 -- Core Analysis Loop
 -- ============================================================================
 
----Analyze a single relation: candidate matching, resolution, type inference.
+---Analyze a single relation: filter compatible types, resolve target, score, pick winner.
 ---@param data DataManager
 ---@param rel table Relation row from database
 ---@param rules table Inference rules
 ---@param resolver_root_map table Type ID → resolver root ID
 local function analyze_relation(data, rel, rules, resolver_root_map)
-    -- Phase 1: 3-dimension candidate matching
-    local candidates = match_candidate_types(
+    -- Step 1: Filter types whose constraints are compatible
+    local candidates = filter_candidates(
         rules, rel.link_selector, rel.source_attribute, rel.source_type, resolver_root_map
     )
 
     if #candidates == 0 then return end
 
-    -- Phase 2: Type-driven resolution
-    local resolver_results = resolve_with_candidates(
+    -- Step 2: Resolve the target (each unique resolver called once)
+    local resolver_results = resolve_targets(
         data, candidates, rel.specification_ref, rel.target_text, rel.source_object_id
     )
 
-    local has_resolution = next(resolver_results) ~= nil
+    -- Step 3: Score all 4 dimensions and pick the winner
+    local inferred, tie_a, tie_b, winning_resolved = score_and_pick(candidates, resolver_results)
 
-    if has_resolution then
-        -- Phase 3: Full 4-dimension scoring
-        local inferred, tie_a, tie_b, winning_resolved = score_and_pick(candidates, resolver_results)
+    -- Apply resolution (target_object_id or target_float_id)
+    if winning_resolved then
+        apply_resolution(data, rel.id, winning_resolved)
+    end
 
-        -- Apply resolution from winning candidate (or first available if tied)
-        if winning_resolved then
-            apply_resolution(data, rel.id, winning_resolved)
-        end
-
-        -- Apply type inference
-        if inferred then
-            data:execute(Queries.resolution.update_relation_type, { id = rel.id, type_ref = inferred })
-        elseif tie_a and tie_b then
-            data:execute(Queries.resolution.mark_relation_ambiguous, { id = rel.id })
-        end
-        -- No match → type stays NULL → VERIFY flags it
-    else
-        -- No resolver available (e.g., XREF_CITATION) — use 3-dim scoring only
-        local inferred, tie_a, tie_b = score_and_pick(candidates, {})
-
-        if inferred then
-            data:execute(Queries.resolution.update_relation_type, { id = rel.id, type_ref = inferred })
-        elseif tie_a and tie_b then
-            data:execute(Queries.resolution.mark_relation_ambiguous, { id = rel.id })
-        end
+    -- Apply type inference
+    if inferred then
+        data:execute(Queries.resolution.update_relation_type, { id = rel.id, type_ref = inferred })
+    elseif tie_a and tie_b then
+        data:execute(Queries.resolution.mark_relation_ambiguous, { id = rel.id })
     end
 end
 
@@ -388,12 +361,9 @@ function M.on_analyze(data, contexts, diagnostics)
             { spec_id = spec_id }
         )
 
-        local resolved_count = 0
         local inferred_count = 0
         for _, rel in ipairs(relations or {}) do
-            local had_target = (rel.target_object_id ~= nil or rel.target_float_id ~= nil)
             analyze_relation(data, rel, rules, resolver_root_map)
-            -- Count for logging (re-query would be expensive, approximate from flow)
             inferred_count = inferred_count + 1
         end
 

@@ -24,10 +24,10 @@ M.insert_float_type = [[
 M.insert_relation_type = [[
     INSERT OR REPLACE INTO spec_relation_types (
         identifier, long_name, description, extends, link_selector,
-        source_attribute, source_type_ref, target_type_ref
+        source_attribute, source_type_ref, target_type_ref, is_structural
     ) VALUES (
         :identifier, :long_name, :description, :extends, :link_selector,
-        :source_attribute, :source_type_ref, :target_type_ref
+        :source_attribute, :source_type_ref, :target_type_ref, :is_structural
     )
 ]]
 

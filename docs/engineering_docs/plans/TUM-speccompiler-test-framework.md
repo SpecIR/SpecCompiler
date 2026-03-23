@@ -1,11 +1,20 @@
 # Tool User Manual -- SpecCompiler Test Framework
 
-| Field | Value |
-|---|---|
-| Document ID | TUM-STF-001 |
-| Revision | Draft A |
-| Date | 2026-02-07 |
-| Tool Name | SpecCompiler Test Framework |
+```list-table:tbl-tum-stf-meta{caption="Document metadata"}
+> header-rows: 1
+> aligns: l,l
+
+* - Field
+  - Value
+* - Document ID
+  - TUM-STF-001
+* - Revision
+  - Draft A
+* - Date
+  - 2026-02-07
+* - Tool Name
+  - SpecCompiler Test Framework
+```
 
 ## 1. Purpose
 
@@ -30,6 +39,12 @@ From repository root:
 
 ```bash
 ./tests/run.sh
+```
+
+Run via Docker (same interface):
+
+```bash
+./tests/docker-run.sh
 ```
 
 Run single suite:
@@ -116,7 +131,7 @@ For preset/type loading coverage:
 
 Required traceability chain for release:
 1. Test case (`vc_*`) -> VC entry in `suite.yaml`
-2. VC -> HLR reference in release docs (`docs/requirements/*`, `docs/verification/*`)
+2. VC -> HLR reference in release docs (`docs/engineering_docs/requirements/*`, `docs/engineering_docs/verification/*`)
 3. HLR -> LLR (when LLR set exists)
 
 Recommended practice:
@@ -144,9 +159,27 @@ If coverage seems stale:
 - verify merged LCOV timestamp changed
 - rerun with no interrupted jobs
 
-## 10. Governance Updates
+## 10. Mutation Testing
+
+The mutation testing framework measures test suite effectiveness by injecting faults. It is independent from the main test runner and must be invoked explicitly.
+
+See `tests/mutation/README.md` for full documentation.
+
+Quick start:
+
+```bash
+# SQL proof view mutations (in-memory, safe)
+./tests/mutation/mutate.sh --sql
+
+# Lua source mutations (on-disk with safety backup)
+./tests/mutation/mutate.sh --lua src/pipeline/verify/verify_handler.lua
+```
+
+Reports: `tests/reports/mutation/sql_report.json`, `tests/reports/mutation/lua_report.json`.
+
+## 11. Governance Updates
 
 When framework behavior changes:
 1. Update this TUM.
-2. Update `docs/plans/TOR-speccompiler-test-framework.md`.
+2. Update `docs/engineering_docs/plans/TOR-speccompiler-test-framework.md`.
 3. Update suite policies where needed (`suite.yaml` comments and ownership).

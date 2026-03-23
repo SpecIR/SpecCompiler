@@ -1,0 +1,32 @@
+# SpecIR Schema Specification
+# Uses default model: general technical publishing
+
+project:
+  code: SPECIR
+  name: SpecIR Schema Specification
+
+template: default
+
+logging:
+  level: info
+  format: console
+  color: true
+
+output_dir: build/
+
+doc_files:
+  - specir.md
+
+outputs:
+  - format: docx
+    path: docx/{spec_id}.docx
+  - format: html5
+    path: www/{spec_id}.html
+
+html5:
+  number_sections: true
+  table_of_contents: true
+  toc_depth: 4
+  standalone: true
+  embed_resources: true
+  resource_path: build/www:.

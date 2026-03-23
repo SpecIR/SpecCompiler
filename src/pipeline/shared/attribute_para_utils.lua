@@ -166,4 +166,13 @@ function M.collect_paragraphs(bq)
     return paras
 end
 
+---Check if a BlockQuote contains attribute definitions.
+---@param blockquote table Pandoc BlockQuote block
+---@return boolean
+function M.is_attribute_blockquote(blockquote)
+    local paras = M.collect_paragraphs(blockquote)
+    if #paras == 0 then return false end
+    return M.is_attribute_para(paras[1])
+end
+
 return M

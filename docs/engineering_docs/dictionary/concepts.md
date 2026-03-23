@@ -1,5 +1,39 @@
 ## System Concepts
 
+### DIC: CommonSpec @TERM-COMMONSPEC
+
+A **structured Markdown language** for authoring typed, traceable specifications.
+
+> term: CommonSpec
+
+> domain: Core
+
+> description:
+>
+> **Purpose:** Defines the input language for SpecCompiler. Extends standard Markdown (CommonMark) with six constructs: specifications, spec objects, spec floats, attributes, spec relations, and spec views.
+>
+> **Architecture:** CommonSpec (language) compiles into SpecIR (intermediate representation) via SpecCompiler (compiler).
+>
+> **Specification:** See the CommonSpec Language Specification (`docs/commonspec/`) for the formal definition.
+
+### DIC: SpecIR @TERM-SPECIR
+
+A **typed relational intermediate representation** for specifications, stored in SQLite.
+
+> term: Specification Intermediate Representation
+
+> acronym: SpecIR
+
+> domain: Core
+
+> description:
+>
+> **Purpose:** Provides a portable, queryable storage format for specification data. Compilation target for CommonSpec and interchange format for other tools (ReqIF, DOORS CSV, SQL).
+>
+> **Schema:** Two core layers: Type System tables (metamodel) and Content tables (data). Build infrastructure and FTS tables are not part of the SpecIR standard.
+>
+> **Specification:** See the SpecIR Schema Specification (`docs/specir/`) for the formal definition.
+
 ### DIC: ANALYZE Phase @TERM-20
 
 The **second phase** in the pipeline that resolves references and infers types.
@@ -82,7 +116,7 @@ The **final phase** in the pipeline that assembles and outputs documents.
 
 ### DIC: Float @TERM-04
 
-A **numbered element** (table, figure, diagram) with caption and cross-reference. See [SpecIR-03](@) for full definition.
+A **numbered element** (table, figure, diagram) with caption and cross-reference. See [dic:spec-float](#) for full definition.
 
 ### DIC: External Renderer @TERM-34
 
@@ -401,3 +435,153 @@ A **test specification** that verifies a requirement or set of requirements.
 > **Traceability:** VCs trace to HLRs via `traceability` attribute links.
 >
 > **Naming:** VC PIDs follow the pattern `VC-{category}-{seq}` (e.g., `VC-PIPE-001`).
+
+### DIC: Composite Object Type @TERM-COMPOSITE
+
+A **spec object type** whose instances receive hierarchical PIDs qualified by the parent specification PID.
+
+> term: Composite Object Type
+
+> domain: Core
+
+> description:
+>
+> **Purpose:** Distinguishes object types that represent document structure (e.g., SECTION) from traceable types that receive standalone PIDs (e.g., HLR, VC).
+>
+> **PID behavior:** Composite objects get hierarchical PIDs derived from the specification PID (e.g., `SRS-sec1.2.3`). Non-composite objects get independent PIDs from their `pid_prefix` and `pid_format` (e.g., `HLR-001`).
+>
+> **Configuration:** Set via `is_composite = true` in the type definition module.
+
+### DIC: Relation Selector @TERM-SELECTOR
+
+The **URL scheme portion** of a Markdown link that drives relation type inference.
+
+> term: Relation Selector
+
+> domain: Core
+
+> description:
+>
+> **Purpose:** Identifies what kind of relation a Markdown link represents, enabling type-driven inference.
+>
+> **Selectors:** `@` (PID reference, e.g., `[HLR-001](@)`), `#` (label reference, e.g., `[fig:diagram](#)`), `@cite` (bibliographic citation).
+>
+> **Configuration:** Each relation type declares a `link_selector` value in `spec_relation_types`. Selectors are model-defined, not hardcoded.
+
+### DIC: Specificity Scoring @TERM-SPECIFICITY
+
+The **constraint-matching score** used to select the best relation type during type inference.
+
+> term: Specificity Scoring
+
+> domain: Core
+
+> description:
+>
+> **Purpose:** Resolves ambiguity when multiple relation types match a given link by selecting the most specific type.
+>
+> **Algorithm:** Each non-NULL constraint match across four dimensions (selector, source_attribute, source_type, target_type) adds one point. The highest total score wins. Ties mark the relation as ambiguous.
+>
+> **Example:** A relation type with constraints on selector + source_type + target_type (score 3) wins over one with only selector (score 1).
+
+### DIC: Processed Intermediate Representation @TERM-PIR
+
+The **complete specification state** after all pipeline phases have executed, captured as a hash for output cache invalidation.
+
+> term: Processed Intermediate Representation
+
+> acronym: P-IR
+
+> domain: Core
+
+> description:
+>
+> **Purpose:** Provides a single hash that represents the fully processed state of a specification, including all resolved relations, materialized views, and transformed content.
+>
+> **Usage:** The output cache stores the P-IR hash alongside each generated output file. When rebuilding, the system compares the current P-IR hash to the cached hash to determine if output regeneration is needed.
+>
+> **Distinction:** Unlike the build cache (which tracks source file hashes), the P-IR hash captures the post-processing state, detecting changes from cross-document operations.
+
+### DIC: Newline-Delimited JSON @TERM-NDJSON
+
+A **text format** where each line is a valid JSON object, used for structured log output.
+
+> term: Newline-Delimited JSON
+
+> acronym: NDJSON
+
+> domain: Infrastructure
+
+> description:
+>
+> **Purpose:** Provides machine-parseable structured logging suitable for CI/CD log aggregation and filtering with tools like `jq`.
+>
+> **Format:** One JSON object per line with fields: `level`, `message`, `timestamp`, and optional context fields.
+>
+> **Usage:** The logger emits NDJSON when output is not connected to a TTY (e.g., piped to a file or running in CI).
+
+### DIC: Proof Policy @TERM-PROOFPOLICY
+
+A **configuration mapping** from proof view `policy_key` to severity level, controlling which violations are reported and at what severity.
+
+> term: Proof Policy
+
+> domain: Core
+
+> description:
+>
+> **Purpose:** Allows projects to control validation strictness by mapping each proof view to a severity level.
+>
+> **Severity levels:** `error` (blocks output generation), `warn` (reported but build continues), `ignore` (suppressed).
+>
+> **Configuration:** Set in the `validation:` section of `project.yaml` (e.g., `traceability_hlr_to_vc: warn`).
+>
+> **Default:** When a policy_key is not configured, the system applies its built-in default severity.
+
+### DIC: Diagnostic Record @TERM-DIAGNOSTIC
+
+A **structured error or warning record** emitted by [TERM-16](@)s during [TERM-15](@) processing.
+
+> term: Diagnostic Record
+
+> domain: Core
+
+> description:
+>
+> **Purpose:** Provides machine-parseable and human-readable feedback on specification errors and warnings throughout all pipeline phases.
+>
+> **Fields:** Each record contains `file` (source path), `line` (source line number), `code` (domain-prefixed identifier, e.g., `SD-301`), and `msg` (human-readable description).
+>
+> **Severity:** Errors trigger abort after [TERM-21](@) phase; warnings are reported but do not block output generation.
+
+### DIC: Build Graph @TERM-BUILDGRAPH
+
+A **dependency tracking structure** recording include file hierarchies for incremental rebuild support.
+
+> term: Build Graph
+
+> domain: Database
+
+> description:
+>
+> **Purpose:** Tracks which files are included by each root document, enabling change detection across include hierarchies.
+>
+> **Storage:** Stored in the `build_graph` table with columns `root_path` (the including document), `node_path` (the included file), and `node_sha1` (content hash at build time).
+>
+> **Usage:** Queried by [TERM-30](@) `is_document_dirty_with_includes()` to determine if any included file has changed since the last successful build.
+
+### DIC: Placeholder Block @TERM-PLACEHOLDERBLOCK
+
+A **CodeBlock marker** inserted during document assembly for deferred [SpecIR-03](@) and [SpecIR-06](@) resolution.
+
+> term: Placeholder Block
+
+> domain: Pipeline
+
+> description:
+>
+> **Purpose:** Marks positions in the assembled Pandoc document where floats and views will be substituted during the [TERM-23](@) phase.
+>
+> **Mechanism:** During assembly, [CSU-034](@) inserts CodeBlock elements at the correct `file_seq` positions. Downstream handlers ([CSU-035](@) for floats, [CSU-036](@) for views) match these placeholders by label and replace them with rendered content.
+>
+> **Lifecycle:** Created during assembly, consumed during float/view emission, never present in final output.
