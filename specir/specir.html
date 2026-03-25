@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>specir_html5</title>
+  <style>
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+background-color: #1a1a1a;
+border: none;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+</head>
+<body>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction" id="toc-introduction"><span class="toc-section-number">1</span> Introduction</a>
+<ul>
+<li><a href="#what-is-specir" id="toc-what-is-specir"><span class="toc-section-number">1.1</span> What is SpecIR?</a></li>
+<li><a href="#design-goals" id="toc-design-goals"><span class="toc-section-number">1.2</span> Design Goals</a></li>
+<li><a href="#schema-layers" id="toc-schema-layers"><span class="toc-section-number">1.3</span> Schema Layers</a></li>
+</ul></li>
+<li><a href="#core-schema-type-system" id="toc-core-schema-type-system"><span class="toc-section-number">2</span> Core Schema: Type System</a>
+<ul>
+<li><a href="#spec_object_types" id="toc-spec_object_types"><span class="toc-section-number">2.1</span> spec_object_types</a></li>
+<li><a href="#spec_float_types" id="toc-spec_float_types"><span class="toc-section-number">2.2</span> spec_float_types</a></li>
+<li><a href="#spec_relation_types" id="toc-spec_relation_types"><span class="toc-section-number">2.3</span> spec_relation_types</a></li>
+<li><a href="#spec_view_types" id="toc-spec_view_types"><span class="toc-section-number">2.4</span> spec_view_types</a></li>
+<li><a href="#spec_specification_types" id="toc-spec_specification_types"><span class="toc-section-number">2.5</span> spec_specification_types</a></li>
+<li><a href="#datatype_definitions" id="toc-datatype_definitions"><span class="toc-section-number">2.6</span> datatype_definitions</a></li>
+<li><a href="#spec_attribute_types" id="toc-spec_attribute_types"><span class="toc-section-number">2.7</span> spec_attribute_types</a></li>
+<li><a href="#enum_values" id="toc-enum_values"><span class="toc-section-number">2.8</span> enum_values</a></li>
+<li><a href="#implicit_type_aliases" id="toc-implicit_type_aliases"><span class="toc-section-number">2.9</span> implicit_type_aliases</a></li>
+<li><a href="#implicit_spec_type_aliases" id="toc-implicit_spec_type_aliases"><span class="toc-section-number">2.10</span>
+implicit_spec_type_aliases</a></li>
+</ul></li>
+<li><a href="#core-schema-content" id="toc-core-schema-content"><span class="toc-section-number">3</span> Core Schema: Content</a>
+<ul>
+<li><a href="#specifications" id="toc-specifications"><span class="toc-section-number">3.1</span> specifications</a></li>
+<li><a href="#spec_objects" id="toc-spec_objects"><span class="toc-section-number">3.2</span> spec_objects</a></li>
+<li><a href="#spec_floats" id="toc-spec_floats"><span class="toc-section-number">3.3</span> spec_floats</a></li>
+<li><a href="#spec_relations" id="toc-spec_relations"><span class="toc-section-number">3.4</span> spec_relations</a></li>
+<li><a href="#spec_views" id="toc-spec_views"><span class="toc-section-number">3.5</span> spec_views</a></li>
+<li><a href="#spec_attribute_values" id="toc-spec_attribute_values"><span class="toc-section-number">3.6</span> spec_attribute_values</a></li>
+</ul></li>
+<li><a href="#non-core-tables" id="toc-non-core-tables"><span class="toc-section-number">4</span> Non-Core Tables</a>
+<ul>
+<li><a href="#build-infrastructure" id="toc-build-infrastructure"><span class="toc-section-number">4.1</span> Build Infrastructure</a></li>
+<li><a href="#full-text-search" id="toc-full-text-search"><span class="toc-section-number">4.2</span> Full-Text Search</a></li>
+</ul></li>
+<li><a href="#views" id="toc-views"><span class="toc-section-number">5</span> Views</a>
+<ul>
+<li><a href="#eav-pivot-views" id="toc-eav-pivot-views"><span class="toc-section-number">5.1</span> EAV Pivot Views</a></li>
+<li><a href="#public-api-views" id="toc-public-api-views"><span class="toc-section-number">5.2</span> Public API Views</a></li>
+</ul></li>
+<li><a href="#interoperability" id="toc-interoperability"><span class="toc-section-number">6</span> Interoperability</a></li>
+</ul>
+</nav>
+<div id="SPEC" class="spec-title" data-custom-style="Title">
+<p>SpecIR: Specification Intermediate Representation</p>
+</div>
+<h1 data-number="1" data-pos="11:1-12:1" id="introduction"><span class="header-section-number">1</span> Introduction</h1>
+<h2 data-number="1.1" data-pos="13:1-14:1" id="what-is-specir"><span class="header-section-number">1.1</span> What is SpecIR?</h2>
+<div data-pos="15:1-16:1">
+<p><strong>SpecIR</strong> is a typed relational intermediate
+representation for specifications, stored in SQLite. It is the
+compilation target for CommonSpec and serves as a universal interchange
+format for specification data.</p>
+</div>
+<div data-pos="17:1-18:1">
+<p>Any tool can read and write a SpecIR database. CommonSpec is one
+input format; ReqIF, DOORS CSV, or direct SQL are others. SpecCompiler
+is the reference compiler that produces SpecIR from CommonSpec, but the
+IR is not tied to any single tool.</p>
+</div>
+<h2 data-number="1.2" data-pos="19:1-20:1" id="design-goals"><span class="header-section-number">1.2</span> Design Goals</h2>
+<div data-pos="21:1-22:1">
+<p><strong>Portable.</strong> A single <code data-pos="21:24-21:29">.db</code> file contains the complete
+specification state. Copy it, query it with any SQLite client, or serve
+it via a web application.</p>
+</div>
+<div data-pos="23:1-24:1">
+<p><strong>Typed.</strong> The schema enforces a type system: every
+object, float, relation, and view references a declared type. Proof
+views express structural constraints as SQL queries.</p>
+</div>
+<div data-pos="25:1-26:1">
+<p><strong>Queryable.</strong> Standard SQL gives immediate access to
+traceability matrices, coverage reports, orphan detection, and custom
+dashboards — no export step required.</p>
+</div>
+<div data-pos="27:1-28:1">
+<p><strong>Interoperable.</strong> SpecIR is the bridge between formats.
+Import from ReqIF, edit in CommonSpec, export to DOCX — SpecIR is the
+common ground.</p>
+</div>
+<h2 data-number="1.3" data-pos="29:1-30:1" id="schema-layers"><span class="header-section-number">1.3</span> Schema Layers</h2>
+<div data-pos="31:1-32:1">
+<p>The SpecIR database contains three layers of tables:</p>
+</div>
+<div data-pos="33:1-38:1">
+<ol type="1">
+<li><div data-pos="33:4-34:1">
+<strong>Type System</strong> — defines the metamodel (what types of
+objects, floats, relations, and views can exist). Populated from model
+definitions.
+</div></li>
+<li><div data-pos="34:4-35:1">
+<strong>Content</strong> — stores actual specification data
+(requirements, tests, figures, traceability links). Populated by the
+compiler or by importers.
+</div></li>
+<li><div data-pos="35:4-36:1">
+<strong>Tooling</strong> (non-core) — build caches, full-text search
+indexes, and output tracking. These are SpecCompiler implementation
+details and are <strong>not part of the SpecIR specification</strong>.
+</div></li>
+</ol>
+</div>
+<div data-pos="37:1-38:1">
+<p>Only layers 1 and 2 constitute the SpecIR standard. External tools
+reading or writing SpecIR should ignore layer 3 tables.</p>
+</div>
+<h1 data-number="2" data-pos="39:1-40:1" id="core-schema-type-system"><span class="header-section-number">2</span> Core Schema: Type System</h1>
+<div data-pos="41:1-42:1">
+<p>The type system tables define the metamodel. They answer the
+question: “What kinds of things can exist in this specification?”</p>
+</div>
+<div data-pos="43:1-44:1">
+<p><strong>Authoritative source:</strong> <code data-pos="43:27-43:52">src/db/schema/types.lua</code></p>
+</div>
+<h2 data-number="2.1" data-pos="45:1-46:1" id="spec_object_types"><span class="header-section-number">2.1</span> spec_object_types</h2>
+<div data-pos="47:1-48:1">
+<p>Defines types of spec objects (e.g., HLR, LLR, VC, SECTION).</p>
+</div>
+<a id="csv-tbl-object-types" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_object_types columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>identifier</td>
+<td>TEXT PK</td>
+<td>Unique type code (e.g. HLR)</td>
+</tr>
+<tr>
+<td>long_name</td>
+<td>TEXT NOT NULL UNIQUE</td>
+<td>Human-readable name</td>
+</tr>
+<tr>
+<td>description</td>
+<td>TEXT</td>
+<td>Documentation</td>
+</tr>
+<tr>
+<td>extends</td>
+<td>TEXT</td>
+<td>Parent type for inheritance</td>
+</tr>
+<tr>
+<td>is_composite</td>
+<td>INTEGER DEFAULT 0</td>
+<td>1 = container type (e.g. SECTION)</td>
+</tr>
+<tr>
+<td>is_required</td>
+<td>INTEGER DEFAULT 0</td>
+<td>1 = every spec must have at least one</td>
+</tr>
+<tr>
+<td>is_default</td>
+<td>INTEGER DEFAULT 0</td>
+<td>1 = used when header has no explicit type</td>
+</tr>
+<tr>
+<td>pid_prefix</td>
+<td>TEXT</td>
+<td>Default PID prefix for auto-generation</td>
+</tr>
+<tr>
+<td>pid_format</td>
+<td>TEXT DEFAULT &#39;%s-%03d&#39;</td>
+<td>Printf format for auto-generated PIDs</td>
+</tr>
+<tr>
+<td>aliases</td>
+<td>TEXT</td>
+<td>Comma-wrapped aliases (e.g. &quot;,hlr,req,&quot;)</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="2.2" data-pos="63:1-64:1" id="spec_float_types"><span class="header-section-number">2.2</span> spec_float_types</h2>
+<div data-pos="65:1-66:1">
+<p>Defines types of floats (e.g., FIGURE, TABLE, PLANTUML).</p>
+</div>
+<a id="csv-tbl-float-types" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_float_types columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>identifier</td>
+<td>TEXT PK</td>
+<td>Unique type code (e.g. FIGURE)</td>
+</tr>
+<tr>
+<td>long_name</td>
+<td>TEXT NOT NULL UNIQUE</td>
+<td>Human-readable name</td>
+</tr>
+<tr>
+<td>description</td>
+<td>TEXT</td>
+<td>Documentation</td>
+</tr>
+<tr>
+<td>caption_format</td>
+<td>TEXT</td>
+<td>Printf format for captions (e.g. Figure %d)</td>
+</tr>
+<tr>
+<td>counter_group</td>
+<td>TEXT</td>
+<td>Shared numbering group</td>
+</tr>
+<tr>
+<td>aliases</td>
+<td>TEXT</td>
+<td>Comma-wrapped aliases for syntax recognition</td>
+</tr>
+<tr>
+<td>needs_external_render</td>
+<td>INTEGER DEFAULT 0</td>
+<td>1 = requires external tool</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="2.3" data-pos="78:1-79:1" id="spec_relation_types"><span class="header-section-number">2.3</span>
+spec_relation_types</h2>
+<div data-pos="80:1-81:1">
+<p>Defines types of relations between objects (e.g., VERIFIES,
+TRACES_TO).</p>
+</div>
+<a id="csv-tbl-relation-types" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_relation_types columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>identifier</td>
+<td>TEXT PK</td>
+<td>Unique relation type code</td>
+</tr>
+<tr>
+<td>long_name</td>
+<td>TEXT NOT NULL UNIQUE</td>
+<td>Human-readable name</td>
+</tr>
+<tr>
+<td>description</td>
+<td>TEXT</td>
+<td>Documentation</td>
+</tr>
+<tr>
+<td>extends</td>
+<td>TEXT</td>
+<td>Parent relation type for inheritance</td>
+</tr>
+<tr>
+<td>source_type_ref</td>
+<td>TEXT FK</td>
+<td>Constrain source object type (NULL = any)</td>
+</tr>
+<tr>
+<td>target_type_ref</td>
+<td>TEXT FK</td>
+<td>Constrain target object type (NULL = any)</td>
+</tr>
+<tr>
+<td>link_selector</td>
+<td>TEXT</td>
+<td>Syntax selector (&quot;@&quot; or &quot;#&quot;)</td>
+</tr>
+<tr>
+<td>source_attribute</td>
+<td>TEXT</td>
+<td>Attribute name for inference</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="2.4" data-pos="94:1-95:1" id="spec_view_types"><span class="header-section-number">2.4</span> spec_view_types</h2>
+<div data-pos="96:1-97:1">
+<p>Defines types of views (e.g., TOC, LOF, ABBREV).</p>
+</div>
+<a id="csv-tbl-view-types" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_view_types columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>identifier</td>
+<td>TEXT PK</td>
+<td>Unique view type code</td>
+</tr>
+<tr>
+<td>long_name</td>
+<td>TEXT NOT NULL UNIQUE</td>
+<td>Human-readable name</td>
+</tr>
+<tr>
+<td>description</td>
+<td>TEXT</td>
+<td>Documentation</td>
+</tr>
+<tr>
+<td>counter_group</td>
+<td>TEXT</td>
+<td>Float counter group to list</td>
+</tr>
+<tr>
+<td>aliases</td>
+<td>TEXT</td>
+<td>Comma-wrapped aliases</td>
+</tr>
+<tr>
+<td>inline_prefix</td>
+<td>TEXT</td>
+<td>Prefix for inline syntax (e.g. abbrev)</td>
+</tr>
+<tr>
+<td>materializer_type</td>
+<td>TEXT</td>
+<td>Materialization strategy (toc, lof, abbrev_list, custom)</td>
+</tr>
+<tr>
+<td>view_subtype_ref</td>
+<td>TEXT</td>
+<td>Parent view type for subtyped views</td>
+</tr>
+<tr>
+<td>needs_external_render</td>
+<td>INTEGER DEFAULT 0</td>
+<td>1 = requires external tool</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="2.5" data-pos="111:1-112:1" id="spec_specification_types"><span class="header-section-number">2.5</span> spec_specification_types</h2>
+<div data-pos="113:1-114:1">
+<p>Defines types of specification documents (e.g., SRS, SDD, SVC).</p>
+</div>
+<a id="csv-tbl-spec-types" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_specification_types columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>identifier</td>
+<td>TEXT PK</td>
+<td>Unique specification type code</td>
+</tr>
+<tr>
+<td>long_name</td>
+<td>TEXT NOT NULL UNIQUE</td>
+<td>Human-readable name</td>
+</tr>
+<tr>
+<td>description</td>
+<td>TEXT</td>
+<td>Documentation</td>
+</tr>
+<tr>
+<td>extends</td>
+<td>TEXT</td>
+<td>Parent type for inheritance</td>
+</tr>
+<tr>
+<td>is_default</td>
+<td>INTEGER DEFAULT 0</td>
+<td>1 = default when no explicit type</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="2.6" data-pos="124:1-125:1" id="datatype_definitions"><span class="header-section-number">2.6</span>
+datatype_definitions</h2>
+<div data-pos="126:1-127:1">
+<p>Defines primitive datatypes for attributes (STRING, INTEGER, ENUM,
+etc.).</p>
+</div>
+<a id="csv-tbl-datatypes" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> datatype_definitions columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>identifier</td>
+<td>TEXT PK</td>
+<td>Unique datatype ID</td>
+</tr>
+<tr>
+<td>long_name</td>
+<td>TEXT NOT NULL UNIQUE</td>
+<td>Human-readable name</td>
+</tr>
+<tr>
+<td>type</td>
+<td>TEXT NOT NULL</td>
+<td>Primitive category: STRING, INTEGER, REAL, BOOLEAN, DATE, ENUM,
+XHTML</td>
+</tr>
+</tbody>
+</table>
+<div data-pos="135:1-136:1">
+<p>The <code data-pos="135:5-135:11">type</code> column determines which
+value column in <code data-pos="135:52-135:75">spec_attribute_values</code> stores the
+data.</p>
+</div>
+<h2 data-number="2.7" data-pos="137:1-138:1" id="spec_attribute_types"><span class="header-section-number">2.7</span>
+spec_attribute_types</h2>
+<div data-pos="139:1-140:1">
+<p>Defines which attributes each object type can have (EAV schema).</p>
+</div>
+<a id="csv-tbl-attr-types" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_attribute_types columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>identifier</td>
+<td>TEXT PK</td>
+<td>Unique attribute definition ID</td>
+</tr>
+<tr>
+<td>owner_type_ref</td>
+<td>TEXT NOT NULL FK</td>
+<td>Object type that owns this attribute</td>
+</tr>
+<tr>
+<td>long_name</td>
+<td>TEXT NOT NULL</td>
+<td>Attribute name as written in source</td>
+</tr>
+<tr>
+<td>datatype_ref</td>
+<td>TEXT NOT NULL FK</td>
+<td>Data type (FK to datatype_definitions)</td>
+</tr>
+<tr>
+<td>min_occurs</td>
+<td>INTEGER DEFAULT 0</td>
+<td>Minimum occurrences (0 = optional)</td>
+</tr>
+<tr>
+<td>max_occurs</td>
+<td>INTEGER DEFAULT 1</td>
+<td>Maximum occurrences</td>
+</tr>
+<tr>
+<td>min_value</td>
+<td>REAL</td>
+<td>Minimum bound for INTEGER/REAL</td>
+</tr>
+<tr>
+<td>max_value</td>
+<td>REAL</td>
+<td>Maximum bound for INTEGER/REAL</td>
+</tr>
+</tbody>
+</table>
+<div data-pos="153:1-154:1">
+<p>Unique constraint: <code data-pos="153:20-153:49">(owner_type_ref, long_name)</code> — each type
+can define an attribute name only once.</p>
+</div>
+<h2 data-number="2.8" data-pos="155:1-156:1" id="enum_values"><span class="header-section-number">2.8</span> enum_values</h2>
+<div data-pos="157:1-158:1">
+<p>Defines allowed values for ENUM-type datatypes.</p>
+</div>
+<a id="csv-tbl-enum-values" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> enum_values columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>identifier</td>
+<td>TEXT PK</td>
+<td>Unique enum value ID (e.g. STATUS_DRAFT)</td>
+</tr>
+<tr>
+<td>datatype_ref</td>
+<td>TEXT NOT NULL FK</td>
+<td>Parent ENUM datatype</td>
+</tr>
+<tr>
+<td>key</td>
+<td>TEXT NOT NULL</td>
+<td>Value as written in source</td>
+</tr>
+<tr>
+<td>sequence</td>
+<td>INTEGER DEFAULT 0</td>
+<td>Display order</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="2.9" data-pos="167:1-168:1" id="implicit_type_aliases"><span class="header-section-number">2.9</span> implicit_type_aliases</h2>
+<div data-pos="169:1-170:1">
+<p>Maps header titles to object types for implicit type inference
+(case-insensitive).</p>
+</div>
+<a id="csv-tbl-type-aliases" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> implicit_type_aliases columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>alias</td>
+<td>TEXT PK COLLATE NOCASE</td>
+<td>Title text that triggers this type</td>
+</tr>
+<tr>
+<td>object_type_id</td>
+<td>TEXT NOT NULL FK</td>
+<td>Object type to assign</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="2.10" data-pos="177:1-178:1" id="implicit_spec_type_aliases"><span class="header-section-number">2.10</span>
+implicit_spec_type_aliases</h2>
+<div data-pos="179:1-180:1">
+<p>Maps document titles (H1) to specification types
+(case-insensitive).</p>
+</div>
+<a id="csv-tbl-spec-aliases" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> implicit_spec_type_aliases columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>alias</td>
+<td>TEXT PK COLLATE NOCASE</td>
+<td>Title text that triggers this type</td>
+</tr>
+<tr>
+<td>spec_type_id</td>
+<td>TEXT NOT NULL FK</td>
+<td>Specification type to assign</td>
+</tr>
+</tbody>
+</table>
+<h1 data-number="3" data-pos="187:1-188:1" id="core-schema-content"><span class="header-section-number">3</span>
+Core Schema: Content</h1>
+<div data-pos="189:1-190:1">
+<p>The content tables store actual specification data. They answer the
+question: “What does this specification contain?”</p>
+</div>
+<div data-pos="191:1-192:1">
+<p><strong>Authoritative source:</strong> <code data-pos="191:27-191:54">src/db/schema/content.lua</code></p>
+</div>
+<h2 data-number="3.1" data-pos="193:1-194:1" id="specifications"><span class="header-section-number">3.1</span> specifications</h2>
+<div data-pos="195:1-196:1">
+<p>Root-level specification documents. Each <code data-pos="195:42-195:47">.md</code> file produces one row.</p>
+</div>
+<a id="csv-tbl-specifications" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> specifications columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>identifier</td>
+<td>TEXT PK</td>
+<td>Filename slug (natural key)</td>
+</tr>
+<tr>
+<td>root_path</td>
+<td>TEXT NOT NULL UNIQUE</td>
+<td>Absolute path to root .md file</td>
+</tr>
+<tr>
+<td>long_name</td>
+<td>TEXT</td>
+<td>Document title from H1 header</td>
+</tr>
+<tr>
+<td>type_ref</td>
+<td>TEXT FK</td>
+<td>Specification type</td>
+</tr>
+<tr>
+<td>pid</td>
+<td>TEXT</td>
+<td>Project identifier from @PID syntax</td>
+</tr>
+<tr>
+<td>header_ast</td>
+<td>JSON</td>
+<td>Rendered H1 header as Pandoc AST</td>
+</tr>
+<tr>
+<td>body_ast</td>
+<td>JSON</td>
+<td>Body content between H1 and first H2</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="3.2" data-pos="208:1-209:1" id="spec_objects"><span class="header-section-number">3.2</span> spec_objects</h2>
+<div data-pos="210:1-211:1">
+<p>Traceable elements within a specification. Created from H2–H6
+headers.</p>
+</div>
+<a id="csv-tbl-objects" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_objects columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INTEGER PK</td>
+<td>Auto-assigned internal key</td>
+</tr>
+<tr>
+<td>content_sha</td>
+<td>TEXT</td>
+<td>SHA1 checksum for change detection</td>
+</tr>
+<tr>
+<td>specification_ref</td>
+<td>TEXT NOT NULL FK</td>
+<td>Parent specification</td>
+</tr>
+<tr>
+<td>type_ref</td>
+<td>TEXT NOT NULL FK</td>
+<td>Object type</td>
+</tr>
+<tr>
+<td>from_file</td>
+<td>TEXT NOT NULL</td>
+<td>Source file path</td>
+</tr>
+<tr>
+<td>file_seq</td>
+<td>INTEGER NOT NULL</td>
+<td>Sequence within file (0-indexed)</td>
+</tr>
+<tr>
+<td>pid</td>
+<td>TEXT</td>
+<td>Project identifier</td>
+</tr>
+<tr>
+<td>pid_prefix</td>
+<td>TEXT</td>
+<td>Extracted PID prefix</td>
+</tr>
+<tr>
+<td>pid_sequence</td>
+<td>INTEGER</td>
+<td>Extracted PID sequence number</td>
+</tr>
+<tr>
+<td>pid_auto_generated</td>
+<td>INTEGER DEFAULT 0</td>
+<td>1 = PID was auto-generated</td>
+</tr>
+<tr>
+<td>title_text</td>
+<td>TEXT NOT NULL</td>
+<td>Plain-text title</td>
+</tr>
+<tr>
+<td>label</td>
+<td>TEXT</td>
+<td>Unified label for # resolution</td>
+</tr>
+<tr>
+<td>level</td>
+<td>INTEGER</td>
+<td>Heading level (2--6)</td>
+</tr>
+<tr>
+<td>start_line</td>
+<td>INTEGER</td>
+<td>Start line in source (1-indexed)</td>
+</tr>
+<tr>
+<td>end_line</td>
+<td>INTEGER</td>
+<td>End line in source</td>
+</tr>
+<tr>
+<td>ast</td>
+<td>JSON</td>
+<td>Body as Pandoc AST</td>
+</tr>
+<tr>
+<td>content_xhtml</td>
+<td>TEXT</td>
+<td>Cached HTML5 rendering</td>
+</tr>
+</tbody>
+</table>
+<div data-pos="233:1-234:1">
+<p>Key indexes: <code data-pos="233:14-233:38">idx_objects_spec_label</code> (UNIQUE on
+specification_ref + label), <code data-pos="233:78-233:100">idx_objects_spec_pid</code> (on
+specification_ref + pid).</p>
+</div>
+<h2 data-number="3.3" data-pos="235:1-236:1" id="spec_floats"><span class="header-section-number">3.3</span> spec_floats</h2>
+<div data-pos="237:1-238:1">
+<p>Numbered floating elements. Created from fenced code blocks with
+<code data-pos="237:66-237:80">syntax:label</code>.</p>
+</div>
+<a id="csv-tbl-floats" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_floats columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INTEGER PK</td>
+<td>Auto-assigned internal key</td>
+</tr>
+<tr>
+<td>content_sha</td>
+<td>TEXT</td>
+<td>SHA1 checksum for change detection</td>
+</tr>
+<tr>
+<td>specification_ref</td>
+<td>TEXT NOT NULL FK</td>
+<td>Parent specification</td>
+</tr>
+<tr>
+<td>type_ref</td>
+<td>TEXT NOT NULL FK</td>
+<td>Float type</td>
+</tr>
+<tr>
+<td>from_file</td>
+<td>TEXT NOT NULL</td>
+<td>Source file path</td>
+</tr>
+<tr>
+<td>file_seq</td>
+<td>INTEGER NOT NULL</td>
+<td>Sequence within file</td>
+</tr>
+<tr>
+<td>start_line</td>
+<td>INTEGER</td>
+<td>Start line in source</td>
+</tr>
+<tr>
+<td>label</td>
+<td>TEXT NOT NULL</td>
+<td>Cross-reference label</td>
+</tr>
+<tr>
+<td>number</td>
+<td>INTEGER</td>
+<td>Auto-assigned number within counter group</td>
+</tr>
+<tr>
+<td>caption</td>
+<td>TEXT</td>
+<td>Caption text</td>
+</tr>
+<tr>
+<td>pandoc_attributes</td>
+<td>JSON</td>
+<td>Parsed attributes from code block</td>
+</tr>
+<tr>
+<td>raw_content</td>
+<td>TEXT</td>
+<td>Original raw content</td>
+</tr>
+<tr>
+<td>raw_ast</td>
+<td>JSON</td>
+<td>Original Pandoc AST</td>
+</tr>
+<tr>
+<td>resolved_ast</td>
+<td>JSON</td>
+<td>Processed AST after rendering</td>
+</tr>
+<tr>
+<td>parent_object_id</td>
+<td>INTEGER FK</td>
+<td>Containing spec object</td>
+</tr>
+<tr>
+<td>anchor</td>
+<td>TEXT</td>
+<td>HTML anchor for linking</td>
+</tr>
+<tr>
+<td>syntax_key</td>
+<td>TEXT</td>
+<td>Original syntax from code block</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="3.4" data-pos="260:1-261:1" id="spec_relations"><span class="header-section-number">3.4</span> spec_relations</h2>
+<div data-pos="262:1-263:1">
+<p>Traceability links between objects. Created from <code data-pos="262:50-262:63">[target](@)</code> and <code data-pos="262:68-262:81">[target](#)</code> syntax.</p>
+</div>
+<a id="csv-tbl-relations" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_relations columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INTEGER PK</td>
+<td>Auto-assigned internal key</td>
+</tr>
+<tr>
+<td>content_sha</td>
+<td>TEXT</td>
+<td>SHA1 checksum for change detection</td>
+</tr>
+<tr>
+<td>specification_ref</td>
+<td>TEXT NOT NULL FK</td>
+<td>Parent specification</td>
+</tr>
+<tr>
+<td>source_object_id</td>
+<td>INTEGER NOT NULL FK</td>
+<td>Source object</td>
+</tr>
+<tr>
+<td>target_text</td>
+<td>TEXT</td>
+<td>Target as written (before resolution)</td>
+</tr>
+<tr>
+<td>target_object_id</td>
+<td>INTEGER FK</td>
+<td>Resolved target object (NULL if unresolved)</td>
+</tr>
+<tr>
+<td>target_float_id</td>
+<td>INTEGER FK</td>
+<td>Resolved target float (NULL if unresolved)</td>
+</tr>
+<tr>
+<td>type_ref</td>
+<td>TEXT FK</td>
+<td>Inferred relation type</td>
+</tr>
+<tr>
+<td>is_ambiguous</td>
+<td>INTEGER DEFAULT 0</td>
+<td>1 = multiple matches found</td>
+</tr>
+<tr>
+<td>from_file</td>
+<td>TEXT NOT NULL</td>
+<td>Source file</td>
+</tr>
+<tr>
+<td>link_line</td>
+<td>INTEGER DEFAULT 0</td>
+<td>Line number of link</td>
+</tr>
+<tr>
+<td>source_attribute</td>
+<td>TEXT</td>
+<td>Attribute containing the link (NULL if in body)</td>
+</tr>
+<tr>
+<td>link_selector</td>
+<td>TEXT</td>
+<td>Selector syntax (&quot;@&quot; or &quot;#&quot;)</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="3.5" data-pos="281:1-282:1" id="spec_views"><span class="header-section-number">3.5</span> spec_views</h2>
+<div data-pos="283:1-284:1">
+<p>Dynamic content blocks. Created from inline code with <code data-pos="283:55-283:73">`type:param`</code> syntax.</p>
+</div>
+<a id="csv-tbl-views" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_views columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INTEGER PK</td>
+<td>Auto-assigned internal key</td>
+</tr>
+<tr>
+<td>content_sha</td>
+<td>TEXT</td>
+<td>SHA1 checksum for change detection</td>
+</tr>
+<tr>
+<td>specification_ref</td>
+<td>TEXT NOT NULL FK</td>
+<td>Parent specification</td>
+</tr>
+<tr>
+<td>view_type_ref</td>
+<td>TEXT NOT NULL FK</td>
+<td>View type</td>
+</tr>
+<tr>
+<td>from_file</td>
+<td>TEXT NOT NULL</td>
+<td>Source file path</td>
+</tr>
+<tr>
+<td>file_seq</td>
+<td>INTEGER NOT NULL</td>
+<td>Sequence within file</td>
+</tr>
+<tr>
+<td>start_line</td>
+<td>INTEGER</td>
+<td>Start line in source</td>
+</tr>
+<tr>
+<td>raw_ast</td>
+<td>JSON</td>
+<td>Original Pandoc AST</td>
+</tr>
+<tr>
+<td>resolved_ast</td>
+<td>JSON</td>
+<td>Materialized view as Pandoc AST</td>
+</tr>
+<tr>
+<td>resolved_data</td>
+<td>JSON</td>
+<td>Pre-computed view data</td>
+</tr>
+</tbody>
+</table>
+<h2 data-number="3.6" data-pos="299:1-300:1" id="spec_attribute_values"><span class="header-section-number">3.6</span> spec_attribute_values</h2>
+<div data-pos="301:1-302:1">
+<p>Typed attribute storage using the Entity-Attribute-Value (EAV)
+pattern.</p>
+</div>
+<a id="csv-tbl-attributes" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_attribute_values columns</figcaption>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INTEGER PK</td>
+<td>Auto-assigned internal key</td>
+</tr>
+<tr>
+<td>content_sha</td>
+<td>TEXT</td>
+<td>SHA1 checksum for change detection</td>
+</tr>
+<tr>
+<td>specification_ref</td>
+<td>TEXT NOT NULL FK</td>
+<td>Parent specification</td>
+</tr>
+<tr>
+<td>owner_object_id</td>
+<td>INTEGER FK</td>
+<td>Owner spec object (NULL if float)</td>
+</tr>
+<tr>
+<td>owner_float_id</td>
+<td>INTEGER FK</td>
+<td>Owner spec float (NULL if object)</td>
+</tr>
+<tr>
+<td>name</td>
+<td>TEXT NOT NULL</td>
+<td>Attribute name</td>
+</tr>
+<tr>
+<td>raw_value</td>
+<td>TEXT</td>
+<td>Original value (before type casting)</td>
+</tr>
+<tr>
+<td>string_value</td>
+<td>TEXT</td>
+<td>For STRING datatype</td>
+</tr>
+<tr>
+<td>int_value</td>
+<td>INTEGER</td>
+<td>For INTEGER datatype</td>
+</tr>
+<tr>
+<td>real_value</td>
+<td>REAL</td>
+<td>For REAL datatype</td>
+</tr>
+<tr>
+<td>bool_value</td>
+<td>INTEGER</td>
+<td>For BOOLEAN datatype (0/1)</td>
+</tr>
+<tr>
+<td>date_value</td>
+<td>TEXT</td>
+<td>For DATE datatype (YYYY-MM-DD)</td>
+</tr>
+<tr>
+<td>enum_ref</td>
+<td>TEXT FK</td>
+<td>For ENUM datatype (FK to enum_values)</td>
+</tr>
+<tr>
+<td>ast</td>
+<td>JSON</td>
+<td>For XHTML datatype (Pandoc AST)</td>
+</tr>
+<tr>
+<td>datatype</td>
+<td>TEXT NOT NULL</td>
+<td>Actual datatype used</td>
+</tr>
+<tr>
+<td>xhtml_value</td>
+<td>TEXT</td>
+<td>Cached HTML5 rendering</td>
+</tr>
+</tbody>
+</table>
+<div data-pos="323:1-324:1">
+<p>The EAV pattern is used because the attribute set is unknown at
+schema creation time — models define custom attributes at runtime.</p>
+</div>
+<h1 data-number="4" data-pos="325:1-326:1" id="non-core-tables"><span class="header-section-number">4</span> Non-Core Tables</h1>
+<div data-pos="327:1-328:1">
+<p>The following tables are <strong>not part of the SpecIR
+specification</strong>. They are SpecCompiler implementation details for
+incremental builds, full-text search, and output caching. External tools
+should ignore these tables.</p>
+</div>
+<div data-pos="329:1-330:1">
+<p><strong>Authoritative source:</strong> <code data-pos="329:27-329:52">src/db/schema/build.lua</code> and <code data-pos="329:57-329:83">src/db/schema/search.lua</code></p>
+</div>
+<h2 data-number="4.1" data-pos="331:1-332:1" id="build-infrastructure"><span class="header-section-number">4.1</span>
+Build Infrastructure</h2>
+<div data-pos="333:1-338:1">
+<ul>
+<li><div data-pos="333:3-334:1">
+<strong>build_graph</strong> — tracks file include/dependency
+relationships for incremental builds. Columns: <code data-pos="333:101-333:112">root_path</code>, <code data-pos="333:114-333:125">node_path</code>, <code data-pos="333:127-333:138">node_sha1</code>.
+</div></li>
+<li><div data-pos="334:3-335:1">
+<strong>source_files</strong> — stores SHA1 hashes of source files for
+change detection. Columns: <code data-pos="334:90-334:96">path</code>,
+<code data-pos="334:98-334:104">sha1</code>.
+</div></li>
+<li><div data-pos="335:3-336:1">
+<strong>output_cache</strong> — tracks generated output files and their
+source state. Columns: <code data-pos="335:87-335:96">spec_id</code>,
+<code data-pos="335:98-335:111">output_path</code>, <code data-pos="335:113-335:123">pir_hash</code>, <code data-pos="335:125-335:139">generated_at</code>.
+</div></li>
+</ul>
+</div>
+<h2 data-number="4.2" data-pos="337:1-338:1" id="full-text-search"><span class="header-section-number">4.2</span> Full-Text Search</h2>
+<div data-pos="339:1-344:1">
+<ul>
+<li><div data-pos="339:3-340:1">
+<strong>fts_objects</strong> — FTS5 virtual table indexing spec object
+text.
+</div></li>
+<li><div data-pos="340:3-341:1">
+<strong>fts_attributes</strong> — FTS5 virtual table indexing attribute
+values.
+</div></li>
+<li><div data-pos="341:3-342:1">
+<strong>fts_floats</strong> — FTS5 virtual table indexing float content.
+</div></li>
+</ul>
+</div>
+<div data-pos="343:1-344:1">
+<p>These tables are populated during the EMIT phase and used by the
+HTML5 web application for browser-native search.</p>
+</div>
+<h1 data-number="5" data-pos="345:1-346:1" id="views"><span class="header-section-number">5</span> Views</h1>
+<h2 data-number="5.1" data-pos="347:1-348:1" id="eav-pivot-views"><span class="header-section-number">5.1</span> EAV Pivot Views</h2>
+<div data-pos="349:1-350:1">
+<p>SpecIR dynamically generates per-type views that pivot the EAV table
+into a columnar format:</p>
+</div>
+<pre data-pos="351:1-354:1"><code>view_{TYPE}_objects</code></pre>
+<div data-pos="355:1-356:1">
+<p>For example, <code data-pos="355:14-355:32">view_HLR_objects</code>
+provides columns like <code data-pos="355:55-355:60">pid</code>, <code data-pos="355:62-355:74">title_text</code>, <code data-pos="355:76-355:84">status</code>, <code data-pos="355:86-355:96">priority</code>, <code data-pos="355:98-355:109">rationale</code> — one row per HLR object,
+with attributes as typed columns instead of EAV rows. These views are
+generated at runtime after type definitions are loaded.</p>
+</div>
+<div data-pos="357:1-358:1">
+<p>External tools querying SpecIR should prefer these pivot views over
+raw EAV joins.</p>
+</div>
+<h2 data-number="5.2" data-pos="359:1-360:1" id="public-api-views"><span class="header-section-number">5.2</span> Public API Views</h2>
+<div data-pos="361:1-362:1">
+<p>SpecIR defines stable public views for BI tools and dashboards. These
+views abstract internal schema complexity and provide stable column
+names.</p>
+</div>
+<div data-pos="363:1-364:1">
+<p><strong>Authoritative source:</strong> <code data-pos="363:27-363:56">src/db/views/public_api.lua</code></p>
+</div>
+<div data-pos="365:1-373:1">
+<ul>
+<li><div data-pos="365:3-366:1">
+<strong>public_traceability_matrix</strong> — all resolved
+object-to-object relations with source/target PIDs, types, and titles.
+</div></li>
+<li><div data-pos="366:3-367:1">
+<strong>public_coverage_report</strong> — traceability status of each
+object (orphan, traces_only, traced_by_only, fully_traced).
+</div></li>
+<li><div data-pos="367:3-368:1">
+<strong>public_dangling_references</strong> — unresolved relations
+(broken links).
+</div></li>
+<li><div data-pos="368:3-369:1">
+<strong>public_float_inventory</strong> — all floats with type, caption,
+number, and parent object.
+</div></li>
+<li><div data-pos="369:3-370:1">
+<strong>public_object_summary</strong> — object counts by type.
+</div></li>
+<li><div data-pos="370:3-371:1">
+<strong>public_specification_list</strong> — all specifications with
+object/float/relation counts.
+</div></li>
+</ul>
+</div>
+<h1 data-number="6" data-pos="372:1-373:1" id="interoperability"><span class="header-section-number">6</span> Interoperability</h1>
+<div data-pos="374:1-375:1">
+<p>SpecIR is designed as a hub for specification interchange:</p>
+</div>
+<div data-pos="376:1-382:1">
+<ul>
+<li><div data-pos="376:3-377:1">
+<strong>CommonSpec</strong> compiles into SpecIR via SpecCompiler.
+</div></li>
+<li><div data-pos="377:3-378:1">
+<strong>ReqIF</strong> can be exported from SpecIR (current) and
+imported into SpecIR (planned).
+</div></li>
+<li><div data-pos="378:3-379:1">
+<strong>SQL</strong> provides direct read/write access for custom
+tooling, dashboards, and integrations.
+</div></li>
+<li><div data-pos="379:3-380:1">
+<strong>Any format</strong> that can express typed objects, attributes,
+and relations can map to and from SpecIR.
+</div></li>
+</ul>
+</div>
+<div data-pos="381:1-382:1">
+<p>The formal separation of the SpecIR schema from the SpecCompiler
+implementation enables third-party tools to produce and consume SpecIR
+databases without depending on SpecCompiler.</p>
+</div>
+</body>
+</html>
