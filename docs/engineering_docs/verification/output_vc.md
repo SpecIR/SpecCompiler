@@ -180,6 +180,27 @@ Verify header classes, bookmarks, and structural decorations in rendered output.
 > traceability: [HLR-OUT-001](@), [LLR-070](@), [LLR-071](@), [LLR-072](@)
 
 
+### VC: Spec Object Render Handler @VC-OUT-005
+
+Verify that object type handlers are loaded and dispatched during TRANSFORM phase, and that composite object heading IDs are patched.
+
+> objective: Confirm that load_type_handler loads object type modules, on_render_SpecObject dispatches to type-specific renderers producing semantic output, and composite heading IDs are patched to match their PIDs.
+
+> verification_method: Test
+
+> approach:
+> - Process test document with COVER, EXEC_SUMMARY, and SECTION objects
+> - Execute pipeline through all five phases with JSON output
+> - Oracle verifies cover semantic Divs, section markers, and composite heading presence
+
+> pass_criteria:
+> - COVER type handler invoked: cover-title, cover-subtitle, cover-author, cover-date, cover-docid, cover-version Divs present
+> - Cover section markers (RawBlocks) emitted
+> - Composite objects (EXEC_SUMMARY, SECTION) retain headers after heading ID patching
+
+> traceability: [HLR-EXT-001](@), [HLR-OUT-001](@), [LLR-094](@)
+
+
 ### VC: Full-Text Search Indexing @VC-OUT-007
 
 Verify that [dic:full-text-search](#) virtual tables are populated with specification content during the [dic:emit-phase](#) phase.
