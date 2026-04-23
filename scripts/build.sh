@@ -478,10 +478,9 @@ if [ "$SKIP_DENO" = false ]; then
 
     DENO_DIR="$PREFIX/vendor/deno_cache" \
         "$PREFIX/bin/deno" cache --no-check \
-        "$SOURCE_DIR/src/tools/echarts-render.ts" \
-        "$SOURCE_DIR/src/tools/mml2omml.ts"
+        "$SOURCE_DIR/src/tools/echarts-render.ts"
 
-    # Create wrapper scripts that use the Deno runtime + cached deps
+    # Create wrapper script that uses the Deno runtime + cached deps
     # SPECCOMPILER_DIST = binaries/vendor, SPECCOMPILER_HOME = source code
     cat > "$PREFIX/bin/echarts-render" << 'EOF'
 #!/bin/sh
@@ -489,13 +488,7 @@ exec "${SPECCOMPILER_DIST}/bin/deno" run --no-check --cached-only --allow-read -
 EOF
     chmod +x "$PREFIX/bin/echarts-render"
 
-    cat > "$PREFIX/bin/mml2omml" << 'EOF'
-#!/bin/sh
-exec "${SPECCOMPILER_DIST}/bin/deno" run --no-check --cached-only --allow-read "${SPECCOMPILER_HOME}/src/tools/mml2omml.ts" "$@"
-EOF
-    chmod +x "$PREFIX/bin/mml2omml"
-
-    echo "  TypeScript deps cached, wrapper scripts created"
+    echo "  TypeScript deps cached, wrapper script created"
 else
     echo "[7/8] Skipping TypeScript utilities (--skip-deno)"
 fi
