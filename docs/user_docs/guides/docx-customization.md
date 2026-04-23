@@ -380,8 +380,8 @@ Pandoc Lua filters run during the DOCX write phase and convert SpecCompiler form
   - OOXML spacing (in twips)
 * - `RawBlock("speccompiler", "bookmark-start:ID:NAME")`
   - OOXML bookmark start
-* - `RawBlock("speccompiler", "math-omml:OMML")`
-  - OOXML math element
+* - `pandoc.Math` (native inline or display)
+  - OOXML math element (native `<m:oMath>` via Pandoc's texmath)
 * - `Div.speccompiler-caption`
   - OOXML caption with SEQ field
 * - `Div.speccompiler-numbered-equation`
