@@ -257,6 +257,8 @@ local function convert_caption_div(div)
 end
 
 ---Convert speccompiler-numbered-equation Div to HTML.
+---Walks the Div looking for a native pandoc.Math element, renders it to
+---MathML via Pandoc's native writer, then wraps with equation-number HTML.
 ---@param div pandoc.Div The equation div
 ---@return pandoc.RawBlock HTML numbered equation
 local function convert_equation_div(div)
@@ -264,15 +266,25 @@ local function convert_equation_div(div)
     local number = get_attr(div, "number") or "1"
     local identifier = get_attr(div, "identifier") or ""
 
-    -- Extract MathML from nested math-mathml RawBlock (prefer MathML for HTML)
+    -- Find the Math element anywhere inside div.content.
+    local math_elt = nil
+    pandoc.walk_block(div, {
+        Math = function(m)
+            math_elt = m
+            return nil
+        end
+    })
+
+    -- Render the Math element to MathML using Pandoc's native writer.
     local mathml = ""
-    for _, block in ipairs(div.content) do
-        if block.t == "RawBlock" and block.format == "speccompiler" then
-            local content = block.text:match("^math%-mathml:(.+)$")
-            if content then
-                mathml = content
-                break
-            end
+    if math_elt then
+        local ok, rendered = pcall(function()
+            local mini_doc = pandoc.Pandoc({ pandoc.Para({ math_elt }) })
+            return pandoc.write(mini_doc, "html",
+                pandoc.WriterOptions({ html_math_method = { method = "mathml" } }))
+        end)
+        if ok and rendered then
+            mathml = rendered
         end
     end
 

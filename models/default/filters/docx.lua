@@ -164,6 +164,7 @@ end
 ---Generate OOXML for numbered equation using tab-stop layout.
 ---Uses a single paragraph with center tab (equation) and right tab (number).
 ---This is the traditional academic approach - no table constraints.
+-- TODO(Task 5): remove, no callers after math refactor
 ---@param omml string OMML math content
 ---@param seq_name string SEQ field name (e.g., "Equation")
 ---@param number string|number Equation number
@@ -416,32 +417,87 @@ local function convert_caption_div(div)
     return pandoc.RawBlock("openxml", ooxml_caption(prefix, seq_name, separator, caption, style, true))
 end
 
----Convert speccompiler-numbered-equation Div to OOXML.
+---Convert speccompiler-numbered-equation Div to a single-paragraph OOXML layout.
+---Finds the pandoc.Math element inside the Div, downcasts to InlineMath so
+---Pandoc emits <m:oMath> (not <m:oMathPara>) inline, and wraps with RawInlines
+---that build the custom tabstop + SEQ-field paragraph.
 ---@param div pandoc.Div The equation div
----@return pandoc.RawBlock|nil OOXML numbered equation
+---@return pandoc.Para|table Mixed-content paragraph or {} to remove
 local function convert_equation_div(div)
     local seq_name = get_attr(div, "seq-name") or "Equation"
     local number = get_attr(div, "number") or "1"
     local identifier = get_attr(div, "identifier") or ""
 
-    -- Extract OMML from nested math-omml RawBlock (prefer OMML for DOCX)
-    local omml = ""
-    for _, block in ipairs(div.content) do
-        if block.t == "RawBlock" and block.format == "speccompiler" then
-            local content = block.text:match("^math%-omml:(.+)$")
-            if content then
-                omml = content
-                break
-            end
+    -- Find the Math element anywhere inside div.content.
+    local math_elt = nil
+    pandoc.walk_block(div, {
+        Math = function(m)
+            math_elt = m
+            return nil
         end
-    end
-
-    if omml == "" then
-        -- No math content - return nil to remove
+    })
+    if not math_elt then
         return {}
     end
 
-    return pandoc.RawBlock("openxml", ooxml_numbered_equation(omml, seq_name, number, identifier))
+    -- Build bookmark OOXML (matches the old template).
+    local bookmark_start_xml, bookmark_end_xml = "", ""
+    if identifier and identifier ~= "" then
+        local bm_id = 0
+        for i = 1, #identifier do
+            bm_id = (bm_id * 31 + identifier:byte(i)) % 100000
+        end
+        bm_id = bm_id + 1
+        bookmark_start_xml = xml.serialize_element(xml.node("w:bookmarkStart", {
+            ["w:id"] = tostring(bm_id),
+            ["w:name"] = identifier,
+        }))
+        bookmark_end_xml = xml.serialize_element(xml.node("w:bookmarkEnd", {
+            ["w:id"] = tostring(bm_id),
+        }))
+    end
+
+    -- SEQ field runs — reuse the existing build_field_code helper.
+    local seq_runs = {}
+    append_all(seq_runs, build_field_code(
+        " SEQ " .. seq_name .. " \\* ARABIC ",
+        tostring(number or "1")
+    ))
+    local seq_xml = ""
+    for _, run in ipairs(seq_runs) do
+        seq_xml = seq_xml .. xml.serialize_element(run)
+    end
+
+    -- Custom pPr + first tab (before the math).
+    local ppr_xml = xml.serialize_element(
+        xml.node("w:pPr", {}, {
+            xml.node("w:tabs", {}, {
+                xml.node("w:tab", {["w:val"] = "center", ["w:pos"] = "4680"}),
+                xml.node("w:tab", {["w:val"] = "right", ["w:pos"] = "9360"}),
+            }),
+        })
+    )
+    local first_tab_xml = xml.serialize_element(xml.node("w:r", {}, { xml.node("w:tab") }))
+
+    -- Trailing: tab, bookmark-start, "(", SEQ field, ")", bookmark-end.
+    local trailing = table.concat({
+        xml.serialize_element(xml.node("w:r", {}, { xml.node("w:tab") })),
+        bookmark_start_xml,
+        xml.serialize_element(xml.node("w:r", {}, { xml.node("w:t", {}, { xml.text("(") }) })),
+        seq_xml,
+        xml.serialize_element(xml.node("w:r", {}, { xml.node("w:t", {}, { xml.text(")") }) })),
+        bookmark_end_xml,
+    })
+
+    -- Downcast DisplayMath → InlineMath so Pandoc emits <m:oMath> without
+    -- the <m:oMathPara> wrapper that would break our single-paragraph layout.
+    local inline_math = pandoc.Math("InlineMath", math_elt.text)
+
+    return pandoc.Para({
+        pandoc.RawInline("openxml", ppr_xml .. first_tab_xml),
+        inline_math,
+        pandoc.RawInline("openxml", trailing),
+    })
 end
 
 ---Convert speccompiler-table Div.
