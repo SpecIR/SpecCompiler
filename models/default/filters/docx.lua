@@ -8,7 +8,6 @@
 ---  - Converts RawBlock("speccompiler", "vertical-space:NNNN") to OOXML spacing (twips)
 ---  - Converts RawBlock("speccompiler", "bookmark-start:ID:NAME") to OOXML bookmark start
 ---  - Converts RawBlock("speccompiler", "bookmark-end:ID") to OOXML bookmark end
----  - Converts RawBlock("speccompiler", "math-omml:OMML") to OOXML math
 ---  - Converts speccompiler-caption Div to OOXML caption with SEQ field
 ---  - Converts speccompiler-numbered-equation Div to OOXML numbered equation
 ---  - Converts speccompiler-toc Div to native Word TOC field
@@ -161,71 +160,6 @@ local function ooxml_caption(prefix, seq_name, separator, caption, style, keep_w
     return xml.serialize_element(xml.node("w:p", {}, children))
 end
 
----Generate OOXML for numbered equation using tab-stop layout.
----Uses a single paragraph with center tab (equation) and right tab (number).
----This is the traditional academic approach - no table constraints.
--- TODO(Task 5): remove, no callers after math refactor
----@param omml string OMML math content
----@param seq_name string SEQ field name (e.g., "Equation")
----@param number string|number Equation number
----@param identifier string|nil Bookmark identifier for cross-references
----@return string OOXML for numbered equation
-local function ooxml_numbered_equation(omml, seq_name, number, identifier)
-    local bookmark_start_xml = ""
-    local bookmark_end_xml = ""
-
-    -- Add bookmarks for cross-reference if identifier provided
-    if identifier and identifier ~= "" then
-        -- Generate simple numeric ID from identifier
-        local bm_id = 0
-        for i = 1, #identifier do
-            bm_id = (bm_id * 31 + identifier:byte(i)) % 100000
-        end
-        bm_id = bm_id + 1
-        bookmark_start_xml = xml.serialize_element(xml.node("w:bookmarkStart", {
-            ["w:id"] = tostring(bm_id),
-            ["w:name"] = identifier,
-        }))
-        bookmark_end_xml = xml.serialize_element(xml.node("w:bookmarkEnd", {
-            ["w:id"] = tostring(bm_id),
-        }))
-    end
-
-    -- Tab-stop approach: center tab at ~50% (4680 twips), right tab at 100% (9360 twips)
-    -- Standard US Letter/A4 text width is ~6.5" = 9360 twips
-    -- Equation centered via center tab, number right-aligned via right tab
-    local children = {
-        xml.node("w:pPr", {}, {
-            xml.node("w:tabs", {}, {
-                xml.node("w:tab", {["w:val"] = "center", ["w:pos"] = "4680"}),
-                xml.node("w:tab", {["w:val"] = "right", ["w:pos"] = "9360"}),
-            }),
-        }),
-        -- Tab to center position
-        xml.node("w:r", {}, {xml.node("w:tab")}),
-        -- Pre-formed OMML content
-        xml.raw(omml),
-        -- Tab to right position
-        xml.node("w:r", {}, {xml.node("w:tab")}),
-        -- Bookmark start (pre-formed OOXML, may be empty)
-        xml.raw(bookmark_start_xml),
-        -- Opening parenthesis
-        xml.node("w:r", {}, {xml.node("w:t", {}, {xml.text("(")})}),
-    }
-
-    -- SEQ field code runs
-    append_all(children, build_field_code(
-        " SEQ " .. seq_name .. " \\* ARABIC ",
-        tostring(number or "1")
-    ))
-
-    -- Closing parenthesis and bookmark end
-    table.insert(children, xml.node("w:r", {}, {xml.node("w:t", {}, {xml.text(")")})}))
-    table.insert(children, xml.raw(bookmark_end_xml))
-
-    return xml.serialize_element(xml.node("w:p", {}, children))
-end
-
 -- ============================================================================
 -- Cover Page Semantic Div Support
 -- ============================================================================
@@ -318,17 +252,6 @@ local function convert_speccompiler_block(block)
         return {}  -- Remove - handled in bookmark-start
     end
 
-    -- Handle math-omml:OMML (for DOCX output)
-    local omml = text:match("^math%-omml:(.+)$")
-    if omml then
-        return pandoc.RawBlock("openxml", omml)
-    end
-
-    -- Handle math-mathml:MATHML (skip for DOCX - we prefer OMML)
-    if text:match("^math%-mathml:") then
-        return {}  -- Remove - DOCX uses OMML
-    end
-
     -- Parse simple markers
     local marker_type, value = parse_marker(text)
 
@@ -375,17 +298,6 @@ end
 ---@return pandoc.RawInline|nil Converted OOXML inline, or nil to remove
 local function convert_speccompiler_inline(inline)
     local text = inline.text
-
-    -- Handle inline-math-omml:OMML (for DOCX output)
-    local inline_omml = text:match("^inline%-math%-omml:(.+)$")
-    if inline_omml then
-        return pandoc.RawInline("openxml", inline_omml)
-    end
-
-    -- Handle inline-math-mathml:MATHML (skip for DOCX - we prefer OMML)
-    if text:match("^inline%-math%-mathml:") then
-        return {}  -- Remove - DOCX uses OMML
-    end
 
     -- Handle view:NAME:CONTENT - view content is already OOXML
     local view_name, view_content = text:match("^view:([^:]+):(.+)$")

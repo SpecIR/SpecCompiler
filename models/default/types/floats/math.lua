@@ -48,8 +48,6 @@ M.handler = {
     ---@param float table Float record from database (raw_content has the AsciiMath)
     ---@return table|nil Pandoc element or nil
     on_render_CodeBlock = function(block, ctx, float, _resolved)
-        if not pandoc then return nil end
-
         local mathml, err = math_utils.asciimath_to_mathml(float.raw_content or "", "block")
         if not mathml then
             ctx.log.warn("AsciiMath conversion failed for %s: %s", tostring(float.id), err or "")

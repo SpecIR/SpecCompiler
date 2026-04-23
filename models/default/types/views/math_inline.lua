@@ -81,7 +81,6 @@ M.handler = {
     on_render_Code = function(code, ctx)
         local expr = match_math_code(code.text or "")
         if not expr then return nil end
-        if not pandoc then return nil end
 
         local mathml, err = math_utils.asciimath_to_mathml(expr, "inline")
         if not mathml then

@@ -8,7 +8,7 @@
 ---  - Converts RawBlock("speccompiler", "vertical-space:NNNN") to HTML spacer div
 ---  - Converts RawBlock("speccompiler", "bookmark-start:ID:NAME") to HTML anchor
 ---  - Converts RawBlock("speccompiler", "bookmark-end:ID") - removed (not needed in HTML)
----  - Converts RawBlock("speccompiler", "math-mathml:MATHML") to MathML
+---  - Converts native pandoc.Math elements to RawInline HTML with inline <math> payload
 ---  - Converts speccompiler-caption Div to HTML figure caption
 ---  - Converts speccompiler-numbered-equation Div to HTML equation with number
 ---  - Converts RawInline("speccompiler", "view:NAME:CONTENT") to HTML placeholder
@@ -177,17 +177,6 @@ local function convert_speccompiler_block(block)
         return {}
     end
 
-    -- Handle math-mathml:MATHML (for HTML output - browsers support MathML)
-    local mathml = text:match("^math%-mathml:(.+)$")
-    if mathml then
-        return pandoc.RawBlock("html", mathml)
-    end
-
-    -- Handle math-omml:OMML (skip for HTML - we prefer MathML)
-    if text:match("^math%-omml:") then
-        return {}  -- Remove - HTML uses MathML
-    end
-
     -- Parse simple markers
     local marker_type, value = parse_marker(text)
 
@@ -214,17 +203,6 @@ end
 ---@return pandoc.RawInline|nil Converted HTML inline, or nil to remove
 local function convert_speccompiler_inline(inline)
     local text = inline.text
-
-    -- Handle inline-math-mathml:MATHML (for HTML output - browsers support MathML)
-    local inline_mathml = text:match("^inline%-math%-mathml:(.+)$")
-    if inline_mathml then
-        return pandoc.RawInline("html", inline_mathml)
-    end
-
-    -- Handle inline-math-omml:OMML (skip for HTML - we prefer MathML)
-    if text:match("^inline%-math%-omml:") then
-        return {}  -- Remove - HTML uses MathML
-    end
 
     -- Handle view:NAME:CONTENT - for HTML, return a placeholder
     local view_name, view_content = text:match("^view:([^:]+):(.+)$")
@@ -394,6 +372,33 @@ local function strip_toc_blocks(doc)
 end
 
 -- ============================================================================
+-- Native Math → MathML conversion
+-- ============================================================================
+
+---Render a pandoc.Math element to a raw MathML string using Pandoc's native
+---html writer with the mathml method. Falls back to the original Math element
+---on failure (which Pandoc will then emit as <span class="math ..."> spans).
+---@param math_elt table pandoc.Math element
+---@return table|nil Replacement inline (RawInline) or nil to leave Math as-is
+local function math_to_mathml_inline(math_elt)
+    local block_wrap = pandoc.Plain({ math_elt })
+    local mini_doc = pandoc.Pandoc({ block_wrap })
+    local writer_opts = pandoc.WriterOptions({
+        html_math_method = { method = "mathml" }
+    })
+    local ok, rendered = pcall(pandoc.write, mini_doc, "html", writer_opts)
+    if not ok or not rendered or rendered == "" then
+        io.stderr:write(string.format(
+            "[html filter] pandoc.write failed for Math element: %s\n",
+            tostring(rendered)))
+        return nil
+    end
+    -- Strip wrapping <p>...</p> Pandoc adds for the Plain block — keep the <math> payload.
+    rendered = rendered:gsub("^%s*<p>%s*", ""):gsub("%s*</p>%s*$", "")
+    return pandoc.RawInline("html", rendered)
+end
+
+-- ============================================================================
 -- Filter Tables
 -- ============================================================================
 
@@ -459,6 +464,10 @@ local FILTER_PASS2 = {
         end
         -- Pass through other RawInlines unchanged
         return inline
+    end,
+
+    Math = function(m)
+        return math_to_mathml_inline(m)
     end,
 
     Link = function(link)
