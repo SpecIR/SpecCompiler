@@ -32,7 +32,10 @@ M.handler = {
         for _, ctx in ipairs(contexts) do
             local floats = float_base.query_floats_by_type(data, ctx, "MATH")
             for _, float in ipairs(floats or {}) do
-                -- Sentinel: no pre-rendering, render-at-EMIT via on_render_CodeBlock
+                -- Sentinel: keeps MATH on the generic resolved-float dispatch path instead
+                -- of the MATH-specific nil-resolved_ast branch in float_resolver.lua
+                -- (removed in a later task). The value itself is ignored by
+                -- on_render_CodeBlock, which re-derives everything from float.raw_content.
                 float_base.update_resolved_ast(data, float.id, "render-at-emit")
             end
         end
@@ -49,17 +52,13 @@ M.handler = {
 
         local mathml, err = math_utils.asciimath_to_mathml(float.raw_content or "", "block")
         if not mathml then
-            if ctx.log and ctx.log.warn then
-                ctx.log.warn("AsciiMath conversion failed for %s: %s", tostring(float.id), err or "")
-            end
+            ctx.log.warn("AsciiMath conversion failed for %s: %s", tostring(float.id), err or "")
             return nil
         end
 
         local math_elt = math_utils.mathml_to_pandoc_math(mathml, "block")
         if not math_elt then
-            if ctx.log and ctx.log.warn then
-                ctx.log.warn("MathML→pandoc.Math failed for %s", tostring(float.id))
-            end
+            ctx.log.warn("MathML→pandoc.Math failed for %s", tostring(float.id))
             return nil
         end
 

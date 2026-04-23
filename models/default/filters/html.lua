@@ -286,6 +286,12 @@ local function convert_equation_div(div)
         if ok and rendered then
             mathml = rendered
         end
+        if not ok then
+            io.stderr:write(string.format(
+                "[html filter] pandoc.write failed for numbered equation %s: %s\n",
+                identifier ~= "" and identifier or "(unnamed)",
+                tostring(rendered)))
+        end
     end
 
     return pandoc.RawBlock("html", html_numbered_equation(mathml, seq_name, number, identifier))

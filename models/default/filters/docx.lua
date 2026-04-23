@@ -469,6 +469,13 @@ local function convert_equation_div(div)
     end
 
     -- Custom pPr + first tab (before the math).
+    -- KNOWN: Pandoc's docx writer emits its own <w:pPr> on the returned Para, so
+    -- the final paragraph contains two <w:pPr> elements (Pandoc's, then ours).
+    -- Word tolerates this and honors our tabstops; the DOCX is schema-invalid
+    -- but renders correctly. The cleaner fix would be constructing the whole
+    -- paragraph as a single RawBlock("openxml", ...), but that sacrifices
+    -- Pandoc's native <m:oMath> emission from the Math element, which is the
+    -- whole point of this refactor.
     local ppr_xml = xml.serialize_element(
         xml.node("w:pPr", {}, {
             xml.node("w:tabs", {}, {
@@ -489,8 +496,11 @@ local function convert_equation_div(div)
         bookmark_end_xml,
     })
 
-    -- Downcast DisplayMath → InlineMath so Pandoc emits <m:oMath> without
-    -- the <m:oMathPara> wrapper that would break our single-paragraph layout.
+    -- Downcast DisplayMath → InlineMath so Pandoc emits <m:oMath> without the
+    -- <m:oMathPara> wrapper. <m:oMathPara> forces Pandoc to open a fresh
+    -- paragraph, which would split our single-paragraph tabstop + SEQ-field
+    -- layout across two paragraphs and break the centered-math + right-number
+    -- visual.
     local inline_math = pandoc.Math("InlineMath", math_elt.text)
 
     return pandoc.Para({
