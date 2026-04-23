@@ -155,4 +155,29 @@ function M.asciimath_to_mathml(raw_content, display_mode)
     return M.normalize_mathml(mathml), nil
 end
 
+---Parse a MathML fragment into a native pandoc.Math element.
+---Uses pandoc.read with the "html" reader, which delegates to texmath
+---(MathML → TeX). Pandoc's writers then emit format-appropriate output:
+---OMML for DOCX, MathML/MathJax/etc. for HTML, TeX for LaTeX.
+---@param mathml string MathML string including <math …>…</math>
+---@param display_mode string "block"|"inline"
+---@return table|nil pandoc.Math element, or nil on parse failure
+function M.mathml_to_pandoc_math(mathml, display_mode)
+    if not mathml or mathml == "" then return nil end
+    local wrapped = "<p>" .. mathml .. "</p>"
+    local ok, doc = pcall(pandoc.read, wrapped, "html")
+    if not ok or not doc or not doc.blocks or #doc.blocks == 0 then
+        return nil
+    end
+    local para = doc.blocks[1]
+    if not para.content then return nil end
+    for _, inline in ipairs(para.content) do
+        if inline.t == "Math" then
+            local mathtype = display_mode == "block" and "DisplayMath" or "InlineMath"
+            return pandoc.Math(mathtype, inline.text)
+        end
+    end
+    return nil
+end
+
 return M
