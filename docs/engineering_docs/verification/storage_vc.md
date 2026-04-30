@@ -40,7 +40,7 @@ Verify attributes store in correct typed columns.
 > - INTEGER values populate int_value column only
 > - ENUM values populate enum_ref column only
 > - Exactly one typed column is non-NULL per row
-> - Invalid values leave typed columns NULL for proof-view diagnostics
+> - Invalid values leave typed columns NULL for verification-view diagnostics
 
 > traceability: [HLR-STOR-002](@), [LLR-DB-008-01](@)
 

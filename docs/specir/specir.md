@@ -20,7 +20,7 @@ Any tool can read and write a SpecIR database. CommonSpec is one input format; R
 
 **Portable.** A single `.db` file contains the complete specification state. Copy it, query it with any SQLite client, or serve it via a web application.
 
-**Typed.** The schema enforces a type system: every object, float, relation, and view references a declared type. Proof views express structural constraints as SQL queries.
+**Typed.** The schema enforces a type system: every object, float, relation, and view references a declared type. Verification views express structural constraints as SQL queries.
 
 **Queryable.** Standard SQL gives immediate access to traceability matrices, coverage reports, orphan detection, and custom dashboards --- no export step required.
 

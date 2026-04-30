@@ -2,189 +2,352 @@
 
 ## Introduction
 
-A **model** defines the vocabulary and behavior of your specification documents. It declares what types of spec objects exist (requirements, design items, test cases), what floats are available (diagrams, tables, code listings), how cross-references resolve, and what validation rules apply.
+A **model** defines the vocabulary and behaviour of your specification documents. It declares what object types exist (requirements, design items, test cases), what floats are available (diagrams, tables, code listings), how cross-references resolve, and what validation rules apply.
 
-SpecCompiler ships with a `default` model that provides base types (SECTION, FIGURE, TABLE, PLANTUML, etc.). You create a custom model when your domain needs additional types, specialized validation, or custom rendering.
+SpecCompiler ships with a `default` model that provides base types (SECTION, FIGURE, TABLE, PLANTUML, …). You create a custom model when your domain needs additional types, specialised rendering, or extra validation.
 
-### Overlay
+## Quick-start template
 
-Models work as **overlays** on top of `default`. When you set `template: mymodel` in `project.yaml`, the engine loads types in order:
+Every type module has the same shape. Copy this skeleton and keep only what you need:
 
-1. `models/default/types/` -- Always loaded first.
-2. `models/mymodel/types/` -- Loaded second; types with the same `id` override the default.
+```src.lua:src-model-quickstart{caption="The full type-module contract, annotated"}
+-- File: models/<your-model>/types/<category>/<type-name>.lua
+local M = {}
 
-This means your custom model only needs to define the types it adds or overrides. Everything else inherits from `default`.
+-- Declarative metadata: picked up by the type loader and written into
+-- the SpecIR database. Exactly one of these keys per module.
+M.object        = { id = "...", ... }   -- or M.float / M.relation / M.view / M.specification
 
-## Model Directory Layout
+-- Optional behaviour. Two kinds of callbacks live here (see Handler Contract):
+--   * on_<phase>(...)           -- pipeline phase hook (on_initialize, on_transform, ...)
+--   * on_render_<Thing>(...)    -- decorated per-item callback (on_render_SpecObject,
+--                                  on_render_Link, on_render_Code, ...)
+M.handler = {
+    name = "my_handler",        -- required and unique across all handlers
+    -- prerequisites = { ... }, -- optional; only needed to order phase hooks
+    -- on_analyze = function(data, contexts, diagnostics) ... end,
+    -- on_render_SpecObject = function(obj, ctx) ... end,
+}
+
+return M
+```
+
+Set `template: <your-model>` in `project.yaml` (see [Project Integration](#project-integration)) and `specc build` will load your types on top of `default`.
+
+## Overlay
+
+Models layer as **overlays** on top of `default`. When `project.yaml` sets `template: mymodel`, the loader runs two passes:
+
+1. `models/default/types/` — loaded first.
+2. `models/mymodel/types/` — loaded second; a type whose `id` matches a default replaces the default entirely.
+
+Types with new `id`s are added alongside the defaults. Everything you don't redefine is inherited.
+
+## Directory layout
 
 ```src:src-model-directory-layout{caption="Model directory structure"}
-models/{name}/
+models/<your-model>/
   types/
-    objects/          -- Spec object types (e.g., hlr.lua, vc.lua)
+    objects/          -- Spec object types  (e.g., hlr.lua, vc.lua)
     specifications/   -- Specification types (e.g., srs.lua)
-    floats/           -- Float types (e.g., figure.lua, chart.lua)
-    views/            -- View types (e.g., abbrev.lua, math_inline.lua)
-    relations/        -- Relation types (e.g., xref_decomposition.lua)
-  proofs/             -- Validation proof queries (e.g., sd_601_*.lua)
-  postprocessors/     -- Format post-processing (docx.lua, html5.lua)
+    floats/           -- Float types         (e.g., sequence_diagram.lua)
+    views/            -- View types          (e.g., symbol.lua)
+    relations/        -- Relation types      (e.g., traces_to.lua)
+  verification_views/             -- Verification views   (e.g., vc_missing_hlr.lua)
+  postprocessors/     -- Per-format post-processing (docx.lua, html5.lua)
   filters/            -- Pandoc Lua filters per output format
   styles/             -- Style presets (preset.lua, docx.lua, html.lua)
   data_views/         -- Chart data generators
-  handlers/           -- Custom pipeline handlers
+  handlers/           -- Extra pipeline handlers not tied to a type
 ```
 
-Only `types/` is required. All other directories are optional.
+Only `types/` is required; everything else is optional.
 
-## Type Definition Pattern
+The loader supports both single files (`types/floats/figure.lua`) and subdirectories with an `init.lua` (`types/floats/figure/init.lua`) — useful when a type needs helper modules alongside it.
 
-Every type module is a Lua file that returns a table with two optional keys:
+## Type categories at a glance
 
-- A **schema key** (`M.object`, `M.float`, `M.relation`, `M.view`, or `M.specification`) that declares the type's metadata and gets registered into the database.
-- An optional **`M.handler`** table that hooks into the pipeline lifecycle.
-
-### Schema Keys by Category
-
-```list-table:tbl-model-schema-keys{caption="Schema keys by type category"}
+```list-table:tbl-model-categories{caption="Type categories, schema keys, and which handler callbacks apply"}
 > header-rows: 1
-> aligns: l,l,l
+> aligns: l,l,l,l
 
 * - Category
-  - Schema Key
-  - Example File
-* - Spec Objects
+  - Schema key
+  - Example file
+  - Handler callbacks typically used
+* - Spec object
   - `M.object`
-  - `types/objects/section.lua`
-* - Floats
+  - `types/objects/hlr.lua`
+  - `on_render_SpecObject`
+* - Float
   - `M.float`
   - `types/floats/figure.lua`
-* - Relations
+  - `on_render_CodeBlock` (or external renderer)
+* - Relation
   - `M.relation`
-  - `types/relations/xref_citation.lua`
-* - Views
+  - `types/relations/traces_to.lua`
+  - `on_render_Link`
+* - View
   - `M.view`
   - `types/views/abbrev.lua`
-* - Specifications
+  - `on_render_Code`
+* - Specification
   - `M.specification`
   - `types/specifications/srs.lua`
+  - `on_initialize`, `on_analyze`
 ```
 
-### Handler Lifecycle
+## Handler contract
 
-Handlers hook into pipeline phases via callback functions:
+`M.handler` is the single behaviour surface for every type. Two kinds of callbacks live on it:
 
-```list-table:tbl-model-handler-callbacks{caption="Handler callback functions"}
+**Phase hooks** run once per pipeline phase. They see the full context and are ordered via `prerequisites`.
+
+**Decorated per-item callbacks** are dispatched inline by a phase hook (e.g. the spec-object renderer) with the specific item being processed and a pre-resolved context. They do **not** need `prerequisites` because they don't participate in phase ordering — they run wherever their dispatching phase runs.
+
+```list-table:tbl-model-handler-callbacks{caption="Handler callbacks, signatures, and when they fire"}
 > header-rows: 1
-> aligns: l,l,l
+> aligns: l,l,l,l
 
 * - Callback
-  - Phase
+  - Kind
+  - Signature
   - Purpose
 * - `on_initialize`
-  - INITIALIZE
-  - Parse content from Pandoc AST, store in database
+  - Phase hook
+  - `(data, contexts, diagnostics)`
+  - Parse content from the Pandoc AST, store in SpecIR.
 * - `on_analyze`
-  - ANALYZE
-  - Validate, resolve references, generate PIDs
+  - Phase hook
+  - `(data, contexts, diagnostics)`
+  - Validate, resolve references, generate PIDs.
 * - `on_transform`
-  - TRANSFORM
-  - Render content, resolve external resources
+  - Phase hook
+  - `(data, contexts, diagnostics)`
+  - Rewrite content, resolve external resources.
 * - `on_render_SpecObject`
-  - EMIT
-  - Convert spec object to Pandoc blocks for output
+  - Decorated
+  - `(obj, ctx)`
+  - Produce Pandoc blocks for a spec object.
+* - `on_render_Link`
+  - Decorated
+  - `(target, ctx) -> string|nil`
+  - Return the display text for a link to an object/float of this relation type. `nil` falls through to the base type.
 * - `on_render_Code`
-  - EMIT
-  - Convert inline code to Pandoc inlines (views)
+  - Decorated
+  - `(code, ctx)`
+  - Produce Pandoc inlines for an inline view (`` `prefix: content` ``).
 * - `on_render_CodeBlock`
-  - EMIT
-  - Convert code block to Pandoc blocks (floats)
+  - Decorated
+  - `(block, ctx)`
+  - Produce Pandoc blocks for a float code block.
 ```
 
-The `prerequisites` field controls execution order: a handler with `prerequisites = {"spec_views"}` runs after the `spec_views` handler.
+**What's in `ctx` for decorated callbacks**
 
-## Walkthrough: Custom Object Type
+```list-table:tbl-model-ctx-fields{caption="Pre-resolved fields on ctx"}
+> header-rows: 1
+> aligns: l,l
 
-This example creates a High-Level Requirement (HLR) type with required attributes.
+* - Field
+  - Meaning
+* - `ctx.attributes`
+  - Object-level attributes (map of lowercase name -> `{ value, ast }`). Already queried by the pipeline.
+* - `ctx.spec_attributes`
+  - Specification-level attributes (map of lowercase name -> string). Cached per spec across objects.
+* - `ctx.spec_id`
+  - Specification identifier.
+* - `ctx.output_format`
+  - Target format (`docx`, `html5`, `gfm`, `json`).
+* - `ctx.original_blocks`
+  - The decoded source blocks, with headers / attribute blockquotes filtered out. Fall back to these when required inputs are missing.
+* - `ctx.db`
+  - `DataManager` — only needed for custom queries. Prefer the pre-resolved fields above.
+```
 
-### Step 1: Create the Type File
+> If you catch yourself starting a decorated callback with a DB query for "the thing I'm rendering", check whether the pipeline already exposes it on `ctx`. Decoration exists so handlers don't carry query boilerplate.
 
-Create `models/mymodel/types/objects/hlr.lua`:
+## Five canonical templates
 
-```src.lua:src-model-object-type{caption="Custom object type: hlr.lua"}
+### Object type
+
+Create an object type with required attributes and a custom render:
+
+```src.lua:src-model-template-object{caption="types/objects/hlr.lua"}
+local render_utils = require("pipeline.shared.render_utils")
 local M = {}
 
 M.object = {
     id = "HLR",
     long_name = "High-Level Requirement",
     description = "A top-level system requirement",
-    pid_prefix = "HLR",           -- Auto-PID prefix
-    pid_format = "%s-%03d",       -- Produces HLR-001, HLR-002, etc.
+    pid_prefix = "HLR",
+    pid_format = "%s-%03d",
     attributes = {
-        {
-            name = "priority",
-            type = "ENUM",
-            values = { "High", "Medium", "Low" },
-            min_occurs = 1,       -- Required
-            max_occurs = 1,
-        },
-        {
-            name = "status",
-            type = "ENUM",
-            values = { "Draft", "Approved", "Implemented" },
-            min_occurs = 1,
-            max_occurs = 1,
-        },
-        {
-            name = "rationale",
-            type = "XHTML",       -- Rich text
-            min_occurs = 0,       -- Optional
-        },
+        { name = "priority", type = "ENUM",
+          values = { "High", "Medium", "Low" },
+          min_occurs = 1, max_occurs = 1 },
+        { name = "rationale", type = "XHTML" },
     },
+}
+
+M.handler = {
+    name = "hlr_handler",
+    on_render_SpecObject = function(obj, ctx)
+        -- obj is the SpecObject row; ctx.attributes is already loaded.
+        local priority = (ctx.attributes.priority or {}).value or "?"
+        local blocks = {}
+        render_utils.add_header_blocks(blocks, ctx.header_level,
+            obj.pid .. ": " .. (obj.title_text or ""))
+        table.insert(blocks, pandoc.Para({
+            pandoc.Strong({ pandoc.Str("Priority: ") }),
+            pandoc.Str(priority),
+        }))
+        render_utils.add_blocks(blocks, ctx.original_blocks)
+        return blocks
+    end,
 }
 
 return M
 ```
 
-### Step 2: Use in Markdown
+Usage:
 
-```src.markdown:src-model-object-usage{caption="Using the custom object type"}
+```src.markdown:src-model-template-object-usage{caption="Authoring an HLR in Markdown"}
 ## hlr: User Authentication @HLR-001
 
 > priority: High
-
-> status: Draft
-
 > rationale: Required by security policy section 4.2
 
 The system shall authenticate users via username and password.
 ```
 
-### Step 3: Add a Handler (Optional)
+Most object types don't need a custom `on_render_SpecObject` — the shared `spec_object_base.create_handler(name)` factory produces a vanilla PID-header / attributes / body renderer. Reach for a custom handler only when the default layout isn't what you want.
 
-If the type needs custom behavior during pipeline phases, add `M.handler`:
+### Relation type
 
-```src.lua:src-model-object-handler{caption="Object type with handler"}
-local Queries = require("db.queries")
+The common case is a simple subtype that narrows a base relation (`PID_REF` for `@` or `LABEL_REF` for `#`):
 
+```src.lua:src-model-template-relation-simple{caption="types/relations/traces_to.lua"}
+local M = {}
+
+M.relation = {
+    id = "TRACES_TO",
+    extends = "PID_REF",
+    long_name = "Traces To",
+    description = "Traceability link from one object to another",
+    source_type_ref = "LLR",
+    target_type_ref = "HLR",
+}
+
+return M
+```
+
+That's complete. The link `[HLR-001](@)` written inside an LLR will resolve as `TRACES_TO`.
+
+When the default display text (PID for objects, `"<caption> <number>"` for floats) isn't right, add `on_render_Link`:
+
+```src.lua:src-model-template-relation-display{caption="Custom display text via on_render_Link"}
 M.handler = {
-    name = "hlr_handler",
-    prerequisites = {},
-
-    on_analyze = function(data, contexts, diagnostics)
-        for _, ctx in ipairs(contexts) do
-            local spec_id = ctx.spec_id or "default"
-            local objects = data:query_all(
-                Queries.content.objects_by_spec_type,
-                { spec_id = spec_id, type_ref = "HLR" }
-            )
-            for _, obj in ipairs(objects or {}) do
-                -- Custom validation logic here
-            end
-        end
+    name = "xref_sec_handler",
+    -- Render section refs as "<hierarchical-number> <title>", e.g. "3.4 Introduction".
+    on_render_Link = function(target, _ctx)
+        local title = target.title or ""
+        local number = target.pid and target.pid:match("sec([%d%.]+)$")
+        if number and title ~= "" then return number .. " " .. title end
+        if title ~= "" then return title end
+        return target.pid
     end,
 }
 ```
 
-### Object Schema Fields Reference
+`target` is pre-resolved. Object targets carry `{ kind = "object", pid, title, spec, type_ref }`; float targets carry `{ kind = "float", label, anchor, number, caption, spec }`. Return a string to override the display text, or `nil` to let the base type's handler take over.
+
+`LABEL_REF` and `PID_REF` each ship with a default `on_render_Link` (title for sections, PID for other objects, `"<caption> <number>"` for floats). Concrete types inherit this automatically via `extends`, so you only write `on_render_Link` when you want something different.
+
+### View type
+
+Views are inline elements written with backtick syntax (`` `prefix: content` ``).
+
+```src.lua:src-model-template-view{caption="types/views/symbol.lua"}
+local M = {}
+
+M.view = {
+    id = "SYMBOL",
+    long_name = "Symbol",
+    description = "Engineering symbol with inline formatting",
+    aliases = { "sym" },
+    inline_prefix = "symbol",
+}
+
+M.handler = {
+    name = "symbol_handler",
+    on_render_Code = function(code, _ctx)
+        local content = (code.text or ""):match("^symbol:%s*(.+)$")
+            or (code.text or ""):match("^sym:%s*(.+)$")
+        if not content then return nil end
+        return { pandoc.Emph({ pandoc.Str(content) }) }
+    end,
+}
+
+return M
+```
+
+Usage: `The force is defined as` `` `symbol: F = ma` ``.
+
+Views that build their content from the database (ToC, lists of figures, abbreviation lists, traceability matrices) typically use `on_render_Code` and call shared helpers such as `ooxml_builder` or `list_table_helpers`.
+
+### Float type
+
+Floats are purely declarative — most don't need `M.handler`.
+
+```src.lua:src-model-template-float{caption="types/floats/sequence_diagram.lua"}
+local M = {}
+
+M.float = {
+    id = "SEQUENCE",
+    long_name = "Sequence Diagram",
+    caption_format = "Figure",
+    counter_group = "FIGURE",      -- Shares numbering with FIGURE, PLANTUML, CHART
+    aliases = { "seq", "sequence" },
+}
+
+return M
+```
+
+Usage:
+
+````src.markdown:src-model-template-float-usage{caption="Authoring a float"}
+```seq:auth-flow{caption="User authentication flow"}
+sequence diagram content here
+```
+````
+
+For floats that need an external tool (PlantUML, charts), see [External renderers](#external-renderers).
+
+### Specification type
+
+Specification types define the top-level document kinds (SRS, SDD, STD, …).
+
+```src.lua:src-model-template-spec{caption="types/specifications/srs.lua"}
+local M = {}
+
+M.specification = {
+    id = "SRS",
+    long_name = "Software Requirements Specification",
+    description = "MIL-STD-498 SRS document",
+    is_default = false,
+    implicit_aliases = { "Software Requirements Specification", "SRS" },
+}
+
+return M
+```
+
+Usage: `# srs: My Project Requirements @SRS-MYPROJ-001` at the top of a `.md` file.
+
+## Schema field reference
+
+### Object schema
 
 ```list-table:tbl-model-object-fields{caption="Object schema fields"}
 > header-rows: 1
@@ -197,46 +360,50 @@ M.handler = {
 * - `id`
   - string
   - required
-  - Unique identifier (uppercase convention)
+  - Unique identifier (uppercase convention).
 * - `long_name`
   - string
   - same as `id`
-  - Human-readable name
+  - Human-readable name.
 * - `description`
   - string
   - `""`
-  - Description text
+  - Description text.
 * - `extends`
   - string
   - nil
-  - Base type for inheritance
+  - Base type for attribute inheritance.
 * - `is_default`
   - boolean
   - false
-  - If true, headers without explicit type match this
+  - Headers without an explicit type match this.
 * - `is_composite`
   - boolean
   - false
-  - Composite object flag
+  - Hierarchical object (contains children with their own PIDs).
 * - `pid_prefix`
   - string
   - nil
-  - Prefix for auto-generated PIDs
+  - Prefix for auto-generated PIDs.
 * - `pid_format`
   - string
   - nil
-  - Printf format string for PIDs
+  - Printf format (e.g. `"%s-%03d"`).
 * - `aliases`
   - list
   - nil
-  - Alternative identifiers for syntax matching
+  - Alternative identifiers for syntax matching.
+* - `implicit_aliases`
+  - list
+  - nil
+  - Titles that auto-resolve to this type (e.g. `"Introduction"` -> `INTRODUCTION`).
 * - `attributes`
   - list
   - nil
-  - Attribute definitions (see Attribute Schema)
+  - Attribute definitions (see below).
 ```
 
-### Attribute Schema
+### Attribute definitions
 
 ```list-table:tbl-model-attribute-fields{caption="Attribute definition fields"}
 > header-rows: 1
@@ -249,62 +416,34 @@ M.handler = {
 * - `name`
   - string
   - required
-  - Attribute identifier
+  - Attribute identifier.
 * - `type`
   - string
   - `"STRING"`
-  - Datatype: STRING, INTEGER, REAL, BOOLEAN, DATE, ENUM, XHTML
+  - One of: `STRING`, `INTEGER`, `REAL`, `BOOLEAN`, `DATE`, `ENUM`, `XHTML`.
 * - `min_occurs`
   - integer
   - 0
-  - Minimum values (0 = optional, 1 = required)
+  - 0 = optional, 1 = required.
 * - `max_occurs`
   - integer
   - 1
-  - Maximum values
-* - `min_value`
+  - Maximum values.
+* - `min_value` / `max_value`
   - number
   - nil
-  - Lower bound for numeric types
-* - `max_value`
-  - number
-  - nil
-  - Upper bound for numeric types
+  - Bounds for numeric types.
 * - `values`
   - list
   - nil
-  - Valid enum values (required when `type = "ENUM"`)
+  - Required when `type = "ENUM"`.
 * - `datatype_ref`
   - string
-  - nil
-  - Explicit datatype ID (overrides auto-generated)
+  - auto
+  - Override the auto-generated datatype id. For ENUM types the default is `<TYPE_ID>_<attr_name>`.
 ```
 
-## Walkthrough: Custom Float Type
-
-Floats are numbered elements declared in fenced code blocks. This example creates a custom float type for diagrams.
-
-### Step 1: Create the Type File
-
-Create `models/mymodel/types/floats/sequence_diagram.lua`:
-
-```src.lua:src-model-float-type{caption="Custom float type: sequence_diagram.lua"}
-local M = {}
-
-M.float = {
-    id = "SEQUENCE",
-    long_name = "Sequence Diagram",
-    description = "UML Sequence Diagram rendered via PlantUML",
-    caption_format = "Figure",        -- Caption prefix in output
-    counter_group = "FIGURE",         -- Shares counter with FIGURE, PLANTUML
-    aliases = { "seq", "sequence" },  -- Syntax: ```seq:label or ```sequence:label
-    needs_external_render = true,     -- Requires external tool
-}
-
-return M
-```
-
-### Float Schema Fields Reference
+### Float schema
 
 ```list-table:tbl-model-float-fields{caption="Float schema fields"}
 > header-rows: 1
@@ -317,350 +456,26 @@ return M
 * - `id`
   - string
   - required
-  - Unique identifier (uppercase)
+  - Unique identifier.
 * - `caption_format`
   - string
   - same as `id`
-  - Prefix used in output captions
+  - Prefix used in output captions (e.g. `"Figure"`).
 * - `counter_group`
   - string
   - same as `id`
-  - Counter sharing group (e.g., FIGURE, TABLE)
+  - Counter sharing group. Floats with the same `counter_group` share a single numbering sequence.
 * - `aliases`
   - list
   - nil
-  - Alternative syntax identifiers
+  - Alternative fence prefixes.
 * - `needs_external_render`
   - boolean
   - false
-  - Whether rendering requires an external tool
-* - `style_id`
-  - string
-  - nil
-  - Custom style identifier for output formatting
+  - See [External renderers](#external-renderers).
 ```
 
-### Counter Groups
-
-Multiple float types can share a numbering sequence by using the same `counter_group`. For example, FIGURE, PLANTUML, and CHART all use `counter_group = "FIGURE"`, so they are numbered sequentially as Figure 1, Figure 2, Figure 3 regardless of which specific type each is.
-
-## Walkthrough: Float with External Rendering
-
-When a float type needs an external tool to produce its output (PlantUML for diagrams, Deno for charts, etc.), it uses the **external render handler**. This handler collects all items that need rendering, spawns external processes in parallel, and dispatches results back to type-specific callbacks.
-
-### How External Rendering Works
-
-The pipeline flow for external renders:
-
-1. **INITIALIZE** -- The float is parsed from the Markdown code block and stored in `spec_floats` with `raw_content`.
-2. **TRANSFORM** -- The external render handler (`src/pipeline/transform/external_render_handler.lua`) queries all floats where `needs_external_render = 1` and `resolved_ast IS NULL`.
-3. **Prepare** -- For each float, the handler calls the registered `prepare_task` callback, which writes input files and builds a command descriptor.
-4. **Cache check** -- If `output_path` exists on disk (from a previous build), the task is skipped and `handle_result` is called immediately with the cached path.
-5. **Batch spawn** -- All non-cached tasks are spawned in parallel via `task_runner.spawn_batch`.
-6. **Dispatch** -- Results (stdout, stderr, exit code) are dispatched to each type's `handle_result` callback, which updates `resolved_ast` in the database.
-
-### Registering a Renderer
-
-External renderers are registered at module load time by calling `external_render.register_renderer(type_ref, callbacks)`. The callbacks table must provide two functions:
-
-```list-table:tbl-model-render-callbacks{caption="External render callback functions"}
-> header-rows: 1
-> aligns: l,l
-
-* - Callback
-  - Signature and Purpose
-* - `prepare_task`
-  - `function(float, build_dir, log, data, model_name) -> task|nil` -- Writes input files, builds command descriptor. Returns nil to skip rendering.
-* - `handle_result`
-  - `function(task, success, stdout, stderr, data, log)` -- Processes output. Updates `resolved_ast` in the database via `float_base.update_resolved_ast`.
-```
-
-### Task Descriptor
-
-The `prepare_task` callback returns a task descriptor table:
-
-```list-table:tbl-model-task-descriptor{caption="Task descriptor fields"}
-> header-rows: 1
-> aligns: l,l,l
-
-* - Field
-  - Type
-  - Description
-* - `cmd`
-  - string
-  - Command to execute (e.g., `"plantuml"`, `"deno"`)
-* - `args`
-  - list
-  - Command arguments
-* - `opts`
-  - table
-  - Options: `cwd` (working directory), `timeout` (milliseconds)
-* - `output_path`
-  - string
-  - Expected output file path; if it exists, the task is skipped (cache hit)
-* - `context`
-  - table
-  - Arbitrary data passed through to `handle_result` (float record, hash, paths, etc.)
-```
-
-### Example: PlantUML Renderer
-
-The built-in PlantUML renderer demonstrates the full pattern:
-
-```src.lua:src-model-external-render-plantuml{caption="PlantUML external renderer (simplified)"}
-local float_base = require("pipeline.shared.float_base")
-local task_runner = require("infra.process.task_runner")
-local external_render = require("pipeline.transform.external_render_handler")
-
-local M = {}
-
-M.float = {
-    id = "PLANTUML",
-    long_name = "PlantUML Diagram",
-    caption_format = "Figure",
-    counter_group = "FIGURE",
-    aliases = { "puml", "plantuml", "uml" },
-    needs_external_render = true,   -- Enables external render pipeline
-}
-
-external_render.register_renderer("PLANTUML", {
-    prepare_task = function(float, build_dir, log)
-        local content = float.raw_content or ''
-        -- Ensure @startuml/@enduml wrapper
-        if not content:match('@startuml') then
-            content = '@startuml\n' .. content .. '\n@enduml'
-        end
-
-        local hash = pandoc.sha1(content)
-        local diagrams_path = build_dir .. "/diagrams"
-        local puml_file = diagrams_path .. "/" .. hash .. ".puml"
-        local png_file = diagrams_path .. "/" .. hash .. ".png"
-
-        task_runner.ensure_dir(diagrams_path)
-        task_runner.write_file(puml_file, content)
-
-        return {
-            cmd = "plantuml",
-            args = { "-tpng", puml_file },
-            opts = { timeout = 30000 },
-            output_path = png_file,       -- Cache key: skip if PNG exists
-            context = {
-                hash = hash,
-                float = float,
-                relative_path = "diagrams/" .. hash .. ".png",
-            }
-        }
-    end,
-
-    handle_result = function(task, success, stdout, stderr, data, log)
-        local ctx = task.context
-        if not success then
-            log.warn("PlantUML failed for %s: %s",
-                ctx.float.identifier:sub(1,12), stderr)
-            return
-        end
-
-        -- Store resolved path as JSON in resolved_ast
-        local json = string.format(
-            '{"png_paths":["%s"]}',
-            ctx.relative_path
-        )
-        float_base.update_resolved_ast(data, ctx.float.identifier, json)
-    end
-})
-
-return M
-```
-
-### Example: Chart Renderer with Data Injection
-
-The chart renderer adds a data injection step before rendering, loading data views from `models/{model}/data_views/`:
-
-```src.lua:src-model-external-render-chart{caption="Chart external renderer (simplified)"}
-local float_base = require("pipeline.shared.float_base")
-local task_runner = require("infra.process.task_runner")
-local data_loader = require("core.data_loader")
-local external_render = require("pipeline.transform.external_render_handler")
-
-local M = {}
-
-M.float = {
-    id = "CHART",
-    long_name = "Chart",
-    caption_format = "Figure",
-    counter_group = "FIGURE",
-    aliases = { "echarts", "echart" },
-    needs_external_render = true,
-}
-
-external_render.register_renderer("CHART", {
-    prepare_task = function(float, build_dir, log, data, model_name)
-        local attrs = float_base.decode_attributes(float)
-        local json_content = float.raw_content or '{}'
-
-        -- Data injection: load view module and merge data into ECharts config
-        local view_name = attrs.view
-        if view_name and data then
-            local inject_attrs = { view = view_name, model = model_name }
-            local config = pandoc.json.decode(json_content)
-            local injected = data_loader.inject_chart_data(
-                config, inject_attrs, data, log)
-            if injected then
-                json_content = pandoc.json.encode(injected)
-            end
-        end
-
-        local hash = pandoc.sha1(json_content)
-        local charts_path = build_dir .. "/charts"
-        local json_file = charts_path .. "/" .. hash .. ".json"
-        local png_file = charts_path .. "/" .. hash .. ".png"
-
-        task_runner.ensure_dir(charts_path)
-        task_runner.write_file(json_file, json_content)
-
-        return {
-            cmd = "deno",
-            args = {
-                "run", "--allow-read", "--allow-write", "--allow-env",
-                "echarts-render.ts", json_file, png_file,
-                tostring(attrs.width or 600),
-                tostring(attrs.height or 400)
-            },
-            opts = { timeout = 60000 },
-            output_path = png_file,
-            context = {
-                hash = hash,
-                float = float,
-                relative_path = "charts/" .. hash .. ".png",
-            }
-        }
-    end,
-
-    handle_result = function(task, success, stdout, stderr, data, log)
-        local ctx = task.context
-        if not success then
-            log.warn("Chart render failed: %s", stderr)
-            return
-        end
-
-        local json = string.format('{"png_path":"%s"}', ctx.relative_path)
-        float_base.update_resolved_ast(data, ctx.float.identifier, json)
-    end
-})
-
-return M
-```
-
-### Creating Your Own External Renderer
-
-To create a float type that uses an external tool:
-
-1. **Set `needs_external_render = true`** in the float schema.
-2. **Register callbacks** with `external_render.register_renderer("YOUR_TYPE", { ... })` at module load time (top-level code, not inside a function).
-3. **In `prepare_task`**: Write input content to a temporary file, build the command and arguments, and return a task descriptor with `output_path` for file-based caching.
-4. **In `handle_result`**: Parse the output (stdout, generated files), serialize the result as JSON, and call `float_base.update_resolved_ast(data, identifier, json)` to store it.
-5. **Do not define `M.handler.on_transform`** -- the external render handler orchestrates the TRANSFORM phase for all registered types. Defining your own `on_transform` would bypass the parallel batch execution.
-
-Key utilities available:
-
-```list-table:tbl-model-render-utilities{caption="Utility functions for external renderers"}
-> header-rows: 1
-> aligns: l,l
-
-* - Function
-  - Purpose
-* - `task_runner.ensure_dir(path)`
-  - Create directory if it does not exist
-* - `task_runner.write_file(path, content)`
-  - Write content to a file; returns `ok, err`
-* - `task_runner.file_exists(path)`
-  - Check if a file exists on disk
-* - `task_runner.command_exists(cmd)`
-  - Check if a command is available in PATH
-* - `float_base.decode_attributes(float)`
-  - Parse float's `pandoc_attributes` JSON into a Lua table
-* - `float_base.update_resolved_ast(data, id, json)`
-  - Store the rendering result in the database
-```
-
-### File-Based Caching
-
-The external render handler provides automatic file-based caching via the `output_path` field in the task descriptor. If the output file already exists on disk when `prepare_task` returns, the handler skips spawning the external process and immediately calls `handle_result` with empty stdout/stderr. This means:
-
-- The content hash should be part of the output filename (e.g., `diagrams/{sha1}.png`) so that content changes produce a new filename and trigger re-rendering.
-- The `handle_result` callback should work correctly whether called after a fresh render or a cache hit (it receives the same `task.context`).
-- Deleting the output files forces re-rendering on the next build (the database `resolved_ast` is also cleared during INITIALIZE).
-
-### External Rendering for Views
-
-The same `external_render.register_renderer` mechanism works for views that need external tools. For example, `math_inline.lua` registers a renderer for the `MATH_INLINE` view type to convert AsciiMath to MathML/OMML via an external script. The handler queries `spec_views` (instead of `spec_floats`) with `needs_external_render = 1` and dispatches to the same callback interface.
-
-## Walkthrough: Custom Relation with Inference Rules
-
-Relations connect spec objects via link syntax. The relation resolver uses specificity scoring to infer the relation type.
-
-### Step 1: Create the Type File
-
-Create `models/mymodel/types/relations/traces_to.lua`:
-
-```src.lua:src-model-relation-type{caption="Custom relation type: traces_to.lua"}
-local M = {}
-
-M.relation = {
-    id = "TRACES_TO",
-    long_name = "Traces To",
-    description = "Traceability link from LLR to HLR",
-    link_selector = "@",             -- Uses [PID](@) syntax
-    source_type_ref = "LLR",        -- Only from LLR objects
-    target_type_ref = "HLR",        -- Only to HLR objects
-    aliases = nil,                   -- No alias prefix
-    is_default = false,
-}
-
-return M
-```
-
-### Step 2: Use in Markdown
-
-```src.markdown:src-model-relation-usage{caption="Using the relation type"}
-### llr: Password Length Check @LLR-001
-
-Passwords must be at least 8 characters. Traces to [HLR-001](@).
-```
-
-### Inference Scoring
-
-When multiple relation types could match a link, the resolver scores each candidate:
-
-```list-table:tbl-model-inference-scoring{caption="Inference scoring dimensions"}
-> header-rows: 1
-> aligns: l,c,l,c
-
-* - Dimension
-  - Match
-  - Constraint mismatch
-  - No constraint (NULL)
-* - **Selector** (`@` or `#`)
-  - +1
-  - Eliminated
-  - +0
-* - **Source attribute**
-  - +1
-  - Eliminated
-  - +0
-* - **Source type**
-  - +1
-  - Eliminated
-  - +0
-* - **Target type**
-  - +1
-  - Eliminated
-  - +0
-```
-
-The highest-scoring candidate wins. If two candidates tie, the relation is flagged as ambiguous (`relation_ambiguous`). Constraints set to `nil` act as wildcards (+0) rather than eliminating the candidate.
-
-### Relation Schema Fields Reference
+### Relation schema
 
 ```list-table:tbl-model-relation-fields{caption="Relation schema fields"}
 > header-rows: 1
@@ -673,189 +488,38 @@ The highest-scoring candidate wins. If two candidates tie, the relation is flagg
 * - `id`
   - string
   - required
-  - Unique identifier (uppercase)
-* - `link_selector`
+  - Unique identifier.
+* - `extends`
   - string
   - nil
-  - Required selector: `"@"` for PID refs, `"#"` for label refs
+  - Base relation type. Typically `PID_REF` (`@`) or `LABEL_REF` (`#`). Inherits selector, resolver, and default `on_render_Link`.
+* - `link_selector`
+  - string
+  - inherited
+  - Override the inherited selector. Rarely needed.
 * - `source_type_ref`
   - string
   - nil
-  - Constrain source to this object type (nil = any)
+  - Constrain the source object type (nil = any).
 * - `target_type_ref`
   - string
   - nil
-  - Constrain target to this object type (nil = any)
+  - Constrain the target type (nil = any). Comma-separated list accepted.
 * - `source_attribute`
   - string
   - nil
-  - Constrain to links within this attribute context
-* - `aliases`
-  - list
-  - nil
-  - Prefix aliases for `[alias:key](#)` syntax
-* - `is_default`
+  - Constrain to links inside this attribute.
+* - `is_structural`
   - boolean
   - false
-  - Default relation for its selector when no better match
+  - Derive from containment hierarchy instead of an explicit link.
 ```
 
-### Relations with Handlers
+### Inference scoring
 
-A relation type can include a handler for custom transform behavior. For example, `xref_citation.lua` rewrites citation links to Pandoc `Cite` elements during the TRANSFORM phase:
+When more than one relation type matches a link, the resolver scores each candidate (`+1` for each constraint that matches, eliminated on mismatch, `+0` on `nil`). The highest scorer wins; ties are flagged as `ambiguous_relation`. A link `[fig:diagram](#)` resolving against a FIGURE will match `XREF_FIGURE` (selector `#` + target_type_ref `FIGURE` = 2) over the generic `LABEL_REF` (selector `#` only = 1).
 
-```src.lua:src-model-relation-handler{caption="Relation type with handler"}
-M.handler = {
-    name = "my_relation_handler",
-    prerequisites = {"spec_relations"},  -- Run after relations are stored
-
-    on_transform = function(data, contexts, diagnostics)
-        for _, ctx in ipairs(contexts) do
-            -- Custom transform logic
-        end
-    end
-}
-```
-
-### Base Types and Inheritance
-
-Relation types support inheritance via base types. Instead of repeating `link_selector` and resolution logic in every type, you extend a base type:
-
-- **`traceable`** (`models/default/types/relations/traceable.lua`) — base for `@` (PID) selector
-- **`xref`** (`models/default/types/relations/xref.lua`) — base for `#` (label) selector
-
-Use `extend()` to create a concrete type:
-
-```src.lua:src-model-extend-traceable{caption="Extending the traceable base type"}
-local traceable = require("models.default.types.relations.traceable")
-local M = {}
-
-M.relation = traceable.extend({
-    id = "TRACES_TO",
-    long_name = "Traces To",
-    description = "Traceability link from one object to another",
-})
-
-return M
-```
-
-The `extend()` call inherits `link_selector = "@"` from the base and merges your overrides. For `#` selector types, use `xref.extend()` instead.
-
-### Custom Link Display Text
-
-By default, object references display the target's PID and float references display the caption format with the float number (e.g., "Figure 3"). To customize display text, add a standard `M.handler` with an `on_transform` hook using the shared `link_rewrite_utils` utility:
-
-```src.lua:src-model-display-text-dic{caption="Custom display text via on_transform"}
-local traceable = require("models.default.types.relations.traceable")
-local link_rewrite = require("pipeline.shared.link_rewrite_utils")
-local M = {}
-
-M.relation = traceable.extend({
-    id = "XREF_DIC",
-    long_name = "Dictionary Reference",
-    description = "Cross-reference to a dictionary entry",
-    target_type_ref = "DIC",
-})
-
-M.handler = {
-    name = "xref_dic_handler",
-    prerequisites = {"spec_relations"},
-    on_transform = function(data, contexts, _diagnostics)
-        link_rewrite.rewrite_display_for_type(data, contexts, "XREF_DIC", function(target)
-            if target.title_text and target.title_text ~= "" then
-                return target.title_text
-            end
-        end)
-    end
-}
-
-return M
-```
-
-A link `[DIC-AUTH-001](@)` would display as "Authentication" instead of "DIC-AUTH-001".
-
-The `display_fn` receives a `target` table with fields `pid`, `type_ref`, and `title_text`. Return a string for custom display text, or `nil` to keep the default.
-
-## Walkthrough: Custom View
-
-Views are inline elements declared with backtick syntax (`` `prefix: content` ``).
-
-### Step 1: Create the Type File
-
-Create `models/mymodel/types/views/symbol.lua`:
-
-```src.lua:src-model-view-type{caption="Custom view type: symbol.lua"}
-local M = {}
-local Queries = require("db.queries")
-
-M.view = {
-    id = "SYMBOL",
-    long_name = "Symbol",
-    description = "Engineering symbol with unit definition",
-    aliases = { "sym" },
-    inline_prefix = "symbol",         -- Enables `symbol: content` syntax
-    needs_external_render = false,
-}
-
-M.handler = {
-    name = "symbol_handler",
-    prerequisites = {"spec_views"},
-
-    on_initialize = function(data, contexts, diagnostics)
-        for _, ctx in ipairs(contexts) do
-            local doc = ctx.doc
-            if not doc or not doc.blocks then goto continue end
-
-            local spec_id = ctx.spec_id or "default"
-            local file_seq = 0
-
-            local visitor = {
-                Code = function(c)
-                    local content = (c.text or ""):match("^symbol:%s*(.+)$")
-                        or (c.text or ""):match("^sym:%s*(.+)$")
-                    if not content then return nil end
-
-                    file_seq = file_seq + 1
-                    local identifier = pandoc.sha1(spec_id .. ":" .. file_seq .. ":" .. content)
-
-                    data:execute(Queries.content.insert_view, {
-                        identifier = identifier,
-                        specification_ref = spec_id,
-                        view_type_ref = "SYMBOL",
-                        from_file = ctx.source_path or "unknown",
-                        file_seq = file_seq,
-                        raw_ast = content
-                    })
-                end
-            }
-
-            for _, block in ipairs(doc.blocks) do
-                pandoc.walk_block(block, visitor)
-            end
-            ::continue::
-        end
-    end,
-
-    on_render_Code = function(code, ctx)
-        local content = (code.text or ""):match("^symbol:%s*(.+)$")
-            or (code.text or ""):match("^sym:%s*(.+)$")
-        if not content then return nil end
-
-        -- Render as emphasized text
-        return { pandoc.Emph({ pandoc.Str(content) }) }
-    end,
-}
-
-return M
-```
-
-### Step 2: Use in Markdown
-
-```src.markdown:src-model-view-usage{caption="Using the custom view type"}
-The force is defined as `symbol: F = ma` where `symbol: F` is force in Newtons.
-```
-
-### View Schema Fields Reference
+### View schema
 
 ```list-table:tbl-model-view-fields{caption="View schema fields"}
 > header-rows: 1
@@ -868,143 +532,155 @@ The force is defined as `symbol: F = ma` where `symbol: F` is force in Newtons.
 * - `id`
   - string
   - required
-  - Unique identifier (uppercase)
+  - Unique identifier.
 * - `inline_prefix`
   - string
   - nil
-  - Prefix for inline code dispatch (e.g., `"math"` enables `math:` syntax)
+  - Prefix for inline code dispatch (`"symbol"` enables `` `symbol: ...` ``).
 * - `aliases`
   - list
   - nil
-  - Alternative prefixes for the same view type
-* - `needs_external_render`
-  - boolean
-  - false
-  - Whether rendering requires an external tool (batch processing)
+  - Alternative prefixes for the same view type.
 * - `materializer_type`
   - string
   - nil
-  - Materializer strategy (e.g., 'toc', 'lof', 'custom')
+  - Strategy (`'toc'`, `'lof'`, `'custom'`) for built-in materialised views.
 * - `counter_group`
   - string
   - nil
-  - Counter group for numbered views
+  - Counter group for numbered views.
+* - `needs_external_render`
+  - boolean
+  - false
+  - See [External renderers](#external-renderers).
 ```
 
-## Validation Proofs
+## Extension checklist
 
-Proofs are SQL-based validation rules that run during the VERIFY phase. Each proof creates a SQL view; if the view returns any rows, those rows represent violations.
+1. Pick a model name (lowercase, matches the directory name).
+2. Create `models/<name>/types/…` with the categories you need.
+3. Declare the schema (`M.object` / `M.float` / …).
+4. Add `M.handler` only if you need custom behaviour.
+5. Set `template: <name>` in `project.yaml`.
+6. Run `specc build` and inspect the output.
+7. Add a verification view if the domain has rules to enforce (see [Verification views](#verification-views)).
 
-### Proof File Pattern
+## Verification views
 
-Create `models/mymodel/proofs/vc_missing_hlr_traceability.lua`:
+Verification views are SQL-based validation rules that run during the VERIFY phase. Each verification view creates a SQL view; rows returned by the view are diagnostics.
 
-```src.lua:src-model-proof{caption="Validation proof module"}
+Place verification view files under `models/<name>/verification_views/`. The loader scans that directory automatically — file names don't need a particular convention, but matching the `policy_key` helps (e.g. `sd_601_vc_missing_hlr.lua`).
+
+```src.lua:src-model-verification-view{caption="models/mymodel/verification_views/vc_missing_hlr.lua"}
 local M = {}
 
-M.proof = {
+M.verification_view = {
     view = "view_traceability_vc_missing_hlr",
-    policy_key = "traceability_vc_to_hlr", -- Key in project.yaml validation section
+    policy_key = "traceability_vc_to_hlr",
     sql = [[
 CREATE VIEW IF NOT EXISTS view_traceability_vc_missing_hlr AS
-SELECT
-  vc.identifier AS object_id,
-  vc.pid AS object_pid,
-  vc.title_text AS object_title,
-  vc.from_file,
-  vc.start_line
+SELECT vc.identifier AS object_id, vc.pid AS object_pid,
+       vc.title_text AS object_title, vc.from_file, vc.start_line
 FROM spec_objects vc
 WHERE vc.type_ref = 'VC'
   AND NOT EXISTS (
-    SELECT 1
-    FROM spec_relations r
-    JOIN spec_objects target ON target.identifier = r.target_ref
-    WHERE r.source_ref = vc.identifier
-      AND target.type_ref = 'HLR'
+      SELECT 1 FROM spec_relations r
+      JOIN spec_objects target ON target.identifier = r.target_ref
+      WHERE r.source_ref = vc.identifier AND target.type_ref = 'HLR'
   );
 ]],
     message = function(row)
         local label = row.object_pid or row.object_title or row.object_id
         return string.format(
-            "Verification case '%s' has no traceability link to an HLR",
-            label
-        )
-    end
+            "Verification case '%s' has no traceability link to an HLR", label)
+    end,
 }
 
 return M
 ```
 
-### Proof Schema
+Suppress a verification view in `project.yaml` via its `policy_key`:
 
-```list-table:tbl-model-proof-fields{caption="Proof module fields"}
+```src.yaml:src-model-suppress-verification-view{caption="Suppressing a verification view"}
+validation:
+  traceability_vc_to_hlr: ignore
+```
+
+## External renderers
+
+Float and view types that need an external tool (PlantUML, ECharts, Graphviz, …) declare `needs_external_render = true` and register callbacks with `external_render.register_renderer` at module load time. The pipeline collects all such items, spawns the processes in parallel, and dispatches results back to each type.
+
+Do **not** also define `M.handler.on_transform` for these types — the external render handler owns TRANSFORM for them.
+
+```src.lua:src-model-external-render{caption="External renderer skeleton"}
+local float_base     = require("pipeline.shared.float_base")
+local task_runner    = require("infra.process.task_runner")
+local external_render = require("pipeline.transform.external_render_handler")
+
+local M = {}
+
+M.float = {
+    id = "PLANTUML",
+    long_name = "PlantUML Diagram",
+    caption_format = "Figure",
+    counter_group = "FIGURE",
+    aliases = { "puml", "plantuml" },
+    needs_external_render = true,
+}
+
+external_render.register_renderer("PLANTUML", {
+    prepare_task = function(float, build_dir, log)
+        local content = float.raw_content or ""
+        local hash = pandoc.sha1(content)
+        local diagrams_path = build_dir .. "/diagrams"
+        local puml_file = diagrams_path .. "/" .. hash .. ".puml"
+        local png_file  = diagrams_path .. "/" .. hash .. ".png"
+
+        task_runner.ensure_dir(diagrams_path)
+        task_runner.write_file(puml_file, content)
+
+        return {
+            cmd = "plantuml",
+            args = { "-tpng", puml_file },
+            opts = { timeout = 30000 },
+            output_path = png_file,   -- Cache key: skipped when the file exists.
+            context = { hash = hash, float = float,
+                        relative_path = "diagrams/" .. hash .. ".png" },
+        }
+    end,
+
+    handle_result = function(task, success, _stdout, stderr, data, log)
+        local ctx = task.context
+        if not success then
+            log.warn("PlantUML failed for %s: %s",
+                ctx.float.identifier:sub(1,12), stderr)
+            return
+        end
+        local json = string.format('{"png_paths":["%s"]}', ctx.relative_path)
+        float_base.update_resolved_ast(data, ctx.float.identifier, json)
+    end,
+})
+
+return M
+```
+
+```list-table:tbl-model-task-descriptor{caption="Task descriptor returned by prepare_task"}
 > header-rows: 1
-> aligns: l,l,l
+> aligns: l,l
 
 * - Field
-  - Type
-  - Description
-* - `view`
-  - string
-  - SQL view name (must match the CREATE VIEW name)
-* - `policy_key`
-  - string
-  - Key for suppression in `project.yaml` validation section
-* - `sql`
-  - string
-  - SQL CREATE VIEW statement; rows returned = violations
-* - `message`
-  - function
-  - Takes a row table, returns a diagnostic message string
+  - Purpose
+* - `cmd`, `args`, `opts`
+  - Process to spawn and its timeout/cwd. `opts.timeout` is in milliseconds.
+* - `output_path`
+  - File-based cache key. If the file exists on disk, `prepare_task` is not spawned — `handle_result` is called immediately with the cached path. Use the content hash in the filename so input changes trigger a fresh render.
+* - `context`
+  - Arbitrary table passed through to `handle_result`.
 ```
 
-### Suppressing Proofs
+The same mechanism works for **views** — `math_inline` uses it to convert AsciiMath to OMML. The render handler queries `spec_views` (instead of `spec_floats`) for view-typed items.
 
-Users suppress proofs in `project.yaml` using the `policy_key`:
-
-```src.yaml:src-model-suppress-proof{caption="Suppressing a validation proof"}
-validation:
-  traceability_vc_to_hlr: ignore   # Suppress this proof
-```
-
-## Model Overlay/Extension Pattern
-
-### How Overlays Work
-
-The type loader (`src/core/type_loader.lua`) loads models in two passes:
-
-1. **Default model**: Scans `models/default/types/{category}/` and registers all types.
-2. **Custom model**: Scans `models/{template}/types/{category}/` and registers all types.
-
-Since type registration uses `INSERT OR REPLACE`, a custom model type with the same `id` as a default type replaces it entirely. Types with new IDs are added alongside the defaults.
-
-### Path Resolution
-
-The loader resolves model paths in order:
-
-1. `$SPECCOMPILER_HOME/models/{name}/types/` (Docker/production)
-2. `./models/{name}/types/` (local development)
-
-### Partial Customization Example
-
-A model that only adds an HLR type and a custom proof:
-
-```src:src-model-minimal-overlay{caption="Minimal overlay model"}
-models/mymodel/
-  types/
-    objects/
-      hlr.lua         -- Adds HLR type (default has no HLR)
-    relations/
-      traces_to.lua   -- Adds traceability relation
-  proofs/
-    sd_601_vc_missing_hlr.lua  -- Domain-specific validation
-```
-
-All other types (SECTION, FIGURE, TABLE, etc.) are inherited from `default`.
-
-## project.yaml Integration
-
-Set the `template` field to use your custom model:
+## Project integration
 
 ```src.yaml:src-model-project-yaml{caption="Using a custom model in project.yaml"}
 project:
@@ -1016,3 +692,21 @@ template: mymodel   # Loads models/default/ then models/mymodel/
 doc_files:
   - srs.md
 ```
+
+## Troubleshooting
+
+**My type doesn't load.** Check that the file is under `types/<category>/<name>.lua`, that the category is one of `{objects, floats, views, relations, specifications}`, and that the module returns `M`. Non-view categories fail loudly; view load failures become warnings on stderr — watch the build output.
+
+**My override isn't taking effect.** Overrides replace by `id`, not by filename. The custom type must declare the **same `id`** as the default (case-sensitive). Filename is irrelevant.
+
+**My handler never fires.** If it's a decorated callback, make sure the dispatching phase is actually reached for your content kind (e.g. `on_render_SpecObject` only fires for objects that have a handler registered *and* pass the render handler's filter). If it's a phase hook, check its `prerequisites` — it won't run before its dependencies and an unresolvable dependency silently drops it from that phase.
+
+**Handler name collision.** Every handler name is global. Use a unique prefix (`mymodel_hlr_handler`) when you're extending an overlay that might already define `hlr_handler`.
+
+**My external renderer runs every build even without changes.** Your `output_path` isn't content-addressed. Include the content hash in the filename so unchanged input hits the file-based cache.
+
+## Pointers
+
+- [User manual](../manual.md) — day-to-day authoring syntax.
+- Engineering docs — [type discovery](../../engineering_docs/architecture/type_discovery_design.md), [model design](../../engineering_docs/architecture/model_design.md) — for internals.
+- [Concepts dictionary](../../engineering_docs/dictionary/concepts.md) — vocabulary reference.

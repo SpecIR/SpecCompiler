@@ -54,13 +54,13 @@ The system shall collect and report processing errors and warnings with source l
 > description: The diagnostics collector provides structured error/warning reporting:
 >
 > 1. **Collection**: [dic:handler](#)s report issues via `diagnostics:error(file, line, code, msg)` and `diagnostics:warn(file, line, code, msg)`
-> 2. **Structured data**: Each diagnostic record contains file path, line number, diagnostic code, and human-readable message
+> 2. **Structured data**: Each diagnostic record contains file path, line number, diagnostic key, and human-readable message
 > 3. **Severity control**: The `has_errors()` method enables the [dic:pipeline](#) to determine abort conditions after the [dic:verify-phase](#) phase
 > 4. **Output integration**: Diagnostics are emitted through the structured logger with file and line context
 >
-> Diagnostic codes follow domain prefixes (e.g., SD-102 for invalid enum, SD-201 for missing required attribute, SD-301 for dangling reference).
+> Diagnostic keys are stable identifiers (e.g., `invalid_enum`, `missing_required`, `dangling_relation`) suitable for filtering and CI policy.
 
-> rationale: Structured diagnostics with source locations enable IDE integration, CI/CD reporting, and user-friendly error resolution. Machine-parseable diagnostic codes enable automated error classification.
+> rationale: Structured diagnostics with source locations enable IDE integration, CI/CD reporting, and user-friendly error resolution. Machine-parseable diagnostic keys enable automated error classification.
 
 > status: Approved
 
@@ -97,4 +97,3 @@ Given identical source files, project configuration, and tool versions, the syst
 > rationale: Reproducible builds are a fundamental certification requirement in aerospace and safety-critical domains. Content-addressed processing ensures that build artifacts can be independently verified.
 
 > status: Approved
-

@@ -135,26 +135,25 @@ Verify spec_attribute_values table stores object properties.
 
 ### VC: Type Validation @VC-018
 
-Verify proof views detect data integrity violations.
+Verify verification views detect data integrity violations.
 
 > objective: Confirm validation catches invalid data
 
 > verification_method: Test
 
 > approach:
-> - Create document with invalid enum value (SD-102)
-> - Create document with missing required attribute (SD-201)
-> - Create document with dangling relation (SD-301)
+> - Create document with invalid enum value (`invalid_enum` / `invalid_cast`)
+> - Create document with missing required attribute (`missing_required`)
+> - Create document with dangling relation (`dangling_relation`)
 > - Run VERIFY phase, check diagnostics
 
 > pass_criteria:
-> - SD-102 violation reported for invalid enum
-> - SD-201 violation reported for missing required
-> - SD-301 violation reported for dangling reference
-> - SD-601/SD-602/SD-603 violations are reported deterministically for broken HLR-VC-TR chains (sw_docs model)
-> - SD-605 violation is reported when VC TP artifact path violates TP naming convention
-> - SD-606 violation is reported when an FD has no traceability link to a CSC
-> - SD-607 violation is reported when an FD has no traceability link to a CSU
+> - `invalid_enum` or `invalid_cast` violation reported for invalid enum input
+> - `missing_required` violation reported for missing required data
+> - `dangling_relation` violation reported for dangling references
+> - `traceability_vc_to_hlr`, `traceability_tr_to_vc`, and `traceability_hlr_to_vc` are reported deterministically for broken HLR-VC-TR chains (sw_docs model)
+> - `traceability_fd_to_csc` violation is reported when an FD has no traceability link to a CSC
+> - `traceability_fd_to_csu` violation is reported when an FD has no traceability link to a CSU
 > - Error messages include file path and line number
 
 > traceability: [HLR-TYPE-007](@), [LLR-068](@), [LLR-069](@)

@@ -15,10 +15,12 @@ capabilities that all domain models inherit and extend.
 and `styles/` subdirectories. The default model (`models/default/`) establishes baseline
 definitions for all five type categories.
 
-**Type Definitions**: [CSC-022](@) defines float types (FIGURE, TABLE, LISTING, PLANTUML,
-CHART, MATH) with counter groups for shared numbering. [CSC-023](@) defines cross-reference
-relation types (XREF_FIGURE, XREF_TABLE, XREF_LISTING, XREF_MATH, XREF_CITATION) that
-map `#` link selectors to target float types. [CSC-024](@) defines view types (TOC, LOF,
+**Type Definitions**: [CSC-017](@) defines the foundational document object and specification types
+(`SECTION`, `SPEC`) that every overlay reuses. [CSC-022](@) defines float types (FIGURE, TABLE, LISTING, PLANTUML,
+CHART, MATH) with counter groups for shared numbering. [CSC-023](@) defines the reusable base
+relation types (`PID_REF`, `LABEL_REF`) plus built-in cross-reference relations
+(`XREF_SEC`, `XREF_FIGURE`, `XREF_TABLE`, `XREF_LISTING`, `XREF_MATH`, `XREF_CITATION`) that
+map `@` and `#` selectors to typed targets without reimplementing resolution. [CSC-024](@) defines view types (TOC, LOF,
 ABBREV, ABBREV_LIST, GAUSS, MATH_INLINE) with inline prefix syntax and materializer
 strategies.
 
@@ -41,8 +43,10 @@ renders UML diagrams via external subprocess. [csu:chart-float-type](#) (CHART) 
 visualizations. [csu:math-float-type](#) (MATH) renders LaTeX equations via KaTeX. Each type declares a
 counter group for cross-specification numbering.
 
-[csc:default-relation-types](#) (Default Relation Types) defines cross-reference relations that resolve `#`
-link selectors to float targets. [csu:xreffigure-relation-type](#) (XREF_FIGURE) targets FIGURE floats. [csu:xreftable-relation-type](#)
+[csc:default-relation-types](#) (Default Relation Types) defines reusable cross-reference relations. The base
+types `PID_REF` and `LABEL_REF` centralize `@` and `#` resolution. `XREF_SEC`
+targets sections by PID.
+[csu:xreffigure-relation-type](#) (XREF_FIGURE) targets FIGURE floats. [csu:xreftable-relation-type](#)
 (XREF_TABLE) targets TABLE floats. [csu:xreflisting-relation-type](#) (XREF_LISTING) targets LISTING floats.
 [csu:xrefmath-relation-type](#) (XREF_MATH) targets MATH floats. [csu:xrefcitation-relation-type](#) (XREF_CITATION) resolves
 bibliography citations via BibTeX keys.
@@ -247,17 +251,17 @@ Given an XHTML [dic:attribute](#) raw_value, [csu:attribute-parser](#) shall pre
 
 > traceability: [HLR-TYPE-006](@)
 
-#### LLR: Proof View Registration @LLR-068
+#### LLR: Verification View Registration @LLR-068
 
-Given a [dic:proof-view](#) SQL string, [csu:proof-loader](#) shall register it as a `CREATE VIEW` in the [dic:specir](#) database during the [dic:verify-phase](#) phase.
+Given a [dic:verification-view](#) SQL string, [csu:verification-view-loader](#) shall register it as a `CREATE VIEW` in the [dic:specir](#) database during the [dic:verify-phase](#) phase.
 
 > verification_method: Test
 
 > traceability: [HLR-TYPE-007](@)
 
-#### LLR: Proof Policy Severity Resolution @LLR-069
+#### LLR: Validation Policy Severity Resolution @LLR-069
 
-Given a [dic:proof-policy](#) `policy_key` and project.yaml configuration, [csu:validation-policy](#) shall return severity (`error`, `warn`, `ignore`) controlling [dic:diagnostic-record](#) emission.
+Given a [dic:validation-policy](#) `policy_key` and project.yaml configuration, [csu:validation-policy](#) shall return severity (`error`, `warn`, `ignore`) controlling [dic:diagnostic-record](#) emission.
 
 > verification_method: Test
 
@@ -273,7 +277,7 @@ Selected layered model loading where domain models extend and override the defau
 >
 > - Default model loads first, establishing baseline types (SECTION, SPEC, float types, relations, views)
 > - Domain model loads second; types with matching IDs replace defaults, new IDs add to the registry
-> - Proof views follow the same pattern: domain proofs override defaults by `policy_key`
+> - Verification views follow the same pattern: domain verification views override defaults by `policy_key`
 > - Attribute inheritance propagated iteratively after all types are loaded, enabling parent attributes to flow to child types across model boundaries
 > - Filter, postprocessor, and style directories follow conventional naming for predictable discovery
 > - Alternative of mixin composition rejected: ordering ambiguity when multiple mixins define the same attribute

@@ -490,7 +490,7 @@ A model provides type definitions organized by category:
 - **Relation types** --- relation types with selectors, resolvers, and constraints (e.g., PID_REF, VERIFIES).
 - **View types** --- view types with parameters and materialization logic (e.g., TOC, LOF, ABBREV).
 - **Specification types** --- document-level types (e.g., SRS, SDD, SVC).
-- **Proof rules** --- constraint violation detectors that enforce model invariants (e.g., missing required attributes, invalid enum values, broken traceability).
+- **Verification rules** --- constraint violation detectors that enforce model invariants (e.g., missing required attributes, invalid enum values, broken traceability).
 
 ### Type Definition Schema
 
@@ -536,7 +536,7 @@ Domain-specific models extend the default with specialized types. For example, a
 - **Relations:** VERIFIES, TRACES_TO, REALIZES, BELONGS --- for traceability between requirements, design, and tests.
 - **Specifications:** SRS, SDD, SVC, TRR, SUM --- for software documentation lifecycle.
 - **Views:** TRACEABILITY_MATRIX, REQUIREMENTS_SUMMARY, COVERAGE_SUMMARY --- for analysis and reporting.
-- **Proofs:** Missing traceability coverage, invalid attribute values, duplicate PIDs.
+- **Verification views:** Missing traceability coverage, invalid attribute values, duplicate PIDs.
 
 ## Datatypes
 

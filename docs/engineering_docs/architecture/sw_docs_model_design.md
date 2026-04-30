@@ -2,7 +2,7 @@
 
 ### FD: Software Documentation Domain Model @FD-007
 
-**Allocation:** Realized by [CSC-025](@) (SW Docs Model), with domain proof views in [CSC-026](@) (SW Docs Proof Views), object types in [CSC-027](@) (SW Docs Object Types), relation types in [CSC-028](@) (SW Docs Relation Types), specification types in [CSC-029](@) (SW Docs Specification Types), and view types in [CSC-030](@) (SW Docs View Types).
+**Allocation:** Realized by [CSC-025](@) (SW Docs Model), with domain verification views in [CSC-026](@) (SW Docs Verification Views), object types in [CSC-027](@) (SW Docs Object Types), relation types in [CSC-028](@) (SW Docs Relation Types), specification types in [CSC-029](@) (SW Docs Specification Types), and view types in [CSC-030](@) (SW Docs View Types).
 
 The software documentation domain model extends the default model with traceable object
 types, domain-specific relation semantics, specification document types, and verification
@@ -12,8 +12,8 @@ views for MIL-STD-498 and DO-178C compliant software documentation workflows.
 an inherited status enum (Draft, Review, Approved, Implemented) that all domain objects
 extend. The taxonomy includes requirements (HLR, LLR, NFR), design elements (FD, SF, DD),
 architectural decomposition (CSC, CSU), verification artifacts (VC, TR), and reference
-types (DIC, SYMBOL). Each type declares its own attributes, PID prefix, and inheritance
-chain through the `extends` field.
+types (DIC, SYMBOL). Each SW Docs type declares its own attributes, PID prefix, and
+inheritance chain through the `extends` field.
 
 **Relation Types**: [CSC-028](@) defines domain-specific traceability relations: REALIZES
 (FD traces to SF via the `traceability` source attribute), BELONGS (HLR membership in SF
@@ -30,7 +30,7 @@ Report). Each type declares version, status, and date attributes.
 matrices (TRACEABILITY_MATRIX, TEST_EXECUTION_MATRIX, TEST_RESULTS_MATRIX) and coverage
 summaries (COVERAGE_SUMMARY, REQUIREMENTS_SUMMARY).
 
-**Proof Views**: [CSC-026](@) provides domain-specific proof view queries that enforce
+**Verification Views**: [CSC-026](@) provides domain-specific verification view queries that enforce
 traceability constraints: VC must trace to HLR, TR must trace to VC, every HLR must be
 covered by at least one VC, every FD must trace to at least one CSC and CSU, and every
 CSC and CSU must have at least one FD allocated. [CSC-025](@) provides the HTML5
@@ -41,7 +41,7 @@ and SQLite-WASM full-text search.
 
 The software documentation domain model is realized through six packages that extend the
 default model with traceable types, domain relations, document types, verification views,
-and proof constraints.
+and verification constraints.
 
 [csc:sw-docs-object-types](#) (SW Docs Object Types) defines the domain object taxonomy. [csu:traceable-base-object-type](#)
 (TRACEABLE Base Object Type) provides the abstract base with an inherited status enum
@@ -74,7 +74,7 @@ Results Reports. Each type declares version, status, and date attributes.
 Summary) computes requirement coverage statistics. [csu:requirements-summary-view](#) (Requirements Summary)
 generates requirement status dashboards.
 
-[csc:sw-docs-proof-views](#) (SW Docs Proof Views) provides domain-specific traceability verification rules.
+[csc:sw-docs-verification-views](#) (SW Docs Verification Views) provides domain-specific traceability verification rules.
 [csu:vc-missing-hlr-traceability](#) (VC Missing HLR Traceability) ensures every verification case traces to at least
 one HLR. [csu:tr-missing-vc-traceability](#) (TR Missing VC Traceability) ensures every test result traces to a
 verification case. [csu:hlr-missing-vc-coverage](#) (HLR Missing VC Coverage) ensures every HLR is covered by at
@@ -96,7 +96,7 @@ participant "CSU Build Engine" as E
 participant "CSU Type Loader" as TL
 participant "CSC-017 Default\nModel" as DEF
 participant "CSC-025 SW Docs\nModel" as SW
-participant "CSU Proof Loader" as PL
+participant "CSU Verification View Loader" as PL
 participant "CSU Data Manager" as DB
 
 == Default Model Loading ==
@@ -118,7 +118,7 @@ loop for each object type
 end
 
 TL -> SW: scan types/relations/
-SW --> TL: REALIZES, BELONGS,\nTRACES_TO, XREF_DIC
+SW --> TL: REALIZES, BELONGS,\nTRACES_TO, XREF_DIC, XREF_DECOMPOSITION
 loop for each relation type
     TL -> DB: register_relation_type(M.relation)
 end
@@ -140,20 +140,20 @@ note right: TRACEABLE.status propagated\nto HLR, LLR, FD, CSC, CSU, etc.
 TL --> E: sw_docs types registered
 deactivate TL
 
-== Domain Proof Loading ==
+== Domain Verification View Loading ==
 E -> PL: load_model("default")
-PL -> DB: create default proof views
+PL -> DB: create default verification views
 
 E -> PL: load_model("sw_docs")
-PL -> SW: scan proofs/
+PL -> SW: scan verification_views/
 SW --> PL: fd_missing_csc, fd_missing_csu,\ncsc_missing_fd, csu_missing_fd,\nhlr_missing_vc, vc_missing_hlr,\ntr_missing_vc
-loop for each domain proof
-    PL -> DB: CREATE VIEW {proof.view}
+loop for each domain verification view
+    PL -> DB: CREATE VIEW {verification_view.view}
     note right: Domain-specific\ntraceability constraints
 end
 
-== VERIFY Executes All Proofs ==
-E -> DB: SELECT * FROM default proofs\n+ sw_docs proofs
+== VERIFY Executes All Verification views ==
+E -> DB: SELECT * FROM default verification views\n+ sw_docs verification views
 DB --> E: violation rows
 @enduml
 ```

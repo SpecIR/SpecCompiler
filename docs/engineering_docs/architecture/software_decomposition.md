@@ -19,7 +19,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > path: src/core/
 
-> description: Pipeline orchestration, metadata/config extraction, model loading, proof loading, validation policy, and runtime control.
+> description: Pipeline orchestration, metadata/config extraction, model loading, verification view loading, validation policy, and runtime control.
 
 ##### CSU: Pandoc Filter Entry Point @CSU-001
 
@@ -81,13 +81,13 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > traceability: [CSC-001](@)
 
-##### CSU: Proof Loader @CSU-007
+##### CSU: Verification View Loader @CSU-007
 
-> file_path: src/core/proof_loader.lua
+> file_path: src/core/verification_view_loader.lua
 
 > language: Lua
 
-> description: Discovers, loads, and registers proof view modules from models/{model}/proofs/, maintaining an in-memory registry of proof definitions used for verification policies.
+> description: Discovers, loads, and registers verification view modules from models/{model}/verification_views/, maintaining an in-memory registry of verification view definitions used for verification policies.
 
 > traceability: [CSC-001](@)
 
@@ -107,7 +107,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Manages configurable validation severity levels (error/warn/ignore) for proof codes, building default policies from loaded proof definitions and allowing project-level overrides.
+> description: Manages configurable validation severity levels (error/warn/ignore) for policy keys, building default policies from loaded verification view definitions and allowing project-level overrides.
 
 > traceability: [CSC-001](@)
 
@@ -119,7 +119,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > path: src/db/
 
-> description: Canonical insert/query API for SpecIR, transaction handling, build cache, output cache, and proof view definitions.
+> description: Canonical insert/query API for SpecIR, transaction handling, build cache, output cache, and verification view definitions.
 
 ##### CSU: Build Cache @CSU-010
 
@@ -161,13 +161,13 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > traceability: [CSC-002](@)
 
-##### CSU: Proof View Definitions @CSU-014
+##### CSU: Verification View Definitions @CSU-014
 
 > file_path: src/db/proof_views.lua
 
 > language: Lua
 
-> description: Defines SQL CREATE VIEW statements for all proof views used in the VERIFY phase, organized by entity type (specifications, objects, floats, relations, views).
+> description: Defines SQL CREATE VIEW statements for all verification views used in the VERIFY phase, organized by entity type (specifications, objects, floats, relations, views).
 
 > traceability: [CSC-002](@)
 
@@ -377,7 +377,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: VERIFY phase handler that iterates over all registered proof views, queries each for violations, and emits structured diagnostics based on validation policy.
+> description: VERIFY phase handler that iterates over all registered verification views, queries each for violations, and emits structured diagnostics based on validation policy.
 
 > traceability: [CSC-003](@)
 
@@ -1095,173 +1095,173 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > traceability: [CSC-019](@)
 
-##### Default Proof Views Package
+##### Default Verification Views Package
 
-#### CSC: Default Proof Views @CSC-020
+#### CSC: Default Verification Views @CSC-020
 
 > component_type: Package
 
-> path: models/default/proofs/
+> path: models/default/verification_views/
 
-> description: SQL proof view queries for detecting constraint violations across specifications, objects, floats, relations, and views.
+> description: SQL verification view queries for detecting constraint violations across specifications, objects, floats, relations, and views.
 
 ##### CSU: Spec Missing Required @CSU-089
 
-> file_path: models/default/proofs/sd_101_spec_missing_required.lua
+> file_path: models/default/verification_views/sd_101_spec_missing_required.lua
 
 > language: Lua
 
-> description: Proof view detecting specifications missing required attributes.
+> description: Verification view detecting specifications missing required attributes.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Spec Invalid Type @CSU-090
 
-> file_path: models/default/proofs/sd_102_spec_invalid_type.lua
+> file_path: models/default/verification_views/sd_102_spec_invalid_type.lua
 
 > language: Lua
 
-> description: Proof view detecting specifications whose type_ref does not match any registered specification type.
+> description: Verification view detecting specifications whose type_ref does not match any registered specification type.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Object Missing Required @CSU-091
 
-> file_path: models/default/proofs/sd_201_object_missing_required.lua
+> file_path: models/default/verification_views/sd_201_object_missing_required.lua
 
 > language: Lua
 
-> description: Proof view detecting spec objects missing required attributes.
+> description: Verification view detecting spec objects missing required attributes.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Object Cardinality Over @CSU-092
 
-> file_path: models/default/proofs/sd_202_object_cardinality_over.lua
+> file_path: models/default/verification_views/sd_202_object_cardinality_over.lua
 
 > language: Lua
 
-> description: Proof view detecting spec object attributes exceeding their declared max_occurs cardinality.
+> description: Verification view detecting spec object attributes exceeding their declared max_occurs cardinality.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Object Cast Failures @CSU-093
 
-> file_path: models/default/proofs/sd_203_object_cast_failures.lua
+> file_path: models/default/verification_views/sd_203_object_cast_failures.lua
 
 > language: Lua
 
-> description: Proof view detecting spec object attributes whose raw values failed to cast to their declared datatype.
+> description: Verification view detecting spec object attributes whose raw values failed to cast to their declared datatype.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Object Invalid Enum @CSU-094
 
-> file_path: models/default/proofs/sd_204_object_invalid_enum.lua
+> file_path: models/default/verification_views/sd_204_object_invalid_enum.lua
 
 > language: Lua
 
-> description: Proof view detecting spec object ENUM attributes with values not matching any entry in enum_values.
+> description: Verification view detecting spec object ENUM attributes with values not matching any entry in enum_values.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Object Invalid Date @CSU-095
 
-> file_path: models/default/proofs/sd_205_object_invalid_date.lua
+> file_path: models/default/verification_views/sd_205_object_invalid_date.lua
 
 > language: Lua
 
-> description: Proof view detecting spec object DATE attributes not matching the YYYY-MM-DD format.
+> description: Verification view detecting spec object DATE attributes not matching the YYYY-MM-DD format.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Object Bounds Violation @CSU-096
 
-> file_path: models/default/proofs/sd_206_object_bounds_violation.lua
+> file_path: models/default/verification_views/sd_206_object_bounds_violation.lua
 
 > language: Lua
 
-> description: Proof view detecting numeric attributes falling outside declared min_value/max_value bounds.
+> description: Verification view detecting numeric attributes falling outside declared min_value/max_value bounds.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Float Orphan @CSU-097
 
-> file_path: models/default/proofs/sd_301_float_orphan.lua
+> file_path: models/default/verification_views/sd_301_float_orphan.lua
 
 > language: Lua
 
-> description: Proof view detecting floats with no parent object despite objects existing in the same specification.
+> description: Verification view detecting floats with no parent object despite objects existing in the same specification.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Float Duplicate Label @CSU-098
 
-> file_path: models/default/proofs/sd_302_float_duplicate_label.lua
+> file_path: models/default/verification_views/sd_302_float_duplicate_label.lua
 
 > language: Lua
 
-> description: Proof view detecting floats sharing the same label within a specification.
+> description: Verification view detecting floats sharing the same label within a specification.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Float Render Failure @CSU-099
 
-> file_path: models/default/proofs/sd_303_float_render_failure.lua
+> file_path: models/default/verification_views/sd_303_float_render_failure.lua
 
 > language: Lua
 
-> description: Proof view detecting floats requiring external rendering but with NULL resolved_ast.
+> description: Verification view detecting floats requiring external rendering but with NULL resolved_ast.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Float Invalid Type @CSU-100
 
-> file_path: models/default/proofs/sd_304_float_invalid_type.lua
+> file_path: models/default/verification_views/sd_304_float_invalid_type.lua
 
 > language: Lua
 
-> description: Proof view detecting floats whose type_ref does not match any registered float type.
+> description: Verification view detecting floats whose type_ref does not match any registered float type.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Relation Unresolved @CSU-101
 
-> file_path: models/default/proofs/sd_401_relation_unresolved.lua
+> file_path: models/default/verification_views/sd_401_relation_unresolved.lua
 
 > language: Lua
 
-> description: Proof view detecting relations with target_text but no resolved target_ref.
+> description: Verification view detecting relations with target_text but no resolved target_ref.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Relation Dangling @CSU-102
 
-> file_path: models/default/proofs/sd_402_relation_dangling.lua
+> file_path: models/default/verification_views/sd_402_relation_dangling.lua
 
 > language: Lua
 
-> description: Proof view detecting relations whose target_ref points to a non-existent identifier.
+> description: Verification view detecting relations whose target_ref points to a non-existent identifier.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: Relation Ambiguous @CSU-103
 
-> file_path: models/default/proofs/sd_407_relation_ambiguous.lua
+> file_path: models/default/verification_views/sd_407_relation_ambiguous.lua
 
 > language: Lua
 
-> description: Proof view detecting relations flagged as ambiguous where the float reference matched multiple targets.
+> description: Verification view detecting relations flagged as ambiguous where the float reference matched multiple targets.
 
 > traceability: [CSC-020](@)
 
 ##### CSU: View Materialization Failure @CSU-104
 
-> file_path: models/default/proofs/sd_501_view_materialization_failure.lua
+> file_path: models/default/verification_views/sd_501_view_materialization_failure.lua
 
 > language: Lua
 
-> description: Proof view detecting views whose materialization failed, leaving both resolved_ast and resolved_data as NULL.
+> description: Verification view detecting views whose materialization failed, leaving both resolved_ast and resolved_data as NULL.
 
 > traceability: [CSC-020](@)
 
@@ -1373,7 +1373,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > path: models/default/types/relations/
 
-> description: Cross-reference relation type definitions mapping link selectors to target float types.
+> description: Cross-reference relation type definitions mapping PID and label selectors to typed object and float targets.
 
 ##### CSU: XREF_CITATION Relation Type @CSU-114
 
@@ -1507,7 +1507,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > path: models/sw_docs/
 
-> description: Domain model for software documentation providing traceable object types, domain-specific proof views, specification types, relation types, and views.
+> description: Domain model for software documentation providing traceable object types, domain-specific verification views, specification types, relation types, and views.
 
 ##### CSU: HTML5 Postprocessor @CSU-125
 
@@ -1519,83 +1519,83 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > traceability: [CSC-025](@)
 
-##### SW Docs Proof Views Package
+##### SW Docs Verification Views Package
 
-#### CSC: SW Docs Proof Views @CSC-026
+#### CSC: SW Docs Verification Views @CSC-026
 
 > component_type: Package
 
-> path: models/sw_docs/proofs/
+> path: models/sw_docs/verification_views/
 
-> description: Domain-specific proof view queries for software documentation traceability and naming convention enforcement.
+> description: Domain-specific verification view queries for software documentation traceability and naming convention enforcement.
 
 ##### CSU: VC Missing HLR Traceability @CSU-126
 
-> file_path: models/sw_docs/proofs/sd_601_vc_missing_hlr_traceability.lua
+> file_path: models/sw_docs/verification_views/sd_601_vc_missing_hlr_traceability.lua
 
 > language: Lua
 
-> description: Proof view detecting verification cases with no traceability link to any high-level requirement.
+> description: Verification view detecting verification cases with no traceability link to any high-level requirement.
 
 > traceability: [CSC-026](@)
 
 ##### CSU: TR Missing VC Traceability @CSU-127
 
-> file_path: models/sw_docs/proofs/sd_602_tr_missing_vc_traceability.lua
+> file_path: models/sw_docs/verification_views/sd_602_tr_missing_vc_traceability.lua
 
 > language: Lua
 
-> description: Proof view detecting test results with no traceability link to any verification case.
+> description: Verification view detecting test results with no traceability link to any verification case.
 
 > traceability: [CSC-026](@)
 
 ##### CSU: HLR Missing VC Coverage @CSU-128
 
-> file_path: models/sw_docs/proofs/sd_603_hlr_missing_vc_coverage.lua
+> file_path: models/sw_docs/verification_views/sd_603_hlr_missing_vc_coverage.lua
 
 > language: Lua
 
-> description: Proof view detecting high-level requirements not covered by any verification case.
+> description: Verification view detecting high-level requirements not covered by any verification case.
 
 > traceability: [CSC-026](@)
 
 ##### CSU: FD Missing CSC Traceability @CSU-131
 
-> file_path: models/sw_docs/proofs/sd_606_fd_missing_csc_traceability.lua
+> file_path: models/sw_docs/verification_views/sd_606_fd_missing_csc_traceability.lua
 
 > language: Lua
 
-> description: Proof view detecting functional descriptions with no traceability link to any Computer Software Component.
+> description: Verification view detecting functional descriptions with no traceability link to any Computer Software Component.
 
 > traceability: [CSC-026](@)
 
 ##### CSU: FD Missing CSU Traceability @CSU-132
 
-> file_path: models/sw_docs/proofs/sd_607_fd_missing_csu_traceability.lua
+> file_path: models/sw_docs/verification_views/sd_607_fd_missing_csu_traceability.lua
 
 > language: Lua
 
-> description: Proof view detecting functional descriptions with no traceability link to any Computer Software Unit.
+> description: Verification view detecting functional descriptions with no traceability link to any Computer Software Unit.
 
 > traceability: [CSC-026](@)
 
 ##### CSU: CSC Missing FD Allocation @CSU-163
 
-> file_path: models/sw_docs/proofs/csc_missing_fd_allocation.lua
+> file_path: models/sw_docs/verification_views/csc_missing_fd_allocation.lua
 
 > language: Lua
 
-> description: Proof view detecting Computer Software Components with no functional description (FD) allocated to them.
+> description: Verification view detecting Computer Software Components with no functional description (FD) allocated to them.
 
 > traceability: [CSC-026](@)
 
 ##### CSU: CSU Missing FD Allocation @CSU-164
 
-> file_path: models/sw_docs/proofs/csu_missing_fd_allocation.lua
+> file_path: models/sw_docs/verification_views/csu_missing_fd_allocation.lua
 
 > language: Lua
 
-> description: Proof view detecting Computer Software Units with no functional description (FD) allocated to them.
+> description: Verification view detecting Computer Software Units with no functional description (FD) allocated to them.
 
 > traceability: [CSC-026](@)
 
@@ -1908,4 +1908,3 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 > description: Defines the TRACEABILITY_MATRIX view generating a table showing the full HLR-to-VC-to-TR traceability chain with test results.
 
 > traceability: [CSC-030](@)
-

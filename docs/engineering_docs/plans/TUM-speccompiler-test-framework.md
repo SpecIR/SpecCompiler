@@ -168,7 +168,7 @@ See `tests/mutation/README.md` for full documentation.
 Quick start:
 
 ```bash
-# SQL proof view mutations (in-memory, safe)
+# SQL verification view mutations (in-memory, safe)
 ./tests/mutation/mutate.sh --sql
 
 # Lua source mutations (on-disk with safety backup)

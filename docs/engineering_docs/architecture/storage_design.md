@@ -62,7 +62,7 @@ high-level query API used by all pipeline phases — inserting spec entities dur
 updating references during ANALYZE, and reading assembled content during EMIT. [csu:build-cache](#)
 (Build Cache) queries `source_files` and `build_graph` to detect changed documents via SHA1
 comparison. [csu:output-cache](#) (Output Cache) tracks generated output files and their input hashes
-to skip redundant generation. [csu:proof-view-definitions](#) (Proof View Definitions) materializes SQL proof
+to skip redundant generation. [csu:verification-view-definitions](#) (Verification View Definitions) materializes SQL verification view
 views at build time for the VERIFY phase.
 
 [csc:db-schema](#) (DB Schema) defines the database structure through composable modules.

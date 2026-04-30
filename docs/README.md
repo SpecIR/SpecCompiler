@@ -15,7 +15,7 @@ The engineering documentation for SpecCompiler Core itself, structured as a form
 | **SVC** (`svc.md`) | Software Verification Cases -- test specifications and results |
 | **DIC** (`dic.md`) | Data Dictionary -- SpecIR type definitions and syntax reference |
 
-These documents use full traceability enforcement: HLR to VC to TR, FD to CSC to CSU. Proof views (SQL validation queries) run during the VERIFY phase to detect missing traceability, unresolved references, and other constraint violations.
+These documents use full traceability enforcement: HLR to VC to TR, FD to CSC to CSU. Verification views (SQL validation queries) run during the VERIFY phase to detect missing traceability, unresolved references, and other constraint violations.
 
 **This is a dogfooding example.** It demonstrates how SpecCompiler can be used to author, validate, and publish safety-critical software documentation from plain Markdown. The same pipeline that builds user projects builds its own engineering docs.
 

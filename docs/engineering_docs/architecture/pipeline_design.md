@@ -28,12 +28,12 @@ document files (with [dic:build-cache](#) checks), and delegates to the pipeline
    spec_objects, attributes, spec_floats, spec_views, spec_relations)
 2. **[dic:analyze-phase](#)** — Resolve cross-references and infer relation types
 3. **[dic:transform-phase](#)** — Render content, materialize views, execute external renderers
-4. **[dic:verify-phase](#)** — Run proof views and collect diagnostics
+4. **[dic:verify-phase](#)** — Run verification views and collect diagnostics
 5. **[dic:emit-phase](#)** — Assemble documents and generate output files
 
 All phases use the same dispatch model: for each handler in sorted order, the Pipeline Orchestrator [CSU-006](@) calls the handler's `on_{phase}(data, contexts, diagnostics)` hook once with the full set of contexts. Handlers are responsible for iterating over contexts internally. Each handler invocation is bracketed by `uv.hrtime()` calls at nanosecond precision to record its duration, and the orchestrator also records the aggregate duration of each phase, providing two-level performance visibility (handler-level and phase-level).
 
-**Phase Abort**: After VERIFY, the Pipeline Orchestrator [CSU-006](@) inspects the diagnostics collector for any error-level entries. If errors exist, the pipeline aborts before EMIT — only output generation is skipped, since TRANSFORM has already completed. This design allows proof views to validate transform results before committing to output.
+**Phase Abort**: After VERIFY, the Pipeline Orchestrator [CSU-006](@) inspects the diagnostics collector for any error-level entries. If errors exist, the pipeline aborts before EMIT — only output generation is skipped, since TRANSFORM has already completed. This design allows verification views to validate transform results before committing to output.
 
 **Context Propagation**: Each document file produces a context containing the parsed AST,
 file path, specification ID, and walker state. Contexts are passed through all phases,
@@ -137,7 +137,7 @@ XFRM -> DB: UPDATE spec_objects.ast\n(rewrite links)
 
 == VERIFY ==
 P -> P: topological_sort("verify")
-P -> DB: SELECT * FROM proof views
+P -> DB: SELECT * FROM verification views
 DB --> P: violation rows
 
 alt errors exist
@@ -482,7 +482,7 @@ Selected SQLite as the persistence engine for the Specification Intermediate Rep
 >
 > - Zero-configuration embedded database requiring no server process
 > - Single-file database portable across platforms (specir.db)
-> - SQL-based query interface enabling declarative proof views and resolution logic
+> - SQL-based query interface enabling declarative verification views and resolution logic
 > - ACID transactions for reliable incremental builds with cache coherency
 > - Built-in FTS5 for full-text search in the web application output
 > - Mature Lua binding (lsqlite3) available in the Pandoc ecosystem
@@ -512,7 +512,7 @@ Selected a five-phase sequential pipeline (INITIALIZE, ANALYZE, TRANSFORM, VERIF
 > - INITIALIZE parses AST into normalized relational IR before any resolution
 > - ANALYZE resolves cross-references and infers types on the complete IR, not partial state
 > - TRANSFORM renders content and materializes views with all references resolved
-> - VERIFY runs proof views after TRANSFORM so it can check transform results (e.g., float render failures, view materialization)
+> - VERIFY runs verification views after TRANSFORM so it can check transform results (e.g., float render failures, view materialization)
 > - EMIT generates output only after verification passes, preventing invalid documents
 > - VERIFY-before-EMIT enables abort on error without wasting output generation time
 > - Phase ordering is fixed; handler ordering within each phase is controlled by topological sort

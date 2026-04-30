@@ -130,13 +130,16 @@ A **numbered element** (table, figure, diagram) with caption and cross-reference
 
 ### DIC: Handler @TERM-16
 
-A **modular component** that processes specific content types through pipeline phases.
+A **modular component** that processes specific content types, declared as `M.handler` on a type module.
 
 > description:
 >
-> **Purpose:** Encapsulates processing logic for a content type across all pipeline phases.
+> **Purpose:** Encapsulates processing logic for a content type.
 >
-> **Structure:** Implements phase methods (initialize, analyze, verify, transform, emit) for its content type.
+> **Structure:** Carries two kinds of callbacks on a single surface:
+>
+> - **Phase hooks** (`on_initialize`, `on_analyze`, `on_transform`, `on_verify`, `on_emit`) — invoked once per phase with full pipeline context. Ordered via `prerequisites`.
+> - **Decorated per-item callbacks** (`on_render_SpecObject`, `on_render_Link`, `on_render_Code`, `on_render_CodeBlock`) — dispatched inline by a phase hook with a pre-resolved subject and context. Do not require `prerequisites`.
 
 ### DIC: INITIALIZE Phase @TERM-19
 
@@ -250,11 +253,11 @@ The **third phase** in the pipeline that materializes views and rewrites content
 
 ### DIC: VERIFY Phase @TERM-21
 
-The **fourth phase** in the pipeline that validates content via proof views.
+The **fourth phase** in the pipeline that validates content via verification views.
 
 > description:
 >
-> **Purpose:** Validates document content using proof views and constraint checking.
+> **Purpose:** Validates document content using verification views and constraint checking.
 >
 > **Position:** Fourth phase after TRANSFORM, before EMIT.
 
@@ -346,11 +349,11 @@ A **unique identifier** assigned to spec objects for cross-referencing (e.g., `@
 >
 > **Auto-generation:** PIDs can be auto-generated from type prefix and sequence number.
 
-### DIC: Proof View @TERM-PROOF
+### DIC: Verification View @TERM-VERIFICATIONVIEW
 
 A **SQL query** that validates data integrity constraints during the VERIFY phase.
 
-> term: Proof View
+> term: Verification View
 
 > acronym: -
 
@@ -520,17 +523,17 @@ A **text format** where each line is a valid JSON object, used for structured lo
 >
 > **Usage:** The logger emits NDJSON when output is not connected to a TTY (e.g., piped to a file or running in CI).
 
-### DIC: Proof Policy @TERM-PROOFPOLICY
+### DIC: Validation Policy @TERM-VALIDATIONPOLICY
 
-A **configuration mapping** from proof view `policy_key` to severity level, controlling which violations are reported and at what severity.
+A **configuration mapping** from verification view `policy_key` to severity level, controlling which violations are reported and at what severity.
 
-> term: Proof Policy
+> term: Validation Policy
 
 > domain: Core
 
 > description:
 >
-> **Purpose:** Allows projects to control validation strictness by mapping each proof view to a severity level.
+> **Purpose:** Allows projects to control validation strictness by mapping each verification view to a severity level.
 >
 > **Severity levels:** `error` (blocks output generation), `warn` (reported but build continues), `ignore` (suppressed).
 >
@@ -550,7 +553,7 @@ A **structured error or warning record** emitted by [TERM-16](@)s during [TERM-1
 >
 > **Purpose:** Provides machine-parseable and human-readable feedback on specification errors and warnings throughout all pipeline phases.
 >
-> **Fields:** Each record contains `file` (source path), `line` (source line number), `code` (domain-prefixed identifier, e.g., `SD-301`), and `msg` (human-readable description).
+> **Fields:** Each record contains `file` (source path), `line` (source line number), `code` (stable diagnostic key, usually the verification view `policy_key`, e.g., `dangling_relation`), and `msg` (human-readable description).
 >
 > **Severity:** Errors trigger abort after [TERM-21](@) phase; warnings are reported but do not block output generation.
 

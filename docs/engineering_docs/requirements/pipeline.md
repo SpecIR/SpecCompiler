@@ -19,7 +19,7 @@ The pipeline shall execute handlers in a five-phase lifecycle: INITIALIZE, ANALY
 > 1. **INITIALIZE**: Parse document AST and populate database with specifications, spec_objects, floats, relations, views, and attributes
 > 2. **ANALYZE**: Resolve relations between objects (link target resolution, type inference)
 > 3. **TRANSFORM**: Pre-compute views, render external content (PlantUML, charts), prepare for output
-> 4. **VERIFY**: Run proof views to validate data integrity, type constraints, cardinality rules
+> 4. **VERIFY**: Run verification views to validate data integrity, type constraints, cardinality rules
 > 5. **EMIT**: Assemble final documents and write to output formats (docx, html5, markdown, json)
 
 > rationale: Separation of concerns enables validation between phases, allows early abort on errors, and supports format-agnostic processing until the final output stage.

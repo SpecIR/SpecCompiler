@@ -77,23 +77,31 @@ describing their data schema. The loader registers these with the data manager, 
 datatype definitions and attribute constraints (name, datatype, min/max occurs, enum
 values, bounds) in the `spec_attribute_defs` and `spec_datatype_defs` tables.
 
-**Handler Registration**: Type modules may export a `M.handler` table with phase hooks.
-These handlers extend the pipeline's processing
-capabilities with type-specific logic (e.g., PlantUML float rendering, traceability matrix
-view materialization). Handlers declare [dic:prerequisites](#) to control execution ordering via
-[dic:topological-sort](#).
+**Handler Registration**: Type modules may export a `M.handler` table with phase hooks
+(`on_initialize`, `on_analyze`, `on_transform`, …) and/or decorated per-item callbacks
+(`on_render_SpecObject`, `on_render_Link`, `on_render_Code`, `on_render_CodeBlock`). Phase
+hooks participate in ordering via [dic:prerequisites](#) and [dic:topological-sort](#);
+decorated callbacks are dispatched inline by a phase hook with pre-resolved inputs and do
+not carry prerequisites. Type modules that do not declare `prerequisites` are defaulted to
+an empty list by `pipeline:register_handler`.
 
-**Base Types**: Relation type modules may export `M.base` instead of `M.relation` to act as
-base types that own resolution logic. Base types are not registered in the database. The type
-loader registers their `M.resolve` function into `_selector_resolvers` (keyed by
-`M.base.link_selector`), which the relation resolver dispatches to during the ANALYZE phase.
-Concrete relation types use `M.extend(overrides)` to inherit base properties (e.g.,
-`link_selector`) while adding their own constraints. This follows the same delegation pattern
-as float type modules (`src/pipeline/transform/spec_floats.lua`).
+**Base Types**: Relation type modules declare themselves as base types by exporting both
+`M.relation` (schema) and `M.resolve` (resolver function). The type loader calls
+`data:register_resolver(schema.id, M.resolve)` so the relation analyzer can dispatch
+resolution by type identifier during the ANALYZE phase. Concrete relation types use
+`M.relation.extends = "<BASE_ID>"` to inherit resolution behaviour; the `extends` chain is
+also walked by [`type_loader.get_relation_handler`](../../../src/core/type_loader.lua) so that
+decorated callbacks (e.g. `on_render_Link`) are inherited when a concrete type doesn't
+define its own.
 
-**Custom Display Text**: Relation types that need custom link display text (e.g., showing
-title instead of PID) export a standard `M.handler` with `on_transform` using the shared
-`link_rewrite_utils.rewrite_display_for_type()` utility.
+**Custom Display Text**: Relation types that need custom link display text define
+`M.handler.on_render_Link(target, ctx) -> string|nil`. The `relation_link_rewriter`
+(TRANSFORM phase) looks up the handler for each resolved link's relation type via
+[`type_loader.get_relation_handler`](../../../src/core/type_loader.lua) and invokes
+`on_render_Link` with the pre-resolved target. Returning `nil` falls through to the base
+type's handler in the `extends` chain. The base types `LABEL_REF` and `PID_REF` ship with
+defaults (title for `SECTION` targets, PID for other objects, `"<caption> <number>"` for
+floats) that concrete types inherit automatically.
 
 **Component Interaction**
 

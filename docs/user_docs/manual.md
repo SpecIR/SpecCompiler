@@ -30,7 +30,7 @@ SpecCompiler is the reference compiler for **CommonSpec**, a structured Markdown
 
 - **Structured authoring**: Define requirements, designs, and verification cases using a consistent syntax.
 - **Traceability**: Link objects together with `abbrev: Project Identifier (PID)` and `#label` references.
-- **Validation**: Automatically verify data integrity through proof views backed by `abbrev: Structured Query Language (SQL)` queries against the `abbrev: Specification Intermediate Representation (SpecIR)`.
+- **Validation**: Automatically verify data integrity through verification views backed by `abbrev: Structured Query Language (SQL)` queries against the `abbrev: Specification Intermediate Representation (SpecIR)`.
 - **Multi-format output**: Generate Word documents and web content from a single source.
 
 SpecCompiler processes documents through a five-phase pipeline: INITIALIZE, ANALYZE, TRANSFORM, VERIFY, and EMIT, as illustrated in [plantuml:diag-pipeline](#).
@@ -43,7 +43,7 @@ This manual covers:
 - Configuration of project files (`project.yaml`) as described in [section:project-configuration](#).
 - Authoring specification documents using CommonSpec syntax ([MANUAL-sec4](@)).
 - Invocation of the tool and interpretation of its outputs ([section:invocation](#)).
-- Verification diagnostics and error code reference.
+- Verification diagnostics and policy-key reference.
 - Incremental build behavior and cache management.
 - Type system configuration and custom model creation; for a detailed walkthrough, see [section:model-directory-layout](#) in the companion model guide.
 - Troubleshooting common problems.
@@ -55,7 +55,7 @@ The processing pipeline consists of five phases:
 1. **INITIALIZE** -- Parse Markdown input via `abbrev: Pandoc Abstract Syntax Tree (AST)`, extract specifications, spec objects, attributes, floats, relations, and views into the SpecIR stored in `abbrev: SQLite Database (SQLite)`.
 2. **ANALYZE** -- Resolve relation types and cross-references using specificity-based inference rules (see [math:eq-specificity](#)).
 3. **TRANSFORM** -- Resolve floats (render PlantUML, charts, tables), materialize views, rewrite links, and render spec objects using type-specific handlers.
-4. **VERIFY** -- Execute proof views (SQL queries) against the SpecIR database to detect constraint violations; see [section:validation-proofs](#) in the model guide.
+4. **VERIFY** -- Execute verification views (SQL queries) against the SpecIR database to detect constraint violations; see [section:verification-views](#) in the model guide.
 5. **EMIT** -- Assemble Pandoc documents from the SpecIR and generate output files in configured formats via parallel Pandoc subprocess invocations.
 
 ```plantuml:diag-pipeline{caption="Processing Pipeline"}
@@ -94,7 +94,7 @@ note bottom of transform
 end note
 
 note bottom of verify
-  Execute proof views
+  Execute verification views
   Report violations
 end note
 
@@ -489,10 +489,10 @@ Links use the pattern `[content](selector)`. Selectors are **not hardcoded** -- 
   - Registered by
   - Resolution
 * - `@`
-  - `traceable` base (XREF_SEC, and model-specific types)
+  - `PID_REF` base (XREF_SEC and model-specific types)
   - PID lookup: same-spec first, then cross-document fallback
 * - `#`
-  - `xref` base (XREF_FIGURE, XREF_TABLE, XREF_LISTING, XREF_MATH, XREF_SECP)
+  - `LABEL_REF` base (XREF_FIGURE, XREF_TABLE, XREF_LISTING, XREF_MATH, XREF_SECP)
   - Scoped label resolution: local scope, then same-spec, then global
 * - `@cite`
   - XREF_CITATION
@@ -564,7 +564,7 @@ The four dimensions (`eq: d_1` through `eq: d_4`) correspond to selector, source
   - +0
 ```
 
-The highest-scoring candidate wins. If two candidates tie, the relation is marked ambiguous. For example, `[fig:diagram](#)` resolving to a FIGURE float will match XREF_FIGURE (selector `#` + target type FIGURE = specificity `eq: S = 2`) over the generic xref base (selector `#` only = specificity `eq: S = 1`).
+The highest-scoring candidate wins. If two candidates tie, the relation is marked ambiguous. For example, `[fig:diagram](#)` resolving to a FIGURE float will match XREF_FIGURE (selector `#` + target type FIGURE = specificity `eq: S = 2`) over the generic `LABEL_REF` base (selector `#` only = specificity `eq: S = 1`).
 
 ### Views
 
@@ -955,7 +955,7 @@ Full Pandoc AST for programmatic integration with other tools.
 Diagnostics are emitted in NDJSON format to stderr:
 
 ```src.json:src-diagnostic-ndjson{caption="Diagnostic NDJSON example"}
-{"level":"error","message":"[object_missing_required] Object missing required attribute 'priority' on HLR-001","file":"srs.md","line":42}
+{"level":"error","message":"[missing_required] Object missing required attribute 'priority' on HLR-001","file":"srs.md","line":42}
 ```
 
 ### Diagnostic Reference
@@ -970,17 +970,17 @@ Diagnostics are emitted in NDJSON format to stderr:
   - Specification missing required attribute
 * - `spec_invalid_type`
   - Invalid specification type reference
-* - `object_missing_required`
+* - `missing_required`
   - Spec object missing required attribute
-* - `object_cardinality_over`
+* - `cardinality_over`
   - Attribute cardinality exceeded
-* - `object_cast_failures`
+* - `invalid_cast`
   - Attribute type cast failure
-* - `object_invalid_enum`
+* - `invalid_enum`
   - Invalid enum value
-* - `object_invalid_date`
+* - `invalid_date`
   - Invalid date format (expected YYYY-MM-DD)
-* - `object_bounds_violation`
+* - `bounds_violation`
   - Value outside declared bounds
 * - `object_duplicate_pid`
   - Duplicate PID across spec objects
@@ -992,11 +992,11 @@ Diagnostics are emitted in NDJSON format to stderr:
   - External render failure
 * - `float_invalid_type`
   - Invalid float type reference
-* - `relation_unresolved`
+* - `unresolved_relation`
   - Unresolved link (PIDs are case-sensitive)
-* - `relation_dangling`
+* - `dangling_relation`
   - Dangling relation (target not found)
-* - `relation_ambiguous`
+* - `ambiguous_relation`
   - Ambiguous float reference
 * - `view_materialization_failure`
   - View materialization failure
@@ -1009,10 +1009,10 @@ Every diagnostic listed in [list-table:tbl-error-codes](#) can be suppressed or 
 ```src.yaml:src-suppress-example{caption="Suppressing a validation rule"}
 validation:
   float_orphan: ignore              # suppress entirely
-  relation_unresolved: warn         # downgrade to warning
+  unresolved_relation: warn         # downgrade to warning
 ```
 
-All proofs default to `error` (halt the build). Set a key to `warn` to emit a warning without halting, or `ignore` to suppress the diagnostic entirely. Custom proofs can define their own policy keys; see [section:validation-proofs](#) in the model guide.
+All verification views default to `error` (halt the build). Set a key to `warn` to emit a warning without halting, or `ignore` to suppress the diagnostic entirely. Custom verification views can define their own policy keys; see [section:verification-views](#) in the model guide.
 
 ## Incremental Builds
 
@@ -1032,121 +1032,26 @@ specc build
 
 ## Type System and Models
 
-### Custom Models
-
-Set `template: mymodel` in `project.yaml`. Types load in order:
-
-1. `models/default/types/` -- Always loaded first.
-2. `models/mymodel/types/` -- Loaded as overlay.
-
-For a complete walkthrough on creating custom types, including object types, float types, relation types with inference rules, and view types, see the companion *Creating a Custom Model* guide. Key sections include:
-
-- [section:model-directory-layout](#) -- Directory structure for models.
-- [section:type-definition-pattern](#) -- Schema keys by category and handler lifecycle.
-- [section:walkthrough-custom-object-type](#) -- Custom object type with attributes.
-- [section:walkthrough-custom-relation-with-inference-rules](#) -- Relation inference scoring.
-- [section:validation-proofs](#) -- SQL-based proof views for the VERIFY phase.
-
 ### Built-in Models
 
-SpecCompiler ships with `default` and `sw_docs`. The `default` model provides general-purpose types (specifications, sections, floats, cross-references, views). The `sw_docs` model overlays `default` with types for requirements engineering and traceability:
+SpecCompiler ships with `default`, `abnt`, and `sw_docs`. The `default` model provides general-purpose types (specifications, sections, floats, cross-references, views). The `sw_docs` model overlays `default` with types for requirements engineering and traceability:
 
 - **Object types**: HLR, LLR, NFR, VC, TR, FD, CSC, CSU, DIC, DD, SF (all extend a common TRACEABLE base with `status` attribute and PID auto-generation)
 - **Specification types**: SRS, SDD, SVC, SUM, TRR (document templates with version, status, date)
-- **Relation types**: TRACES_TO, BELONGS, REALIZES, XREF_DECOMPOSITION, XREF_DIC (traceability links with specificity-based inference)
+- **Relation types**: TRACES_TO, BELONGS, REALIZES, VERIFIES, XREF_DECOMPOSITION, XREF_DIC (traceability links with specificity-based inference)
 - **View types**: TRACEABILITY_MATRIX, TEST_RESULTS_MATRIX, TEST_EXECUTION_MATRIX, COVERAGE_SUMMARY, REQUIREMENTS_SUMMARY (query-based tables materialized from the SpecIR)
-- **Proofs**: Traceability chain validation (VC-HLR, TR-VC, FD-CSC/CSU coverage)
+- **Verification views**: Traceability chain validation (VC-HLR, TR-VC, FD-CSC/CSU coverage)
 - **Postprocessor**: Interactive single-file HTML5 web application
+
+The `abnt` model overlays `default` with ABNT NBR 14724 pre-textual elements (Capa, Folha de Rosto, lists of figures/tables/abbreviations), citation formatting, and a DOCX postprocessor tuned for Brazilian academic standards.
 
 The `docs/engineering_docs/` directory in this repository uses `sw_docs` and serves as a living example of the model in practice.
 
-### Type Directory Structure
+### Custom Models
 
-```src:src-type-directory-tree{caption="Type model directory structure"}
-models/{template}/
-  types/
-    objects/          # Spec object types
-    floats/           # Float types
-    relations/        # Relation types
-    views/            # View types
-    specifications/   # Specification types
-  postprocessors/     # Format-specific post-processing
-  styles/             # DOCX style presets
-  filters/            # Pandoc Lua filters per output format
-```
+Set `template: mymodel` in `project.yaml`. Custom types layer as overlays on top of `default` (types with matching `id` replace the default; new `id`s add).
 
-### Type Module Structure
-
-**Object type:**
-
-```src.lua:src-object-type-module{caption="Object type module example"}
-local M = {}
-M.object = {
-    id = "HLR",
-    long_name = "High-Level Requirement",
-    pid_prefix = "HLR",
-    pid_format = "%s-%03d",
-    attributes = {
-        { name = "priority", datatype_ref = "PRIORITY_ENUM",
-          min_occurs = 1, max_occurs = 1,
-          values = {"High", "Medium", "Low"} },
-    }
-}
-return M
-```
-
-**Relation type:**
-
-```src.lua:src-relation-type-module{caption="Relation type module example"}
-local M = {}
-M.relation = {
-    id = "TRACES_TO",
-    link_selector = "@",
-    source_type_ref = "LLR",
-    target_type_ref = "HLR",
-}
-return M
-```
-
-### Attribute Schema Fields
-
-```list-table:tbl-attribute-schema{caption="Attribute schema fields"}
-> header-rows: 1
-> aligns: l,l,l,l
-
-* - Field
-  - Type
-  - Default
-  - Description
-* - `name`
-  - string
-  - required
-  - Attribute identifier
-* - `datatype_ref`
-  - string
-  - `STRING`
-  - STRING, INTEGER, REAL, BOOLEAN, DATE, ENUM, XHTML
-* - `min_occurs`
-  - integer
-  - 0
-  - Minimum values (0 optional, 1 required)
-* - `max_occurs`
-  - integer
-  - 1
-  - Maximum values
-* - `min_value`
-  - number
-  - nil
-  - Lower bound for numeric values
-* - `max_value`
-  - number
-  - nil
-  - Upper bound for numeric values
-* - `values`
-  - list
-  - nil
-  - Valid enum values
-```
+Everything else — directory layout, the `M.handler` contract, schema fields for each category, verification views, external renderers — lives in the companion [Creating a Custom Model](guides/creating-a-model.md) guide.
 
 ## Troubleshooting
 

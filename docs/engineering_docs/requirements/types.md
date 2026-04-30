@@ -5,10 +5,10 @@
 Dynamic type system providing typed containers for [dic:specification](#), [dic:spec-object](#), [dic:spec-float](#), [dic:spec-view](#), [dic:spec-relation](#), and [dic:attribute](#).
 
 > description: Groups requirements for the six core containers that store parsed specification
-> data plus the proof-view validation framework.
+> data plus the verification-view validation framework.
 
 > rationale: A typed container model enables schema validation, type-specific rendering,
-> and data integrity checking through SQL proof views.
+> and data integrity checking through SQL verification views.
 
 #### HLR: Specifications Container @HLR-TYPE-001
 
@@ -147,9 +147,9 @@ The type system shall provide a spec_attributes container for structured metadat
 
 #### HLR: Type Validation @HLR-TYPE-007
 
-The type system shall provide proof views that detect data integrity violations across all specification containers.
+The type system shall provide verification views that detect data integrity violations across all specification containers.
 
-> description: Proof views are SQL queries registered in the [dic:verify-phase](#) phase that check for constraint violations:
+> description: Verification views are SQL queries registered in the [dic:verify-phase](#) phase that check for constraint violations:
 >
 > - Specification-level (missing required attributes, invalid types)
 > - Object-level (missing required, cardinality, cast failures, invalid enum/date, bounds)
