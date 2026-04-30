@@ -240,6 +240,65 @@ local function append_latex_options(args, format, format_config, project_root)
     end
 end
 
+---Load a model's config.lua, if present.
+---Models declare defaults (citation, language, ...) here. Missing config or
+---missing fields are not errors — they just mean "no model default".
+---@param template string|nil Template/model name
+---@return table|nil model_config Loaded config table, or nil if unavailable
+local function load_model_config(template)
+    if not template or template == "" then
+        return nil
+    end
+    local ok, mod = pcall(require, "models." .. template .. ".config")
+    if ok and type(mod) == "table" then
+        return mod
+    end
+    return nil
+end
+
+---Resolve the CSL path for a build, applying the precedence:
+---  1. user-specified `csl` in project.yaml (resolved against project root,
+---     with a fallback to models/<template>/assets/<basename>)
+---  2. model-declared default in models/<template>/config.lua's `citation.csl`
+---  3. nil (no --csl flag)
+---@param format_config table Format-merged config (may have `csl`)
+---@param project_root string Absolute project root
+---@param template string|nil Template/model name
+---@return string|nil csl_path Absolute path to a readable CSL file, or nil
+local function resolve_csl_path(format_config, project_root, template)
+    if format_config.csl then
+        local user_path = resolve_project_path(format_config.csl, project_root)
+        if file_exists(user_path) then
+            return user_path
+        end
+        local speccompiler_home = M.get_speccompiler_home()
+        local basename = format_config.csl:match("([^/]+)$")
+        local model_csl = string.format("%s/models/%s/assets/%s",
+            speccompiler_home, template or "default", basename)
+        if file_exists(model_csl) then
+            return model_csl
+        end
+        io.stderr:write(string.format("Warning: CSL file not found: %s\n", user_path))
+        return nil
+    end
+
+    local model_config = load_model_config(template)
+    if model_config and model_config.citation and model_config.citation.csl then
+        local declared = model_config.citation.csl
+        local speccompiler_home = M.get_speccompiler_home()
+        local model_csl = string.format("%s/models/%s/assets/%s",
+            speccompiler_home, template, declared)
+        if file_exists(model_csl) then
+            return model_csl
+        end
+        io.stderr:write(string.format(
+            "Warning: model %q declares citation.csl=%q but file not found at %s\n",
+            template, declared, model_csl))
+    end
+
+    return nil
+end
+
 local function append_citation_options(args, format_config, project_root, template)
     if format_config.bibliography then
         local bib_path = resolve_project_path(format_config.bibliography, project_root)
@@ -253,21 +312,10 @@ local function append_citation_options(args, format_config, project_root, templa
         end
     end
 
-    if format_config.csl and format_config.citeproc ~= false then
-        local csl_path = resolve_project_path(format_config.csl, project_root)
-        if file_exists(csl_path) then
+    if format_config.citeproc ~= false then
+        local csl_path = resolve_csl_path(format_config, project_root, template)
+        if csl_path then
             table.insert(args, "--csl=" .. csl_path)
-        else
-            -- Fallback: check model assets directory
-            local speccompiler_home = M.get_speccompiler_home()
-            local basename = format_config.csl:match("([^/]+)$")
-            local model_csl = string.format("%s/models/%s/assets/%s",
-                speccompiler_home, template or "default", basename)
-            if file_exists(model_csl) then
-                table.insert(args, "--csl=" .. model_csl)
-            else
-                io.stderr:write(string.format("Warning: CSL file not found: %s\n", csl_path))
-            end
         end
     end
 end
