@@ -1,8 +1,8 @@
-local SQL = require("models.default.proofs.sql")
+local SQL = require("models.default.verification_views.sql")
 
 local M = {}
 
-M.proof = {
+M.verification_view = {
     view = "view_relation_ambiguous",
     policy_key = "ambiguous_relation",
     sql = SQL.view_relation_ambiguous,

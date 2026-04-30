@@ -1,8 +1,8 @@
-local SQL = require("models.default.proofs.sql")
+local SQL = require("models.default.verification_views.sql")
 
 local M = {}
 
-M.proof = {
+M.verification_view = {
     view = "view_object_cardinality_over",
     policy_key = "cardinality_over",
     sql = SQL.view_object_cardinality_over,

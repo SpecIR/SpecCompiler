@@ -1,8 +1,8 @@
-local SQL = require("models.sw_docs.proofs.sql")
+local SQL = require("models.sw_docs.verification_views.sql")
 
 local M = {}
 
-M.proof = {
+M.verification_view = {
     view = "view_traceability_csc_missing_fd",
     policy_key = "traceability_csc_to_fd",
     sql = SQL.view_traceability_csc_missing_fd,

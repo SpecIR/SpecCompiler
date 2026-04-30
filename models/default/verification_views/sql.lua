@@ -1,11 +1,11 @@
----Proof SQL views for the default model.
--- CREATE VIEW statements extracted from individual proof modules.
--- Keyed by view name (matches M.proof.view in each proof file).
+---Verification view SQL views for the default model.
+-- CREATE VIEW statements extracted from individual verification view modules.
+-- Keyed by view name (matches M.verification_view.view in each verification_view file).
 
 local M = {}
 
 -- ============================================================================
--- Float proofs
+-- Float verification_views
 -- ============================================================================
 
 M.view_float_duplicate_label = [[
@@ -78,7 +78,7 @@ WHERE ft.needs_external_render = 1
 ]]
 
 -- ============================================================================
--- Object proofs
+-- Object verification_views
 -- ============================================================================
 
 M.view_object_bounds_violation = [[
@@ -264,7 +264,7 @@ WHERE ad.min_occurs > 0
 ]]
 
 -- ============================================================================
--- Relation proofs
+-- Relation verification_views
 -- ============================================================================
 
 M.view_relation_ambiguous = [[
@@ -279,29 +279,6 @@ SELECT
 FROM spec_relations r
 LEFT JOIN spec_objects so ON r.source_object_id = so.id
 WHERE r.is_ambiguous = 1;
-]]
-
-M.view_relation_dangling = [[
-CREATE VIEW IF NOT EXISTS view_relation_dangling AS
-SELECT
-  r.id,
-  r.source_object_id,
-  r.target_text,
-  r.target_object_id,
-  r.target_float_id,
-  r.type_ref AS relation_type,
-  r.from_file,
-  COALESCE(so.title_text, '(unknown source)') AS source_title,
-  CASE WHEN r.link_line > 0 THEN r.link_line ELSE COALESCE(so.start_line, 0) END AS start_line
-FROM spec_relations r
-LEFT JOIN spec_objects so ON r.source_object_id = so.id
-WHERE (r.target_object_id IS NOT NULL OR r.target_float_id IS NOT NULL)
-  AND NOT EXISTS (
-    SELECT 1 FROM spec_objects o WHERE o.id = r.target_object_id
-  )
-  AND NOT EXISTS (
-    SELECT 1 FROM spec_floats f WHERE f.id = r.target_float_id
-  );
 ]]
 
 M.view_relation_unresolved = [[
@@ -332,7 +309,7 @@ WHERE r.target_text IS NOT NULL
 ]]
 
 -- ============================================================================
--- Specification proofs
+-- Specification verification_views
 -- ============================================================================
 
 M.view_spec_invalid_type = [[
@@ -373,7 +350,7 @@ WHERE ad.min_occurs > 0
 ]]
 
 -- ============================================================================
--- View proofs
+-- View verification_views
 -- ============================================================================
 
 M.view_view_materialization_failure = [[

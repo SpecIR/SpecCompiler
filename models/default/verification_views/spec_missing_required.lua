@@ -1,8 +1,8 @@
-local SQL = require("models.default.proofs.sql")
+local SQL = require("models.default.verification_views.sql")
 
 local M = {}
 
-M.proof = {
+M.verification_view = {
     view = "view_spec_missing_required",
     policy_key = "spec_missing_required",
     sql = SQL.view_spec_missing_required,

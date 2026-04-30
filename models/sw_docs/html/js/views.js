@@ -64,8 +64,8 @@ var SpecCompiler = SpecCompiler || {};
       linkColumns: [],
       specialRenderers: { coverage_pct: renderCoverageBar }
     },
-    dangling: {
-      title: 'Dangling References',
+    unresolved: {
+      title: 'Unresolved References',
       description: 'Unresolved cross-references and ambiguous relations',
       sql: [
         'SELECT',

@@ -143,8 +143,9 @@ local function parse_list_table(content, log)
     if opts.widths then
         local raw_widths = {}
         local total = 0
-        for w in opts.widths:gmatch('[^,]+') do
-            local num = tonumber(w:gsub('%s', '')) or 0
+        for width_spec in opts.widths:gmatch('[^,]+') do
+            local clean_width = width_spec:gsub('%s', '')
+            local num = tonumber(clean_width) or 0
             table.insert(raw_widths, num)
             total = total + num
         end

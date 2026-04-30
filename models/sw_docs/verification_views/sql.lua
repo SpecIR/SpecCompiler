@@ -1,11 +1,11 @@
----Proof SQL views for the sw_docs model.
--- CREATE VIEW statements extracted from individual proof modules.
--- Keyed by view name (matches M.proof.view in each proof file).
+---Verification view SQL views for the sw_docs model.
+-- CREATE VIEW statements extracted from individual verification view modules.
+-- Keyed by view name (matches M.verification_view.view in each verification_view file).
 
 local M = {}
 
 -- ============================================================================
--- Traceability proofs
+-- Traceability verification_views
 -- ============================================================================
 
 M.view_traceability_csc_missing_fd = [[
@@ -158,7 +158,7 @@ WHERE vc.type_ref = 'VC'
 ]]
 
 -- ============================================================================
--- Allocation traceability proofs
+-- Allocation traceability verification_views
 -- ============================================================================
 
 M.view_traceability_hlr_missing_allocation = [[

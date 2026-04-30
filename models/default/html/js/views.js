@@ -57,8 +57,8 @@ var SpecCompiler = SpecCompiler || {};
       ].join(' '),
       linkColumns: []
     },
-    dangling: {
-      title: 'Dangling References',
+    unresolved: {
+      title: 'Unresolved References',
       description: 'Unresolved cross-references and ambiguous relations',
       sql: [
         'SELECT',

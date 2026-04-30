@@ -4,7 +4,7 @@
 return {
     { name = "traceability", label = "Traceability Matrix" },
     { name = "coverage",     label = "Coverage Report" },
-    { name = "dangling",     label = "Dangling References" },
+    { name = "unresolved",   label = "Unresolved References" },
     { name = "inventory",    label = "Float Inventory" },
     { name = "summary",      label = "Object Summary" },
 }

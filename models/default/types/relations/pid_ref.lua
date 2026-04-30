@@ -1,7 +1,7 @@
 ---Base relation type for PID-based references (@ selector).
 ---Owns resolution logic for @ links. Concrete types use extends = "PID_REF".
 ---
----@module traceable
+---@module pid_ref
 local Queries = require("db.queries")
 local M = {}
 
@@ -10,6 +10,24 @@ M.relation = {
     long_name = "PID Reference",
     description = "Base relation type for PID-based references (@ selector)",
     link_selector = "@",
+}
+
+---Default display rule for PID-based refs. Mirrors LABEL_REF's convention:
+---sections by title, other objects by PID, floats by "<caption> <number>".
+---Concrete subtypes (XREF_SEC, XREF_DECOMPOSITION, ...) can override by
+---defining their own on_render_Link.
+M.handler = {
+    name = "pid_ref_handler",
+    on_render_Link = function(target, _ctx)
+        if target.kind == "float" then
+            local caption = target.caption or "Item"
+            return caption .. " " .. (target.number or "?")
+        end
+        if target.type_ref == "SECTION" and target.title and target.title ~= "" then
+            return target.title
+        end
+        return target.pid
+    end,
 }
 
 ---Resolve a PID reference. Same-spec first, then cross-doc fallback.

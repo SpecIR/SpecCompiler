@@ -1,7 +1,7 @@
 ---Base relation type for label-based cross-references (# selector).
 ---Owns scoped label resolution (local -> spec -> global). Concrete types use extends = "LABEL_REF".
 ---
----@module xref
+---@module label_ref
 local Queries = require("db.queries")
 local M = {}
 
@@ -10,6 +10,26 @@ M.relation = {
     long_name = "Label Reference",
     description = "Base relation type for label-based cross-references (# selector)",
     link_selector = "#",
+}
+
+---Default display rule for label-based refs. Sections render by title (the
+---prose convention "see Chapter 3 Introduction"); everything else renders by
+---PID (for objects) or "<caption> <number>" (for floats). Concrete subtypes
+---(XREF_SEC, XREF_FIGURE, ...) can override by defining their own
+---on_render_Link; those without one inherit this behaviour via the extends
+---chain in core.type_loader.get_relation_handler.
+M.handler = {
+    name = "label_ref_handler",
+    on_render_Link = function(target, _ctx)
+        if target.kind == "float" then
+            local caption = target.caption or "Item"
+            return caption .. " " .. (target.number or "?")
+        end
+        if target.type_ref == "SECTION" and target.title and target.title ~= "" then
+            return target.title
+        end
+        return target.pid
+    end,
 }
 
 ---Parse target_text for explicit scope (ScopedRef: scope:prefix:label).
@@ -41,7 +61,6 @@ function M.resolve(data, spec_id, target_text, source_object_id)
     local label, explicit_scope = parse_scoped_target(raw_label)
     if not label then return nil, false end
 
-    -- Explicit scope: strict resolution (no fallback)
     if explicit_scope then
         local scope_obj = data:query_one(Queries.resolution.scope_object_by_pid_in_spec,
             { spec_id = spec_id, pid = explicit_scope })
@@ -59,9 +78,6 @@ function M.resolve(data, spec_id, target_text, source_object_id)
         return nil, false
     end
 
-    -- Implicit scoping: walk from closest scope to global
-
-    -- Step 1: Local float scope (float's parent = source object)
     if source_object_id then
         local results = data:query_all(Queries.resolution.float_by_label_in_scope_typed,
             { label = label, scope_id = source_object_id })
@@ -73,7 +89,6 @@ function M.resolve(data, spec_id, target_text, source_object_id)
         end
     end
 
-    -- Step 2: Same specification (unified objects + floats)
     local results = data:query_all(Queries.resolution.unified_by_label_in_spec,
         { spec = spec_id, label = label })
 
@@ -83,7 +98,6 @@ function M.resolve(data, spec_id, target_text, source_object_id)
         return results[1], true
     end
 
-    -- Step 3: Cross-document (global fallback)
     results = data:query_all(Queries.resolution.unified_by_label_global,
         { label = label })
 
