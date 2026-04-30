@@ -47,7 +47,6 @@ COPY scripts/versions.env        /build/scripts/versions.env
 COPY scripts/build.sh     /build/scripts/build.sh
 COPY src/tools/amath/            /build/src/tools/amath/
 COPY src/tools/echarts-render.ts /build/src/tools/echarts-render.ts
-COPY src/tools/mml2omml.ts       /build/src/tools/mml2omml.ts
 
 # Build everything: Lua, Pandoc (via GHCup/Cabal), Deno, PlantUML, SQLite,
 # all Lua C extensions (lsqlite3, luv, brimworks/zip, luaamath), and pure Lua

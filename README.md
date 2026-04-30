@@ -177,7 +177,7 @@ INSERT INTO spec_relations
 VALUES ('svc', 2, '0013', 'VERIFIES', '@', 'traceability');
 ```
 
-Type-checking is then a query against SpecIR. For example, the proof view
+Type-checking is then a query against SpecIR. For example, the verification view
 `invalid_cast` checks whether `'Pending'` is a legal value for
 `TRACEABLE.status` — it is not (only Draft, Review, Approved, Implemented are).
 And `traceability_hlr_to_vc` finds HLRs that are never the target of a
