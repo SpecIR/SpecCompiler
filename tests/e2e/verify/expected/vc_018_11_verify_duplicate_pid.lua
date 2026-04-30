@@ -1,6 +1,6 @@
 -- Oracle: duplicate PID detection.
 -- Two HLR objects share @HLR-DUPE, triggering object_duplicate_pid.
--- HLR-UNIQUE is a control and must NOT appear in the proof view.
+-- HLR-UNIQUE is a control and must NOT appear in the verification view.
 
 return function(_, helpers)
     if not helpers.expect_errors then

@@ -230,6 +230,18 @@ M.select_attributes_by_owner = [[
     WHERE owner_object_id = :owner_id
 ]]
 
+-- Get spec-level attribute values (not owned by any object or float).
+-- Used to decorate render contexts with ctx.spec_attributes so object
+-- handlers (e.g. CAPA) can read document-level metadata like title / author
+-- without re-querying inside every handler.
+M.select_spec_attributes = [[
+    SELECT name, string_value, raw_value
+    FROM spec_attribute_values
+    WHERE specification_ref = :spec_ref
+      AND owner_object_id IS NULL
+      AND owner_float_id IS NULL
+]]
+
 -- Get attribute values with AST for link rewriting (TRANSFORM phase)
 M.attributes_with_ast = [[
     SELECT av.id, av.owner_object_id, av.ast

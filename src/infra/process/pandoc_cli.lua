@@ -245,13 +245,15 @@ local function append_citation_options(args, format_config, project_root, templa
         local bib_path = resolve_project_path(format_config.bibliography, project_root)
         if file_exists(bib_path) then
             table.insert(args, "--bibliography=" .. bib_path)
-            table.insert(args, "--citeproc")
+            if format_config.citeproc ~= false then
+                table.insert(args, "--citeproc")
+            end
         else
             io.stderr:write(string.format("Warning: Bibliography file not found: %s\n", bib_path))
         end
     end
 
-    if format_config.csl then
+    if format_config.csl and format_config.citeproc ~= false then
         local csl_path = resolve_project_path(format_config.csl, project_root)
         if file_exists(csl_path) then
             table.insert(args, "--csl=" .. csl_path)

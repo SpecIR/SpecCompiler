@@ -18,14 +18,26 @@ end
 ---Check if output is up-to-date for a specification
 ---@param spec_id string Specification ID
 ---@param output_path string Output file path
+---@param dependencies string[]|nil Extra files that affect this output
 ---@return boolean is_current True if output is current and can be skipped
-function M:is_output_current(spec_id, output_path)
+function M:is_output_current(spec_id, output_path, dependencies)
     -- Check if output file exists
     if not task_runner.file_exists(output_path) then
         if self.log then
             self.log.debug("Output cache miss: file doesn't exist: %s", output_path)
         end
         return false
+    end
+
+    local output_mtime = task_runner.file_mtime(output_path)
+    for _, dep_path in ipairs(dependencies or {}) do
+        local dep_mtime = task_runner.file_mtime(dep_path)
+        if dep_mtime and output_mtime and dep_mtime > output_mtime then
+            if self.log then
+                self.log.debug("Output cache miss: dependency changed for %s: %s", output_path, dep_path)
+            end
+            return false
+        end
     end
 
     -- Get cached P-IR hash for this spec and output path

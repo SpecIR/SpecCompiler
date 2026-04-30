@@ -41,20 +41,28 @@ local function load_type_handler(type_ref, model_name)
         return type_handlers[cache_key]
     end
 
-    -- Try to load from model types/objects
     local type_name = type_ref:lower()
-    local module_path = "models." .. model_name .. ".types.objects." .. type_name
+    local module_paths = {
+        "models." .. model_name .. ".types.objects." .. type_name,
+    }
 
-    local ok, type_module = pcall(require, module_path)
-    if ok and type_module then
-        -- Type modules can export handler in two ways:
-        -- 1. M.handler = {...} with on_render_SpecObject
-        -- 2. return base_handler.create(M, name) which returns handler directly
-        local handler = type_module.handler or type_module
-        if handler and handler.on_render_SpecObject then
-            type_handlers[cache_key] = handler
-            logger.debug("Loaded type handler", {type_ref = type_ref})
-            return handler
+    -- Overlay models inherit default handlers unless they override them locally.
+    if model_name ~= "default" then
+        table.insert(module_paths, "models.default.types.objects." .. type_name)
+    end
+
+    for _, module_path in ipairs(module_paths) do
+        local ok, type_module = pcall(require, module_path)
+        if ok and type_module then
+            -- Type modules can export handler in two ways:
+            -- 1. M.handler = {...} with on_render_SpecObject
+            -- 2. return base_handler.create(M, name) which returns handler directly
+            local handler = type_module.handler or type_module
+            if handler and handler.on_render_SpecObject then
+                type_handlers[cache_key] = handler
+                logger.debug("Loaded type handler", {type_ref = type_ref})
+                return handler
+            end
         end
     end
 
@@ -80,6 +88,26 @@ local function get_object_attributes(data, object_id)
                 value = row.string_value or row.raw_value or "",
                 ast = row.ast  -- JSON-encoded Pandoc inlines (may be nil)
             }
+        end
+    end
+    return attrs
+end
+
+---Query spec-level attributes (title, author, etc. set on the specification
+---itself, not on any object or float). Returned as a flat name -> string map
+---keyed by lowercase name; `raw_value` is used when `string_value` is absent.
+---@param data DataManager
+---@param spec_ref string Specification identifier
+---@return table attrs Map of lowercase attribute name -> string value
+local function get_spec_attributes(data, spec_ref)
+    local results = data:query_all(Queries.content.select_spec_attributes,
+        {spec_ref = spec_ref})
+
+    local attrs = {}
+    if results then
+        for _, row in ipairs(results) do
+            local name = row.name and row.name:lower() or ""
+            attrs[name] = row.string_value or row.raw_value or ""
         end
     end
     return attrs
@@ -215,6 +243,20 @@ function M.on_transform(data, contexts, diagnostics)
     local log = logger.create_diagnostic_adapter(diagnostics, "RENDER")
 
     data:begin_transaction()
+    -- Cache spec-level attributes per specification_ref across all objects in
+    -- this transform run. Handlers read ctx.spec_attributes (populated below)
+    -- instead of re-querying.
+    local spec_attributes_cache = {}
+    local function spec_attributes_for(spec_ref)
+        if not spec_ref then return {} end
+        local cached = spec_attributes_cache[spec_ref]
+        if cached == nil then
+            cached = get_spec_attributes(data, spec_ref)
+            spec_attributes_cache[spec_ref] = cached
+        end
+        return cached
+    end
+
     for _, ctx in ipairs(contexts) do
         local model_name = ctx.model_name or ctx.template or "default"
         local spec_id = ctx.spec_id or "default"
@@ -253,6 +295,7 @@ function M.on_transform(data, contexts, diagnostics)
                     spec_id = obj.specification_ref,
                     spec_identifier = obj.specification_ref,
                     attributes = get_object_attributes(data, obj.id),
+                    spec_attributes = spec_attributes_for(obj.specification_ref),
                     original_blocks = body_blocks,
                     output_format = ctx.output_format or "docx",
                     format = ctx.output_format or "docx",

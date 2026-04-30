@@ -128,7 +128,7 @@ function M.cast_all(data)
                     data:execute(sql, params)
                 end
             end
-            -- If result is nil, cast failed - leave typed columns NULL for proof view
+            -- If result is nil, cast failed - leave typed columns NULL for verification view
         end
     end
 end

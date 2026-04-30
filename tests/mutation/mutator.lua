@@ -1,9 +1,9 @@
 -- SpecCompiler Mutation Testing Engine
--- Pandoc filter that runs mutation testing on SQL proof views and Lua source.
+-- Pandoc filter that runs mutation testing on SQL verification views and Lua source.
 -- Usage: pandoc --lua-filter tests/mutation/mutator.lua --metadata mode=sql < /dev/null
 --
 -- Modes:
---   sql           Run SQL proof view mutations (default + sw_docs models)
+--   sql           Run SQL verification view mutations (default + sw_docs models)
 --   lua           Run Lua source mutations (requires target metadata)
 --   all           Run both
 
@@ -100,10 +100,10 @@ end
 -- Module cache management
 -- ============================================
 
----Clear all proof-related modules from package.loaded (forces re-require).
+---Clear all verification-view-related modules from package.loaded (forces re-require).
 ---@param model_name string e.g., "default" or "sw_docs"
-local function clear_proof_modules(model_name)
-    local prefix = "models." .. model_name .. ".proofs."
+local function clear_verification_view_modules(model_name)
+    local prefix = "models." .. model_name .. ".verification_views."
     for module_name, _ in pairs(package.loaded) do
         if module_name:sub(1, #prefix) == prefix then
             package.loaded[module_name] = nil
@@ -127,7 +127,7 @@ local function clear_source_module(file_path)
 end
 
 -- ============================================
--- SQL Proof Mutation Engine
+-- SQL Verification View Mutation Engine
 -- ============================================
 
 -- Resolve tmpdir for mutation DB files (avoids ZFS CoW pressure)
@@ -200,22 +200,22 @@ local function collect_diagnostic_codes(diag)
     return codes
 end
 
----Run all SQL proof view mutations.
+---Run all SQL verification view mutations.
 ---@return table report {total, killed, survived, skipped, views={...}}
 local function run_sql_mutations()
-    print("\nSQL Proof Mutations")
+    print("\nSQL Verification View Mutations")
     print(string.rep("=", 60))
 
-    -- Discover which models have SQL proof definitions
+    -- Discover which models have SQL verification view definitions
     local model_sql_modules = {
-        { model = "default", require_path = "models.default.proofs.sql" },
-        { model = "sw_docs", require_path = "models.sw_docs.proofs.sql" },
+        { model = "default", require_path = "models.default.verification_views.sql" },
+        { model = "sw_docs", require_path = "models.sw_docs.verification_views.sql" },
     }
 
-    -- Ensure pristine module state: clear any stale proof modules from
+    -- Ensure pristine module state: clear any stale verification view modules from
     -- previous runs (e.g., if run.sh invokes mutator after the normal suite).
     for _, msm in ipairs(model_sql_modules) do
-        clear_proof_modules(msm.model)
+        clear_verification_view_modules(msm.model)
     end
 
     -- Load original SQL modules fresh from disk
@@ -226,7 +226,7 @@ local function run_sql_mutations()
         end
     end
 
-    -- Find test suites that exercise proofs (expect_errors mode)
+    -- Find test suites that exercise verification_views (expect_errors mode)
     local verify_suite = speccompiler_home .. "/tests/e2e/verify"
     local casting_neg_suite = speccompiler_home .. "/tests/e2e/casting_negative"
 
@@ -311,10 +311,10 @@ local function run_sql_mutations()
                 local mutated_sql = shallow_clone(orig_sql_module)
                 mutated_sql[view_name] = mutation.sql
 
-                -- 2. Clear proof module cache, then inject mutated SQL.
-                -- Order matters: clear_proof_modules removes ALL models.X.proofs.*
+                -- 2. Clear verification_view module cache, then inject mutated SQL.
+                -- Order matters: clear_verification_view_modules removes ALL models.X.verification_views.*
                 -- entries (including the sql module), so inject AFTER clearing.
-                clear_proof_modules(msm.model)
+                clear_verification_view_modules(msm.model)
                 package.loaded[msm.require_path] = mutated_sql
 
                 -- 3. Run each test file and compare diagnostics to baseline
@@ -355,7 +355,7 @@ local function run_sql_mutations()
                 end
 
                 -- 4. Restore original (clear first, then set — same order as inject)
-                clear_proof_modules(msm.model)
+                clear_verification_view_modules(msm.model)
                 package.loaded[msm.require_path] = orig_sql_module
 
                 -- 5. Record result
@@ -517,7 +517,7 @@ local function run_lua_mutations(target_path, suites)
             for dir in handle:lines() do
                 if dir ~= e2e_dir and file_exists(dir .. "/suite.yaml") then
                     local suite_config = parse_yaml(read_file(dir .. "/suite.yaml") or "")
-                    -- Skip expect_errors suites (they test proofs, not source logic)
+                    -- Skip expect_errors suites (they test verification_views, not source logic)
                     if suite_config.expect_errors ~= "true" then
                         for _, md_file in ipairs(discover_suite_tests(dir)) do
                             table.insert(suites, { suite = dir, file = md_file })

@@ -14,6 +14,36 @@ local Queries = require("db.queries")
 
 local KNOWN_CATEGORIES = { "objects", "floats", "views", "relations", "specifications" }
 
+-- Registry of relation-type handlers keyed by the relation type's identifier.
+-- Populated as each type module is loaded in M.load_model; read by
+-- relation_link_rewriter (and any other dispatcher) to find the handler
+-- associated with a given relation type id.
+M._relation_handlers = {}
+
+-- Parallel map of relation-type identifier -> parent type identifier
+-- (captured from `M.relation.extends` at load time). Used by
+-- `get_relation_handler` to walk the extends chain so concrete types inherit
+-- decorated callbacks (e.g. on_render_Link) from their base type.
+M._relation_extends = {}
+
+---Return the handler for a given relation type id, walking the `extends`
+---chain when the type itself has none. Returns nil when no ancestor in the
+---chain registered a handler.
+---@param type_id string|nil
+---@return table|nil handler
+function M.get_relation_handler(type_id)
+    if not type_id then return nil end
+    local seen = {}
+    local current = type_id
+    while current and not seen[current] do
+        local handler = M._relation_handlers[current]
+        if handler then return handler end
+        seen[current] = true
+        current = M._relation_extends[current]
+    end
+    return nil
+end
+
 
 -- Filesystem functions using luv
 local function create_fs_adapter(uv_lib)
@@ -62,6 +92,8 @@ local function register_float_type(data, schema)
 end
 
 ---Register a relation type into spec_relation_types.
+---Relation-type display behaviour lives on the module's `M.handler`
+---(see `M.load_model`, which indexes handlers in `M._relation_handlers`).
 ---@param data DataManager
 ---@param schema table Relation type schema
 local function register_relation_type(data, schema)
@@ -429,8 +461,21 @@ function M.load_model(data, pipeline, model_name)
         local ok, module = try_load_type(base_path, type_path)
         if ok then
             M.register_module(data, module)
+            -- Capture the relation type's extends chain so get_relation_handler
+            -- can inherit decorated callbacks from ancestors when a concrete
+            -- type doesn't define them. Captured here (not only when a handler
+            -- is present) so that a concrete type without a handler still
+            -- inherits its base's behaviour.
+            if module.relation and module.relation.id and module.relation.extends then
+                M._relation_extends[module.relation.id] = module.relation.extends
+            end
             if module.handler then
                 pipeline:register_handler(module.handler)
+                -- Index relation handlers by type id so link-rewriting can
+                -- dispatch type-specific behaviour (e.g. on_render_Link).
+                if module.relation and module.relation.id then
+                    M._relation_handlers[module.relation.id] = module.handler
+                end
             end
         else
             -- Views are optional extensions; warn instead of erroring

@@ -1,6 +1,6 @@
 # Verify Object Attribute Errors @SVC-VERIFY-ATTRS
 
-This test intentionally triggers object attribute errors to verify the proof view system.
+This test intentionally triggers object attribute errors to verify the verification view system.
 
 > version: 1.0
 

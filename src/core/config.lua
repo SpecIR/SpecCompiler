@@ -183,6 +183,31 @@ function M.extract_metadata(meta)
         }
     end
 
+    -- LaTeX configuration. Keep this generic so template postprocessors can
+    -- receive model-specific keys such as uspsc_zip without changing core code.
+    local latex_config = nil
+    if meta.latex and type(meta.latex) == "table" then
+        latex_config = {}
+        for k, v in pairs(meta.latex) do
+            local key = type(k) == "string" and k or utils.stringify(k)
+            if type(v) == "boolean" or type(v) == "number" then
+                latex_config[key] = v
+            elseif key == "filters" and type(v) == "table" then
+                latex_config[key] = {}
+                for i, item in ipairs(v) do
+                    latex_config[key][i] = utils.stringify(item)
+                end
+            elseif key == "variables" and type(v) == "table" then
+                latex_config[key] = {}
+                for vk, vv in pairs(v) do
+                    latex_config[key][type(vk) == "string" and vk or utils.stringify(vk)] = utils.stringify(vv)
+                end
+            else
+                latex_config[key] = utils.stringify(v)
+            end
+        end
+    end
+
     -- New outputs format: [{format, path}, ...]
     local outputs = nil
     if meta.outputs and type(meta.outputs) == "table" then
@@ -221,6 +246,8 @@ function M.extract_metadata(meta)
         docx = docx_config,
         -- HTML5 configuration
         html5 = html5_config,
+        -- LaTeX configuration
+        latex = latex_config,
         -- Bibliography/citation configuration
         bibliography = meta.bibliography and utils.stringify(meta.bibliography) or nil,
         csl = meta.csl and utils.stringify(meta.csl) or nil,

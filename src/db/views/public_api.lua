@@ -98,15 +98,15 @@ LEFT JOIN spec_relations r_in ON r_in.target_object_id = so.id
 GROUP BY so.id;
 
 --------------------------------------------------------------------------------
--- DANGLING REFERENCES
+-- UNRESOLVED REFERENCES
 -- Shows unresolved relations (broken links).
 -- Answers: "Which references couldn't be resolved?"
 --
 -- Example queries:
---   SELECT * FROM public_dangling_references
---   SELECT * FROM public_dangling_references WHERE from_file LIKE '%requirements%'
+--   SELECT * FROM public_unresolved_references
+--   SELECT * FROM public_unresolved_references WHERE from_file LIKE '%requirements%'
 --------------------------------------------------------------------------------
-CREATE VIEW IF NOT EXISTS public_dangling_references AS
+CREATE VIEW IF NOT EXISTS public_unresolved_references AS
 SELECT
   src.pid AS source_pid,
   src.type_ref AS source_type,

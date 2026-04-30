@@ -3,7 +3,7 @@
 # Usage: ./tests/mutation/mutate.sh [options]
 #
 # Options:
-#   --sql                Run SQL proof view mutations
+#   --sql                Run SQL verification view mutations
 #   --lua <file>         Run Lua source mutations on a specific file
 #   --all                Run all mutation modes
 #   --verbose            Show killed mutants (not just survivors)
@@ -55,7 +55,7 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [options]"
             echo ""
             echo "Options:"
-            echo "  --sql                Run SQL proof view mutations"
+            echo "  --sql                Run SQL verification view mutations"
             echo "  --lua <file>         Run Lua source mutations on a specific file"
             echo "  --all                Run all mutation modes (requires --lua target for Lua mode)"
             echo "  --verbose, -v        Show killed mutants (not just survivors)"

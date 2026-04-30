@@ -8,6 +8,7 @@
 ---@module relation_link_rewriter
 local Queries = require("db.queries")
 local ast_utils = require("pipeline.shared.ast_utils")
+local type_loader = require("core.type_loader")
 
 local M = {
     name = "relation_link_rewriter",
@@ -59,21 +60,45 @@ local function build_relation_lookup(data, spec_id)
 
         local key = tostring(r.source_object_id) .. "|" .. r.link_selector .. "|" .. r.target_text
 
+        local handler = type_loader.get_relation_handler(r.relation_type_ref)
+        local on_link = handler and handler.on_render_Link
+
         if r.object_pid then
-            local display_text
-            -- Sections: show title instead of PID for friendly display
-            if r.object_type_ref == "SECTION" and r.object_title_text and r.object_title_text ~= "" then
-                if r.object_spec ~= spec_id then
-                    -- Cross-document: prefix with spec identifier
-                    display_text = r.object_spec .. ": " .. r.object_title_text
-                else
-                    -- Same document: title only
-                    display_text = r.object_title_text
-                end
-            else
-                -- Non-section objects: PID is the meaningful identifier
-                display_text = r.object_pid
+            -- Local display text: delegate to the relation type's
+            -- on_render_Link. Every relation type extends LABEL_REF or PID_REF,
+            -- both of which register a default handler, so the lookup always
+            -- resolves something. Cross-document spec prefix is added below.
+            local local_display
+            if on_link then
+                local_display = on_link(
+                    {
+                        pid = r.object_pid,
+                        title = r.object_title_text or "",
+                        spec = r.object_spec,
+                        type_ref = r.object_type_ref,
+                        kind = "object",
+                    },
+                    {
+                        spec_id = spec_id,
+                        source_object_id = r.source_object_id,
+                        is_cross_doc = r.object_spec ~= spec_id,
+                        selector = r.link_selector,
+                    })
             end
+            -- Safety net: if a relation type lacks any on_render_Link up its
+            -- extends chain (e.g. a custom type that sets extends = nil),
+            -- fall back to the raw PID so we never emit an empty link.
+            if not local_display then
+                local_display = r.object_pid
+            end
+
+            local display_text
+            if r.object_spec ~= spec_id then
+                display_text = r.object_spec .. ": " .. local_display
+            else
+                display_text = local_display
+            end
+
             lookup[key] = {
                 spec = r.object_spec,
                 anchor = r.object_pid,
@@ -81,12 +106,34 @@ local function build_relation_lookup(data, spec_id)
             }
         elseif r.float_anchor or r.float_label then
             local anchor = r.float_anchor or r.float_label
-            local caption_format = r.caption_format or "Item"
-            local display_text = caption_format .. " " .. (r.float_number or "?")
+            local local_display
+            if on_link then
+                local_display = on_link(
+                    {
+                        label = r.float_label,
+                        anchor = r.float_anchor,
+                        number = r.float_number,
+                        caption = r.caption_format,
+                        spec = r.float_spec,
+                        kind = "float",
+                    },
+                    {
+                        spec_id = spec_id,
+                        source_object_id = r.source_object_id,
+                        is_cross_doc = r.float_spec ~= spec_id,
+                        selector = r.link_selector,
+                    })
+            end
+            -- Safety net: only reached when a float relation type's extends
+            -- chain has no on_render_Link at all. The label alone beats
+            -- emitting nothing.
+            if not local_display then
+                local_display = r.float_label or r.float_anchor or ""
+            end
             local entry = {
                 spec = r.float_spec,
                 anchor = anchor,
-                display_text = display_text
+                display_text = local_display
             }
             lookup[key] = entry
 

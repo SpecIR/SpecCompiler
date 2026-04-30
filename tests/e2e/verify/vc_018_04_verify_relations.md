@@ -1,6 +1,6 @@
 # Verify Relation Errors @SVC-VERIFY-RELATIONS
 
-This test intentionally triggers relation errors to verify the proof view system.
+This test intentionally triggers relation errors to verify the verification view system.
 
 > version: 1.0
 

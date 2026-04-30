@@ -47,7 +47,6 @@ SELECT
   rt.identifier AS relation_type,
   rt.long_name,
   rt.link_selector,
-  rt.is_default,
   rt.source_type_ref,
   rt.target_type_ref
 FROM spec_relation_types rt;
@@ -154,7 +153,7 @@ JOIN spec_object_types sot ON ita.object_type_id = sot.identifier;
 -- Resolves attribute datatypes for validation.
 -- Links attribute values to their expected types.
 --
--- Used by: attribute_caster handler, proof views
+-- Used by: attribute_caster handler, verification views
 --------------------------------------------------------------------------------
 CREATE VIEW IF NOT EXISTS view_attribute_type_resolution AS
 SELECT

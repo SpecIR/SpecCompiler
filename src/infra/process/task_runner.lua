@@ -270,6 +270,17 @@ function M.file_exists(path)
     return stat ~= nil
 end
 
+---Get file modification time in seconds.
+---@param path string File path
+---@return number|nil mtime Modification time, or nil if file is missing
+function M.file_mtime(path)
+    local stat = uv.fs_stat(path)
+    if not stat or not stat.mtime then
+        return nil
+    end
+    return stat.mtime.sec + (stat.mtime.nsec or 0) / 1000000000
+end
+
 ---Spawn a command asynchronously.
 ---Returns immediately with a result handle.
 ---@param cmd string Command to execute

@@ -237,7 +237,7 @@ CREATE TABLE IF NOT EXISTS datatype_definitions (
 -- 6. ATTRIBUTE DEFINITIONS
 -- Defines which attributes each object type can have (EAV schema).
 -- Includes cardinality and bounds constraints.
--- Validated by proof views (missing_required, cardinality_over, bounds).
+-- Validated by verification views (missing_required, cardinality_over, bounds).
 --------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS spec_attribute_types (
   -- Unique attribute definition ID
@@ -249,7 +249,7 @@ CREATE TABLE IF NOT EXISTS spec_attribute_types (
   owner_type_ref TEXT NOT NULL,
 
   -- Attribute name as it appears in markdown (e.g., "status", "priority")
-  -- Case-sensitive. Used in queries and proof views.
+  -- Case-sensitive. Used in queries and verification views.
   long_name TEXT NOT NULL,
 
   -- Data type for this attribute
@@ -257,19 +257,19 @@ CREATE TABLE IF NOT EXISTS spec_attribute_types (
   datatype_ref TEXT NOT NULL,
 
   -- Minimum occurrences. 0 = optional, 1+ = required.
-  -- Validated by proof view_object_missing_required
+  -- Validated by verification view_object_missing_required
   min_occurs INTEGER DEFAULT 0,
 
   -- Maximum occurrences. 1 = single value, >1 = multi-value attribute.
-  -- Validated by proof view_object_cardinality_over
+  -- Validated by verification view_object_cardinality_over
   max_occurs INTEGER DEFAULT 1,
 
   -- For INTEGER/REAL: minimum allowed value (inclusive)
-  -- Validated by proof view_object_bounds_violation
+  -- Validated by verification view_object_bounds_violation
   min_value REAL,
 
   -- For INTEGER/REAL: maximum allowed value (inclusive)
-  -- Validated by proof view_object_bounds_violation
+  -- Validated by verification view_object_bounds_violation
   max_value REAL,
 
   FOREIGN KEY (datatype_ref) REFERENCES datatype_definitions(identifier),
@@ -362,15 +362,15 @@ CREATE TABLE IF NOT EXISTS spec_specification_types (
 );
 
 --------------------------------------------------------------------------------
--- INDEXES FOR PROOF VIEW PERFORMANCE
--- These indexes accelerate the VERIFY phase proof views which check data
+-- INDEXES FOR VERIFICATION VIEW PERFORMANCE
+-- These indexes accelerate the VERIFY phase verification views which check data
 -- integrity via complex JOINs on type reference columns.
 --------------------------------------------------------------------------------
 
--- spec_attribute_types index for bounds and cardinality proof views
+-- spec_attribute_types index for bounds and cardinality verification views
 CREATE INDEX IF NOT EXISTS idx_attr_def_owner_type ON spec_attribute_types(owner_type_ref);
 
--- enum_values index for invalid enum proof view
+-- enum_values index for invalid enum verification view
 CREATE INDEX IF NOT EXISTS idx_enum_values_datatype ON enum_values(datatype_ref);
 ]]
 

@@ -1,4 +1,4 @@
----SQL mutation operators for proof view mutation testing.
+---SQL mutation operators for verification view mutation testing.
 ---Each operator generates single-site mutations on a SQL string.
 ---
 ---An operator returns an array of {mutated_sql, description} pairs,

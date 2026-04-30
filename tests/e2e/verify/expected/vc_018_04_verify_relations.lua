@@ -2,7 +2,7 @@
 -- Verifies relation errors are triggered for relation violations
 --
 -- In expect_errors mode, this oracle verifies that the expected policy_key codes
--- were detected by the proof view system.
+-- were detected by the verification view system.
 
 return function(actual_doc, helpers)
     -- In expect_errors mode, actual_doc is nil and we check diagnostics

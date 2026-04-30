@@ -19,5 +19,7 @@ validation:
 # - vc_type_001_sf.md        -> VC-TYPE-001 (Software Function Type)
 # - vc_type_002_nfr.md       -> VC-TYPE-002 (Non-Functional Requirement Type)
 # - vc_type_003_attr_dedup.md -> VC-TYPE-003 (Attribute Deduplication)
+# - vc_rel_006_xref_decomposition.md -> VC-REL-006 (Decomposition cross-references use PID resolution)
+# - vc_rel_007_xref_dic.md   -> VC-REL-007 (Dictionary cross-references stay in sw_docs)
 # - vc_rel_004_belongs.md    -> VC-REL-004 (BELONGS Relation)
 # - vc_rel_005_realizes.md   -> VC-REL-005 (REALIZES Relation)

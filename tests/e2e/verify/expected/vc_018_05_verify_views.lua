@@ -1,5 +1,6 @@
 -- Test oracle for VC-VERIFY-004: View Syntax Compatibility
--- Verifies unsupported/legacy view syntax does not emit unexpected SD-5xx
+-- Verifies unsupported/legacy view syntax does not emit unexpected
+-- view-related verification_view keys.
 --
 -- In expect_errors mode, this oracle validates diagnostics emitted by VERIFY.
 
@@ -27,9 +28,9 @@ return function(actual_doc, helpers)
             end
         end
 
-        -- Verify no SD-5xx codes were emitted
+        -- Verify no explicit view verification_view failures were emitted
         for code, _ in pairs(detected_codes) do
-            if code:match("^SD%-5%d%d$") then
+            if code == "view_materialization_failure" then
                 err(string.format("Unexpected %s detected", code))
             end
         end

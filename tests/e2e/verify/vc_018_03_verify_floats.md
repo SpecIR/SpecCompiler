@@ -1,6 +1,6 @@
 # Verify Float Errors @SVC-VERIFY-FLOATS
 
-This test intentionally triggers float errors to verify the proof view system.
+This test intentionally triggers float errors to verify the verification view system.
 
 > version: 1.0
 

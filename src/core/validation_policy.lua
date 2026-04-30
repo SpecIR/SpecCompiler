@@ -4,14 +4,14 @@ local M = {}
 M.MODES = { ERROR = "error", WARN = "warn", IGNORE = "ignore" }
 
 function M.new(config)
-    -- Build default policies dynamically from registered proofs (all default to "error")
-    local ok, ProofLoader = pcall(require, "core.proof_loader")
+    -- Build default policies dynamically from registered verification views.
+    local ok, VerificationViewLoader = pcall(require, "core.verification_view_loader")
     local default_policies = {}
 
     if ok then
-        for _, proof in ipairs(ProofLoader.get_proofs()) do
-            if proof.policy_key then
-                default_policies[proof.policy_key] = "error"
+        for _, verification_view in ipairs(VerificationViewLoader.get_verification_views()) do
+            if verification_view.policy_key then
+                default_policies[verification_view.policy_key] = "error"
             end
         end
     end
@@ -48,12 +48,12 @@ function M:report(violation_type, message, diagnostics)
     if mode == "error" then
         self.error_count = self.error_count + 1
         if diagnostics and diagnostics.error then
-            diagnostics:error(message, nil, nil, "VALIDATION")
+            diagnostics:error(nil, nil, violation_type, message)
         end
     elseif mode == "warn" then
         self.warning_count = self.warning_count + 1
         if diagnostics and diagnostics.warn then
-            diagnostics:warn(message, nil, nil, "VALIDATION")
+            diagnostics:warn(nil, nil, violation_type, message)
         end
     end
     -- ignore = do nothing

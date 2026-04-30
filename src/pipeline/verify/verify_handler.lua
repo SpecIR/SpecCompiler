@@ -1,31 +1,31 @@
 -- src/pipeline/verify/verify_handler.lua
--- Pipeline handler that runs all proof views during VERIFY phase.
--- Proof definitions are loaded from models via proof_loader (no hardcoded proofs).
+-- Pipeline handler that runs all verification views during VERIFY phase.
+-- Verification view definitions are loaded from models via verification_view_loader.
 
 local M = {
     name = "verify",
     prerequisites = {"relation_analyzer"}
 }
 
-local ProofLoader = require("core.proof_loader")
+local VerificationViewLoader = require("core.verification_view_loader")
 
----Run a single proof view and collect violations
+---Run a single verification view and collect violations
 ---@param data DataManager
----@param proof table Proof definition
+---@param verification_view table Verification view definition
 ---@param policy table|nil ValidationPolicy
 ---@return table[] violations
-local function run_proof(data, proof, policy)
+local function run_verification_view(data, verification_view, policy)
     local violations = {}
 
-    -- INLINE SQL: proof.view is a runtime table name from model proof definitions
+    -- INLINE SQL: verification_view.view is a runtime table name from model verification view definitions
     local ok, rows = pcall(function()
-        return data:query_all("SELECT * FROM " .. proof.view, {})
+        return data:query_all("SELECT * FROM " .. verification_view.view, {})
     end)
 
     if not ok then
         local level = "error"
         if policy and policy.get_level then
-            local policy_level = policy:get_level(proof.policy_key)
+            local policy_level = policy:get_level(verification_view.policy_key)
             if policy_level then
                 level = policy_level
             end
@@ -33,11 +33,11 @@ local function run_proof(data, proof, policy)
 
         if level ~= "ignore" then
             table.insert(violations, {
-                key = proof.policy_key,
+                key = verification_view.policy_key,
                 level = level,
                 message = string.format(
-                    "Validation query failed for proof view '%s': %s",
-                    proof.view,
+                    "Validation query failed for verification view '%s': %s",
+                    verification_view.view,
                     tostring(rows)
                 ),
                 file = nil,
@@ -50,7 +50,7 @@ local function run_proof(data, proof, policy)
     for _, row in ipairs(rows or {}) do
         local level = "error"
         if policy and policy.get_level then
-            local policy_level = policy:get_level(proof.policy_key)
+            local policy_level = policy:get_level(verification_view.policy_key)
             if policy_level then
                 level = policy_level
             end
@@ -58,9 +58,9 @@ local function run_proof(data, proof, policy)
 
         if level ~= "ignore" then
             table.insert(violations, {
-                key = proof.policy_key,
+                key = verification_view.policy_key,
                 level = level,
-                message = proof.message(row),
+                message = verification_view.message(row),
                 file = row.from_file,
                 line = row.start_line
             })
@@ -85,9 +85,9 @@ function M.on_verify(data, contexts, diagnostics)
     local error_count = 0
     local warn_count = 0
 
-    -- Collect violations from all proof views and report to diagnostics in a single pass
-    for _, proof in ipairs(ProofLoader.get_proofs()) do
-        local violations = run_proof(data, proof, policy)
+    -- Collect violations from all verification views and report to diagnostics in a single pass
+    for _, verification_view in ipairs(VerificationViewLoader.get_verification_views()) do
+        local violations = run_verification_view(data, verification_view, policy)
         for _, v in ipairs(violations) do
             table.insert(all_violations, v)
             if v.level == "error" then

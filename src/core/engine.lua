@@ -148,10 +148,10 @@ end
 
 ---Reset all module-level caches from prior runs.
 ---Required for re-entrant engine.run_project calls in tests.
----Uses cache_registry for handler caches; ProofLoader has its own reset.
+---Uses cache_registry for handler caches; VerificationViewLoader has its own reset.
 local function reset_pipeline_caches()
-    local ProofLoader = require("core.proof_loader")
-    ProofLoader.reset()
+    local VerificationViewLoader = require("core.verification_view_loader")
+    VerificationViewLoader.reset()
     local cache_registry = require("pipeline.shared.cache_registry")
     cache_registry.clear_all()
 end
@@ -215,23 +215,23 @@ local function register_core_handlers(pipeline)
     pipeline:register_handler(require("pipeline.emit.emitter"))
 end
 
----Load model types and proof views, initialize database views.
+---Load model types and verification views, initialize database views.
 ---@param data DataManager
 ---@param pipeline Pipeline
 ---@param template string Model template name
 local function load_models(data, pipeline, template)
-    local ProofLoader = require("core.proof_loader")
+    local VerificationViewLoader = require("core.verification_view_loader")
 
     TypeLoader.load_model(data, pipeline, "default")
     if template and template ~= "default" then
         TypeLoader.load_model(data, pipeline, template)
     end
 
-    ProofLoader.load_model("default")
+    VerificationViewLoader.load_model("default")
     if template and template ~= "default" then
-        ProofLoader.load_model(template)
+        VerificationViewLoader.load_model(template)
     end
-    ProofLoader.create_views(data)
+    VerificationViewLoader.create_views(data)
 
     local schema_init = require("db.schema.init")
     schema_init.initialize_views(data)

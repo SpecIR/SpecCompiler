@@ -392,12 +392,12 @@ CREATE TABLE IF NOT EXISTS spec_attribute_values (
   bool_value INTEGER,
 
   -- For DATE datatype (format: YYYY-MM-DD)
-  -- Validated by proof view_object_invalid_date
+  -- Validated by verification view_object_invalid_date
   date_value TEXT,
 
   -- For ENUM datatype
   -- FK to enum_values.identifier
-  -- Validated by proof view_object_invalid_enum
+  -- Validated by verification view_object_invalid_enum
   enum_ref TEXT,
 
   -- ============================================================
@@ -435,7 +435,7 @@ CREATE TABLE IF NOT EXISTS spec_attribute_values (
 
 -- PID lookup per specification (partial index: NULL PIDs excluded)
 -- Serves: WHERE specification_ref = ? AND pid = ? (relation resolver)
--- Uniqueness enforced by view_object_duplicate_pid proof in VERIFY phase, not by DB constraint.
+-- Uniqueness enforced by view_object_duplicate_pid verification_view in VERIFY phase, not by DB constraint.
 CREATE INDEX IF NOT EXISTS idx_objects_spec_pid
     ON spec_objects(specification_ref, pid) WHERE pid IS NOT NULL;
 
@@ -444,7 +444,7 @@ CREATE INDEX IF NOT EXISTS idx_objects_spec_pid
 CREATE UNIQUE INDEX IF NOT EXISTS idx_objects_spec_label
     ON spec_objects(specification_ref, label) WHERE label IS NOT NULL;
 
--- Label lookup per specification for floats (not unique — duplicates detected by view_float_duplicate_label proof)
+-- Label lookup per specification for floats (not unique — duplicates detected by view_float_duplicate_label verification_view)
 -- Serves: WHERE specification_ref = ? AND label = ? (# selector resolution)
 CREATE INDEX IF NOT EXISTS idx_floats_spec_label
     ON spec_floats(specification_ref, label) WHERE label IS NOT NULL;
@@ -485,7 +485,7 @@ CREATE INDEX IF NOT EXISTS idx_spec_objects_parent_lookup
     ON spec_objects(specification_ref, from_file, start_line, end_line, level);
 
 -- Type-only lookups: EAV pivot views filter by type_ref without spec scope
--- Serves: WHERE type_ref = ? (eav_pivot views, proof views)
+-- Serves: WHERE type_ref = ? (eav_pivot views, verification views)
 CREATE INDEX IF NOT EXISTS idx_spec_objects_type
     ON spec_objects(type_ref);
 
@@ -509,7 +509,7 @@ CREATE INDEX IF NOT EXISTS idx_spec_floats_anchor
     ON spec_floats(anchor) WHERE anchor IS NOT NULL;
 
 -- Type-only lookups: float type queries without spec scope
--- Serves: WHERE type_ref = ? (float_base queries, proof views)
+-- Serves: WHERE type_ref = ? (float_base queries, verification views)
 CREATE INDEX IF NOT EXISTS idx_spec_floats_type
     ON spec_floats(type_ref);
 
@@ -542,7 +542,7 @@ CREATE INDEX IF NOT EXISTS idx_spec_relations_unresolved
 -- === spec_attribute_values ===
 
 -- EAV pivot and attribute validation: owner + attribute name
--- Serves: WHERE owner_object_id = ? AND name = ? (EAV pivot, proof views)
+-- Serves: WHERE owner_object_id = ? AND name = ? (EAV pivot, verification views)
 --         WHERE owner_object_id = ? (attribute listing, type resolution)
 -- Note: left-prefix covers owner_object_id-only lookups too
 CREATE INDEX IF NOT EXISTS idx_spec_attr_owner_name

@@ -40,18 +40,25 @@ local function load_spec_type_handler(type_ref, model_name)
         return spec_type_handlers[cache_key]
     end
 
-    -- Try to load from model types/specifications
     local type_name = type_ref:lower()
-    local module_path = "models." .. model_name .. ".types.specifications." .. type_name
+    local module_paths = {
+        "models." .. model_name .. ".types.specifications." .. type_name,
+    }
 
-    local ok, type_module = pcall(require, module_path)
-    if ok and type_module then
-        -- Specification modules have M.handler with on_render_Specification
-        local handler = type_module.handler
-        if handler and handler.on_render_Specification then
-            spec_type_handlers[cache_key] = handler
-            logger.debug("Loaded specification type handler", {type_ref = type_ref})
-            return handler
+    if model_name ~= "default" then
+        table.insert(module_paths, "models.default.types.specifications." .. type_name)
+    end
+
+    for _, module_path in ipairs(module_paths) do
+        local ok, type_module = pcall(require, module_path)
+        if ok and type_module then
+            -- Specification modules have M.handler with on_render_Specification
+            local handler = type_module.handler
+            if handler and handler.on_render_Specification then
+                spec_type_handlers[cache_key] = handler
+                logger.debug("Loaded specification type handler", {type_ref = type_ref})
+                return handler
+            end
         end
     end
 

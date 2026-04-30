@@ -89,6 +89,7 @@ local function collect_documents(data, contexts, log)
         config.db_file = c.db_file
         config.outputs = c.outputs
         config.html5 = c.html5
+        config.latex = c.latex
         config.docx = c.docx
         config.bibliography = c.bibliography
         config.csl = c.csl
@@ -134,6 +135,39 @@ local function build_format_config(d, output, log)
     return format_config
 end
 
+local function resolve_project_path(path, project_root)
+    if not path then
+        return nil
+    end
+    if path:match("^/") then
+        return path
+    end
+    return (project_root or ".") .. "/" .. path
+end
+
+local function collect_output_dependencies(d)
+    local deps = {}
+    local project_root = d.config.project_root or "."
+
+    local bibliography = resolve_project_path(d.config.bibliography, project_root)
+    if bibliography then
+        deps[#deps + 1] = bibliography
+    end
+
+    local csl = resolve_project_path(d.config.csl, project_root)
+    if csl then
+        deps[#deps + 1] = csl
+    end
+
+    local latex = d.config.latex or {}
+    local uspsc_zip = resolve_project_path(latex.uspsc_zip, project_root)
+    if uspsc_zip then
+        deps[#deps + 1] = uspsc_zip
+    end
+
+    return deps
+end
+
 local function prepare_emit_tasks(documents, output_cache, diagnostics, log)
     local tasks = {}
     local task_metadata = {}
@@ -176,7 +210,7 @@ local function prepare_emit_tasks(documents, output_cache, diagnostics, log)
         for _, output in ipairs(outputs) do
             local output_path = output.path:gsub("{spec_id}", d.spec_id)
 
-            if output_cache:is_output_current(d.spec_id, output_path) then
+            if output_cache:is_output_current(d.spec_id, output_path, collect_output_dependencies(d)) then
                 log.info("Skipped %s: %s (unchanged)", output.format, output_path)
                 goto continue_output
             end
@@ -328,6 +362,17 @@ local function finalize_postprocessors(outputs_by_format, contexts, log)
                 output_dir = output_dir,
                 db_path = output_dir .. "/specir.db",
             }
+            local ctx_config = contexts[1] and contexts[1].config or {}
+            for k, v in pairs(ctx_config) do
+                if finalize_config[k] == nil then
+                    finalize_config[k] = v
+                end
+            end
+            local ctx = contexts[1] or {}
+            finalize_config.spec_id = ctx.spec_id
+            finalize_config.bibliography = ctx.bibliography
+            finalize_config.csl = ctx.csl
+            finalize_config.latex = ctx.latex
 
             local ok, err = pcall(postprocessor.finalize, info.paths, finalize_config, log)
             if ok then

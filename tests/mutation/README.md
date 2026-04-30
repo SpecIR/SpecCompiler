@@ -1,12 +1,12 @@
 # Mutation Testing Framework
 
-Mutation testing for SpecCompiler's SQL proof views and Lua pipeline source.
+Mutation testing for SpecCompiler's SQL verification views and Lua pipeline source.
 Measures test suite effectiveness by injecting faults and checking if tests detect them.
 
 ## Quick Start
 
 ```bash
-# SQL proof view mutations (safe, in-memory — ~5 min)
+# SQL verification view mutations (safe, in-memory — ~5 min)
 ./tests/mutation/mutate.sh --sql
 
 # Lua source mutations on a specific file (~2-10 min depending on file size)
@@ -22,9 +22,9 @@ Reports are written to `tests/reports/mutation/sql_report.json` and `lua_report.
 
 ### SQL Mode (`--sql`)
 
-Mutates SQL proof view definitions **in-memory** (never writes to disk). For each of the
-26 proof views (17 default + 9 sw_docs), applies single-site mutations and checks if the
-verify/casting_negative test suites detect the change via diagnostic code comparison.
+Mutates SQL verification view definitions **in-memory** (never writes to disk). For each of the
+26 verification views (17 default + 9 sw_docs), applies single-site mutations and checks if the
+verify/casting_negative test suites detect the change via diagnostic key comparison.
 
 **Operators** (6): negate EXISTS, relax AND→OR, flip comparisons, swap NULL checks,
 shift HAVING thresholds, drop WHERE predicates.
@@ -39,7 +39,7 @@ A shell trap + backup file protects against interrupted mutations leaving corrup
 **Operators** (10): flip equality/order/logic/bool, remove not, nil→false, flip return,
 off-by-one, boundary shift, empty string.
 
-**Oracle** (triple-signal): Any change in (1) output file content, (2) diagnostic codes,
+**Oracle** (triple-signal): Any change in (1) output file content, (2) diagnostic keys,
 or (3) pipeline pass/fail status kills the mutant. Mutations are pre-validated with
 `load()` to skip syntactically invalid mutants.
 

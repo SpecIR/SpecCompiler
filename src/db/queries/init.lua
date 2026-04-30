@@ -9,7 +9,7 @@
 --   Builders: M.build_{purpose}(args) → SQL string  (for dynamic IN clauses, CASE updates)
 --
 --   Justified inline SQL exceptions are marked with `-- INLINE SQL: <reason>` in:
---     • verify_handler.lua   — runtime table name from model proof definitions
+--     • verify_handler.lua   — runtime table name from model verification view definitions
 --     • fts_indexer.lua      — DDL / PRAGMA (schema ops, not data queries)
 --     • eav_pivot.lua        — dynamically generated CREATE VIEW from type metadata
 

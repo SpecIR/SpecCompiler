@@ -1,7 +1,7 @@
 # Verify View Syntax @SVC-VERIFY-VIEWS
 
 This test validates that legacy/unsupported inline view syntax does not crash
-the pipeline and does not emit unexpected SD-5xx diagnostics.
+the pipeline and does not emit unexpected view diagnostics.
 
 > version: 1.0
 
@@ -13,7 +13,7 @@ The following inline code uses an unregistered view prefix.
 
 `invalid_view_type:`
 
-No SD-5xx error is expected.
+No `view_materialization_failure` error is expected.
 
 ### Unregistered Fenced Block Class Is Ignored
 
@@ -23,7 +23,7 @@ The following fenced block uses an unregistered class and should be ignored.
 SELEKT * FORM nonexistent_table WHERE invalid syntax
 ```
 
-No SD-5xx error is expected.
+No `view_materialization_failure` error is expected.
 
 ## Section: Valid View Controls @SEC-VALID-VIEWS
 

@@ -28,14 +28,20 @@ return function(_, _)
         return false, "Unexpected missing-name error: " .. tostring(err_missing_name)
     end
 
+    -- `prerequisites` is optional: handlers that carry only decorated per-item
+    -- callbacks (e.g. on_render_Link) don't participate in phase ordering, so
+    -- they need no prereqs. Registration defaults the field to an empty list.
+    local handler_without_prereq = { name = "handler_without_prereq" }
     local ok_missing_prereq, err_missing_prereq = pcall(function()
-        p:register_handler({ name = "handler_without_prereq" })
+        p:register_handler(handler_without_prereq)
     end)
-    if ok_missing_prereq then
-        return false, "Expected missing prerequisites registration to fail"
+    if not ok_missing_prereq then
+        return false, "Expected missing prerequisites to default to {}, got error: "
+            .. tostring(err_missing_prereq)
     end
-    if not tostring(err_missing_prereq):match("Handler must have a 'prerequisites' field: handler_without_prereq") then
-        return false, "Unexpected missing-prerequisites error: " .. tostring(err_missing_prereq)
+    if type(handler_without_prereq.prerequisites) ~= "table"
+        or #handler_without_prereq.prerequisites ~= 0 then
+        return false, "Expected prerequisites to default to empty table"
     end
 
     p:register_handler({

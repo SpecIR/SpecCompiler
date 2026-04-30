@@ -103,7 +103,7 @@ Separate framework for measuring test suite effectiveness. See
 [mutation/README.md](mutation/README.md) for full details.
 
 ```bash
-# SQL proof view mutations (in-memory, safe)
+# SQL verification view mutations (in-memory, safe)
 ./tests/mutation/mutate.sh --sql
 
 # Lua source mutations (on-disk with safety backup)

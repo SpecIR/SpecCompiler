@@ -109,7 +109,7 @@ local function parse_header_content(content_str, default_type)
     end
 
     -- Extract @PID from end of title (also handles escaped \@PID from markdown)
-    local title_part, pid_part = title:match("^(.-)%s*\\?@([%w%-_]+)%s*$")
+    local title_part, pid_part = title:match("^(.-)%s*\\?@([%w%-_%.]+)%s*$")
     if pid_part then
         title = title_part
         pid = pid_part

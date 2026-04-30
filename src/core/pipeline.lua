@@ -27,19 +27,25 @@ function M.new(opts)
     return self
 end
 
----Register a handler with prerequisites
----@param handler table Handler with name field, prerequisites array, and on_{phase} hooks
+---Register a handler with prerequisites.
+---
+---Handlers come in two shapes on a single `M.handler` surface:
+--- * Phase handlers define `on_<phase>` hooks (e.g. `on_transform`) and rely
+---   on `prerequisites` to order themselves against other phase handlers.
+--- * Decorated per-item callbacks (e.g. `on_render_SpecObject`,
+---   `on_render_Link`) are dispatched inline by a phase handler with
+---   pre-resolved inputs; they do not participate in phase ordering, so
+---   `prerequisites` is not required and defaults to an empty list.
+---@param handler table Handler with name field, optional prerequisites array, and on_{phase} hooks
 function M:register_handler(handler)
     if not handler.name then
         error("Handler must have a 'name' field")
-    end
-    if not handler.prerequisites then
-        error("Handler must have a 'prerequisites' field: " .. handler.name)
     end
     if self.handlers[handler.name] then
         error("Handler already registered: " .. handler.name)
     end
 
+    handler.prerequisites = handler.prerequisites or {}
     self.handlers[handler.name] = handler
 
     if self.log then self.log.debug("Registered handler: " .. handler.name) end
@@ -211,6 +217,7 @@ function M:execute(docs, opts)
         -- Multi-format output support
         outputs = pinfo.outputs,  -- Array of {format, path} from project.yaml
         html5 = pinfo.html5,  -- HTML5 config from project.yaml
+        latex = pinfo.latex,  -- LaTeX config from project.yaml
         -- Bibliography/citation configuration
         bibliography = pinfo.bibliography,  -- Path to .bib file
         csl = pinfo.csl,  -- Path to CSL file for citation styling
@@ -264,7 +271,7 @@ function M:execute(docs, opts)
     end
 
     -- Abort if verification found errors
-    -- VERIFY runs after TRANSFORM so proof views can check transform results
+    -- VERIFY runs after TRANSFORM so verification views can check transform results
     -- (e.g., float render failure, view materialization failure)
     if self.diagnostics and self.diagnostics:has_errors() then
         if self.log then
