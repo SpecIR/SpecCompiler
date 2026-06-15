@@ -17,6 +17,7 @@
 ---@module models.default.filters.docx
 
 local xml = require("infra.format.xml")
+local float_anchor = require("pipeline.shared.float_anchor")
 
 -- ============================================================================
 -- OOXML DOM Construction Helpers
@@ -132,8 +133,9 @@ end
 ---@param caption string Caption text
 ---@param style string Paragraph style
 ---@param keep_with_next boolean|nil If true, adds keepNext to prevent orphaning
+---@param number string|nil Pre-computed float number to cache as the SEQ placeholder
 ---@return string OOXML caption paragraph
-local function ooxml_caption(prefix, seq_name, separator, caption, style, keep_with_next)
+local function ooxml_caption(prefix, seq_name, separator, caption, style, keep_with_next, number)
     local pPr_children = {
         xml.node("w:pStyle", {["w:val"] = style}),
     }
@@ -149,8 +151,11 @@ local function ooxml_caption(prefix, seq_name, separator, caption, style, keep_w
         }),
     }
 
-    -- SEQ field code runs
-    append_all(children, build_field_code(" SEQ " .. seq_name .. " \\* ARABIC "))
+    -- SEQ field code runs. The cached placeholder is the value Word/LibreOffice
+    -- show before the user updates fields (F9), so pass float-number when known
+    -- to avoid every caption showing "1" until field-update.
+    local placeholder = (number and number ~= "") and number or nil
+    append_all(children, build_field_code(" SEQ " .. seq_name .. " \\* ARABIC ", placeholder))
 
     -- Separator and caption text
     table.insert(children, xml.node("w:r", {}, {
@@ -187,6 +192,41 @@ local function ooxml_styled_para(text, style)
             xml.node("w:t", {["xml:space"] = "preserve"}, {xml.text(text)})
         })
     }))
+end
+
+---Generate OOXML for a semantic spec-object header paragraph.
+---@param text string Header text
+---@param bookmark_name string|nil Bookmark target, usually the object PID
+---@return string OOXML styled paragraph
+local function ooxml_spec_object_header(text, bookmark_name)
+    local children = {
+        xml.node("w:pPr", {}, {
+            xml.node("w:pStyle", {["w:val"] = "SpecObjectHeader"}),
+            xml.node("w:keepNext"),
+            -- Keep object headers in Word's outline/TOC without using Heading1-5.
+            xml.node("w:outlineLvl", {["w:val"] = "0"}),
+        }),
+    }
+
+    if bookmark_name and bookmark_name ~= "" then
+        local bm_id = float_anchor.bookmark_id(bookmark_name)
+        table.insert(children, xml.node("w:bookmarkStart", {
+            ["w:id"] = tostring(bm_id),
+            ["w:name"] = bookmark_name,
+        }))
+        table.insert(children, xml.node("w:r", {}, {
+            xml.node("w:t", {["xml:space"] = "preserve"}, {xml.text(text)})
+        }))
+        table.insert(children, xml.node("w:bookmarkEnd", {
+            ["w:id"] = tostring(bm_id),
+        }))
+    else
+        table.insert(children, xml.node("w:r", {}, {
+            xml.node("w:t", {["xml:space"] = "preserve"}, {xml.text(text)})
+        }))
+    end
+
+    return xml.serialize_element(xml.node("w:p", {}, children))
 end
 
 -- ============================================================================
@@ -277,16 +317,6 @@ local function convert_speccompiler_block(block)
         local orientation = value or "portrait"
         return pandoc.RawBlock("openxml", ooxml_section_break_orientation(orientation))
 
-    elseif marker_type == "float-position-start" then
-        -- Pass through to postprocessor as OOXML comment marker
-        -- Format: float-position-start:POSITION:TYPE
-        return pandoc.RawBlock("openxml",
-            string.format('<!-- speccompiler:float-position-start:%s -->', value or "h:FIGURE"))
-
-    elseif marker_type == "float-position-end" then
-        -- End marker for postprocessor
-        return pandoc.RawBlock("openxml", '<!-- speccompiler:float-position-end -->')
-
     else
         -- Unknown speccompiler marker - remove
         return {}
@@ -321,12 +351,13 @@ local function convert_caption_div(div)
     local prefix = get_attr(div, "prefix") or "Figure"
     local separator = get_attr(div, "separator") or ":"
     local style = get_attr(div, "style") or "Caption"
+    local number = get_attr(div, "float-number")
 
     -- Extract caption text from Div content
     local caption = pandoc.utils.stringify(div.content)
 
     -- Caption comes before content, so use keepNext to prevent orphaning
-    return pandoc.RawBlock("openxml", ooxml_caption(prefix, seq_name, separator, caption, style, true))
+    return pandoc.RawBlock("openxml", ooxml_caption(prefix, seq_name, separator, caption, style, true, number))
 end
 
 ---Convert speccompiler-numbered-equation Div to a single-paragraph OOXML layout.
@@ -355,11 +386,7 @@ local function convert_equation_div(div)
     -- Build bookmark OOXML (matches the old template).
     local bookmark_start_xml, bookmark_end_xml = "", ""
     if identifier and identifier ~= "" then
-        local bm_id = 0
-        for i = 1, #identifier do
-            bm_id = (bm_id * 31 + identifier:byte(i)) % 100000
-        end
-        bm_id = bm_id + 1
+        local bm_id = float_anchor.bookmark_id(identifier)
         bookmark_start_xml = xml.serialize_element(xml.node("w:bookmarkStart", {
             ["w:id"] = tostring(bm_id),
             ["w:name"] = identifier,
@@ -481,46 +508,42 @@ local function convert_toc_div(div, heading_text)
     return result
 end
 
----Convert speccompiler-positioned-float Div.
----Wraps content with position markers for postprocessor to convert to anchored OOXML.
----@param div pandoc.Div The positioned float div
----@return table Content blocks with position markers
-local function convert_positioned_float_div(div)
-    local position = get_attr(div, "data-position") or "h"
-    local orientation = get_attr(div, "data-orientation")
-    local float_type = get_attr(div, "data-float-type") or "FIGURE"
-
-    local result = {}
-
-    -- For position="p" (isolated page), add section break before (with orientation)
-    if position == "p" then
-        local orient = orientation or "portrait"
-        -- Emit OOXML section break directly (not speccompiler marker)
-        table.insert(result, pandoc.RawBlock("openxml",
-            ooxml_section_break_orientation(orient)))
+---Find the first Header inside a block list.
+---@param blocks table[] Blocks to search
+---@return table|nil Header block
+local function find_first_header(blocks)
+    for _, block in ipairs(blocks or {}) do
+        if block.t == "Header" then
+            return block
+        end
+        if block.content then
+            local found = find_first_header(block.content)
+            if found then return found end
+        end
     end
+    return nil
+end
 
-    -- Add marker indicating float position for postprocessor
-    -- Emit OOXML comment directly (not speccompiler marker, since RawBlock handler
-    -- won't re-process elements returned from Div handler in same filter pass)
-    table.insert(result, pandoc.RawBlock("openxml",
-        string.format('<!-- speccompiler:float-position-start:%s:%s -->', position, float_type)))
-
-    -- Include the float content
-    for _, block in ipairs(div.content) do
-        table.insert(result, block)
+---Convert a spec-object-header wrapper into a semantic DOCX paragraph.
+---Spec objects should not reuse Word Heading1-5 styles: those belong to
+---document sections. The PID bookmark is preserved for cross-references.
+---@param div pandoc.Div The spec-object-header Div
+---@return pandoc.RawBlock
+local function convert_spec_object_header_div(div)
+    local header = find_first_header(div.content)
+    local text = pandoc.utils.stringify(header and header.content or div.content)
+    local bookmark_name = nil
+    if header then
+        bookmark_name = header.identifier
+            or (header.attr and header.attr.identifier)
+            or (header.attr and header.attr[1])
     end
+    bookmark_name = bookmark_name
+        or div.identifier
+        or (div.attr and div.attr.identifier)
+        or (div.attr and div.attr[1])
 
-    -- End position marker (OOXML comment)
-    table.insert(result, pandoc.RawBlock("openxml", '<!-- speccompiler:float-position-end -->'))
-
-    -- For position="p", add section break after to return to normal
-    if position == "p" then
-        table.insert(result, pandoc.RawBlock("openxml",
-            ooxml_section_break_orientation("portrait")))
-    end
-
-    return result
+    return pandoc.RawBlock("openxml", ooxml_spec_object_header(text, bookmark_name))
 end
 
 -- ============================================================================
@@ -649,8 +672,8 @@ local FILTER_PASS1 = {
             return convert_equation_div(div)
         elseif has_class(div, "speccompiler-table") then
             return convert_table_div(div)
-        elseif has_class(div, "speccompiler-positioned-float") then
-            return convert_positioned_float_div(div)
+        elseif has_class(div, "spec-object-header") then
+            return convert_spec_object_header_div(div)
         end
 
         -- Cover page semantic divs -> styled OOXML paragraphs

@@ -17,7 +17,7 @@ function M.new(db_handler, log)
 end
 
 ---Register a resolver function for a base relation type.
----Called by type_loader when loading base relation types (e.g. PID_REF, LABEL_REF).
+---Called by the host registry when registering base relation descriptors (e.g. PID_REF, LABEL_REF).
 ---Resolution is type-driven: the type's extends chain determines which resolver to use.
 ---@param type_id string Base relation type identifier ("PID_REF", "LABEL_REF", etc.)
 ---@param fn function Resolver function(data, spec_id, target_text, source_object_id)
@@ -42,7 +42,7 @@ function M:query_one(sql, params)
 end
 
 function M:execute(sql, params)
-    local stmt = self.db:prepare_statement(sql, "execute")
+    local stmt = self.db:prepare_statement(sql)
     local res = self.db:execute_prepared(stmt, params)
     stmt:finalize()
     return res

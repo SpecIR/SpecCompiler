@@ -54,87 +54,45 @@ local function materialize_abbrev_list(data, spec_id, view_type_ref)
         { spec_id = spec_id, view_type_ref = view_type_ref }) or {}
 end
 
--- Cache for view type lookups
+-- Caches for view type lookups (false = cached negative result)
 local view_counter_group_cache = {}
 local view_abbrev_type_cache = {}
-
----Get the counter_group for a view name by querying spec_view_types.
----Returns the counter_group if this view is a "list of floats" type.
----@param data DataManager
----@param view_name string View name (e.g., "lof", "lot")
----@return string|nil counter_group The counter_group, or nil if not a list view
-local function get_view_counter_group(data, view_name)
-    local lower_name = view_name:lower()
-
-    if view_counter_group_cache[lower_name] ~= nil then
-        return view_counter_group_cache[lower_name] or nil
-    end
-
-    -- Query spec_view_types for counter_group (list-of-X views)
-    local result = data:query_one(Queries.materialization.select_counter_group_by_view,
-        { view_name = lower_name })
-
-    if result and result.counter_group then
-        view_counter_group_cache[lower_name] = result.counter_group
-        return result.counter_group
-    end
-
-    view_counter_group_cache[lower_name] = false  -- Cache negative result
-    return nil
-end
-
----Get the view_subtype_ref for abbreviation-style views.
----Queries spec_view_types for views that have view_subtype_ref set.
----@param data DataManager
----@param view_name string View name (e.g., "abbrev_list", "sigla_list")
----@return string|nil view_subtype_ref The view subtype ref, or nil if not an abbrev view
-local function get_abbrev_view_type(data, view_name)
-    local lower_name = view_name:lower()
-
-    if view_abbrev_type_cache[lower_name] ~= nil then
-        return view_abbrev_type_cache[lower_name] or nil
-    end
-
-    -- Query spec_view_types for abbreviation-style views
-    -- These have view_subtype_ref set (e.g., points to ABBREV, SIGLA, etc.)
-    local result = data:query_one(Queries.materialization.select_subtype_ref_by_view,
-        { view_name = lower_name })
-
-    if result and result.view_subtype_ref then
-        view_abbrev_type_cache[lower_name] = result.view_subtype_ref
-        return result.view_subtype_ref
-    end
-
-    view_abbrev_type_cache[lower_name] = false  -- Cache negative result
-    return nil
-end
-
--- Cache for materializer type lookups
 local view_materializer_type_cache = {}
 
----Get the materializer_type for a view name.
----Queries spec_view_types for the materialization strategy.
+---Cached spec_view_types lookup: query once per view name, remember misses.
+---@param cache table Cache table keyed by lowercase view name
 ---@param data DataManager
----@param view_name string View name (e.g., "toc", "lof")
----@return string|nil materializer_type The materializer type (e.g., "toc", "lof", "abbrev_list")
-local function get_view_materializer_type(data, view_name)
+---@param view_name string View name (e.g., "toc", "lof", "sigla_list")
+---@param query string Queries.materialization.* SQL taking {view_name}
+---@param field string Result field to return (e.g., "counter_group")
+---@return string|nil value The field value, or nil if not that kind of view
+local function cached_view_lookup(cache, data, view_name, query, field)
     local lower_name = view_name:lower()
-
-    if view_materializer_type_cache[lower_name] ~= nil then
-        return view_materializer_type_cache[lower_name] or nil
+    if cache[lower_name] ~= nil then
+        return cache[lower_name] or nil
     end
+    local result = data:query_one(query, { view_name = lower_name })
+    local value = result and result[field] or nil
+    cache[lower_name] = value or false
+    return value
+end
 
-    -- Query spec_view_types for materializer_type
-    local result = data:query_one(Queries.materialization.select_materializer_type_by_view,
-        { view_name = lower_name })
+---Get the counter_group for a view name ("list of floats" views, e.g. lof/lot).
+local function get_view_counter_group(data, view_name)
+    return cached_view_lookup(view_counter_group_cache, data, view_name,
+        Queries.materialization.select_counter_group_by_view, "counter_group")
+end
 
-    if result and result.materializer_type then
-        view_materializer_type_cache[lower_name] = result.materializer_type
-        return result.materializer_type
-    end
+---Get the view_subtype_ref for abbreviation-style views (e.g. abbrev_list).
+local function get_abbrev_view_type(data, view_name)
+    return cached_view_lookup(view_abbrev_type_cache, data, view_name,
+        Queries.materialization.select_subtype_ref_by_view, "view_subtype_ref")
+end
 
-    view_materializer_type_cache[lower_name] = false  -- Cache negative result
-    return nil
+---Get the materializer_type for a view name (materialization strategy).
+local function get_view_materializer_type(data, view_name)
+    return cached_view_lookup(view_materializer_type_cache, data, view_name,
+        Queries.materialization.select_materializer_type_by_view, "materializer_type")
 end
 
 ---Clear module-level caches (required for re-entrant engine.run_project calls).
@@ -148,13 +106,6 @@ cache_registry.register(M.clear_cache)
 -- ============================================================================
 -- Transform Phase
 -- ============================================================================
-
----Encode entries array as JSON.
----@param entries table Array of table entries
----@return string json JSON string
-local function encode_as_json(entries)
-    return pandoc.json.encode(entries)
-end
 
 ---Pre-compute view data and store in resolved_data column.
 ---Model-agnostic: uses inline_prefix to identify inline view entries.
@@ -201,7 +152,7 @@ function M.on_transform(data, contexts, diagnostics)
 
             -- Store materialized data if we got entries
             if entries then
-                local json_data = encode_as_json(entries)
+                local json_data = pandoc.json.encode(entries)
                 data:execute(Queries.materialization.update_view_resolved_data,
                     { id = view.id, data = json_data })
             end

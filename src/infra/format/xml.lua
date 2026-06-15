@@ -53,20 +53,6 @@ end
 ---@return string Escaped value safe for XML attributes
 M.escape_attr = M.escape
 
----Unescape XML entities back to original characters.
----@param text string Text with XML entities
----@return string Unescaped text
-function M.unescape(text)
-    if text == nil then return "" end
-    text = tostring(text)
-    text = text:gsub("&apos;", "'")
-    text = text:gsub("&quot;", '"')
-    text = text:gsub("&gt;", ">")
-    text = text:gsub("&lt;", "<")
-    text = text:gsub("&amp;", "&")  -- Must be last
-    return text
-end
-
 -- ============================================================================
 -- DOM Parsing and Serialization
 -- ============================================================================
@@ -229,17 +215,6 @@ function M.node(tag, attributes, children)
     return el
 end
 
----Create new element node (alias for node without children).
----@param name string Element tag name
----@param attrs table|nil Attributes table {name=value, ...}
----@param nsURI string|nil Namespace URI
----@return table New element node
-function M.element(name, attrs, nsURI)
-    local el = M.node(name, attrs)
-    el.nsURI = nsURI
-    return el
-end
-
 -- ============================================================================
 -- DOM Queries
 -- ============================================================================
@@ -278,30 +253,6 @@ function M.find_by_name(parent, name)
             end
             -- Recurse into children
             local nested = M.find_by_name(node, name)
-            for _, n in ipairs(nested) do
-                table.insert(results, n)
-            end
-        end
-    end
-    return results
-end
-
----Find elements by attribute value.
----@param parent table Parent element to search from
----@param attr_name string Attribute name to match
----@param attr_value string Attribute value to match
----@return table Array of matching elements
-function M.find_by_attr(parent, attr_name, attr_value)
-    local results = {}
-    local kids = parent.kids or parent.el or {}
-
-    for _, node in ipairs(kids) do
-        if node.type == "element" then
-            if node.attr and node.attr[attr_name] == attr_value then
-                table.insert(results, node)
-            end
-            -- Recurse into children
-            local nested = M.find_by_attr(node, attr_name, attr_value)
             for _, n in ipairs(nested) do
                 table.insert(results, n)
             end
@@ -409,15 +360,6 @@ function M.set_attr(el, name, value)
     })
 end
 
----Remove attribute from element.
----@param el table Element to modify
----@param name string Attribute name to remove
-function M.remove_attr(el, name)
-    if el.attr then
-        el.attr[name] = nil
-    end
-end
-
 -- ============================================================================
 -- DOM Manipulation
 -- ============================================================================
@@ -482,68 +424,9 @@ function M.replace_child(parent, name, new_child)
     return false
 end
 
----Replace a specific node in parent's children.
----@param parent table Parent element
----@param old_node table The node to replace
----@param new_node table The replacement node
----@return boolean true if replaced, false if not found
-function M.replace_node(parent, old_node, new_node)
-    local kids_key = parent.kids and "kids" or (parent.el and "el" or nil)
-    if not kids_key then return false end
-    local kids = parent[kids_key]
-    for i, node in ipairs(kids) do
-        if node == old_node then
-            old_node.parent = nil
-            new_node.parent = parent
-            kids[i] = new_node
-            return true
-        end
-    end
-    return false
-end
-
----Remove all children with a given tag name.
----@param parent table Parent element
----@param name string Tag name of children to remove
----@return number Count of removed children
-function M.remove_children_by_name(parent, name)
-    local kids_key = parent.kids and "kids" or (parent.el and "el" or nil)
-    if not kids_key then return 0 end
-    local kids = parent[kids_key]
-    local count = 0
-    local i = 1
-    while i <= #kids do
-        local node = kids[i]
-        if element_matches_name(node, name) then
-            table.remove(kids, i)
-            node.parent = nil
-            count = count + 1
-        else
-            i = i + 1
-        end
-    end
-    return count
-end
-
 -- ============================================================================
 -- Utility Functions
 -- ============================================================================
-
----Get text content of element (concatenates all text children).
----@param el table Element to get text from
----@return string Concatenated text content
-function M.get_text(el)
-    local parts = {}
-    local kids = el.kids or {}
-    for _, node in ipairs(kids) do
-        if node.type == "text" then
-            table.insert(parts, node.value)
-        elseif node.type == "element" then
-            table.insert(parts, M.get_text(node))
-        end
-    end
-    return table.concat(parts)
-end
 
 ---Clone an element (deep copy).
 ---@param el table Element to clone

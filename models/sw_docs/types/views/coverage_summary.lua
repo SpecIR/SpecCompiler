@@ -1,3 +1,5 @@
+local view_utils = require("pipeline.shared.view_utils")
+local make_link_target = view_utils.make_link_target
 ---Coverage Summary View for sw_docs.
 ---Generates a Pandoc Table showing VC counts and pass rates grouped by Software Function (SF).
 ---
@@ -6,33 +8,18 @@
 ---
 ---@module coverage_summary
 
-local M = {}
-
-M.view = {
+local schema = {
     id = "COVERAGE_SUMMARY",
+    extends = "TABLE_VIEW",
     long_name = "Coverage Summary",
     description = "VC coverage grouped by Software Function",
     inline_prefix = "coverage_summary"
 }
 
-local prefix_matcher = require("pipeline.shared.prefix_matcher")
-local match_codeblock = prefix_matcher.codeblock_from_decl(M.view)
 
----Generate coverage summary as a Pandoc Table.
----@param data DataManager
----@param spec_id string
----@param options table|nil
----@return pandoc.Block
----Build link target, using cross-document .ext placeholder for objects in other specs.
-local function make_link_target(pid, target_spec, current_spec)
-    if target_spec == current_spec then
-        return "#" .. pid
-    else
-        return target_spec .. ".ext#" .. pid
-    end
-end
-
-function M.generate(data, spec_id, options)
+local function build_block(dctx)
+    local data = dctx.data
+    local spec_id = dctx.spec_id or "default"
     local rows_data = data:query_all([[
         SELECT
             sf.pid AS sf_pid,
@@ -146,25 +133,10 @@ function M.generate(data, spec_id, options)
     return pandoc.utils.from_simple_table(tbl)
 end
 
-M.handler = {
-    name = "coverage_summary_handler",
-    prerequisites = {"spec_objects", "spec_relations"},
-
-    on_render_Code = function()
-        return nil
-    end,
-
-    on_render_CodeBlock = function(block, ctx)
-        if not match_codeblock(block) then return nil end
-
-        local data = ctx.data
-        local spec_id = ctx.spec_id or "default"
-        if not data or not pandoc then
-            return nil
-        end
-
-        return M.generate(data, spec_id, {})
-    end,
+return {
+    kind = "view",
+    schema = schema,
+    hooks = {
+        build_block = build_block,
+    }
 }
-
-return M

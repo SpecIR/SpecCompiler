@@ -11,58 +11,27 @@ local pid_utils = require("pipeline.shared.pid_utils")
 local Queries = require("db.queries")
 local attribute_para = require("pipeline.shared.attribute_para_utils")
 local cache_registry = require("pipeline.shared.cache_registry")
+local cache_utils = require("pipeline.shared.cache_utils")
 
 local M = {
     name = "specifications",
     prerequisites = {}  -- Runs first in INITIALIZE
 }
 
--- Cache for default types
-local default_object_type_cache = nil
-local default_spec_type_cache = nil
-
----Query the default object type from spec_object_types.
----Falls back to nil if no default type is configured.
----@param data DataManager
----@return string|nil default_type The default type identifier
-local function get_default_object_type(data)
-    if default_object_type_cache then
-        return default_object_type_cache
-    end
-
+-- Singleton caches for default types (nil = no default configured)
+local default_object_type = cache_utils.create_once(function(data)
     local result = data:query_one(Queries.types.default_object_type)
-
-    if result and result.identifier then
-        default_object_type_cache = result.identifier
-        return default_object_type_cache
-    end
-
-    return nil  -- No default configured
-end
-
----Query the default specification type from spec_specification_types.
----Falls back to nil if no default type is configured.
----@param data DataManager
----@return string|nil default_type The default specification type identifier
-local function get_default_specification_type(data)
-    if default_spec_type_cache then
-        return default_spec_type_cache
-    end
-
+    return result and result.identifier or nil
+end)
+local default_spec_type = cache_utils.create_once(function(data)
     local result = data:query_one(Queries.types.default_spec_type)
-
-    if result and result.identifier then
-        default_spec_type_cache = result.identifier
-        return default_spec_type_cache
-    end
-
-    return nil  -- No default configured
-end
+    return result and result.identifier or nil
+end)
 
 ---Clear module-level caches (required for re-entrant engine.run_project calls).
 function M.clear_cache()
-    default_object_type_cache = nil
-    default_spec_type_cache = nil
+    default_object_type:clear()
+    default_spec_type:clear()
 end
 cache_registry.register(M.clear_cache)
 
@@ -245,31 +214,10 @@ local function resolve_implicit_spec_type(data, title)
     return result and result.spec_type_id or nil
 end
 
----Extract parsed headers from a single context WITHOUT database operations.
----Sets ctx.parsed_headers and returns specification data for batch insertion.
----@param ctx Context Document context
----@param data DataManager Data manager (for type validation only)
----@param diagnostics Diagnostics
----@return table|nil spec_data Specification data for DB insert, or nil if no L1 header
-local function extract_headers_from_context(ctx, data, diagnostics)
-    local doc = ctx.doc
-    local spec_id = ctx.spec_id or "default"
-
-    local blocks
-    local source_path = "unknown"
-    if doc then
-        if doc.blocks then
-            blocks = doc.blocks
-            source_path = doc.source_path or "unknown"
-        elseif doc.doc and doc.doc.blocks then
-            blocks = doc.doc.blocks
-            source_path = doc.source_path or "unknown"
-        end
-    end
-
-    if not blocks then return nil end
-
-    -- First pass: collect all headers
+---First pass: collect all Header blocks with their parse-relevant fields.
+---@param blocks table Document blocks
+---@return table headers Array of header records (index, level, title_text, ...)
+local function collect_headers(blocks)
     local headers = {}
     for i, block in ipairs(blocks) do
         if block.t == "Header" then
@@ -297,9 +245,125 @@ local function extract_headers_from_context(ctx, data, diagnostics)
             })
         end
     end
+    return headers
+end
 
-    local default_object_type = get_default_object_type(data)
-    local default_spec_type = get_default_specification_type(data)
+---Collect a header's section blocks (header through the block before the next
+---header), stamping the PID identifier onto the header and stripping the @PID
+---notation from its inlines (mutates the header block in place).
+---@param blocks table Document blocks
+---@param start_idx integer First block index of the section (the header)
+---@param end_idx integer Last block index of the section
+---@param pid string|nil Explicit PID parsed from the header, if any
+---@param header_line integer Header source line (end_line fallback)
+---@return table section_blocks
+---@return integer|nil end_line Last source line of the section
+local function collect_section_blocks(blocks, start_idx, end_idx, pid, header_line)
+    local section_blocks = {}
+    for j = start_idx, end_idx do
+        local block = blocks[j]
+        if block.t == "Header" and pid and block.attr then
+            block.attr.identifier = pid
+            -- Strip @PID notation from header inlines — PID is stored
+            -- separately and should not appear in rendered output
+            if block.content then
+                strip_pid_from_inlines(block.content, pid)
+            end
+        end
+        table.insert(section_blocks, block)
+    end
+
+    local end_line = nil
+    if #section_blocks > 0 then
+        end_line = get_block_end_line(section_blocks[#section_blocks])
+            or get_block_line(section_blocks[#section_blocks])
+        if not end_line then
+            end_line = header_line + #section_blocks
+        end
+    end
+
+    return section_blocks, end_line
+end
+
+---Resolve a header's final type_ref: implicit typing from the title when no
+---explicit type was given, then validation with fallback-to-default warnings.
+---@param data DataManager
+---@param diagnostics Diagnostics
+---@param header table Header record from collect_headers
+---@param type_ref string|nil Type parsed from the header (or header_default)
+---@param title string Parsed title
+---@param header_default string|nil Default type for this header level
+---@param source_path string Document path for diagnostics
+---@return string|nil type_ref Resolved type
+local function resolve_header_type(data, diagnostics, header, type_ref, title, header_default, source_path)
+    local is_valid_type = header.level == 1 and is_valid_specification_type or is_valid_object_type
+
+    -- If no explicit type (defaulted to header_default), try implicit typing from title
+    if type_ref == header_default or type_ref == nil then
+        if header.level == 1 then
+            -- Try implicit specification type from title (e.g., "Trabalho Acadêmico" -> TRABALHO_ACADEMICO)
+            local implicit_spec_type = resolve_implicit_spec_type(data, title)
+            if implicit_spec_type and is_valid_specification_type(data, implicit_spec_type) then
+                type_ref = implicit_spec_type
+            end
+        else
+            -- Try implicit object type from title (level 2+)
+            local implicit_type = resolve_implicit_type(data, title)
+            if implicit_type and is_valid_object_type(data, implicit_type) then
+                type_ref = implicit_type
+            end
+        end
+    end
+
+    if type_ref and type_ref ~= header_default and not is_valid_type(data, type_ref) then
+        local diag_file = header.source_file or source_path
+        if header_default then
+            diagnostics:add_warning(
+                diag_file,
+                header.line,
+                string.format("Unknown type '%s', falling back to %s", type_ref, header_default)
+            )
+            type_ref = header_default
+        else
+            diagnostics:add_warning(
+                diag_file,
+                header.line,
+                string.format("Unknown type '%s' and no default type configured", type_ref)
+            )
+        end
+    end
+
+    return type_ref
+end
+
+---Extract parsed headers from a single context WITHOUT database operations.
+---Sets ctx.parsed_headers and returns specification data for batch insertion.
+---@param ctx Context Document context
+---@param data DataManager Data manager (for type validation only)
+---@param diagnostics Diagnostics
+---@return table|nil spec_data Specification data for DB insert, or nil if no L1 header
+local function extract_headers_from_context(ctx, data, diagnostics)
+    local doc = ctx.doc
+    local spec_id = ctx.spec_id or "default"
+
+    local blocks
+    local source_path = "unknown"
+    if doc then
+        if doc.blocks then
+            blocks = doc.blocks
+            source_path = doc.source_path or "unknown"
+        elseif doc.doc and doc.doc.blocks then
+            blocks = doc.doc.blocks
+            source_path = doc.source_path or "unknown"
+        end
+    end
+
+    if not blocks then return nil end
+
+    local headers = collect_headers(blocks)
+
+    local default_obj_type_id = default_object_type:get(data)
+    local default_spec_type_id = default_spec_type:get(data)
 
     local parsed_headers = {}
     local spec_data = nil
@@ -310,72 +374,18 @@ local function extract_headers_from_context(ctx, data, diagnostics)
 
         local header_default
         if header.level == 1 then
-            header_default = default_spec_type
+            header_default = default_spec_type_id
         else
-            header_default = default_object_type
+            header_default = default_obj_type_id
         end
-        local type_ref, title, pid, pid_prefix, pid_sequence, pid_format = parse_header_content(header.title_text, header_default)
+        local type_ref, title, pid, pid_prefix, pid_sequence = parse_header_content(header.title_text, header_default)
 
-        local section_blocks = {}
-        for j = start_idx, end_idx do
-            local block = blocks[j]
-            if block.t == "Header" and pid and block.attr then
-                block.attr.identifier = pid
-                -- Strip @PID notation from header inlines — PID is stored
-                -- separately and should not appear in rendered output
-                if block.content then
-                    strip_pid_from_inlines(block.content, pid)
-                end
-            end
-            table.insert(section_blocks, block)
-        end
-
-        local end_line = nil
-        if #section_blocks > 0 then
-            end_line = get_block_end_line(section_blocks[#section_blocks])
-                or get_block_line(section_blocks[#section_blocks])
-            if not end_line then
-                end_line = header.line + #section_blocks
-            end
-        end
+        local section_blocks, end_line =
+            collect_section_blocks(blocks, start_idx, end_idx, pid, header.line)
 
         local ast_json = blocks_to_json(section_blocks)
-        local is_valid_type = header.level == 1 and is_valid_specification_type or is_valid_object_type
 
-        -- If no explicit type (defaulted to header_default), try implicit typing from title
-        if type_ref == header_default or type_ref == nil then
-            if header.level == 1 then
-                -- Try implicit specification type from title (e.g., "Trabalho Acadêmico" -> TRABALHO_ACADEMICO)
-                local implicit_spec_type = resolve_implicit_spec_type(data, title)
-                if implicit_spec_type and is_valid_specification_type(data, implicit_spec_type) then
-                    type_ref = implicit_spec_type
-                end
-            else
-                -- Try implicit object type from title (level 2+)
-                local implicit_type = resolve_implicit_type(data, title)
-                if implicit_type and is_valid_object_type(data, implicit_type) then
-                    type_ref = implicit_type
-                end
-            end
-        end
-
-        if type_ref and type_ref ~= header_default and not is_valid_type(data, type_ref) then
-            local diag_file = header.source_file or source_path
-            if header_default then
-                diagnostics:add_warning(
-                    diag_file,
-                    header.line,
-                    string.format("Unknown type '%s', falling back to %s", type_ref, header_default)
-                )
-                type_ref = header_default
-            else
-                diagnostics:add_warning(
-                    diag_file,
-                    header.line,
-                    string.format("Unknown type '%s' and no default type configured", type_ref)
-                )
-            end
-        end
+        type_ref = resolve_header_type(data, diagnostics, header, type_ref, title, header_default, source_path)
 
         table.insert(parsed_headers, {
             header = header,
@@ -384,8 +394,6 @@ local function extract_headers_from_context(ctx, data, diagnostics)
             pid = pid,
             pid_prefix = pid_prefix,
             pid_sequence = pid_sequence,
-            pid_format = pid_format,
-            section_blocks = section_blocks,
             end_line = end_line,
             ast_json = ast_json,
             seq = i

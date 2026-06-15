@@ -237,31 +237,6 @@ function M.write_file(path, content)
     return true
 end
 
----Read content from a file.
----@param path string File path
----@return string|nil content
----@return string|nil error
-function M.read_file(path)
-    local stat = uv.fs_stat(path)
-    if not stat then
-        return nil, "File not found: " .. path
-    end
-
-    local fd, err = uv.fs_open(path, "r", 420)
-    if not fd then
-        return nil, "Failed to open file: " .. (err or "unknown")
-    end
-
-    local content, read_err = uv.fs_read(fd, stat.size)
-    uv.fs_close(fd)
-
-    if not content then
-        return nil, "Failed to read file: " .. (read_err or "unknown")
-    end
-
-    return content
-end
-
 ---Check if a file exists.
 ---@param path string File path
 ---@return boolean exists
@@ -406,7 +381,5 @@ function M.spawn_batch(tasks, max_concurrent)
 end
 
 -- Export constants
-M.DEFAULT_TIMEOUT_MS = DEFAULT_TIMEOUT_MS
-M.uv = uv
 
 return M

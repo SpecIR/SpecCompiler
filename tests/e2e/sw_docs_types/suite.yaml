@@ -1,0 +1,24 @@
+# SW Docs Model Type Tests
+# Tests for sw_docs-specific object types (SF, NFR, ...) and relations
+# (REALIZES, and the LABEL_REF cross-references XREF_DIC / XREF_DECOMPOSITION).
+
+project:
+  code: TEST_SW_DOCS_TYPES
+  name: SW Docs Type System Tests
+
+template: sw_docs
+output_format: json
+
+validation:
+  traceability_hlr_to_vc: ignore
+  traceability_fd_to_csc: ignore
+  traceability_fd_to_csu: ignore
+  traceability_hlr_allocation: ignore
+
+# Test case to VC mapping:
+# - vc_017_03_attr_dedup.md        -> VC-017 (Attribute deduplication)
+# - vc_019_02_sf_type.md           -> VC-019 (Software Function type)
+# - vc_019_03_nfr_type.md          -> VC-019 (Non-Functional Requirement type)
+# - vc_019_04_realizes_relation.md -> VC-019 (REALIZES relation)
+# - vc_019_05_xref_decomposition.md -> VC-019 (CSC/CSU xrefs: @ -> XREF_SEC, #label -> XREF_DECOMPOSITION)
+# - vc_019_06_xref_dic.md          -> VC-019 (DIC xrefs: @ -> XREF_SEC, #label -> XREF_DIC)

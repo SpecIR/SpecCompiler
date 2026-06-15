@@ -2,23 +2,8 @@
 ---Targets: Bibliography entries via @cite/@citep selectors.
 ---
 ---@module xref_citation
-local M = {}
 local Queries = require("db.queries")
 local ast_utils = require("pipeline.shared.ast_utils")
-
-M.relation = {
-    id = "XREF_CITATION",
-    long_name = "Citation Reference",
-    description = "Cross-reference to a bibliography entry",
-
-    -- Inference pattern (source, attribute, target)
-    source_type_ref = nil,     -- nil = any source can cite
-    source_attribute = nil,    -- nil = any attribute
-    target_type_ref = nil,     -- Citations target bibliography entries, not spec objects
-
-    -- Resolution
-    link_selector = "@cite,@citep",
-}
 
 -- ============================================================================
 -- Handler
@@ -83,16 +68,30 @@ local function rewrite_citation_links(data, spec_id)
     end
 end
 
-M.handler = {
-    name = "xref_citation_handler",
-    prerequisites = {"spec_relations"},  -- Run after relations are stored
+return {
+    kind = "relation",
+    schema = {
+        id = "XREF_CITATION",
+        long_name = "Citation Reference",
+        description = "Cross-reference to a bibliography entry",
 
-    on_transform = function(data, contexts, diagnostics)
-        for _, ctx in ipairs(contexts) do
-            local spec_id = ctx.spec_id or "default"
-            rewrite_citation_links(data, spec_id)
-        end
-    end
+        -- Inference pattern (source, attribute, target)
+        source_type_ref = nil,     -- nil = any source can cite
+        source_attribute = nil,    -- nil = any attribute
+        target_type_ref = nil,     -- Citations target bibliography entries, not spec objects
+
+        -- Resolution
+        link_selector = "@cite,@citep",
+
+        -- Phase ordering: run after relations are stored
+        phase_prerequisites = { "spec_relations" },
+    },
+    hooks = {
+        on_transform = function(data, contexts, diagnostics)
+            for _, ctx in ipairs(contexts) do
+                local spec_id = ctx.spec_id or "default"
+                rewrite_citation_links(data, spec_id)
+            end
+        end,
+    },
 }
-
-return M

@@ -1,3 +1,4 @@
+
 # SpecCompiler Core User Manual @MANUAL
 
 > version: 1.0
@@ -16,7 +17,7 @@
 
 > document_id: SC-UM-001
 
-This manual is itself a complete working example of a SpecCompiler document authored with `template: default`. Every feature described in these pages -- floats, cross-references, abbreviations, charts, diagrams, views, and math -- is also demonstrated inline. Process this file with `specc build` to see the rendered output. The companion guides *Creating a Custom Model* and *DOCX Customization* are included in the same project and can be cross-referenced by section label.
+This manual is itself a complete working example of a SpecCompiler document authored with `template: default`. Every core feature described in these pages -- floats, cross-references, abbreviations, diagrams, views, and math -- is demonstrated inline and renders with the default model. Charts (`chart:` floats) are an overlay-model feature: their authoring syntax is shown below but is not rendered here, because the default core is deliberately deno-free (see *Chart (ECharts)*). Process this file with `specc build` to see the rendered output. The companion guides *Creating a Custom Model* and *DOCX Customization* are included in the same project and can be cross-referenced by section label.
 
 ## INDEX
 
@@ -54,7 +55,7 @@ The processing pipeline consists of five phases:
 
 1. **INITIALIZE** -- Parse Markdown input via `abbrev: Pandoc Abstract Syntax Tree (AST)`, extract specifications, spec objects, attributes, floats, relations, and views into the SpecIR stored in `abbrev: SQLite Database (SQLite)`.
 2. **ANALYZE** -- Resolve relation types and cross-references using specificity-based inference rules (see [math:eq-specificity](#)).
-3. **TRANSFORM** -- Resolve floats (render PlantUML, charts, tables), materialize views, rewrite links, and render spec objects using type-specific handlers.
+3. **TRANSFORM** -- Resolve floats (render PlantUML, charts, tables), materialize views, rewrite links, and render spec objects using each type's render hook.
 4. **VERIFY** -- Execute verification views (SQL queries) against the SpecIR database to detect constraint violations; see [section:verification-views](#) in the model guide.
 5. **EMIT** -- Assemble Pandoc documents from the SpecIR and generate output files in configured formats via parallel Pandoc subprocess invocations.
 
@@ -105,15 +106,15 @@ end note
 @enduml
 ```
 
-```chart:chart-pipeline-ops{caption="Operations per Pipeline Phase"}
+```json
 {
   "xAxis": { "type": "category", "data": ["INITIALIZE", "ANALYZE", "TRANSFORM", "VERIFY", "EMIT"] },
-  "yAxis": { "type": "value", "name": "Handler count" },
+  "yAxis": { "type": "value", "name": "Hook count" },
   "series": [{ "type": "bar", "data": [6, 2, 5, 1, 3], "itemStyle": { "color": "#5470c6" } }]
 }
 ```
 
-The handler counts shown in [chart:chart-pipeline-ops](#) reflect the default model. Custom models may add handlers in any phase.
+The ECharts config above (hook counts per phase) renders as a bar chart under any model that provides the `chart:` float, such as `abnt`; the counts reflect the default model. Custom models may add hooks in any phase.
 
 ## Installation
 
@@ -143,26 +144,21 @@ All dependency versions are pinned in `scripts/versions.env`.
 
 ### Building the Image
 
-Build the Docker image and install the wrapper from the repository root:
+The image is a thin overlay on the official pandoc image (`Dockerfile.lean`): stock pandoc, the four compiled Lua C extensions, and the SpecCompiler Lua source. No compiler toolchain, no pandoc build. From the repository root:
 
 ```src.bash:src-build-image{caption="Build and install via Docker"}
-bash scripts/docker_build.sh
+docker build -f Dockerfile.lean --target full -t speccompiler-core:latest .
 bash scripts/install.sh
 ```
 
-`docker_build.sh` executes a multi-stage Docker build:
+Two targets are available:
 
-- **Toolchain** -- Compiles Lua, Pandoc (with GHC), and native Lua extensions (luv, lsqlite3, zip) from source. Builds Deno TypeScript utilities. Downloads and wraps PlantUML with a minimal JRE. This stage is cached and only rebuilt when `scripts/versions.env`, `scripts/build.sh`, or `src/tools/` change.
-- **Runtime-base** -- Copies only runtime artifacts into a lean Debian Bookworm image without build tools. Installs runtime dependencies (Python/reqif, graphviz, lcov). This is the stable base for code-only updates.
-- **Runtime** -- Overlays `src/` and `models/` onto runtime-base to produce the final image.
+- **`full`** (recommended) -- core plus the optional external renderers: deno for model-owned `chart:` floats (e.g. the `abnt` model) and PlantUML for `puml:` diagrams.
+- **`lean`** -- core only (stock pandoc + extensions + Lua source); chart and PlantUML floats are unavailable.
 
 `install.sh` installs the `specc` `abbrev: Command-Line Interface (CLI)` wrapper at `~/.local/bin/specc` and writes the image reference to `~/.config/speccompiler/env`. If a local image exists it is used automatically; otherwise, the GHCR image is pulled on first use.
 
-The build script supports three modes:
-
-- **Default** (`bash scripts/docker_build.sh`) -- Builds the full image if not present.
-- **Force** (`bash scripts/docker_build.sh --force`) -- Rebuilds everything from scratch, including the toolchain.
-- **Code-only** (`bash scripts/docker_build.sh --code-only`) -- Updates only `src/` and `models/` layers without recompiling the toolchain. Always builds from the stable `runtime-base` image, preventing Docker layer accumulation. Dangling images from previous builds are automatically pruned.
+For maintainers who need the fully from-source toolchain (custom-compiled pandoc, air-gapped builds), the pre-lean path remains available via `bash scripts/docker_build.sh` (old `Dockerfile`) and `bash scripts/build.sh` — it is no longer the default.
 
 ### Verifying Installation
 
@@ -438,6 +434,8 @@ void init(void) {
 
 #### Chart (ECharts)
 
+The `CHART` float lives in an overlay model such as `abnt`, not in the lean core: set `template: abnt` in `project.yaml` (or use any model that carries the CHART float). Rendering needs deno — the Docker `full` image ships it; native installs can run the model's `scripts/bootstrap.sh`. The default core is deliberately deno-free, so the chart examples in this manual show authoring syntax only and are not rendered here.
+
 ````src.markdown:src-chart-float-syntax{caption="Chart float syntax"}
 ```chart:chart-coverage{caption="Test Coverage"}
 {
@@ -447,7 +445,7 @@ void init(void) {
 ```
 ````
 
-Charts support data injection via view modules. Add `view="gauss"` and `params="mean=0,sigma=1"` to the code fence attributes to inject generated data into the ECharts configuration at render time. See [chart:chart-gauss](#) for a working example.
+Charts support data injection via view modules. Add `view="gauss"` and `params="mean=0,sigma=1"` to the code fence attributes to inject generated data into the ECharts configuration at render time. The *Chart with Data View Injection* example below shows the syntax (the `gauss` view ships with the overlay model that provides charts).
 
 #### Math
 
@@ -716,7 +714,7 @@ L = T_(network) + T_(processing) + T_(db)
 
 #### Throughput Chart (ECharts)
 
-```chart:chart-throughput{caption="Throughput by Module"}
+```json
 {
   "xAxis": { "type": "category", "data": ["Auth", "Data", "Search", "Notify"] },
   "yAxis": { "type": "value", "name": "req/s" },
@@ -728,7 +726,7 @@ L = T_(network) + T_(processing) + T_(db)
 
 Every float and object defined above can be referenced from prose. The following paragraph demonstrates cross-reference resolution using the `#` selector.
 
-The system architecture is depicted in [plantuml:diag-layers](#). Component details, including the technology stack for each layer, are listed in [list-table:tbl-components](#). Performance targets and actuals are compared in [csv:tbl-metrics](#) -- all four metrics pass their thresholds. The initialization logic is shown in [listing:lst-init](#), and the latency model driving performance requirements is defined by [math:eq-latency](#). Finally, throughput measurements by module are visualized in [chart:chart-throughput](#).
+The system architecture is depicted in [plantuml:diag-layers](#). Component details, including the technology stack for each layer, are listed in [list-table:tbl-components](#). Performance targets and actuals are compared in [csv:tbl-metrics](#) -- all four metrics pass their thresholds. The initialization logic is shown in [listing:lst-init](#), and the latency model driving performance requirements is defined by [math:eq-latency](#). Finally, throughput measurements by module are described by the chart config shown above, which renders as a chart under overlay models that provide the `chart:` float.
 
 The `@` selector resolves by PID and works across documents. For example, this sentence references the introduction of this manual: [MANUAL-sec1](@). Cross-document references to the companion guides also work; see [section:model-directory-layout](#) for the model directory layout and [section:style-presets](#) for DOCX style presets.
 
@@ -833,8 +831,9 @@ Inline math is useful for formulas within prose paragraphs, while block `math:` 
 
 #### Chart with Data View Injection (Gauss)
 
-Charts can load data dynamically from view modules using the `view` attribute. The `gauss` view generates a Gaussian probability density function and injects it into the ECharts dataset. The chart below demonstrates this -- the `view="gauss"` attribute triggers the data injection pipeline:
+Charts can load data dynamically from view modules using the `view` attribute. The `gauss` view generates a Gaussian probability density function and injects it into the ECharts dataset. The syntax below shows this -- the `view="gauss"` attribute triggers the data injection pipeline in models that provide the chart float:
 
+````src.markdown:src-chart-gauss-syntax{caption="Chart with gauss data injection"}
 ```chart:chart-gauss{caption="Standard Normal Distribution" view="gauss" params="mean=0,sigma=1,xmin=-3,xmax=3,points=61"}
 {
   "xAxis": { "type": "value", "name": "x" },
@@ -842,8 +841,9 @@ Charts can load data dynamically from view modules using the `view` attribute. T
   "series": [{ "type": "line", "smooth": true }]
 }
 ```
+````
 
-The `params` attribute passes `mean`, `sigma`, `xmin`, `xmax`, and `points` to the Gauss view's `generate()` function. The function returns an ECharts dataset that replaces the chart's placeholder data at render time. This same mechanism supports custom data views that query the SpecIR database; see [section:walkthrough-custom-view](#) in the model guide for details on creating view modules.
+The `params` attribute passes `mean`, `sigma`, `xmin`, `xmax`, and `points` to the Gauss view's `dataset` data hook. The hook returns an ECharts dataset that replaces the chart's placeholder data at render time. This same mechanism supports custom data views that query the SpecIR database; see [section:walkthrough-custom-view](#) in the model guide for details on creating view types.
 
 #### Generated Lists
 
@@ -1049,9 +1049,11 @@ The `docs/engineering_docs/` directory in this repository uses `sw_docs` and ser
 
 ### Custom Models
 
-Set `template: mymodel` in `project.yaml`. Custom types layer as overlays on top of `default` (types with matching `id` replace the default; new `id`s add).
+Set `template: mymodel` in `project.yaml`. Custom types layer as overlays on top of `default` (types with matching `id` replace the default; new `id`s add). The model directory is resolved under the SpecCompiler installation (`models/mymodel/`) first, then under the project directory itself — so a project can ship its own model alongside its documents.
 
-Everything else — directory layout, the `M.handler` contract, schema fields for each category, verification views, external renderers — lives in the companion [Creating a Custom Model](guides/creating-a-model.md) guide.
+Each extension point is a single Lua file that returns one descriptor table -- a `kind` (`object`, `float`, `view`, `relation`, `specification`, or `verification`), a `schema` holding your data (the authoritative `id`, `extends`, `attributes`, and so on), and an optional `hooks` table holding any behaviour. A pure-data type omits `hooks` entirely. The recipe is simple: decide the kind, put your data in `schema`, and pick the hook whose name matches what you want to do -- a `render`/`render_block`/`render_link` hook to produce output during the EMIT walk, or a data hook like `dataset` or `transform` to produce data earlier in the pipeline. You receive the right context and return the documented type. Shared behaviour lives once on a base type and is inherited through `schema.extends` (for example, objects extend `TRACEABLE` to get the standard card, and matrix views extend `TABLE_VIEW`).
+
+Everything else — directory layout, the full hook catalogue and the context each one receives, schema fields for each kind, verification views, and external renderers — lives in the companion [Creating a Custom Model](guides/creating-a-model.md) guide.
 
 ## Troubleshooting
 

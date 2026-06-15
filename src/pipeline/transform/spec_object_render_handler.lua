@@ -2,8 +2,8 @@
 ---TRANSFORM phase handler that invokes type handlers to render spec objects.
 ---
 ---Types like COVER, DEDICATION, etc. can define header() and body() functions
----that transform the stored AST into styled output. This handler loads type
----modules and calls on_render_SpecObject to apply those transformations.
+---that transform the stored AST into styled output. This handler invokes the
+---host-indexed object render hook to apply those transformations.
 ---
 ---@module spec_object_render_handler
 local M = {
@@ -16,9 +16,8 @@ local attribute_para = require("pipeline.shared.attribute_para_utils")
 local render_utils = require("pipeline.shared.render_utils")
 local ast_utils = require("pipeline.shared.ast_utils")
 local Queries = require("db.queries")
-
--- Cache of loaded type handlers by type_ref
-local type_handlers = {}
+local registry = require("contract.registry")
+local hook_ctx = require("pipeline.shared.hook_ctx")
 
 ---Encode Pandoc blocks to JSON for storage.
 ---Uses pandoc.json.encode for consistency with section_handler.
@@ -30,46 +29,8 @@ local function encode_ast(blocks)
     return pandoc.json.encode(blocks)
 end
 
----Try to load a type handler for a given type_ref.
----@param type_ref string Type identifier (e.g., "COVER")
----@param model_name string Model name (e.g., "abnt")
----@return table|nil handler Handler module or nil if not found
-local function load_type_handler(type_ref, model_name)
-    -- Check cache first
-    local cache_key = model_name .. ":" .. type_ref
-    if type_handlers[cache_key] ~= nil then
-        return type_handlers[cache_key]
-    end
-
-    local type_name = type_ref:lower()
-    local module_paths = {
-        "models." .. model_name .. ".types.objects." .. type_name,
-    }
-
-    -- Overlay models inherit default handlers unless they override them locally.
-    if model_name ~= "default" then
-        table.insert(module_paths, "models.default.types.objects." .. type_name)
-    end
-
-    for _, module_path in ipairs(module_paths) do
-        local ok, type_module = pcall(require, module_path)
-        if ok and type_module then
-            -- Type modules can export handler in two ways:
-            -- 1. M.handler = {...} with on_render_SpecObject
-            -- 2. return base_handler.create(M, name) which returns handler directly
-            local handler = type_module.handler or type_module
-            if handler and handler.on_render_SpecObject then
-                type_handlers[cache_key] = handler
-                logger.debug("Loaded type handler", {type_ref = type_ref})
-                return handler
-            end
-        end
-    end
-
-    -- Not found or doesn't have on_render_SpecObject
-    type_handlers[cache_key] = false  -- Cache miss
-    return nil
-end
+-- Object render dispatch reads host:get_hook_inherited("object", type_ref, "render")
+-- (overlaid default -> template).
 
 ---Query attributes for a spec object.
 ---Returns both string values and AST for rich content rendering.
@@ -196,18 +157,20 @@ local function unwrap_spec_object_divs(blocks)
     return result
 end
 
----Filter out existing spec-object-attributes Divs from blocks.
----These may exist from a previous transform and should not be duplicated.
----The spec_object_base.render_attributes() will add a fresh one.
+---Filter out Divs with the given class from previous transform runs.
+---These may exist from a previous transform and should not be duplicated
+---(spec_object_base.render_attributes() / the render hook add fresh ones).
+---Filtering keeps type handler rendering idempotent across repeated TRANSFORMs.
 ---@param blocks table Array of Pandoc blocks
----@return table filtered Blocks without spec-object-attributes Divs
-local function filter_spec_object_attr_divs(blocks)
+---@param class string Div class to drop (e.g., "spec-object-header")
+---@return table filtered Blocks without Divs of that class
+local function filter_divs_with_class(blocks, class)
     if not blocks then return {} end
     local filtered = {}
     for _, block in ipairs(blocks) do
         local block_type = block.t or (block.tag) or ""
-        if block_type == "Div" and render_utils.block_has_class(block, "spec-object-attributes") then
-            logger.debug("Filtered existing spec-object-attributes Div")
+        if block_type == "Div" and render_utils.block_has_class(block, class) then
+            logger.debug("Filtered existing " .. class .. " Div (idempotent transform)")
         else
             table.insert(filtered, block)
         end
@@ -215,24 +178,57 @@ local function filter_spec_object_attr_divs(blocks)
     return filtered
 end
 
----Filter out spec-object-header Divs from previous transform runs.
----The base_handler wraps type handler header() output in a Div with this class.
----Filtering this makes type handler rendering idempotent - running TRANSFORM
----multiple times (e.g., on cached documents) produces the same result.
----@param blocks table Array of Pandoc blocks
----@return table filtered Blocks without spec-object-header Divs
-local function filter_spec_object_headers(blocks)
-    if not blocks then return {} end
-    local filtered = {}
-    for _, block in ipairs(blocks) do
-        local block_type = block.t or (block.tag) or ""
-        if block_type == "Div" and render_utils.block_has_class(block, "spec-object-header") then
-            logger.debug("Filtered existing spec-object-header Div (idempotent transform)")
-        else
-            table.insert(filtered, block)
+---Patch heading IDs for composite objects (SECTION, EXEC_SUMMARY, etc.).
+---Composite objects are excluded from full type-handler rendering because
+---their AST contains nested children whose headers must not be stripped.
+---This lightweight pass only updates the FIRST header's ID to the PID,
+---ensuring cross-references like [MANUAL-sec14](@) resolve in HTML output.
+---@param data DataManager
+---@param spec_id string Specification identifier
+---@param log table Logger adapter
+local function patch_composite_heading_ids(data, spec_id, log)
+    local composites = data:query_all(Queries.content.select_composite_objects_by_spec,
+        { spec_id = spec_id })
+
+    local patched = 0
+    for _, obj in ipairs(composites or {}) do
+        local decoded = decode_ast(obj.ast)
+        if decoded and #decoded > 0 then
+            -- Find the first Header in the top-level blocks
+            for _, block in ipairs(decoded) do
+                local block_type = block.t or (block.tag) or ""
+                if block_type == "Header" then
+                    -- Check if the header ID already matches the PID
+                    local current_id = ""
+                    if block.attr then
+                        current_id = block.attr.identifier or
+                                     (type(block.attr[1]) == "string" and block.attr[1]) or ""
+                    end
+                    if current_id ~= obj.pid then
+                        -- Update the header ID to the PID
+                        if block.attr and block.attr.identifier ~= nil then
+                            block.attr.identifier = obj.pid
+                        else
+                            -- Reconstruct attr preserving classes and kvpairs
+                            local classes = block.attr and block.attr[2] or {}
+                            local kvpairs = block.attr and block.attr[3] or {}
+                            block.attr = pandoc.Attr(obj.pid, classes, kvpairs)
+                        end
+                        local new_ast = encode_ast(decoded)
+                        data:execute(Queries.content.update_object_ast, {
+                            ast = new_ast, id = obj.id
+                        })
+                        patched = patched + 1
+                    end
+                    break  -- Only patch the first header
+                end
+            end
         end
     end
-    return filtered
+
+    if patched > 0 then
+        log.info("Patched heading IDs for %d composite object(s)", patched)
+    end
 end
 
 ---TRANSFORM phase: Invoke type handlers to render spec objects.
@@ -247,6 +243,7 @@ function M.on_transform(data, contexts, diagnostics)
     -- this transform run. Handlers read ctx.spec_attributes (populated below)
     -- instead of re-querying.
     local spec_attributes_cache = {}
+    local spec_info_cache = {}
     local function spec_attributes_for(spec_ref)
         if not spec_ref then return {} end
         local cached = spec_attributes_cache[spec_ref]
@@ -256,9 +253,19 @@ function M.on_transform(data, contexts, diagnostics)
         end
         return cached
     end
+    local function spec_info_for(spec_ref)
+        if not spec_ref then return {} end
+        local cached = spec_info_cache[spec_ref]
+        if cached == nil then
+            cached = data:query_one(Queries.content.select_specification_for_render,
+                { spec_id = spec_ref }) or {}
+            spec_info_cache[spec_ref] = cached
+        end
+        return cached
+    end
 
+    local host = registry.current()
     for _, ctx in ipairs(contexts) do
-        local model_name = ctx.model_name or ctx.template or "default"
         local spec_id = ctx.spec_id or "default"
 
         -- Query spec objects for this spec that might need type handler rendering
@@ -274,9 +281,9 @@ function M.on_transform(data, contexts, diagnostics)
 
         local rendered_count = 0
         for _, obj in ipairs(objects) do
-            local handler = load_type_handler(obj.type_ref, model_name)
+            local render = host and host:get_hook_inherited("object", obj.type_ref, "render")
 
-            if handler then
+            if render then
                 -- Build context for type handler
                 -- Filter out headers, attribute blockquotes, and existing spec-object-attributes divs
                 -- - Headers: type handlers create styled headers
@@ -287,25 +294,29 @@ function M.on_transform(data, contexts, diagnostics)
                 -- Sequential filtering: remove elements that type handlers will recreate
                 local body_blocks = filter_headers(unwrapped)
                 body_blocks = filter_attribute_blockquotes(body_blocks)
-                body_blocks = filter_spec_object_attr_divs(body_blocks)
-                body_blocks = filter_spec_object_headers(body_blocks)
+                body_blocks = filter_divs_with_class(body_blocks, "spec-object-attributes")
+                body_blocks = filter_divs_with_class(body_blocks, "spec-object-header")
 
-                local render_ctx = {
-                    spec_object = obj,
-                    spec_id = obj.specification_ref,
-                    spec_identifier = obj.specification_ref,
+                -- The object render hook receives the canonical frozen ctx
+                -- (HLR-EXT-009): invariant core + the object subject. spec_id is
+                -- the object's own specification.
+                -- The rendering type's schema carries declarative render options
+                -- (attr_order, show_pid, ...) for the host card renderer.
+                local desc = host:get_descriptor("object", obj.type_ref)
+                local subject = {
+                    object = obj,
                     attributes = get_object_attributes(data, obj.id),
+                    specification = spec_info_for(obj.specification_ref),
                     spec_attributes = spec_attributes_for(obj.specification_ref),
-                    original_blocks = body_blocks,
-                    output_format = ctx.output_format or "docx",
-                    format = ctx.output_format or "docx",
-                    db = data,
-                    api = ctx.api,
+                    element = body_blocks,
                     header_level = obj.level or 2,
+                    type_schema = desc and desc.schema or {},
                 }
+                local render_ctx = hook_ctx.build(
+                    ctx, data, diagnostics, subject, "render", obj.specification_ref)
 
-                -- Call type handler's on_render_SpecObject
-                local ok, result = pcall(handler.on_render_SpecObject, obj, render_ctx)
+                -- Call the host-indexed object render hook
+                local ok, result = pcall(render, render_ctx)
 
                 if ok and result and #result > 0 then
                     -- Encode new blocks and update database
@@ -326,53 +337,7 @@ function M.on_transform(data, contexts, diagnostics)
 
         log.info("Rendered %d spec objects with type handlers", rendered_count)
 
-        -- Patch heading IDs for composite objects (SECTION, EXEC_SUMMARY, etc.).
-        -- Composite objects are excluded from full type-handler rendering because
-        -- their AST contains nested children whose headers must not be stripped.
-        -- This lightweight pass only updates the FIRST header's ID to the PID,
-        -- ensuring cross-references like [MANUAL-sec14](@) resolve in HTML output.
-        local composites = data:query_all(Queries.content.select_composite_objects_by_spec,
-            { spec_id = spec_id })
-
-        local patched = 0
-        for _, obj in ipairs(composites or {}) do
-            local decoded = decode_ast(obj.ast)
-            if decoded and #decoded > 0 then
-                -- Find the first Header in the top-level blocks
-                for _, block in ipairs(decoded) do
-                    local block_type = block.t or (block.tag) or ""
-                    if block_type == "Header" then
-                        -- Check if the header ID already matches the PID
-                        local current_id = ""
-                        if block.attr then
-                            current_id = block.attr.identifier or
-                                         (type(block.attr[1]) == "string" and block.attr[1]) or ""
-                        end
-                        if current_id ~= obj.pid then
-                            -- Update the header ID to the PID
-                            if block.attr and block.attr.identifier ~= nil then
-                                block.attr.identifier = obj.pid
-                            else
-                                -- Reconstruct attr preserving classes and kvpairs
-                                local classes = block.attr and block.attr[2] or {}
-                                local kvpairs = block.attr and block.attr[3] or {}
-                                block.attr = pandoc.Attr(obj.pid, classes, kvpairs)
-                            end
-                            local new_ast = encode_ast(decoded)
-                            data:execute(Queries.content.update_object_ast, {
-                                ast = new_ast, id = obj.id
-                            })
-                            patched = patched + 1
-                        end
-                        break  -- Only patch the first header
-                    end
-                end
-            end
-        end
-
-        if patched > 0 then
-            log.info("Patched heading IDs for %d composite object(s)", patched)
-        end
+        patch_composite_heading_ids(data, spec_id, log)
 
         ::continue::
     end

@@ -36,8 +36,10 @@ jobs:
             -v "${{ github.workspace }}:/workspace" \
             -w /workspace \
             -e SPECCOMPILER_HOME=/workspace \
+            -e SPECCOMPILER_DIST=/opt/speccompiler \
+            --entrypoint bash \
             "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" \
-            /workspace/tests/run.sh --junit || true
+            tests/run.sh --junit || true
 
           # Generate TRR markdown from JUnit XML
           mkdir -p docs/engineering_docs/test_results
@@ -46,8 +48,10 @@ jobs:
             -v "${{ github.workspace }}:/workspace" \
             -w /workspace \
             -e SPECCOMPILER_HOME=/workspace \
+            -e SPECCOMPILER_DIST=/opt/speccompiler \
+            --entrypoint pandoc \
             "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" \
-            pandoc --lua-filter tests/helpers/trr_generator.lua \
+            --lua-filter tests/helpers/trr_generator.lua \
               --metadata junit_path=tests/reports/junit.xml \
               --metadata output_path=docs/engineering_docs/test_results/tr.md \
               < /dev/null
@@ -65,7 +69,7 @@ jobs:
               -v "${{ github.workspace }}:/workspace" \
               -w /workspace \
               "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" \
-              /opt/speccompiler/bin/speccompiler-core "$project"
+              build "$project"
             echo "::endgroup::"
           done
 

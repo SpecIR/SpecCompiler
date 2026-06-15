@@ -1,15 +1,17 @@
 -- src/core/validation_policy.lua
+-- Per-policy-key severity levels for verification views ("error" | "warn" |
+-- "ignore"), defaulted from the host's registered views and overridable via
+-- project.yaml `validation:`. Consumed by verify_handler:get_level().
 local M = {}
 
-M.MODES = { ERROR = "error", WARN = "warn", IGNORE = "ignore" }
-
 function M.new(config)
-    -- Build default policies dynamically from registered verification views.
-    local ok, VerificationViewLoader = pcall(require, "core.verification_view_loader")
+    -- Build default policies dynamically from the host's registered verification
+    -- views (the host owns the ordered policy_key registry).
+    local host = require("contract.registry").current()
     local default_policies = {}
 
-    if ok then
-        for _, verification_view in ipairs(VerificationViewLoader.get_verification_views()) do
+    if host then
+        for _, verification_view in ipairs(host:get_verification_views()) do
             if verification_view.policy_key then
                 default_policies[verification_view.policy_key] = "error"
             end
@@ -18,8 +20,6 @@ function M.new(config)
 
     local self = {
         policies = default_policies,
-        error_count = 0,
-        warning_count = 0,
     }
 
     -- Override from config
@@ -34,45 +34,8 @@ function M.new(config)
     return setmetatable(self, { __index = M })
 end
 
-function M:get_mode(violation_type)
-    return self.policies[violation_type] or "warn"
-end
-
 function M:get_level(policy_key)
-    return self:get_mode(policy_key)
-end
-
-function M:report(violation_type, message, diagnostics)
-    local mode = self:get_mode(violation_type)
-
-    if mode == "error" then
-        self.error_count = self.error_count + 1
-        if diagnostics and diagnostics.error then
-            diagnostics:error(nil, nil, violation_type, message)
-        end
-    elseif mode == "warn" then
-        self.warning_count = self.warning_count + 1
-        if diagnostics and diagnostics.warn then
-            diagnostics:warn(nil, nil, violation_type, message)
-        end
-    end
-    -- ignore = do nothing
-end
-
-function M:should_fail_build()
-    return self.error_count > 0
-end
-
-function M:reset()
-    self.error_count = 0
-    self.warning_count = 0
-end
-
-function M:get_summary()
-    return {
-        errors = self.error_count,
-        warnings = self.warning_count
-    }
+    return self.policies[policy_key] or "warn"
 end
 
 return M

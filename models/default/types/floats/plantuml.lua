@@ -11,20 +11,6 @@
 ---@module plantuml
 local float_base = require("pipeline.shared.float_base")
 local task_runner = require("infra.process.task_runner")
-local external_render = require("pipeline.transform.external_render_handler")
-
-local M = {}
-
-M.float = {
-    id = "PLANTUML",
-    long_name = "PlantUML Diagram",
-    description = "A PlantUML diagram rendered to PNG",
-    caption_format = "Figure",   -- Display as "Figura" in ABNT
-    counter_group = "FIGURE",    -- Share counter with FIGURE and CHART
-    aliases = { "puml", "plantuml", "uml" },
-    needs_external_render = true,
-    style_id = "PLANTUML",
-}
 
 -- ============================================================================
 -- Internal Helpers
@@ -90,116 +76,133 @@ local function serialize_result(result)
 end
 
 -- ============================================================================
--- External Render Registration
+-- External Render hooks (indexed by the host as float prepare_task/handle_result).
+-- These are per-item render hooks, not a phase handler.
 -- ============================================================================
 
-external_render.register_renderer("PLANTUML", {
-    ---Prepare a spawn task for this float.
-    ---@param float table Float record from database
-    ---@param build_dir string Build directory path
-    ---@param log table Logger
-    ---@return table|nil task Task descriptor or nil to skip
-    prepare_task = function(float, build_dir, log)
-        local content = ensure_wrapper(float.raw_content or '')
-        local hash = hash_content(content)
-        local attrs = float_base.decode_attributes(float)
+return {
+    kind = "float",
+    schema = {
+        id = "PLANTUML",
+        long_name = "PlantUML Diagram",
+        description = "A PlantUML diagram rendered to PNG",
+        caption_format = "Figure",   -- Display as "Figura" in ABNT
+        counter_group = "FIGURE",    -- Share counter with FIGURE and CHART
+        aliases = { "puml", "plantuml", "uml" },
+        needs_external_render = true,
+    },
+    hooks = {
+        ---Prepare a spawn task for this float.
+        ---@param float table Float record from database
+        ---@param build_dir string Build directory path
+        ---@param log table Logger
+        ---@return table|nil task Task descriptor or nil to skip
+        prepare_task = function(dctx)
+            local float = dctx.subject.float
+            local build_dir = dctx.subject.build_dir
+            local log = dctx.log
+            local content = ensure_wrapper(float.raw_content or '')
+            local hash = hash_content(content)
+            local attrs = float_base.decode_attributes(float)
 
-        -- Normalize build_dir to avoid double slashes
-        local norm_build_dir = normalize_path(build_dir)
-        local diagrams_path = norm_build_dir .. "/" .. DIAGRAMS_DIR
-        local puml_file = diagrams_path .. "/" .. hash .. ".puml"
-        local png_file = diagrams_path .. "/" .. hash .. ".png"
-        -- Store relative path for LaTeX (relative to output file which is in build_dir)
-        local relative_png = DIAGRAMS_DIR .. "/" .. hash .. ".png"
+            -- Normalize build_dir to avoid double slashes
+            local norm_build_dir = normalize_path(build_dir)
+            local diagrams_path = norm_build_dir .. "/" .. DIAGRAMS_DIR
+            local puml_file = diagrams_path .. "/" .. hash .. ".puml"
+            local png_file = diagrams_path .. "/" .. hash .. ".png"
+            -- Store relative path for LaTeX (relative to output file which is in build_dir)
+            local relative_png = DIAGRAMS_DIR .. "/" .. hash .. ".png"
 
-        task_runner.ensure_dir(diagrams_path)
-        local ok, err = task_runner.write_file(puml_file, content)
-        if not ok then
-            log.warn("Failed to write puml file: %s", err)
-            return nil
-        end
+            task_runner.ensure_dir(diagrams_path)
+            local ok, err = task_runner.write_file(puml_file, content)
+            if not ok then
+                log.warn("Failed to write puml file: %s", err)
+                return nil
+            end
 
-        if not task_runner.command_exists("plantuml") then
-            log.warn("PlantUML command not found in PATH")
-            return nil
-        end
+            if not task_runner.command_exists("plantuml") then
+                log.warn("PlantUML command not found in PATH")
+                return nil
+            end
 
-        log.debug("Preparing PlantUML: %s", hash:sub(1, 12))
+            log.debug("Preparing PlantUML: %s", hash:sub(1, 12))
 
-        return {
-            -- Force headless mode to avoid X11 dependency in CI/headless environments.
-            cmd = "env",
-            args = {
-                "JAVA_TOOL_OPTIONS=-Djava.awt.headless=true",
-                "plantuml",
-                "-tpng",
-                hash .. ".puml"
-            },
-            opts = { cwd = diagrams_path, timeout = 30000 },
-            output_path = png_file,
-            context = {
-                hash = hash,
-                float = float,
-                attrs = attrs,
-                diagrams_path = diagrams_path,
-                relative_path = relative_png,  -- Path relative to output file (for LaTeX)
-                relative_dir = DIAGRAMS_DIR    -- For multi-page outputs
+            return {
+                -- Force headless mode to avoid X11 dependency in CI/headless environments.
+                cmd = "env",
+                args = {
+                    "JAVA_TOOL_OPTIONS=-Djava.awt.headless=true",
+                    "plantuml",
+                    "-tpng",
+                    hash .. ".puml"
+                },
+                opts = { cwd = diagrams_path, timeout = 30000 },
+                output_path = png_file,
+                context = {
+                    hash = hash,
+                    float = float,
+                    attrs = attrs,
+                    diagrams_path = diagrams_path,
+                    relative_path = relative_png,  -- Path relative to output file (for LaTeX)
+                    relative_dir = DIAGRAMS_DIR    -- For multi-page outputs
+                }
             }
-        }
-    end,
+        end,
 
-    ---Handle result after spawn completes.
-    ---@param task table Task descriptor with context
-    ---@param success boolean Whether spawn succeeded
-    ---@param stdout string Captured stdout
-    ---@param stderr string Captured stderr
-    ---@param data DataManager Database instance
-    ---@param log table Logger
-    handle_result = function(task, success, stdout, stderr, data, log)
-        local ctx = task.context
-        local float = ctx.float
+        ---Handle result after spawn completes.
+        ---@param task table Task descriptor with context
+        ---@param success boolean Whether spawn succeeded
+        ---@param stdout string Captured stdout
+        ---@param stderr string Captured stderr
+        ---@param data DataManager Database instance
+        ---@param log table Logger
+        handle_result = function(dctx)
+            local task = dctx.subject.task
+            local success = dctx.subject.success
+            local stderr = dctx.subject.stderr
+            local data = dctx.data
+            local log = dctx.log
+            local ctx = task.context
+            local float = ctx.float
 
-        if not success then
-            log.warn("PlantUML failed for %s: %s", tostring(float.id), stderr)
-            return
-        end
+            if not success then
+                log.warn("PlantUML failed for %s: %s", tostring(float.id), stderr)
+                return
+            end
 
-        -- Check for multi-page output - use relative paths for LaTeX compatibility
-        local png_paths = {}
-        if task_runner.file_exists(task.output_path) then
-            -- Use relative path for single-page output
-            table.insert(png_paths, ctx.relative_path or task.output_path)
-        end
+            -- Check for multi-page output - use relative paths for LaTeX compatibility
+            local png_paths = {}
+            if task_runner.file_exists(task.output_path) then
+                -- Use relative path for single-page output
+                table.insert(png_paths, ctx.relative_path or task.output_path)
+            end
 
-        local page = 1
-        while true do
-            local page_file = string.format("%s/%s_%03d.png", ctx.diagrams_path, ctx.hash, page)
-            if task_runner.file_exists(page_file) then
-                -- Use relative path for multi-page output
-                local relative_page = string.format("%s/%s_%03d.png", ctx.relative_dir or ctx.diagrams_path, ctx.hash, page)
-                table.insert(png_paths, relative_page)
-                page = page + 1
-            else
-                break
+            local page = 1
+            while true do
+                local page_file = string.format("%s/%s_%03d.png", ctx.diagrams_path, ctx.hash, page)
+                if task_runner.file_exists(page_file) then
+                    -- Use relative path for multi-page output
+                    local relative_page = string.format("%s/%s_%03d.png", ctx.relative_dir or ctx.diagrams_path, ctx.hash, page)
+                    table.insert(png_paths, relative_page)
+                    page = page + 1
+                else
+                    break
+                end
+            end
+
+            if #png_paths == 0 then
+                log.warn("PlantUML completed but no PNG for %s", tostring(float.id))
+                return
+            end
+
+            local result = { png_paths = png_paths }
+            if ctx.attrs.width then result.width = ctx.attrs.width end
+            if ctx.attrs.height then result.height = ctx.attrs.height end
+
+            local json = serialize_result(result)
+            if json then
+                float_base.update_resolved_ast(data, float.id, json)
             end
         end
-
-        if #png_paths == 0 then
-            log.warn("PlantUML completed but no PNG for %s", tostring(float.id))
-            return
-        end
-
-        local result = { png_paths = png_paths }
-        if ctx.attrs.width then result.width = ctx.attrs.width end
-        if ctx.attrs.height then result.height = ctx.attrs.height end
-
-        local json = serialize_result(result)
-        if json then
-            float_base.update_resolved_ast(data, float.id, json)
-        end
-    end
-})
-
--- No M.handler.on_transform - external_render_handler orchestrates
-
-return M
+    }
+}

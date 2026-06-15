@@ -19,7 +19,7 @@ local M = {
 
 -- Singleton cache: default object type from spec_object_types
 local default_object_type = cache_utils.create_once(function(data)
-    local result = data:query_one(Queries.resolution.default_object_type)
+    local result = data:query_one(Queries.types.default_object_type)
     return result and result.identifier or nil
 end)
 
@@ -32,28 +32,12 @@ local attr_def = cache_utils.create_map(function(cache_key, data)
     })
 end)
 
----Query the default object type from spec_object_types.
----@param data DataManager
----@return string|nil default_type The default type identifier
-local function get_default_object_type(data)
-    return default_object_type:get(data)
-end
-
 ---Clear module-level caches (required for re-entrant engine.run_project calls).
 function M.clear_cache()
     attr_def:clear()
     default_object_type:clear()
 end
 cache_registry.register(M.clear_cache)
-
----Look up attribute definition to get datatype.
----@param data DataManager
----@param owner_type string Owner type (e.g., "HLR", "SECTION")
----@param attr_name string Attribute name
----@return table|nil definition Attribute definition with datatype
-local function get_attribute_definition(data, owner_type, attr_name)
-    return attr_def:get(owner_type .. ":" .. attr_name, data)
-end
 
 ---Pre-index attribute positions in blockquote blocks for O(n) processing.
 ---Returns array of {pos, field_name} for each attribute-defining Para.
@@ -120,12 +104,12 @@ local function process_single_attribute(bq_blocks, attr_pos, field_name, next_at
     local content_key = spec_id .. tostring(current_owner.id or "") .. field_name .. raw_value
     local content_sha = hash_utils.sha1(content_key)
 
-    -- Look up datatype from definition
-    local attr_def = get_attribute_definition(data, current_owner_type, field_name)
-    local datatype = attr_def and attr_def.datatype or DT.STRING
+    -- Look up datatype from definition (module-level attr_def key-value cache)
+    local attr_definition = attr_def:get(current_owner_type .. ":" .. field_name, data)
+    local datatype = attr_definition and attr_definition.datatype or DT.STRING
 
     -- Cast value to typed columns
-    local cast_result = AttributeCaster.cast(raw_value, datatype, data, attr_def)
+    local cast_result = AttributeCaster.cast(raw_value, datatype, data, attr_definition)
 
     -- Serialize value AST for rich content
     local ast_json = nil
@@ -236,7 +220,7 @@ local function extract_attributes_from_context(ctx, data)
 
     local spec_id = ctx.spec_id or "default"
     local blocks = doc.blocks or (doc.doc and doc.doc.blocks) or {}
-    local default_type = get_default_object_type(data)
+    local default_type = default_object_type:get(data)
 
     local attrs = {}
     local current_owner = nil

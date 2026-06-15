@@ -180,12 +180,12 @@ local domain_labels = {
     EXT   = "Extension",
     OUT   = "Output",
     AUDIT = "Audit",
-    SDN   = "SW Docs Model",
+    SWDOCS = "SW Docs Model",
     WEB   = "HTML5 Postprocessor",
     DEF   = "Default Model",
 }
 
-local domain_order = { "PIPE", "STOR", "TYPE", "EXT", "OUT", "AUDIT", "SDN", "WEB", "DEF" }
+local domain_order = { "PIPE", "STOR", "TYPE", "EXT", "OUT", "AUDIT", "SWDOCS", "WEB", "DEF" }
 
 local function get_domain(vc_pid)
     -- Check for explicit domain prefix (e.g., VC-PIPE-007, VC-OUT-001)

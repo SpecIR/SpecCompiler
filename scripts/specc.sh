@@ -68,10 +68,8 @@ cmd_build() {
         -u "$(id -u):$(id -g)" \
         -v "$(pwd):/workspace" \
         -w /workspace \
-        -e "SPECCOMPILER_HOME=/opt/speccompiler" \
-        -e "SPECCOMPILER_DIST=/opt/speccompiler" \
         -e "SPECCOMPILER_LOG_LEVEL=${SPECCOMPILER_LOG_LEVEL:-INFO}" \
-        "$IMAGE" /opt/speccompiler/bin/speccompiler-core "$project_file"
+        "$IMAGE" build "$project_file"
     echo -e "${GREEN}Build complete.${NC}"
 }
 

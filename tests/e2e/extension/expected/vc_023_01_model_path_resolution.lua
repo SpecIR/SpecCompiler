@@ -1,9 +1,10 @@
--- Test oracle for VC-023: Model Path Resolution
--- Verifies SPECCOMPILER_HOME precedence, cwd fallback, and not-found failure mode.
+-- Test oracle for VC-023: Model Path Resolution (host engine)
+-- Verifies the host's SPECCOMPILER_HOME-then-cwd model resolution and that a
+-- fully-absent model is a loud error.
 
 return function(_, _)
     local utils = require("type_loader_test_utils")
-    local type_loader = require("core.type_loader")
+    local registry = require("contract.registry")
     local uv = require("luv")
 
     local root = uv.cwd()
@@ -16,7 +17,7 @@ return function(_, _)
     local ok, err = pcall(function()
         local created_prefer_cwd, err_prefer_cwd = utils.create_model(root, prefer_model, {
             ["objects/cwd_only.lua"] = [[
-                return { object = { id = "VC023_CWD_SELECTED", long_name = "CWD selected model" } }
+                return { kind = "object", schema = { id = "VC023_CWD_SELECTED", long_name = "CWD selected model" } }
             ]]
         })
         if not created_prefer_cwd then
@@ -25,7 +26,7 @@ return function(_, _)
 
         local created_prefer_home, err_prefer_home = utils.create_model(home_root, prefer_model, {
             ["objects/home_only.lua"] = [[
-                return { object = { id = "VC023_HOME_SELECTED", long_name = "HOME selected model" } }
+                return { kind = "object", schema = { id = "VC023_HOME_SELECTED", long_name = "HOME selected model" } }
             ]]
         })
         if not created_prefer_home then
@@ -34,7 +35,7 @@ return function(_, _)
 
         local created_fallback_cwd, err_fallback_cwd = utils.create_model(root, fallback_model, {
             ["objects/fallback_only.lua"] = [[
-                return { object = { id = "VC023_CWD_FALLBACK", long_name = "CWD fallback model" } }
+                return { kind = "object", schema = { id = "VC023_CWD_FALLBACK", long_name = "CWD fallback model" } }
             ]]
         })
         if not created_fallback_cwd then
@@ -53,7 +54,7 @@ return function(_, _)
                 -- Case 1: model exists in SPECCOMPILER_HOME and cwd -> SPECCOMPILER_HOME wins.
                 local data_prefer, calls_prefer = utils.new_data_collector()
                 utils.clear_loaded_model(prefer_model)
-                type_loader.load_model(data_prefer, pipeline, prefer_model)
+                registry.new{ data = data_prefer, pipeline = pipeline }:load_model(prefer_model)
                 local prefer_ids = utils.identifiers_from_calls(calls_prefer)
 
                 if not prefer_ids["VC023_HOME_SELECTED"] then
@@ -66,7 +67,7 @@ return function(_, _)
                 -- Case 2: model missing in SPECCOMPILER_HOME but exists in cwd -> cwd fallback.
                 local data_fallback, calls_fallback = utils.new_data_collector()
                 utils.clear_loaded_model(fallback_model)
-                type_loader.load_model(data_fallback, pipeline, fallback_model)
+                registry.new{ data = data_fallback, pipeline = pipeline }:load_model(fallback_model)
                 local fallback_ids = utils.identifiers_from_calls(calls_fallback)
 
                 if not fallback_ids["VC023_CWD_FALLBACK"] then
@@ -77,7 +78,7 @@ return function(_, _)
                 local data_missing = { execute = function() end }
                 local ok_missing, missing_err = pcall(function()
                     utils.clear_loaded_model(missing_model)
-                    type_loader.load_model(data_missing, pipeline, missing_model)
+                    registry.new{ data = data_missing, pipeline = pipeline }:load_model(missing_model)
                 end)
                 if ok_missing then
                     error("Expected missing model load to fail")

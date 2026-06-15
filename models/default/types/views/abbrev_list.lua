@@ -13,12 +13,10 @@
 ---  - EMIT: Query spec_views/ABBREV, return Pandoc Table or BulletList
 ---
 ---@module abbrev_list
-local M = {}
 
 local Queries = require("db.queries")
-local xml = require("infra.format.xml")
 
-M.view = {
+local schema = {
     id = "ABBREV_LIST",
     long_name = "Abbreviation List",
     description = "List of all abbreviations defined in the document",
@@ -33,8 +31,8 @@ M.view = {
 -- ============================================================================
 
 local prefix_matcher = require("pipeline.shared.prefix_matcher")
-local match_prefix = prefix_matcher.from_decl(M.view)
-local match_abbrev_list_codeblock = prefix_matcher.codeblock_from_decl(M.view)
+local match_prefix = prefix_matcher.from_decl(schema)
+local match_abbrev_list_codeblock = prefix_matcher.codeblock_from_decl(schema)
 local function match_abbrev_list_code(text)
     return match_prefix(text) ~= nil
 end
@@ -48,7 +46,7 @@ end
 ---@param data DataManager Database instance
 ---@param spec_id string Specification identifier
 ---@return table entries Array of {abbrev, meaning} sorted alphabetically
-function M.get_list(data, spec_id)
+local function get_list(data, spec_id)
     local abbrevs = data:query_all(Queries.content.views_by_type, {
         spec_id = spec_id,
         view_type = "ABBREV"
@@ -83,205 +81,90 @@ end
 -- OOXML Generation
 -- ============================================================================
 
----Generate OOXML table for abbreviation list.
----Produces a two-column table with header row (Abbreviation | Description).
+---Build the abbreviation list as a SEMANTIC Pandoc table (two columns:
+---Abbreviation | Description). Format-specific styling is left to the filters --
+---no model hardcodes OOXML here. Shared by `render_block` (inline ```abbrev_list:```
+---blocks) and `build_block` (cross-model reuse, e.g. the ABNT "Lista de Siglas").
 ---@param data DataManager Database instance
 ---@param spec_id string Specification identifier
----@return string OOXML content
-function M.generate_list_ooxml(data, spec_id)
-    local abbrevs = M.get_list(data, spec_id)
+---@return table|nil block A pandoc.Table, an empty-state Para, or nil
+local function build_abbrev_block(data, spec_id)
+    if not data or not pandoc then return nil end
 
-    if #abbrevs == 0 then
-        local empty_p = xml.node("w:p", {}, {
-            xml.node("w:r", {}, {
-                xml.node("w:t", {}, { xml.text("No abbreviations defined.") })
-            })
-        })
-        return xml.serialize_element(empty_p)
+    local entries = get_list(data, spec_id)
+    if #entries == 0 then
+        return pandoc.Para{pandoc.Str("[No abbreviations defined]")}
     end
 
-    -- Build table rows
     local rows = {}
-
-    -- Header row
-    local header_row = xml.node("w:tr", {}, {
-        xml.node("w:tc", {}, {
-            xml.node("w:tcPr", {}, {
-                xml.node("w:tcW", { ["w:type"] = "pct", ["w:w"] = "1500" }),
-            }),
-            xml.node("w:p", {}, {
-                xml.node("w:pPr", {}, {
-                    xml.node("w:spacing", { ["w:before"] = "40", ["w:after"] = "40" }),
-                }),
-                xml.node("w:r", {}, {
-                    xml.node("w:rPr", {}, { xml.node("w:b") }),
-                    xml.node("w:t", {}, { xml.text("Abbreviation") }),
-                }),
-            }),
-        }),
-        xml.node("w:tc", {}, {
-            xml.node("w:tcPr", {}, {
-                xml.node("w:tcW", { ["w:type"] = "pct", ["w:w"] = "3500" }),
-            }),
-            xml.node("w:p", {}, {
-                xml.node("w:pPr", {}, {
-                    xml.node("w:spacing", { ["w:before"] = "40", ["w:after"] = "40" }),
-                }),
-                xml.node("w:r", {}, {
-                    xml.node("w:rPr", {}, { xml.node("w:b") }),
-                    xml.node("w:t", {}, { xml.text("Description") }),
-                }),
-            }),
-        }),
-    })
-    table.insert(rows, header_row)
-
-    -- Data rows
-    for _, a in ipairs(abbrevs) do
-        local row = xml.node("w:tr", {}, {
-            xml.node("w:tc", {}, {
-                xml.node("w:tcPr", {}, {
-                    xml.node("w:tcW", { ["w:type"] = "pct", ["w:w"] = "1500" }),
-                }),
-                xml.node("w:p", {}, {
-                    xml.node("w:pPr", {}, {
-                        xml.node("w:spacing", { ["w:before"] = "20", ["w:after"] = "20" }),
-                    }),
-                    xml.node("w:r", {}, {
-                        xml.node("w:rPr", {}, { xml.node("w:b") }),
-                        xml.node("w:t", {}, { xml.text(a.abbrev) }),
-                    }),
-                }),
-            }),
-            xml.node("w:tc", {}, {
-                xml.node("w:tcPr", {}, {
-                    xml.node("w:tcW", { ["w:type"] = "pct", ["w:w"] = "3500" }),
-                }),
-                xml.node("w:p", {}, {
-                    xml.node("w:pPr", {}, {
-                        xml.node("w:spacing", { ["w:before"] = "20", ["w:after"] = "20" }),
-                    }),
-                    xml.node("w:r", {}, {
-                        xml.node("w:t", {}, { xml.text(a.meaning) }),
-                    }),
-                }),
-            }),
-        })
-        table.insert(rows, row)
+    for _, entry in ipairs(entries) do
+        table.insert(rows, pandoc.Row({
+            pandoc.Cell({pandoc.Plain{pandoc.Strong{pandoc.Str(entry.abbrev)}}}),
+            pandoc.Cell({pandoc.Plain{pandoc.Str(entry.meaning)}})
+        }))
     end
 
-    -- Assemble table children: tblPr + tblGrid + all rows
-    local children = {
-        xml.node("w:tblPr", {}, {
-            xml.node("w:tblStyle", { ["w:val"] = "TableGrid" }),
-            xml.node("w:tblW", { ["w:type"] = "pct", ["w:w"] = "5000" }),
-            xml.node("w:tblLook", {
-                ["w:val"] = "04A0",
-                ["w:firstRow"] = "1",
-                ["w:lastRow"] = "0",
-                ["w:firstColumn"] = "0",
-                ["w:lastColumn"] = "0",
-                ["w:noHBand"] = "0",
-                ["w:noVBand"] = "1",
-            }),
-        }),
-        xml.node("w:tblGrid", {}, {
-            xml.node("w:gridCol", { ["w:w"] = "2700" }),
-            xml.node("w:gridCol", { ["w:w"] = "6656" }),
-        }),
-    }
-    for _, row in ipairs(rows) do
-        table.insert(children, row)
-    end
-
-    local tbl = xml.node("w:tbl", {}, children)
-
-    return xml.serialize_element(tbl)
+    local table_body = { attr = pandoc.Attr(), body = rows, head = {}, row_head_columns = 0 }
+    local colspecs = { {pandoc.AlignLeft, nil}, {pandoc.AlignLeft, nil} }
+    return pandoc.Table(
+        {long = {}, short = {}}, colspecs,
+        pandoc.TableHead{}, {table_body}, pandoc.TableFoot{}
+    )
 end
 
 -- ============================================================================
--- Handler
+-- Descriptor
 -- ============================================================================
 
-M.handler = {
-    name = "abbrev_list_handler",
-    prerequisites = {"abbrev_handler"},  -- Needs ABBREV views to be populated
-
-    ---EMIT: Render inline Code elements with abbrev_list: syntax.
-    ---NOTE: Abbreviation list generates block-level content (Table), so inline Code
-    ---cannot be replaced directly. Return placeholder or use CodeBlock.
-    ---@param code table Pandoc Code element
-    ---@param ctx Context
-    ---@return table|nil Inline elements (placeholder) or nil
-    on_render_Code = function(code, ctx)
-        if not match_abbrev_list_code(code.text or "") then
-            return nil
-        end
-
-        local data = ctx.data
-        local spec_id = ctx.spec_id or "default"
-
-        if data then
-            local entries = M.get_list(data, spec_id)
-            if #entries == 0 then
-                return { pandoc.Str("[No abbreviations defined]") }
+return {
+    kind = "view",
+    schema = schema,
+    hooks = {
+        ---EMIT: Render inline Code elements with abbrev_list: syntax.
+        ---NOTE: Abbreviation list generates block-level content (Table), so inline Code
+        ---cannot be replaced directly. Return placeholder or use CodeBlock.
+        ---@param code table Pandoc Code element
+        ---@param ctx Context
+        ---@return table|nil Inline elements (placeholder) or nil
+        render = function(ctx)
+            local code = ctx.subject.element
+            if not match_abbrev_list_code(code.text or "") then
+                return nil
             end
-        end
 
-        -- Non-empty abbreviation list generates block content (Table).
-        -- Inline Code cannot be replaced with blocks.
-        -- Use ``` abbrev_list: ``` code block syntax for actual list rendering.
-        return { pandoc.Str("[ABBREVIATION LIST]") }
-    end,
+            local data = ctx.data
+            local spec_id = ctx.spec_id or "default"
 
-    ---EMIT: Render CodeBlock elements with abbrev_list class.
-    ---@param block table Pandoc CodeBlock element
-    ---@param ctx Context
-    ---@return table|nil Replacement block
-    on_render_CodeBlock = function(block, ctx)
-        if not match_abbrev_list_codeblock(block) then return nil end
+            if data then
+                local entries = get_list(data, spec_id)
+                if #entries == 0 then
+                    return { pandoc.Str("[No abbreviations defined]") }
+                end
+            end
 
-        local data = ctx.data
-        local spec_id = ctx.spec_id or "default"
+            -- Non-empty abbreviation list generates block content (Table).
+            -- Inline Code cannot be replaced with blocks.
+            -- Use ``` abbrev_list: ``` code block syntax for actual list rendering.
+            return { pandoc.Str("[ABBREVIATION LIST]") }
+        end,
 
-        if not data or not pandoc then
-            return nil
-        end
+        ---EMIT: Render CodeBlock elements with abbrev_list class.
+        ---@param block table Pandoc CodeBlock element
+        ---@param ctx Context
+        ---@return table|nil Replacement block
+        render_block = function(ctx)
+            if not match_abbrev_list_codeblock(ctx.subject.element) then return nil end
+            return build_abbrev_block(ctx.data, ctx.spec_id or "default")
+        end,
 
-        local entries = M.get_list(data, spec_id)
-        if #entries == 0 then
-            return pandoc.Para{pandoc.Str("[No abbreviations defined]")}
-        end
-
-        -- Build rows as pandoc.Row objects with pandoc.Cell objects
-        local rows = {}
-        for _, entry in ipairs(entries) do
-            table.insert(rows, pandoc.Row({
-                pandoc.Cell({pandoc.Plain{pandoc.Strong{pandoc.Str(entry.abbrev)}}}),
-                pandoc.Cell({pandoc.Plain{pandoc.Str(entry.meaning)}})
-            }))
-        end
-
-        -- Create table with two columns (TableBody is a plain Lua table)
-        local table_body = {
-            attr = pandoc.Attr(),
-            body = rows,
-            head = {},
-            row_head_columns = 0
-        }
-        local colspecs = {
-            {pandoc.AlignLeft, nil},
-            {pandoc.AlignLeft, nil}
-        }
-
-        return pandoc.Table(
-            {long = {}, short = {}},
-            colspecs,
-            pandoc.TableHead{},
-            {table_body},
-            pandoc.TableFoot{}
-        )
-    end
+        ---DATA: produce the abbreviation list as a semantic pandoc.Table.
+        ---Host-dispatched (get_hook("view","ABBREV_LIST","build_block")) so other
+        ---models render an ABNT-style "Lista de Siglas" via the host instead of a
+        ---file-path require. dctx.subject.params is unused.
+        ---@param dctx table frozen data context (dctx.data, dctx.spec_id)
+        ---@return table|nil block A pandoc.Table (or empty-state Para)
+        build_block = function(dctx)
+            return build_abbrev_block(dctx.data, dctx.spec_id or "default")
+        end,
+    },
 }
-
-return M

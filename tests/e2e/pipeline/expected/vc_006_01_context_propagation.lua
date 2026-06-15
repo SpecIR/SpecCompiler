@@ -20,7 +20,6 @@ return function(_, _)
             },
             html5 = { standalone = true, number_sections = true },
             bibliography = "refs/sample.bib",
-            csl = "refs/sample.csl",
             files = { "docs/example.md" }
         }
 
@@ -103,8 +102,10 @@ return function(_, _)
         if ctx.bibliography ~= "refs/sample.bib" then
             return false, string.format("Context %d bibliography mismatch: %s", i, tostring(ctx.bibliography))
         end
-        if ctx.csl ~= "refs/sample.csl" then
-            return false, string.format("Context %d csl mismatch: %s", i, tostring(ctx.csl))
+        -- CSL is model-declared (models/<name>/config.lua citation.csl), not a
+        -- project-config field, so it must NOT appear on the context.
+        if ctx.csl ~= nil then
+            return false, string.format("Context %d unexpectedly carries csl: %s", i, tostring(ctx.csl))
         end
         if type(ctx.doc) ~= "table" then
             return false, string.format("Context %d missing doc field", i)

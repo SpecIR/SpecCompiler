@@ -46,7 +46,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY scripts/versions.env        /build/scripts/versions.env
 COPY scripts/build.sh     /build/scripts/build.sh
 COPY src/tools/amath/            /build/src/tools/amath/
-COPY src/tools/echarts-render.ts /build/src/tools/echarts-render.ts
+COPY models/abnt/tools/echarts-render.ts /build/models/abnt/tools/echarts-render.ts
 
 # Build everything: Lua, Pandoc (via GHCup/Cabal), Deno, PlantUML, SQLite,
 # all Lua C extensions (lsqlite3, luv, brimworks/zip, luaamath), and pure Lua

@@ -5,7 +5,6 @@ local DataManager = require("db.manager")
 local Diagnostics = require("core.diagnostics")
 local DbHandler = require("db.handler")
 -- Type system loader (registers object/float/relation/view types from models)
-local TypeLoader = require("core.type_loader")
 local FileWalker = require("infra.io.file_walker")
 local DocumentWalker = require("infra.io.document_walker")
 local reference_cache = require("infra.reference_cache")
@@ -148,12 +147,11 @@ end
 
 ---Reset all module-level caches from prior runs.
 ---Required for re-entrant engine.run_project calls in tests.
----Uses cache_registry for handler caches; VerificationViewLoader has its own reset.
+---Uses cache_registry for handler caches and resets the host registry.
 local function reset_pipeline_caches()
-    local VerificationViewLoader = require("core.verification_view_loader")
-    VerificationViewLoader.reset()
     local cache_registry = require("pipeline.shared.cache_registry")
     cache_registry.clear_all()
+    require("contract.registry").reset()
 end
 
 ---Check if existing database has compatible schema.
@@ -220,19 +218,21 @@ end
 ---@param pipeline Pipeline
 ---@param template string Model template name
 local function load_models(data, pipeline, template)
-    local VerificationViewLoader = require("core.verification_view_loader")
-
-    TypeLoader.load_model(data, pipeline, "default")
+    -- The host engine is the sole loader: it walks each model, registers every
+    -- descriptor (type rows, hooks, extends), registers module phase handlers
+    -- into the pipeline, and (finalize) propagates inherited attributes and
+    -- creates the verification SQL views. The overlay is default then template.
+    local registry = require("contract.registry")
+    local host = registry.new{ data = data, pipeline = pipeline }
+    host:load_model("default")
     if template and template ~= "default" then
-        TypeLoader.load_model(data, pipeline, template)
+        host:load_model(template)
     end
+    host:finalize()
+    registry.set_current(host)
 
-    VerificationViewLoader.load_model("default")
-    if template and template ~= "default" then
-        VerificationViewLoader.load_model(template)
-    end
-    VerificationViewLoader.create_views(data)
-
+    -- DB views are initialized after the host has registered types + created
+    -- verification views (so they see the populated type/verification state).
     local schema_init = require("db.schema.init")
     schema_init.initialize_views(data)
 end
@@ -353,12 +353,9 @@ end
 function M.run_project(project_info)
     reset_pipeline_caches()
 
-    -- Configure logger from project.yaml settings (with env var override)
+    -- Configure logger from project.yaml settings (manifest-only; HLR-CFG-001).
+    -- Log level comes solely from project.yaml `logging.level`; no env override.
     local logging_config = project_info.logging or {}
-    local env_level = os.getenv("SPECCOMPILER_LOG_LEVEL")
-    if env_level then
-        logging_config.level = env_level
-    end
     logger.configure(logging_config)
 
     local log = logger.create_adapter(logging_config.level or "INFO")

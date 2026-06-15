@@ -8,7 +8,8 @@ local M = {
     prerequisites = {"spec_objects", "attributes"}  -- Needs attributes for AST link extraction
 }
 
--- Import spec_floats for get_float_anchor function
+-- Import spec_floats for get_type_prefix (label/prefix normalization) and
+-- find_parent_object (shared parent-by-line resolution)
 local spec_floats = require("pipeline.initialize.spec_floats")
 
 -- Cache for resolved type aliases
@@ -44,28 +45,25 @@ local function resolve_float_type_from_prefix(data, prefix)
     return canonical
 end
 
----Find the parent spec_object for a link based on file and line number.
----The parent is the spec_object whose line range contains this link.
+---Resolve a link prefix to its canonical first-alias form, handling the
+---type.language format (e.g., "src.lua" -> base type "src").
 ---@param data DataManager
----@param spec_id string Specification identifier
----@param from_file string Source file path
----@param line number Line number of the link
----@return integer|nil parent_object_id The parent spec_object id
-local function find_parent_object(data, spec_id, from_file, line)
-    if not line or line <= 0 then
-        return nil
+---@param type_part string The prefix as written in the link
+---@return string|nil canonical_prefix Canonical prefix, or nil if unknown type
+local function resolve_canonical_prefix(data, type_part)
+    local canonical_type = resolve_float_type_from_prefix(data, type_part)
+    if not canonical_type then
+        local base_type = type_part:match("^([^%.]+)")
+        if base_type and base_type ~= type_part then
+            canonical_type = resolve_float_type_from_prefix(data, base_type)
+        end
     end
-
-    -- Find the spec_object that contains this line (start_line <= line <= end_line)
-    -- Order by level descending to get the most specific (deepest nested) container
-    local parent = data:query_one(Queries.resolution.find_parent_object_by_line, {
-        spec_id = spec_id,
-        from_file = from_file,
-        line = line
-    })
-
-    return parent and parent.id or nil
+    if not canonical_type then return nil end
+    return spec_floats.get_type_prefix(data, canonical_type)
 end
+
+-- Parent-by-line resolution is shared with spec_floats
+local find_parent_object = spec_floats.find_parent_object
 
 ---Parse link syntax to extract target, type, prefix, scope, and selector.
 ---Supports: [PID](@), [type:label](#), [scope:type:label](#), [key](@cite), [key](@citep)
@@ -106,19 +104,9 @@ local function parse_link_syntax(link, data)
     local scope_part, type_part, label_part = content_text:match("^([^:]+):([^:]+):(.+)$")
     if scope_part and type_part and label_part then
         -- Only decompose if prefix is a known float type
-        if data then
-            local canonical_type = resolve_float_type_from_prefix(data, type_part)
-            -- Handle type.language format (e.g., src.lua) — extract base type
-            if not canonical_type then
-                local base_type = type_part:match("^([^%.]+)")
-                if base_type and base_type ~= type_part then
-                    canonical_type = resolve_float_type_from_prefix(data, base_type)
-                end
-            end
-            if canonical_type then
-                local canonical_prefix = spec_floats.get_type_prefix(data, canonical_type)
-                return label_part, nil, canonical_prefix, scope_part, selector
-            end
+        local canonical_prefix = data and resolve_canonical_prefix(data, type_part)
+        if canonical_prefix then
+            return label_part, nil, canonical_prefix, scope_part, selector
         end
         -- Unknown prefix -- treat as plain text
         return content_text, nil, nil, nil, selector
@@ -127,21 +115,10 @@ local function parse_link_syntax(link, data)
     -- Try prefix:label pattern (e.g., fig:diagram, cite:smith2024, src.lua:example)
     local type_part2, label_part2 = content_text:match("^([^:]+):(.+)$")
     if type_part2 then
-        if data then
-            -- Check if prefix is a known float type
-            local canonical_type = resolve_float_type_from_prefix(data, type_part2)
-            -- Handle type.language format (e.g., src.lua) — extract base type
-            if not canonical_type then
-                local base_type = type_part2:match("^([^%.]+)")
-                if base_type and base_type ~= type_part2 then
-                    canonical_type = resolve_float_type_from_prefix(data, base_type)
-                end
-            end
-            if canonical_type then
-                -- Known prefix -- normalize to canonical first alias
-                local canonical_prefix = spec_floats.get_type_prefix(data, canonical_type)
-                return label_part2, nil, canonical_prefix, nil, selector
-            end
+        -- Known prefix -- normalize to canonical first alias
+        local canonical_prefix = data and resolve_canonical_prefix(data, type_part2)
+        if canonical_prefix then
+            return label_part2, nil, canonical_prefix, nil, selector
         end
         -- Unknown prefix -- treat as plain text (entire content is the target)
         return content_text, nil, nil, nil, selector
@@ -271,7 +248,7 @@ local function process_document_links(data, doc, spec_id, skip_keys)
     return relation_count
 end
 
-local function process_attribute_links(data, ctx, spec_id, diagnostics, seen_keys)
+local function process_attribute_links(data, ctx, spec_id, seen_keys)
     local attr_relations = data:query_all(Queries.resolution.select_attributes_with_ast_by_spec, { spec_id = spec_id })
 
     local attr_link_count = 0
@@ -363,7 +340,7 @@ function M.on_initialize(data, contexts, diagnostics)
         if not doc.walk_links then goto continue end
 
         local attr_relation_keys = {}
-        local attr_relations_count, attr_link_count = process_attribute_links(data, ctx, spec_id, diagnostics, attr_relation_keys)
+        local attr_relations_count, attr_link_count = process_attribute_links(data, ctx, spec_id, attr_relation_keys)
         local relation_count = attr_relations_count
         relation_count = relation_count + process_document_links(data, doc, spec_id, attr_relation_keys)
 

@@ -147,175 +147,6 @@ end
 -- Base Document Processing (runs for all templates)
 -- ============================================================================
 
--- A4 dimensions and margins in EMUs (English Metric Units)
--- 1 cm = 360000 EMUs
--- A4 = 21cm x 29.7cm
--- ABNT margins: left 3cm, right 2cm → text width = 16cm
-local MAX_TEXT_WIDTH_EMU = 5760000  -- 16cm in EMUs (A4 with ABNT margins)
-
----Constrain image extent to fit within text margins.
----Scales down width (and proportionally height) if image is too wide.
----@param drawing_xml string The drawing element XML
----@return string Modified drawing XML with constrained extent
-local function constrain_extent_to_margins(drawing_xml)
-    -- Extract current extent values - handle both attribute orderings
-    -- Pattern 1: cx="..." cy="..."
-    -- Pattern 2: cy="..." cx="..."
-    local cx = drawing_xml:match('wp:extent[^>]*cx="(%d+)"')
-    local cy = drawing_xml:match('wp:extent[^>]*cy="(%d+)"')
-
-    if not cx then return drawing_xml end
-
-    local width = tonumber(cx)
-    local height = tonumber(cy) or 0
-
-    -- If width exceeds max, scale down proportionally
-    if width > MAX_TEXT_WIDTH_EMU then
-        local scale = MAX_TEXT_WIDTH_EMU / width
-        local new_width = math.floor(MAX_TEXT_WIDTH_EMU)
-        local new_height = math.floor(height * scale)
-
-        -- Replace wp:extent element completely (handles any attribute ordering)
-        local modified = drawing_xml:gsub(
-            '(<wp:extent)[^/]*/>',
-            string.format('%%1 cx="%d" cy="%d"/>', new_width, new_height)
-        )
-
-        -- Also scale a:ext if present (for picture element inside)
-        modified = modified:gsub(
-            '(<a:ext)[^/]*/>',
-            function(prefix)
-                -- Only replace if this a:ext has similar dimensions (the image extent)
-                return string.format('%s cx="%d" cy="%d"/>', prefix, new_width, new_height)
-            end
-        )
-
-        return modified
-    end
-
-    return drawing_xml
-end
-
----Convert inline image to anchored format.
----For academic documents, position specifiers control wrapping behavior:
----  h = here (anchored to paragraph, flows with text)
----  t = top (anchored to paragraph, Word will try to place near top of page)
----  b = bottom (anchored to paragraph, Word will try to place near bottom)
----All use margin-relative positioning to stay within text area.
----@param drawing_xml string The <w:drawing> element XML
----@param _position string Position specifier (h, t, b) - reserved for future use
----@return string Modified drawing XML with wp:anchor instead of wp:inline
-local function convert_to_anchored(drawing_xml, _position)
-    -- First, constrain the image to fit within margins
-    local modified = constrain_extent_to_margins(drawing_xml)
-
-    -- All positions use paragraph-relative vertical positioning
-    -- Word will naturally flow the anchored image with content
-    -- The position hint is informational - Word handles actual placement
-    local v_relative = "paragraph"
-    local v_position = '<wp:posOffset>0</wp:posOffset>'
-
-    -- Add anchor attributes and positioning elements
-    -- Key settings:
-    --   relativeFrom="margin" for horizontal = stays within text margins
-    --   relativeFrom="paragraph" for vertical = flows with text
-    --   wrapTopAndBottom = text wraps above/below, not beside
-    modified = modified:gsub('<wp:inline([^>]*)>', function(attrs)
-        return string.format([[<wp:anchor distT="0" distB="0" distL="0" distR="0"
-               simplePos="0" relativeHeight="1" behindDoc="0"
-               locked="0" layoutInCell="1" allowOverlap="0"%s>
-            <wp:simplePos x="0" y="0"/>
-            <wp:positionH relativeFrom="margin">
-                <wp:align>center</wp:align>
-            </wp:positionH>
-            <wp:positionV relativeFrom="%s">
-                %s
-            </wp:positionV>]], attrs, v_relative, v_position)
-    end)
-
-    -- Replace closing tag
-    modified = modified:gsub('</wp:inline>', '</wp:anchor>')
-
-    -- Add wrap element before docPr (if not already present)
-    if not modified:match('<wp:wrap') then
-        modified = modified:gsub('(<wp:docPr)', '<wp:wrapTopAndBottom/>%1')
-    end
-
-    return modified
-end
-
----Process float position markers and convert inline images to anchored.
----@param content string document.xml content
----@param log table Logger instance
----@return string Modified content
-local function process_positioned_floats(content, log)
-    local modified = content
-
-    -- Find all float-position markers and track regions
-    -- Format: <!-- speccompiler:float-position-start:POSITION:TYPE -->
-    local pattern_start = '<!%-%- speccompiler:float%-position%-start:([htbp]):([A-Z]+) %-%->'
-    local pattern_end = '<!%-%- speccompiler:float%-position%-end %-%->'
-
-    -- Track positions of markers for removal
-    local regions = {}
-    local pos = 1
-
-    while true do
-        local start_pos, end_pos, position, float_type = modified:find(pattern_start, pos)
-        if not start_pos then break end
-
-        -- Find matching end marker
-        local end_start, end_end = modified:find(pattern_end, end_pos)
-        if end_start then
-            table.insert(regions, {
-                start_marker_begin = start_pos,
-                start_marker_end = end_pos,
-                end_marker_begin = end_start,
-                end_marker_end = end_end,
-                position = position,
-                float_type = float_type,
-            })
-        end
-
-        pos = end_pos + 1
-    end
-
-    -- Process regions in reverse order to maintain positions
-    for i = #regions, 1, -1 do
-        local region = regions[i]
-
-        if region.float_type ~= "MATH" then  -- MATH is inline-only
-            -- Extract content between markers
-            local region_content = modified:sub(region.start_marker_end + 1, region.end_marker_begin - 1)
-
-            -- Convert any inline images to anchored
-            local modified_region = region_content:gsub(
-                '(<w:drawing>.-</w:drawing>)',
-                function(drawing)
-                    if drawing:match('<wp:inline') then
-                        log.debug('[DOCX-POST] Converting inline image to anchored (position=%s)', region.position)
-                        return convert_to_anchored(drawing, region.position)
-                    end
-                    return drawing
-                end
-            )
-
-            -- Rebuild content: before + modified region + after
-            -- Remove markers in the process
-            modified = modified:sub(1, region.start_marker_begin - 1) ..
-                       modified_region ..
-                       modified:sub(region.end_marker_end + 1)
-        else
-            -- Just remove markers for MATH (keep content as-is)
-            modified = modified:sub(1, region.start_marker_begin - 1) ..
-                       modified:sub(region.start_marker_end + 1, region.end_marker_begin - 1) ..
-                       modified:sub(region.end_marker_end + 1)
-        end
-    end
-
-    return modified
-end
-
 ---Add keepNext property to float captions to prevent orphans.
 ---@param content string document.xml content
 ---@param _log table Logger instance (unused, kept for future debugging)
@@ -340,15 +171,12 @@ local function add_keep_next_to_captions(content, _log)
 end
 
 ---Base document processing that runs for all templates.
----Handles common features like positioned floats and caption orphan prevention.
+---Handles common features like caption orphan prevention.
 ---@param content string document.xml content
 ---@param log table Logger instance
 ---@return string Modified content
 local function base_process_document(content, log)
     local modified = content
-
-    -- Process positioned floats (convert inline to anchored where marked)
-    modified = process_positioned_floats(modified, log)
 
     -- Add keepNext to captions to prevent orphans
     modified = add_keep_next_to_captions(modified, log)
@@ -408,7 +236,7 @@ function M.postprocess(docx_path, template_name, log, config)
     local rels_content = read_xml(rels_path)
     if rels_content and pp and pp.process_rels then
         log.debug('[DOCX-POST] Calling hook: process_rels')
-        rels_content = pp.process_rels(rels_content, log)
+        rels_content = pp.process_rels(rels_content, log, config)
         write_xml(rels_path, rels_content)
     end
 
@@ -439,9 +267,15 @@ function M.postprocess(docx_path, template_name, log, config)
     -- Pass config for style injection from config.lua
     local styles_xml_path = temp_dir .. '/word/styles.xml'
     local styles_content = read_xml(styles_xml_path)
-    if styles_content and pp and pp.process_styles then
+    if styles_content and M.process_styles then
+        log.debug('[DOCX-POST] Calling base hook: process_styles')
+        styles_content = M.process_styles(styles_content, log, config)
+    end
+    if styles_content and pp and pp ~= M and pp.process_styles then
         log.debug('[DOCX-POST] Calling hook: process_styles')
         styles_content = pp.process_styles(styles_content, log, config)
+    end
+    if styles_content then
         write_xml(styles_xml_path, styles_content)
     end
 
@@ -494,7 +328,7 @@ function M.postprocess(docx_path, template_name, log, config)
     local content_types = read_xml(content_types_path)
     if content_types and pp and pp.process_content_types then
         log.debug('[DOCX-POST] Calling hook: process_content_types')
-        content_types = pp.process_content_types(content_types, log)
+        content_types = pp.process_content_types(content_types, log, config)
         write_xml(content_types_path, content_types)
     end
 
@@ -528,32 +362,28 @@ end
 ---@param reference_doc string Path to reference DOCX
 ---@param log table Logger instance
 ---@return string|nil styles_xml
----@return string|nil numbering_xml
----@return string|nil settings_xml
 function M.extract_reference_styles(reference_doc, log)
     local abs_path = get_absolute_path(reference_doc)
 
     -- Check if reference doc exists
     if not zip_utils.path_exists(abs_path) then
         log.warn('[DOCX-POST] Reference document not found: %s', abs_path)
-        return nil, nil, nil
+        return nil
     end
 
     -- Extract to temp directory
     local temp_dir = extract_docx(abs_path, log)
     if not temp_dir then
-        return nil, nil, nil
+        return nil
     end
 
-    -- Read the XML files
+    -- Read the styles XML (the only part consumers merge)
     local styles_xml = read_xml(temp_dir .. '/word/styles.xml')
-    local numbering_xml = read_xml(temp_dir .. '/word/numbering.xml')
-    local settings_xml = read_xml(temp_dir .. '/word/settings.xml')
 
     -- Cleanup
     zip_utils.rmdir_r(temp_dir)
 
-    return styles_xml, numbering_xml, settings_xml
+    return styles_xml
 end
 
 -- ============================================================================
@@ -780,91 +610,6 @@ local function fix_code_styles(content, log)
     return xml.serialize(doc)
 end
 
----Inject a Word-native TOC field into document.xml before the first heading.
----Creates a dynamic field (w:fldChar sequence) that Word/LibreOffice renders
----on document open, rather than Pandoc's static inline TOC.
----@param content string document.xml content
----@param log table Logger instance
----@return string Modified content
-local function inject_toc_field(content, log)
-    local doc = xml.parse(content)
-    if not doc or not doc.root then return content end
-
-    local body = xml.find_child(doc.root, "w:body")
-    if not body then return content end
-
-    -- Find the first heading paragraph
-    local first_heading_idx = nil
-    for i, kid in ipairs(body.kids or {}) do
-        if kid.name == "w:p" or (kid.nsPrefix and kid.nsPrefix .. ":" .. kid.name == "w:p") then
-            local pPr = xml.find_child(kid, "w:pPr")
-            if pPr then
-                local pStyle = xml.find_child(pPr, "w:pStyle")
-                if pStyle then
-                    local val = xml.get_attr(pStyle, "w:val")
-                    if val and val:match("^Heading%d$") then
-                        first_heading_idx = i
-                        break
-                    end
-                end
-            end
-        end
-    end
-
-    if not first_heading_idx then
-        log.debug("[DEFAULT-TOC] No heading paragraphs found, skipping TOC injection")
-        return content
-    end
-
-    -- TOC heading paragraph
-    local toc_heading = xml.node("w:p", {}, {
-        xml.node("w:pPr", {}, {
-            xml.node("w:pStyle", { ["w:val"] = "TOCHeading" }),
-        }),
-        xml.node("w:r", {}, {
-            xml.node("w:t", {}, { xml.text("Table of Contents") }),
-        }),
-    })
-
-    -- TOC field: begin + instrText + separate
-    local toc_field_start = xml.node("w:p", {}, {
-        xml.node("w:r", {}, {
-            xml.node("w:fldChar", { ["w:fldCharType"] = "begin" }),
-        }),
-        xml.node("w:r", {}, {
-            xml.node("w:instrText", { ["xml:space"] = "preserve" }, {
-                xml.text(' TOC \\o "1-3" \\h '),
-            }),
-        }),
-        xml.node("w:r", {}, {
-            xml.node("w:fldChar", { ["w:fldCharType"] = "separate" }),
-        }),
-    })
-
-    -- TOC field end
-    local toc_field_end = xml.node("w:p", {}, {
-        xml.node("w:r", {}, {
-            xml.node("w:fldChar", { ["w:fldCharType"] = "end" }),
-        }),
-    })
-
-    -- Page break after TOC
-    local page_break = xml.node("w:p", {}, {
-        xml.node("w:r", {}, {
-            xml.node("w:br", { ["w:type"] = "page" }),
-        }),
-    })
-
-    -- Insert before first heading (in reverse order so indices stay correct)
-    xml.insert_child(body, page_break, first_heading_idx)
-    xml.insert_child(body, toc_field_end, first_heading_idx)
-    xml.insert_child(body, toc_field_start, first_heading_idx)
-    xml.insert_child(body, toc_heading, first_heading_idx)
-
-    log.debug("[DEFAULT-TOC] Injected TOC field before first heading")
-    return xml.serialize(doc)
-end
-
 ---Process document.xml for default template.
 ---@param content string document.xml content
 ---@param config table Configuration
@@ -990,6 +735,65 @@ local function fix_heading_styles(content, log)
     return xml.serialize(doc)
 end
 
+---Ensure semantic spec-object styles exist even when the reference DOCX was
+---generated before these styles were introduced.
+---@param content string styles.xml content
+---@param log table Logger instance
+---@return string Modified content
+local function ensure_spec_object_styles(content, log)
+    local doc = xml.parse(content)
+    if not doc or not doc.root then return content end
+
+    local styles_root = doc.root
+    if styles_root.name ~= "w:styles" then
+        styles_root = xml.find_child(doc.root, "w:styles") or doc.root
+    end
+
+    local existing = {}
+    for _, style_el in ipairs(xml.find_children(styles_root, "w:style")) do
+        local sid = xml.get_attr(style_el, "w:styleId")
+        if sid then existing[sid] = true end
+    end
+
+    if not existing.SpecObjectHeader then
+        xml.add_child(styles_root, xml.node("w:style", {
+            ["w:type"] = "paragraph",
+            ["w:styleId"] = "SpecObjectHeader",
+            ["w:customStyle"] = "1",
+        }, {
+            xml.node("w:name", {["w:val"] = "Spec Object Header"}),
+            xml.node("w:basedOn", {["w:val"] = "Normal"}),
+            xml.node("w:next", {["w:val"] = "FirstParagraph"}),
+            xml.node("w:qFormat"),
+            xml.node("w:pPr", {}, {
+                xml.node("w:keepNext"),
+                xml.node("w:spacing", {
+                    ["w:before"] = "280",
+                    ["w:after"] = "120",
+                    ["w:line"] = "276",
+                    ["w:lineRule"] = "auto",
+                }),
+                xml.node("w:outlineLvl", {["w:val"] = "0"}),
+            }),
+            xml.node("w:rPr", {}, {
+                xml.node("w:rFonts", {
+                    ["w:ascii"] = "Calibri Light",
+                    ["w:hAnsi"] = "Calibri Light",
+                    ["w:cs"] = "Calibri Light",
+                }),
+                xml.node("w:b"),
+                xml.node("w:bCs"),
+                xml.node("w:color", {["w:val"] = "0F4C64"}),
+                xml.node("w:sz", {["w:val"] = "32"}),
+                xml.node("w:szCs", {["w:val"] = "32"}),
+            }),
+        }))
+        log.debug("[DEFAULT-STYLES] Added SpecObjectHeader style")
+    end
+
+    return xml.serialize(doc)
+end
+
 ---Process styles.xml for default template.
 ---@param content string styles.xml content
 ---@param log table Logger instance
@@ -1000,6 +804,7 @@ function M.process_styles(content, log, config)
     content = fix_code_styles(content, log)
     content = fix_heading_styles(content, log)
     content = merge_reference_styles(content, log, config)
+    content = ensure_spec_object_styles(content, log)
     return content
 end
 

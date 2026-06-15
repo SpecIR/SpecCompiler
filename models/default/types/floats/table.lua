@@ -2,18 +2,6 @@
 -- Handles CSV, TSV, and list-table parsing using Pandoc readers
 -- Ported from v1: extensions/templates/default/types/objects/table/handler.lua
 
-local M = {}
-
--- Float schema for type registration (goes into spec_float_types)
-M.float = {
-    id = "TABLE",
-    long_name = "Table",
-    description = "Tables from CSV, TSV, or list-table syntax",
-    caption_format = "Table",
-    counter_group = "TABLE",  -- Own counter
-    aliases = { "csv", "tsv", "list-table", "listtable" }
-}
-
 -- ============================================================================
 -- CSV/TSV Parsing (uses Pandoc's built-in CSV reader)
 -- ============================================================================
@@ -182,12 +170,15 @@ end
 -- Transform Interface (called by float_resolver)
 -- ============================================================================
 
----Transform raw content to Pandoc AST
+---Transform raw content to a Pandoc-AST JSON string (the resolved_ast the float
+---resolver stores; the EMIT render hook decodes it back to a Pandoc Table).
 ---@param raw_content string Raw code block content
----@param type_ref string Original type (CSV, TSV, LIST_TABLE, TABLE)
+---@param _float table The float record (unused; TABLE auto-detects its format)
 ---@param log table|nil Logger (optional)
----@return pandoc.Block|nil Transformed AST block
-function M.transform(raw_content, type_ref, log)
+---@return string|nil resolved Pandoc-AST JSON string, or nil on parse failure
+local function transform(dctx)
+    local raw_content = dctx.subject.raw_content
+    local log = dctx.log
     log = log or { debug = function() end, error = function() end }
 
     -- Detect list-table by content patterns:
@@ -197,48 +188,62 @@ function M.transform(raw_content, type_ref, log)
                           raw_content:match("^%*%s+%-") or
                           raw_content:match("\n%*%s+%-")
 
+    local block
     if is_list_table then
         log.debug("Detected list-table from content pattern")
-        return parse_list_table(raw_content, log)
+        block = parse_list_table(raw_content, log)
     else
         log.debug("Using CSV parser for table content")
-        return parse_csv_tsv(raw_content, log)
+        block = parse_csv_tsv(raw_content, log)
     end
+
+    return block and pandoc.json.encode(block) or nil
 end
 
--- ============================================================================
--- Handler (EMIT phase)
--- ============================================================================
+return {
+    kind = "float",
 
-M.handler = {
-    name = "table_handler",
-    prerequisites = {},
+    -- Float schema for type registration (goes into spec_float_types)
+    schema = {
+        id = "TABLE",
+        long_name = "Table",
+        description = "Tables from CSV, TSV, or list-table syntax",
+        caption_format = "Table",
+        counter_group = "TABLE",  -- Own counter
+        aliases = { "csv", "tsv", "list-table", "listtable" }
+    },
 
-    ---EMIT: Convert resolved_ast to Pandoc elements.
-    ---@param block table Pandoc CodeBlock element
-    ---@param ctx table Context with data, spec_id, log, preset
-    ---@param float table Float record from database
-    ---@param resolved string resolved_ast JSON string (Pandoc Table)
-    ---@return table|nil Pandoc element or nil
-    on_render_CodeBlock = function(block, ctx, float, resolved)
-        if not resolved or not pandoc then return nil end
+    hooks = {
+        -- TRANSFORM: parse raw CSV/TSV/list-table content into a Pandoc Table
+        -- AST. The float resolver reads this via
+        -- host:get_hook("float", "TABLE", "transform").
+        transform = transform,
 
-        -- resolved_ast is JSON-encoded Pandoc Table
-        local table_ast = pandoc.json.decode(resolved)
-        if not table_ast or table_ast.t ~= "Table" then
-            return nil
+        ---EMIT: convert the resolved table AST into a Pandoc Div wrapping the
+        ---Table, from the canonical ctx (subject.resolved + subject.float).
+        ---@param ctx table Canonical ctx (subject.resolved/float, pandoc)
+        ---@return table|nil Pandoc element or nil
+        render = function(ctx)
+            local resolved = ctx.subject.resolved
+            local float = ctx.subject.float
+            local pandoc = ctx.pandoc
+            if not resolved or not pandoc then return nil end
+
+            -- resolved_ast is JSON-encoded Pandoc Table
+            local table_ast = pandoc.json.decode(resolved)
+            if not table_ast or table_ast.t ~= "Table" then
+                return nil
+            end
+
+            -- Wrap Pandoc Table in semantic Div for filter processing
+            -- Filters will convert to format-specific output (OOXML for DOCX, HTML for web)
+            return pandoc.Div(
+                {table_ast},
+                pandoc.Attr("", {"speccompiler-table"}, {
+                    ["float-type"] = float.type_ref or "TABLE",
+                    ["identifier"] = float.anchor or float.label or "",
+                })
+            )
         end
-
-        -- Wrap Pandoc Table in semantic Div for filter processing
-        -- Filters will convert to format-specific output (OOXML for DOCX, HTML for web)
-        return pandoc.Div(
-            {table_ast},
-            pandoc.Attr("", {"speccompiler-table"}, {
-                ["float-type"] = float.type_ref or "TABLE",
-                ["identifier"] = float.anchor or float.label or "",
-            })
-        )
-    end
+    }
 }
-
-return M

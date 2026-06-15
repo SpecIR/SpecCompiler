@@ -178,7 +178,7 @@ local function is_chart_renderer_available()
     end
 
     local root = speccompiler_home or "."
-    local ts_renderer = root .. "/src/tools/echarts-render.ts"
+    local ts_renderer = root .. "/models/abnt/tools/echarts-render.ts"
     local has_deno = command_succeeds("command -v deno >/dev/null 2>&1")
 
     if has_deno and file_exists(ts_renderer) then

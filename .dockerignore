@@ -24,6 +24,9 @@ vendor/
 bin/echarts-render
 bin/mml2omml
 
+# Prebuilt toolchain output (rebuilt in-image; never ship into the build context)
+dist/
+
 # Build outputs
 audit_outputs/
 

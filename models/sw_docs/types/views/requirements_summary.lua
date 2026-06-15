@@ -1,3 +1,5 @@
+local view_utils = require("pipeline.shared.view_utils")
+local make_link_target = view_utils.make_link_target
 ---Requirements Summary View for sw_docs.
 ---Generates a Pandoc Table showing HLR counts grouped by Software Function (SF).
 ---
@@ -8,37 +10,23 @@
 ---
 ---@module requirements_summary
 
-local M = {}
-
-M.view = {
+local schema = {
     id = "REQUIREMENTS_SUMMARY",
+    extends = "TABLE_VIEW",
     long_name = "Requirements Summary",
     description = "HLR count grouped by Software Function",
     inline_prefix = "requirements_summary"
 }
 
-local prefix_matcher = require("pipeline.shared.prefix_matcher")
-local match_codeblock = prefix_matcher.codeblock_from_decl(M.view)
-
----Build link target, using cross-document .ext placeholder for objects in other specs.
----@param pid string Target PID
----@param target_spec string Specification owning the target object
----@param current_spec string Current specification being rendered
----@return string Link href
-local function make_link_target(pid, target_spec, current_spec)
-    if target_spec == current_spec then
-        return "#" .. pid
-    else
-        return target_spec .. ".ext#" .. pid
-    end
-end
 
 ---Generate requirements summary as a Pandoc Table.
+---@param params table|nil
 ---@param data DataManager
 ---@param spec_id string
----@param options table|nil
 ---@return pandoc.Block
-function M.generate(data, spec_id, options)
+local function build_block(dctx)
+    local data = dctx.data
+    local spec_id = dctx.spec_id or "default"
     -- Fetch individual HLR PIDs per SF via BELONGS relation
     local rows_data = data:query_all([[
         SELECT
@@ -130,25 +118,10 @@ function M.generate(data, spec_id, options)
     return pandoc.utils.from_simple_table(tbl)
 end
 
-M.handler = {
-    name = "requirements_summary_handler",
-    prerequisites = {"spec_objects", "spec_relations"},
-
-    on_render_Code = function()
-        return nil
-    end,
-
-    on_render_CodeBlock = function(block, ctx)
-        if not match_codeblock(block) then return nil end
-
-        local data = ctx.data
-        local spec_id = ctx.spec_id or "default"
-        if not data or not pandoc then
-            return nil
-        end
-
-        return M.generate(data, spec_id, {})
-    end,
+return {
+    kind = "view",
+    schema = schema,
+    hooks = {
+        build_block = build_block,
+    }
 }
-
-return M

@@ -7,9 +7,12 @@
 ---Directory structure:
 ---  models/{model}/types/views/{view_name}.lua
 ---
----View API:
----  M.view = { id = "...", inline_prefix = "...", ... }
----  M.generate = function(params, data, spec_id) ... end
+---View API (descriptor literal):
+---  return {
+---    kind = "view",
+---    schema = { id = "...", inline_prefix = "...", ... },
+---    hooks = { generate = function(params, data, spec_id) ... end },
+---  }
 ---
 ---Where:
 ---  params  - user parameters from code block attributes
@@ -28,11 +31,11 @@ local function try_load_view_module(view_name, model_name)
     local module_path = "models." .. model_name .. ".types.views." .. view_name
     local ok, view_module = pcall(require, module_path)
 
-    if ok and view_module and view_module.generate then
+    if ok and view_module and type(view_module.dataset) == "function" then
         return view_module, nil
     end
 
-    return nil, "View module not found: " .. module_path
+    return nil, "View module not found (or no dataset hook): " .. module_path
 end
 
 ---Load a view and return data.
@@ -44,24 +47,34 @@ end
 ---@return table|nil dataset Dataset with source array
 ---@return string|nil error Error message
 function M.load_view(view_name, model_name, data, params, spec_id)
-    -- Try specified model first
-    local view_module, err = try_load_view_module(view_name, model_name)
+    -- Prefer the host's `dataset` hook for registered view types (file name ==
+    -- lower(schema.id), and the host index is already overlaid default->model).
+    local host = require("contract.registry").current()
+    -- Inherited lookup: a view may alias another (e.g. GAUSSIAN extends GAUSS)
+    -- and inherit its dataset hook through the extends chain, like every other
+    -- hook dispatch path.
+    local dataset = host and host:get_hook_inherited("view", view_name:upper(), "dataset")
 
-    -- Fallback to default model if not found
-    if not view_module and model_name ~= "default" then
-        view_module, err = try_load_view_module(view_name, "default")
+    -- Fall back to loose module loading for views the host does not index:
+    -- subdirectory/test-fixture modules (e.g. test_fixtures.params_echo) that
+    -- export a top-level `dataset(dctx)`.
+    if not dataset then
+        local view_module, err = try_load_view_module(view_name, model_name)
+        if not view_module and model_name ~= "default" then
+            view_module, err = try_load_view_module(view_name, "default")
+        end
+        if not view_module then
+            return nil, err or ("View not found: " .. view_name)
+        end
+        dataset = view_module.dataset
     end
 
-    if not view_module then
-        return nil, err or ("View not found: " .. view_name)
-    end
-
-    -- View should export a generate(params, data, spec_id) function
-    if type(view_module.generate) ~= "function" then
-        return nil, "View must export a generate(params, data, spec_id) function"
-    end
-
-    local gen_ok, result = pcall(view_module.generate, params or {}, data, spec_id or "default")
+    -- Data hooks take a single frozen DATA ctx: subject carries the parsed params,
+    -- the DB is dctx.data, the spec is dctx.spec_id. (No render ctx in this phase.)
+    local hook_ctx = require("pipeline.shared.hook_ctx")
+    local dctx = hook_ctx.build_data({ model = model_name }, data, nil,
+        { params = params or {} }, "dataset", spec_id)
+    local gen_ok, result = pcall(dataset, dctx)
     if not gen_ok then
         return nil, "View execution failed: " .. tostring(result)
     end

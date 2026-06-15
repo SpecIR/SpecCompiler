@@ -1,9 +1,10 @@
--- Test oracle for VC-020: Model Directory Structure
--- Verifies all KNOWN_CATEGORIES are discovered and loaded.
+-- Test oracle for VC-020: Model Directory Structure (host engine)
+-- Verifies the host discovers all type categories from a model directory and
+-- registers each type (id is read from the descriptor schema, HLR-EXT-001).
 
 return function(_, _)
     local utils = require("type_loader_test_utils")
-    local type_loader = require("core.type_loader")
+    local registry = require("contract.registry")
     local uv = require("luv")
 
     local root = uv.cwd()
@@ -11,17 +12,18 @@ return function(_, _)
     local ok, err = pcall(function()
         local created, create_err = utils.create_model(root, model_name, {
             ["objects/object_vc020.lua"] = [[
-                return { object = { id = "VC020_OBJ", long_name = "VC020 Object" } }
+                return { kind = "object", schema = { id = "VC020_OBJ", long_name = "VC020 Object" } }
             ]],
             ["floats/float_vc020.lua"] = [[
-                return { float = { id = "VC020_FLOAT", long_name = "VC020 Float", counter_group = "vc020_counter" } }
+                return { kind = "float", schema = { id = "VC020_FLOAT", long_name = "VC020 Float", counter_group = "vc020_counter" } }
             ]],
             ["views/view_vc020.lua"] = [[
-                return { view = { id = "VC020_VIEW", long_name = "VC020 View", materializer_type = "inline" } }
+                return { kind = "view", schema = { id = "VC020_VIEW", long_name = "VC020 View", materializer_type = "inline" } }
             ]],
             ["relations/relation_vc020.lua"] = [[
                 return {
-                    relation = {
+                    kind = "relation",
+                    schema = {
                         id = "VC020_REL",
                         long_name = "VC020 Relation",
                         source_type_ref = "HLR",
@@ -30,7 +32,7 @@ return function(_, _)
                 }
             ]],
             ["specifications/spec_vc020.lua"] = [[
-                return { specification = { id = "VC020_SPEC", long_name = "VC020 Spec" } }
+                return { kind = "specification", schema = { id = "VC020_SPEC", long_name = "VC020 Spec" } }
             ]]
         })
         if not created then
@@ -41,7 +43,7 @@ return function(_, _)
         local pipeline = { register_handler = function() end }
 
         utils.clear_loaded_model(model_name)
-        type_loader.load_model(data, pipeline, model_name)
+        registry.new{ data = data, pipeline = pipeline }:load_model(model_name)
 
         local identifiers = utils.identifiers_from_calls(calls)
         local expected = {

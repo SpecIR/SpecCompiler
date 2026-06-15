@@ -159,7 +159,6 @@ entity "spec_objects" as spec_objects {
   start_line : INTEGER
   end_line : INTEGER
   ast : JSON
-  content_xhtml : TEXT
 }
 
 entity "spec_floats" as spec_floats {
@@ -231,7 +230,6 @@ entity "spec_attribute_values" as spec_attribute_values {
   enum_ref : TEXT
   ast : JSON
   datatype : TEXT
-  xhtml_value : TEXT
 }
 
 

@@ -16,9 +16,8 @@ local M = {
 
 local logger = require("infra.logger")
 local Queries = require("db.queries")
-
--- Cache of loaded specification type handlers
-local spec_type_handlers = {}
+local registry = require("contract.registry")
+local hook_ctx = require("pipeline.shared.hook_ctx")
 
 ---Encode Pandoc blocks to JSON for storage.
 ---@param blocks table Array of Pandoc blocks
@@ -29,67 +28,19 @@ local function encode_ast(blocks)
     return pandoc.json.encode(blocks)
 end
 
----Try to load a specification type handler.
----@param type_ref string Type identifier (e.g., "SRS")
----@param model_name string Model name (e.g., "sw_docs")
----@return table|nil handler Handler module or nil if not found
-local function load_spec_type_handler(type_ref, model_name)
-    -- Check cache first
-    local cache_key = model_name .. ":" .. type_ref
-    if spec_type_handlers[cache_key] ~= nil then
-        return spec_type_handlers[cache_key]
-    end
-
-    local type_name = type_ref:lower()
-    local module_paths = {
-        "models." .. model_name .. ".types.specifications." .. type_name,
-    }
-
-    if model_name ~= "default" then
-        table.insert(module_paths, "models.default.types.specifications." .. type_name)
-    end
-
-    for _, module_path in ipairs(module_paths) do
-        local ok, type_module = pcall(require, module_path)
-        if ok and type_module then
-            -- Specification modules have M.handler with on_render_Specification
-            local handler = type_module.handler
-            if handler and handler.on_render_Specification then
-                spec_type_handlers[cache_key] = handler
-                logger.debug("Loaded specification type handler", {type_ref = type_ref})
-                return handler
-            end
-        end
-    end
-
-    -- Not found or doesn't have on_render_Specification
-    spec_type_handlers[cache_key] = false  -- Cache miss
-    return nil
-end
+-- Specification render dispatch reads host:get_hook_inherited("specification", type_ref, "render")
+-- (walks the extends chain, like relation render_link).
 
 ---TRANSFORM phase: Invoke specification type handlers.
 ---@param data DataManager
 ---@param contexts Context[]
 ---@param diagnostics Diagnostics
 function M.on_transform(data, contexts, diagnostics)
-    local log = {
-        debug = function(msg, ...)
-            local formatted = select("#", ...) > 0 and string.format(msg, ...) or tostring(msg)
-            logger.debug(formatted)
-        end,
-        info = function(msg, ...)
-            local formatted = select("#", ...) > 0 and string.format(msg, ...) or tostring(msg)
-            logger.info(formatted)
-        end,
-        warn = function(msg, ...)
-            local formatted = select("#", ...) > 0 and string.format(msg, ...) or tostring(msg)
-            logger.warn(formatted)
-        end
-    }
+    local log = logger.create_diagnostic_adapter(diagnostics, "RENDER")
 
     data:begin_transaction()
+    local host = registry.current()
     for _, ctx in ipairs(contexts) do
-        local model_name = ctx.model_name or ctx.template or "default"
         local spec_id = ctx.spec_id or "default"
 
         -- Query the specification
@@ -106,23 +57,25 @@ function M.on_transform(data, contexts, diagnostics)
             goto continue
         end
 
-        -- Try to load the specification type's handler
-        local handler = load_spec_type_handler(spec.type_ref, model_name)
+        -- The host owns the specification render hook.
+        local render = host and host:get_hook_inherited("specification", spec.type_ref, "render")
 
-        if not handler then
+        if not render then
             log.debug("No handler for specification type: %s", spec.type_ref)
             goto continue
         end
 
-        -- Build context for the handler
-        local render_ctx = {
-            specification = spec,
-            spec_id = spec_id,
-            output_format = ctx.output_format or "docx"
-        }
+        -- The specification render hook receives the canonical frozen ctx
+        -- (HLR-EXT-009) with the specification subject; the rendering type's
+        -- schema carries declarative render options (show_pid, style).
+        local desc = host:get_descriptor("specification", spec.type_ref)
+        local render_ctx = hook_ctx.build(
+            ctx, data, diagnostics,
+            { specification = spec, type_schema = desc and desc.schema or {} },
+            "render", spec_id)
 
         -- Call the handler to render the specification header
-        local ok, result = pcall(handler.on_render_Specification, render_ctx, pandoc, data)
+        local ok, result = pcall(render, render_ctx)
 
         if ok and result then
             -- Store the rendered header AST in specifications table

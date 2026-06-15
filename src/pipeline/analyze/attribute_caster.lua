@@ -97,40 +97,4 @@ function M.cast(raw_value, datatype, data, attr_def)
     return result or {}
 end
 
----Cast all pending attributes (those with raw_value but no typed value)
----@param data DataManager
-function M.cast_all(data)
-    -- Get all attributes that need casting
-    local pending = data:query_all(Queries.content.pending_attribute_casts, {})
-
-    for _, attr in ipairs(pending or {}) do
-        local handler = HANDLERS[attr.datatype]
-        if handler then
-            local result
-            if attr.datatype == DT.ENUM then
-                result = handler(attr.raw_value, data, attr.datatype_ref)
-            else
-                result = handler(attr.raw_value)
-            end
-
-            if result then
-                -- Update the appropriate typed column
-                local col_names = {}
-                local params = { id = attr.id }
-
-                for col, val in pairs(result) do
-                    col_names[#col_names + 1] = col
-                    params[col] = val
-                end
-
-                if #col_names > 0 then
-                    local sql = Queries.content.build_attribute_cast_update(col_names)
-                    data:execute(sql, params)
-                end
-            end
-            -- If result is nil, cast failed - leave typed columns NULL for verification view
-        end
-    end
-end
-
 return M

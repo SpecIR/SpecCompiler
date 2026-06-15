@@ -11,18 +11,23 @@ local logger = require("infra.logger")
 ---@param meta table Pandoc metadata from --metadata-file project.yaml
 function Meta(meta)
     -- Wrap in pcall to catch errors and exit cleanly
-    local ok, err = pcall(function()
+    local ok, result = pcall(function()
         -- Extract project configuration from metadata
         local project_info = config.extract_metadata(meta)
 
         -- Run the build pipeline for all files
-        engine.run_project(project_info)
-
+        return engine.run_project(project_info)
     end)
 
     if not ok then
-        logger.error(tostring(err))
+        logger.error(tostring(result))
         os.exit(1)
+    end
+
+    -- Blocking verification errors must fail the build process so CI jobs
+    -- and agent loops can react to the exit code, not just the log text.
+    if result and result.has_errors and result:has_errors() then
+        os.exit(2)
     end
 
     -- Explicit success exit avoids a Pandoc/libuv teardown assertion observed

@@ -86,13 +86,13 @@ A **MIL-STD-498 implementation decomposition element** representing a source fil
 
 ### DIC: Data View @TERM-35
 
-A **Lua module** generating data for chart injection.
+A **view descriptor** whose `dataset` data hook generates data for chart injection.
 
 > description:
 >
 > **Purpose:** Produces structured data that can be injected into chart floats.
 >
-> **Implementation:** Lua scripts that query database and return chart-compatible data structures.
+> **Implementation:** A `dataset` DATA hook receives a frozen data context (reading `subject.params`) and returns a `{ source / data / links }` dataset. The descriptor is resolved from `models/{requested}/types/views/{view}` with fallback to `models/default/types/views/{view}`.
 
 ### DIC: EAV Model @TERM-EAV
 
@@ -130,16 +130,16 @@ A **numbered element** (table, figure, diagram) with caption and cross-reference
 
 ### DIC: Handler @TERM-16
 
-A **modular component** that processes specific content types, declared as `M.handler` on a type module.
+A **named hook** that a type descriptor contributes to the pipeline, indexed by the host engine and dispatched by capability rather than declared on a `M.handler` surface.
 
 > description:
 >
-> **Purpose:** Encapsulates processing logic for a content type.
+> **Purpose:** Encapsulates processing logic for a content type. Behaviour lives only under a descriptor's `hooks` table; the host classifies each hook by name and indexes it into the `(kind, id) -> hook` map.
 >
-> **Structure:** Carries two kinds of callbacks on a single surface:
+> **Structure:** Two kinds of contributions, both keyed by hook name:
 >
-> - **Phase hooks** (`on_initialize`, `on_analyze`, `on_transform`, `on_verify`, `on_emit`) — invoked once per phase with full pipeline context. Ordered via `prerequisites`.
-> - **Decorated per-item callbacks** (`on_render_SpecObject`, `on_render_Link`, `on_render_Code`, `on_render_CodeBlock`) — dispatched inline by a phase hook with a pre-resolved subject and context. Do not require `prerequisites`.
+> - **Phase participation** — `on_<phase>` functions (`on_initialize`, `on_analyze`, `on_transform`, `on_verify`, `on_emit`) declared in `hooks` beside the behavior hooks; the host synthesizes them into `pipeline:register_handler` under the derived name `<lower(id)>_handler`, ordered via `schema.phase_prerequisites`. Each runs once per phase with full pipeline context.
+> - **Per-item hooks** — RENDER hooks (`render`, `render_block`, `render_link`, `message`) and DATA hooks (`dataset`, `build_block`, `transform`, `resolve`, `prepare_task`, `handle_result`). The hook NAME selects one of two context tiers (a frozen render ctx or a frozen data ctx) and the return type the hook owes. Consumers resolve them via `get_hook_inherited`, which walks the `extends` chain.
 
 ### DIC: INITIALIZE Phase @TERM-19
 
@@ -153,11 +153,11 @@ The **first phase** in the pipeline that parses AST and populates IR containers.
 
 ### DIC: Model @TERM-33
 
-A **collection of type definitions**, handlers, and styles for a domain.
+A **collection of type descriptors** and styles for a domain, overlaid onto the `default` model by the host engine.
 
 > description:
 >
-> **Purpose:** Bundles related type definitions, handlers, and styling for specific documentation domains.
+> **Purpose:** Bundles related type descriptors (each carrying its own `hooks`) and styling for specific documentation domains. The host overlays `default` then each model later-wins-by-id, so a model overrides only the type ids it redefines.
 >
 > **Examples:** SRS model for software requirements, HRS model for hardware requirements.
 
@@ -233,13 +233,13 @@ The **third phase** in the pipeline that materializes views and rewrites content
 
 ### DIC: Type Loader @TERM-38
 
-**System that discovers and loads** type handlers from model directories.
+The **host engine** (`src/contract/registry.lua`) that overlays models and registers their type descriptors.
 
 > description:
 >
-> **Purpose:** Dynamically discovers and instantiates type handlers from model definitions.
+> **Purpose:** Discovers each model's type descriptors and registers them with the SpecIR type tables, the data manager, and the pipeline.
 >
-> **Implementation:** Scans model directories for handler definitions and registers them.
+> **Implementation:** Overlays the `default` model then each requested model (later-wins-by-id; resolved repo-bundled under `SPECCOMPILER_HOME/models/{model}` then cwd, no out-of-tree path). For each `models/{model}/types/{category}/` file it loads the single returned descriptor `{ kind, schema, [hooks] }`, validates it (known `kind`, present `schema.id`, each hook valid for the kind, no behaviour on top-level keys), emits the type row, and eager-indexes each hook into a `(kind, id) -> hook` map read via `get_hook` / `get_hook_inherited` (which walks the `extends` chain). `host:finalize()` then propagates inherited attributes, creates the verification SQL views, and asserts required hooks.
 
 ### DIC: Type Registry @TERM-26
 
@@ -415,11 +415,11 @@ A **category definition** that governs behavior for objects, floats, relations, 
 
 > description:
 >
-> **Purpose:** Defines the schema, validation rules, and rendering behavior for a category of elements.
+> **Purpose:** Defines the schema, validation rules, and `hooks` behaviour for a category of elements.
 >
 > **Categories:** Object types (HLR, SECTION), float types (FIGURE, TABLE), relation types (TRACES_TO), view types (TOC, LOF).
 >
-> **Registration:** Types are loaded from model directories and stored in the type registry.
+> **Registration:** Each type is one descriptor (`{ kind, schema, hooks }`) loaded from a model's category directory, validated by the host engine, and emitted into the type registry.
 
 ### DIC: Verification Case @TERM-VC
 
@@ -453,7 +453,7 @@ A **spec object type** whose instances receive hierarchical PIDs qualified by th
 >
 > **PID behavior:** Composite objects get hierarchical PIDs derived from the specification PID (e.g., `SRS-sec1.2.3`). Non-composite objects get independent PIDs from their `pid_prefix` and `pid_format` (e.g., `HLR-001`).
 >
-> **Configuration:** Set via `is_composite = true` in the type definition module.
+> **Configuration:** Set via `is_composite = true` in the descriptor's `schema`.
 
 ### DIC: Relation Selector @TERM-SELECTOR
 

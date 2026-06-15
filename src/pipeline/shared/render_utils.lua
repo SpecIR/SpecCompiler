@@ -1,7 +1,6 @@
 ---@meta pipeline.shared.render_utils
 
 ---Render utilities for spec object handlers.
----Extracted from base_handler.lua to support direct on_render_SpecObject implementations.
 ---
 ---Usage: local render_utils = require("pipeline.shared.render_utils")
 
@@ -50,27 +49,17 @@ function M.add_header_blocks(blocks, header_result)
     local result_type = type(header_result)
     if result_type ~= "table" and result_type ~= "userdata" then return end
 
-    if header_result.t then
-        -- Single Pandoc element
-        if header_result.t == "Div" then
+    -- Normalize: a single Pandoc element becomes a one-item array
+    local items = header_result.t and { header_result } or header_result
+    for _, b in ipairs(items) do
+        if b.t == "Div" then
             -- Add marker class to existing Div (preserves original classes/styles)
-            M.add_class_to_div(header_result, "spec-object-header")
-            table.insert(blocks, header_result)
+            M.add_class_to_div(b, "spec-object-header")
+            table.insert(blocks, b)
         else
             -- Wrap non-Div elements in marker Div
-            local marker_div = pandoc.Div({header_result}, pandoc.Attr("", {"spec-object-header"}, {}))
+            local marker_div = pandoc.Div({b}, pandoc.Attr("", {"spec-object-header"}, {}))
             table.insert(blocks, marker_div)
-        end
-    else
-        -- Array of elements
-        for _, b in ipairs(header_result) do
-            if b.t == "Div" then
-                M.add_class_to_div(b, "spec-object-header")
-                table.insert(blocks, b)
-            else
-                local marker_div = pandoc.Div({b}, pandoc.Attr("", {"spec-object-header"}, {}))
-                table.insert(blocks, marker_div)
-            end
         end
     end
 end

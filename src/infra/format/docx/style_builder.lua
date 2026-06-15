@@ -54,14 +54,6 @@ function M.to_line_spacing(ratio)
     return tostring(math.floor(ratio * 240))
 end
 
----Escape XML special characters.
----Delegates to xml.escape() for consistency.
----@param str string The string to escape
----@return string escaped
-function M.escape_xml(str)
-    return xml.escape(str)
-end
-
 -- ============================================================================
 -- OOXML Style Building Functions
 -- ============================================================================
@@ -210,13 +202,24 @@ function M.build_pPr(style)
         if style.spacing.after ~= nil then
             attrs["w:after"] = tostring(M.to_twips(style.spacing.after))
         end
-        if style.spacing.line ~= nil then
+        if style.spacing.line_exact ~= nil then
+            -- Fixed leading in points (TeX-style baseline grid)
+            attrs["w:line"] = tostring(math.floor(style.spacing.line_exact * 20))
+            attrs["w:lineRule"] = "exact"
+        elseif style.spacing.line ~= nil then
             attrs["w:line"] = M.to_line_spacing(style.spacing.line)
             attrs["w:lineRule"] = "auto"
         end
         if next(attrs) then
             table.insert(children, xml.node("w:spacing", attrs))
         end
+    end
+
+    -- Suppress before/after spacing between consecutive paragraphs that use
+    -- the same style. This is useful for list blocks: the style can define
+    -- space around the block without opening space between every item.
+    if style.contextual_spacing then
+        table.insert(children, xml.node("w:contextualSpacing"))
     end
 
     -- Indentation
@@ -404,124 +407,5 @@ function M.build_character_style_xml(style)
     return xml.serialize_element(xml.node("w:style", style_attrs, children))
 end
 
----Build table style XML element.
----@param style table The table style definition
----@return string xml The complete w:style element
-function M.build_table_style_xml(style)
-    local style_attrs = {
-        ["w:type"] = "table",
-        ["w:styleId"] = style.id,
-        ["w:customStyle"] = "1",
-    }
-
-    local children = {}
-
-    -- Style name
-    table.insert(children, xml.node("w:name", { ["w:val"] = style.name }))
-
-    -- Quick format
-    table.insert(children, xml.node("w:qFormat"))
-
-    -- UI priority
-    table.insert(children, xml.node("w:uiPriority", { ["w:val"] = "99" }))
-
-    -- Table properties
-    local tbl_children = {}
-
-    -- Table borders
-    if style.borders then
-        local border_children = {}
-        local function add_border(name, border)
-            if border and border.style ~= "none" then
-                table.insert(border_children, xml.node("w:" .. name, {
-                    ["w:val"] = border.style,
-                    ["w:sz"] = tostring(math.floor(border.width * 8)),
-                    ["w:color"] = border.color,
-                }))
-            end
-        end
-        add_border("top", style.borders.top)
-        add_border("bottom", style.borders.bottom)
-        add_border("left", style.borders.left)
-        add_border("right", style.borders.right)
-        add_border("insideH", style.borders.inside_h or style.borders.insideH)
-        add_border("insideV", style.borders.inside_v or style.borders.insideV)
-
-        if #border_children > 0 then
-            table.insert(tbl_children, xml.node("w:tblBorders", nil, border_children))
-        end
-    end
-
-    -- Cell margins
-    if style.cell_margins then
-        local margin_children = {}
-        if style.cell_margins.top then
-            table.insert(margin_children, xml.node("w:top", {
-                ["w:w"] = tostring(M.to_twips(style.cell_margins.top)),
-                ["w:type"] = "dxa",
-            }))
-        end
-        if style.cell_margins.bottom then
-            table.insert(margin_children, xml.node("w:bottom", {
-                ["w:w"] = tostring(M.to_twips(style.cell_margins.bottom)),
-                ["w:type"] = "dxa",
-            }))
-        end
-        if style.cell_margins.left then
-            table.insert(margin_children, xml.node("w:left", {
-                ["w:w"] = tostring(M.to_twips(style.cell_margins.left)),
-                ["w:type"] = "dxa",
-            }))
-        end
-        if style.cell_margins.right then
-            table.insert(margin_children, xml.node("w:right", {
-                ["w:w"] = tostring(M.to_twips(style.cell_margins.right)),
-                ["w:type"] = "dxa",
-            }))
-        end
-        if #margin_children > 0 then
-            table.insert(tbl_children, xml.node("w:tblCellMar", nil, margin_children))
-        end
-    end
-
-    if #tbl_children > 0 then
-        table.insert(children, xml.node("w:tblPr", nil, tbl_children))
-    end
-
-    -- Table conditional formatting: header row (tblStylePr type="firstRow")
-    if style.header_row then
-        local hr_children = {}
-
-        -- Header row paragraph properties (bold, etc.)
-        if style.header_row.font then
-            local rPr_children = {}
-            if style.header_row.font.bold then
-                table.insert(rPr_children, xml.node("w:b"))
-                table.insert(rPr_children, xml.node("w:bCs"))
-            end
-            if #rPr_children > 0 then
-                table.insert(hr_children, xml.node("w:rPr", nil, rPr_children))
-            end
-        end
-
-        -- Header row shading
-        if style.header_row.shading then
-            local tc_children = {
-                xml.node("w:shd", {
-                    ["w:val"] = style.header_row.shading.pattern or "clear",
-                    ["w:color"] = style.header_row.shading.color or "auto",
-                    ["w:fill"] = style.header_row.shading.fill or "auto",
-                })
-            }
-            table.insert(hr_children, xml.node("w:tcPr", nil, tc_children))
-        end
-
-        if #hr_children > 0 then
-            table.insert(children, xml.node("w:tblStylePr", { ["w:type"] = "firstRow" }, hr_children))
-        end
-    end
-
-    return xml.serialize_element(xml.node("w:style", style_attrs, children))
-end
 
 return M

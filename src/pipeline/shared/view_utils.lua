@@ -4,13 +4,6 @@
 ---@module view_utils
 local M = {}
 
----Wrap MathML in HTML for Pandoc parsing.
----@param mathml string MathML content
----@return string html HTML document containing MathML
-function M.wrap_mathml_as_html(mathml)
-    return string.format('<!DOCTYPE html><html><body>%s</body></html>', mathml)
-end
-
 ---Serialize a Pandoc element to JSON.
 ---@param element table Pandoc element (Block or Inline)
 ---@return string|nil json JSON string or nil on error
@@ -57,6 +50,20 @@ function M.lookup_resolved_ast(data, spec_id, view_type, raw_content)
         raw_content = raw_content
     })
     return result and result.resolved_ast or nil
+end
+
+---Build a link target for a PID: internal (#pid) for same-document targets,
+---external ({spec}.ext#pid) for cross-document targets.
+---@param pid string Target object PID
+---@param target_spec string Specification the target lives in
+---@param current_spec string Specification being rendered
+---@return string target
+function M.make_link_target(pid, target_spec, current_spec)
+    if target_spec == current_spec then
+        return "#" .. pid
+    else
+        return target_spec .. ".ext#" .. pid
+    end
 end
 
 return M

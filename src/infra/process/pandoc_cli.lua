@@ -256,32 +256,14 @@ local function load_model_config(template)
     return nil
 end
 
----Resolve the CSL path for a build, applying the precedence:
----  1. user-specified `csl` in project.yaml (resolved against project root,
----     with a fallback to models/<template>/assets/<basename>)
----  2. model-declared default in models/<template>/config.lua's `citation.csl`
----  3. nil (no --csl flag)
----@param format_config table Format-merged config (may have `csl`)
----@param project_root string Absolute project root
+---Resolve the CSL path for a build. CSL is MODEL-DECLARED only: the model's
+---config.lua `citation.csl`, resolved against models/<template>/assets/.
+---No project.yaml override — citation style is part of the model's identity
+---(e.g. abnt/uspsc declare ABNT NBR 6023; models without citations declare
+---nothing and get no --csl flag).
 ---@param template string|nil Template/model name
 ---@return string|nil csl_path Absolute path to a readable CSL file, or nil
-local function resolve_csl_path(format_config, project_root, template)
-    if format_config.csl then
-        local user_path = resolve_project_path(format_config.csl, project_root)
-        if file_exists(user_path) then
-            return user_path
-        end
-        local speccompiler_home = M.get_speccompiler_home()
-        local basename = format_config.csl:match("([^/]+)$")
-        local model_csl = string.format("%s/models/%s/assets/%s",
-            speccompiler_home, template or "default", basename)
-        if file_exists(model_csl) then
-            return model_csl
-        end
-        io.stderr:write(string.format("Warning: CSL file not found: %s\n", user_path))
-        return nil
-    end
-
+local function resolve_csl_path(template)
     local model_config = load_model_config(template)
     if model_config and model_config.citation and model_config.citation.csl then
         local declared = model_config.citation.csl
@@ -313,7 +295,7 @@ local function append_citation_options(args, format_config, project_root, templa
     end
 
     if format_config.citeproc ~= false then
-        local csl_path = resolve_csl_path(format_config, project_root, template)
+        local csl_path = resolve_csl_path(template)
         if csl_path then
             table.insert(args, "--csl=" .. csl_path)
         end
@@ -400,46 +382,5 @@ end
 -- ============================================================================
 -- Parse Task Builder (for parallel document parsing)
 -- ============================================================================
-
----Build a task descriptor for parsing markdown to JSON AST.
----Used for parallel document parsing via subprocess spawning.
----@param input_path string Path to input markdown file
----@param output_path string Path to output JSON file
----@param opts table|nil Options: include_filter (path to include expansion filter)
----@return table task Task descriptor for task_runner
-function M.build_parse_task(input_path, output_path, opts)
-    opts = opts or {}
-    local args = {}
-
-    -- Input format: CommonMark with sourcepos for line tracking
-    table.insert(args, "-f")
-    table.insert(args, "commonmark_x+sourcepos")
-
-    -- Output format: JSON AST
-    table.insert(args, "-t")
-    table.insert(args, "json")
-
-    -- Output file
-    table.insert(args, "-o")
-    table.insert(args, output_path)
-
-    -- Include expansion filter (handles recursive includes in subprocess)
-    if opts.include_filter then
-        table.insert(args, "--lua-filter=" .. opts.include_filter)
-    end
-
-    -- Input file (last argument)
-    table.insert(args, input_path)
-
-    return {
-        cmd = "pandoc",
-        args = args,
-        opts = {
-            timeout = opts.timeout or 60000  -- 1 minute default for parsing
-        },
-        input_path = input_path,
-        output_path = output_path
-    }
-end
 
 return M

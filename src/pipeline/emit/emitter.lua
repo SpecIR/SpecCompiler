@@ -57,11 +57,11 @@ local function load_docx_preset(ctx, log)
     return preset
 end
 
-local function collect_documents(data, contexts, log)
+local function collect_documents(data, contexts, log, diagnostics)
     local documents = {}
 
     for _, c in ipairs(contexts) do
-        local output_dir = c.build_dir or os.getenv("BUILD_DIR") or "build"
+        local output_dir = c.build_dir or "build"
         local spec_id = c.spec_id or "default"
         local output_path = c.output_path or (output_dir .. "/" .. spec_id .. ".docx")
 
@@ -77,10 +77,10 @@ local function collect_documents(data, contexts, log)
         end
 
         local preset = load_docx_preset(c, log)
-        local float_results = float_resolver.resolve_floats(data, output_dir, log)
+        local float_results = float_resolver.resolve_floats(data, log)
 
-        local transformed_doc = emit_float.transform_floats_in_doc(doc, float_results, data, spec_id, log, preset, c.template)
-        transformed_doc = emit_view.transform_views_in_doc(transformed_doc, data, spec_id, log, c.template)
+        local transformed_doc = emit_float.transform_floats_in_doc(doc, float_results, data, spec_id, log, preset, c, diagnostics)
+        transformed_doc = emit_view.transform_views_in_doc(transformed_doc, data, spec_id, log, c, diagnostics)
 
         local config = c.config or {}
         config.output_dir = output_dir
@@ -92,7 +92,6 @@ local function collect_documents(data, contexts, log)
         config.latex = c.latex
         config.docx = c.docx
         config.bibliography = c.bibliography
-        config.csl = c.csl
 
         documents[#documents + 1] = {
             doc = transformed_doc,
@@ -127,11 +126,6 @@ local function build_format_config(d, output, log)
         format_config.bibliography = d.config.bibliography
         log.debug("[EMIT] Merged bibliography: %s", d.config.bibliography)
     end
-    if d.config.csl and not format_config.csl then
-        format_config.csl = d.config.csl
-        log.debug("[EMIT] Merged CSL: %s", d.config.csl)
-    end
-
     return format_config
 end
 
@@ -154,11 +148,6 @@ local function collect_output_dependencies(d)
         deps[#deps + 1] = bibliography
     end
 
-    local csl = resolve_project_path(d.config.csl, project_root)
-    if csl then
-        deps[#deps + 1] = csl
-    end
-
     local latex = d.config.latex or {}
     local uspsc_zip = resolve_project_path(latex.uspsc_zip, project_root)
     if uspsc_zip then
@@ -166,6 +155,87 @@ local function collect_output_dependencies(d)
     end
 
     return deps
+end
+
+---Prepare one pandoc task for a single (document, output) pair: cache check,
+---per-format filter, filtered-AST serialization, and task construction.
+---@param d table Document bundle ({doc, spec_id, config, ...})
+---@param output table Output spec ({format, path}) from project.yaml
+---@param json_dir string Directory for serialized ASTs
+---@param output_cache table OutputCache instance
+---@param log table Logger adapter
+---@return table|nil task Pandoc task, or nil when skipped/failed
+---@return table|nil meta {spec_id, format, output_path} when task is returned
+---@return string|nil format_json_path Saved filtered-AST path (independent of task)
+local function prepare_output_task(d, output, json_dir, output_cache, log)
+    local output_path = output.path:gsub("{spec_id}", d.spec_id)
+
+    if output_cache:is_output_current(d.spec_id, output_path, collect_output_dependencies(d)) then
+        log.info("Skipped %s: %s (unchanged)", output.format, output_path)
+        return nil
+    end
+
+    local output_dir = output_path:match("^(.+)/[^/]+$")
+    if output_dir then
+        task_runner.ensure_dir(output_dir)
+    end
+
+    local format_config = build_format_config(d, output, log)
+
+    local work_doc = d.doc
+    local filter = Writer.load_filter(d.config.template, output.format)
+    if filter and filter.apply then
+        local filter_ok, filtered = pcall(filter.apply, d.doc, d.config, log)
+        if filter_ok and filtered then
+            work_doc = filtered
+            log.debug("[EMIT] Applied filter: %s/%s", d.config.template or "default", output.format)
+        else
+            log.warn("[EMIT] Filter error for %s: %s", output.format, tostring(filtered))
+        end
+    end
+
+    local format_json_path = json_dir .. "/" .. d.spec_id .. "_" .. output.format .. ".json"
+    local filter_json_ok, filter_doc_json = pcall(function()
+        return pandoc.write(work_doc, "json")
+    end)
+    if not filter_json_ok then
+        log.error("Failed to serialize %s document %s to JSON: %s", output.format, d.spec_id, tostring(filter_doc_json))
+        return nil
+    end
+
+    -- The task always references format_json_path (matching prior behavior even
+    -- when the write fails — pandoc then reports the missing input itself);
+    -- only the RETURNED path is nil'd so the caller's saved-AST list stays accurate.
+    local saved_json_path = format_json_path
+    local filter_write_ok, filter_write_err = task_runner.write_file(format_json_path, filter_doc_json)
+    if not filter_write_ok then
+        log.warn("Failed to save filtered Pandoc AST: %s", filter_write_err or "unknown")
+        saved_json_path = nil
+    end
+
+    local task = pandoc_cli.build_task(
+        output.format,
+        format_config,
+        format_json_path,
+        output_path,
+        d.config.project_root,
+        d.config.template or "default",
+        {
+            spec_id = d.spec_id,
+            format = output.format,
+            output_path = output_path
+        }
+    )
+
+    if task.args then
+        log.debug("[EMIT] Pandoc args for %s: %s", output.format, table.concat(task.args, " "))
+    end
+
+    return task, {
+        spec_id = d.spec_id,
+        format = output.format,
+        output_path = output_path
+    }, saved_json_path
 end
 
 local function prepare_emit_tasks(documents, output_cache, diagnostics, log)
@@ -208,74 +278,15 @@ local function prepare_emit_tasks(documents, output_cache, diagnostics, log)
         end
 
         for _, output in ipairs(outputs) do
-            local output_path = output.path:gsub("{spec_id}", d.spec_id)
-
-            if output_cache:is_output_current(d.spec_id, output_path, collect_output_dependencies(d)) then
-                log.info("Skipped %s: %s (unchanged)", output.format, output_path)
-                goto continue_output
+            local task, meta, format_json_path =
+                prepare_output_task(d, output, json_dir, output_cache, log)
+            if task then
+                tasks[#tasks + 1] = task
+                task_metadata[#task_metadata + 1] = meta
             end
-
-            local output_dir = output_path:match("^(.+)/[^/]+$")
-            if output_dir then
-                task_runner.ensure_dir(output_dir)
-            end
-
-            local format_config = build_format_config(d, output, log)
-
-            local work_doc = d.doc
-            local filter = Writer.load_filter(d.config.template, output.format)
-            if filter and filter.apply then
-                local filter_ok, filtered = pcall(filter.apply, d.doc, d.config, log)
-                if filter_ok and filtered then
-                    work_doc = filtered
-                    log.debug("[EMIT] Applied filter: %s/%s", d.config.template or "default", output.format)
-                else
-                    log.warn("[EMIT] Filter error for %s: %s", output.format, tostring(filtered))
-                end
-            end
-
-            local format_json_path = json_dir .. "/" .. d.spec_id .. "_" .. output.format .. ".json"
-            local filter_json_ok, filter_doc_json = pcall(function()
-                return pandoc.write(work_doc, "json")
-            end)
-            if not filter_json_ok then
-                log.error("Failed to serialize %s document %s to JSON: %s", output.format, d.spec_id, tostring(filter_doc_json))
-                goto continue_output
-            end
-
-            local filter_write_ok, filter_write_err = task_runner.write_file(format_json_path, filter_doc_json)
-            if not filter_write_ok then
-                log.warn("Failed to save filtered Pandoc AST: %s", filter_write_err or "unknown")
-            else
+            if format_json_path then
                 format_json_paths[#format_json_paths + 1] = format_json_path
             end
-
-            local task = pandoc_cli.build_task(
-                output.format,
-                format_config,
-                format_json_path,
-                output_path,
-                d.config.project_root,
-                d.config.template or "default",
-                {
-                    spec_id = d.spec_id,
-                    format = output.format,
-                    output_path = output_path
-                }
-            )
-
-            if task.args then
-                log.debug("[EMIT] Pandoc args for %s: %s", output.format, table.concat(task.args, " "))
-            end
-
-            tasks[#tasks + 1] = task
-            task_metadata[#task_metadata + 1] = {
-                spec_id = d.spec_id,
-                format = output.format,
-                output_path = output_path
-            }
-
-            ::continue_output::
         end
 
         ::continue_doc::
@@ -347,6 +358,49 @@ local function finalize_postprocessors(outputs_by_format, contexts, log)
         return false
     end
 
+    local function output_paths_for_format(fmt)
+        local paths = {}
+        local ctx = contexts[1] or {}
+        local outs = ctx.outputs
+        if type(outs) ~= "table" then
+            return paths
+        end
+        local output_dir = ctx.build_dir or "build"
+        local spec_id = ctx.spec_id or "default"
+        for _, o in ipairs(outs) do
+            if o and o.format == fmt and o.path then
+                local path = o.path:gsub("{spec_id}", spec_id)
+                if not path:match("^/") and not path:match("/") then
+                    path = output_dir .. "/" .. path
+                end
+                paths[#paths + 1] = path
+            end
+        end
+        return paths
+    end
+
+    local function build_finalize_config()
+        local output_dir = contexts[1].build_dir or "build"
+        local finalize_config = {
+            template = template,
+            project_root = project_root,
+            output_dir = output_dir,
+            db_path = output_dir .. "/specir.db",
+        }
+        local ctx_config = contexts[1] and contexts[1].config or {}
+        for k, v in pairs(ctx_config) do
+            if finalize_config[k] == nil then
+                finalize_config[k] = v
+            end
+        end
+        local ctx = contexts[1] or {}
+        finalize_config.spec_id = ctx.spec_id
+        finalize_config.bibliography = ctx.bibliography
+        finalize_config.latex = ctx.latex
+        finalize_config.docx = ctx.docx
+        return finalize_config
+    end
+
     for fmt, info in pairs(outputs_by_format) do
         local writer_fmt = fmt
         if fmt == "html" then
@@ -355,24 +409,7 @@ local function finalize_postprocessors(outputs_by_format, contexts, log)
 
         local postprocessor = Writer.load_postprocessor(template, writer_fmt)
         if postprocessor and postprocessor.finalize then
-            local output_dir = contexts[1].build_dir or os.getenv("BUILD_DIR") or "build"
-            local finalize_config = {
-                template = template,
-                project_root = project_root,
-                output_dir = output_dir,
-                db_path = output_dir .. "/specir.db",
-            }
-            local ctx_config = contexts[1] and contexts[1].config or {}
-            for k, v in pairs(ctx_config) do
-                if finalize_config[k] == nil then
-                    finalize_config[k] = v
-                end
-            end
-            local ctx = contexts[1] or {}
-            finalize_config.spec_id = ctx.spec_id
-            finalize_config.bibliography = ctx.bibliography
-            finalize_config.csl = ctx.csl
-            finalize_config.latex = ctx.latex
+            local finalize_config = build_finalize_config()
 
             local ok, err = pcall(postprocessor.finalize, info.paths, finalize_config, log)
             if ok then
@@ -383,13 +420,29 @@ local function finalize_postprocessors(outputs_by_format, contexts, log)
         end
     end
 
+    -- PDF generation is a LaTeX postprocessor side effect. If the TeX output is
+    -- cache-hit, run the postprocessor over the existing TeX file so configured
+    -- PDF compilation still happens.
+    if not outputs_by_format.latex and wants_format("latex") then
+        local postprocessor = Writer.load_postprocessor(template, "latex")
+        if postprocessor and postprocessor.finalize then
+            local paths = output_paths_for_format("latex")
+            local ok, err = pcall(postprocessor.finalize, paths, build_finalize_config(), log)
+            if ok then
+                log.info("[EMIT] Finalized latex postprocessor on cached output (%d files)", #paths)
+            else
+                log.warn("[EMIT] Finalize error for latex (cached build): %s", tostring(err))
+            end
+        end
+    end
+
     -- Even when all documents are cached and no outputs were regenerated,
     -- we still want to re-run HTML finalization so UI/asset changes
     -- (CSS/JS/templates) are reflected in index.html.
     if not outputs_by_format.html5 and not outputs_by_format.html and wants_format("html5") then
         local postprocessor = Writer.load_postprocessor(template, "html5")
         if postprocessor and postprocessor.finalize then
-            local output_dir = contexts[1].build_dir or os.getenv("BUILD_DIR") or "build"
+            local output_dir = contexts[1].build_dir or "build"
             local finalize_config = {
                 template = template,
                 project_root = project_root,
@@ -426,7 +479,7 @@ function M.on_emit(data, contexts, diagnostics)
     local log = get_log_from_contexts(contexts)
     local output_cache = OutputCache.new(data, log)
 
-    local documents = collect_documents(data, contexts, log)
+    local documents = collect_documents(data, contexts, log, diagnostics)
     if #documents == 0 then
         log.debug("No documents to generate")
         return

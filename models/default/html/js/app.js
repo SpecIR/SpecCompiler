@@ -472,7 +472,14 @@ var SpecCompiler = SpecCompiler || {};
 
     // Update TOC highlight
     if (SpecCompiler.Sidebar) {
-      SpecCompiler.Sidebar.highlightTocItem(id);
+      var docId = activeSection.id && activeSection.id.indexOf('doc-') === 0
+        ? activeSection.id.slice(4)
+        : null;
+      if (SpecCompiler.Sidebar.setActiveElement && docId) {
+        SpecCompiler.Sidebar.setActiveElement(docId, id);
+      } else {
+        SpecCompiler.Sidebar.highlightTocItem(id);
+      }
     }
   }
 

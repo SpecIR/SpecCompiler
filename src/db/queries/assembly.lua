@@ -31,38 +31,6 @@ M.select_objects_by_spec = [[
     ORDER BY file_seq
 ]]
 
--- Get a single spec_object AST by id (for incremental assembly or previews)
-M.select_object_ast = [[
-    SELECT ast FROM spec_objects WHERE id = :id
-]]
-
--- ============================================================================
--- Spec Floats
--- ============================================================================
-
--- Get all floats for a specification with type info, ordered by file sequence
-M.select_floats_by_spec = [[
-    SELECT f.id, f.type_ref, f.label, f.anchor, f.number, f.caption, f.pandoc_attributes,
-           f.raw_content, f.resolved_ast, f.from_file,
-           ft.caption_format, ft.counter_group
-    FROM spec_floats f
-    LEFT JOIN spec_float_types ft ON f.type_ref = ft.identifier
-    WHERE f.specification_ref = :spec_id
-    ORDER BY f.file_seq
-]]
-
--- ============================================================================
--- Spec Views
--- ============================================================================
-
--- Get all views for a specification ordered by file sequence
-M.select_views_by_spec = [[
-    SELECT id, view_type_ref, raw_ast, resolved_ast
-    FROM spec_views
-    WHERE specification_ref = :spec_id
-    ORDER BY file_seq
-]]
-
 -- ============================================================================
 -- Attribute Values
 -- ============================================================================
