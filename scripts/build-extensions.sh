@@ -94,5 +94,17 @@ if [ ! -d "$OUT/slaxml" ]; then
     && mkdir -p "$OUT/slaxml" && cp SLAXML/*.lua "$OUT/slaxml/" )
 fi
 
+# --- SQLite WASM (browser sqlite for the HTML web app search/filters/inspector) ---
+# html5.lua embeds these from $DIST/vendor/sqlite/wasm/; without them the web app
+# falls back to "SQLite WASM not available" and search/inspector are disabled.
+if [ ! -f "$OUT/sqlite/wasm/sqlite3.wasm" ]; then
+  echo "  downloading SQLite WASM ${SQLITE_VERSION}..."
+  mkdir -p "$OUT/sqlite/wasm"
+  ( cd "$TMP" && curl -sL "https://sqlite.org/${SQLITE_YEAR}/sqlite-wasm-${SQLITE_VERSION}.zip" -o sqlite-wasm.zip \
+    && unzip -q sqlite-wasm.zip \
+    && cp "sqlite-wasm-${SQLITE_VERSION}/jswasm/sqlite3.js"   "$OUT/sqlite/wasm/" \
+    && cp "sqlite-wasm-${SQLITE_VERSION}/jswasm/sqlite3.wasm" "$OUT/sqlite/wasm/" )
+fi
+
 echo "  extensions ready in: $OUT"
 ls "$OUT" | tr '\n' ' '; echo

@@ -42,6 +42,8 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.imgref.outputs.ref }}
     permissions:
       contents: read
       packages: write
@@ -101,6 +103,11 @@ jobs:
           cache-from: type=gha,scope=lean
           cache-to: type=gha,mode=max,scope=lean
 
+      - name: Export image ref for docs
+        id: imgref
+        if: github.event_name != 'pull_request'
+        run: echo "ref=${REGISTRY}/${IMAGE_NAME}:${{ steps.meta.outputs.version }}" >> "$GITHUB_OUTPUT"
+
       - name: Make package public
         if: github.event_name != 'pull_request'
         env:
@@ -152,6 +159,20 @@ jobs:
           files: tests/reports/coverage/merged.lcov
           disable_search: true
           fail_ci_if_error: false
+
+  # Auto-deploy the docs to gh-pages on every `v*` release tag, using the image
+  # just built/pushed by build-and-test (so no separate `docs*` tag is needed).
+  deploy-docs:
+    name: Deploy documentation
+    needs: build-and-test
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+      packages: read
+    uses: ./.github/workflows/deploy-docs.yml
+    with:
+      image: ${{ needs.build-and-test.outputs.image }}
+    secrets: inherit
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
