@@ -1,8 +1,18 @@
 name: Deploy Documentation
 
 on:
+  # Manual/standalone docs deploy: push any tag starting with "docs".
   push:
     tags: ['docs*']
+  # Called by the release pipeline (docker-publish.yml) after the image is built,
+  # so a `v*` release tag updates gh-pages automatically with the just-built image.
+  workflow_call:
+    inputs:
+      image:
+        description: "Image ref to build docs with (defaults to :latest when run standalone)."
+        type: string
+        required: false
+        default: ""
 
 env:
   REGISTRY: ghcr.io
@@ -21,6 +31,14 @@ jobs:
       - name: Lowercase image name
         run: echo "IMAGE_NAME=${IMAGE_NAME,,}" >> $GITHUB_ENV
 
+      - name: Resolve docs image
+        run: |
+          if [ -n "${{ inputs.image }}" ]; then
+            echo "DOC_IMAGE=${{ inputs.image }}" >> "$GITHUB_ENV"
+          else
+            echo "DOC_IMAGE=${REGISTRY}/${IMAGE_NAME}:latest" >> "$GITHUB_ENV"
+          fi
+
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
@@ -38,7 +56,7 @@ jobs:
             -e SPECCOMPILER_HOME=/workspace \
             -e SPECCOMPILER_DIST=/opt/speccompiler \
             --entrypoint bash \
-            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" \
+            "${{ env.DOC_IMAGE }}" \
             tests/run.sh --junit || true
 
           # Generate TRR markdown from JUnit XML
@@ -50,7 +68,7 @@ jobs:
             -e SPECCOMPILER_HOME=/workspace \
             -e SPECCOMPILER_DIST=/opt/speccompiler \
             --entrypoint pandoc \
-            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" \
+            "${{ env.DOC_IMAGE }}" \
             --lua-filter tests/helpers/trr_generator.lua \
               --metadata junit_path=tests/reports/junit.xml \
               --metadata output_path=docs/engineering_docs/test_results/tr.md \
@@ -68,7 +86,7 @@ jobs:
               --user "$(id -u):$(id -g)" \
               -v "${{ github.workspace }}:/workspace" \
               -w /workspace \
-              "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" \
+              "${{ env.DOC_IMAGE }}" \
               build "$project"
             echo "::endgroup::"
           done
