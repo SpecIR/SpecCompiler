@@ -181,3 +181,14 @@ The system shall infer relation types during the [dic:analyze-phase](#) phase us
 
 > status: Approved
 
+
+#### HLR: Prerequisite-Not-Found Diagnostic @HLR-PIPE-011
+
+The system shall distinguish a handler prerequisite that resolves to another phase from one that resolves to no registered handler at all, emitting a diagnostic only for the latter.
+
+> description: The per-phase topological sort deliberately drops a prerequisite that does not participate in the current phase (handlers cannot be ordered across phases). `Pipeline:validate_prerequisites()`, run once when all handlers are registered, distinguishes the two cases the filter conflates: a prerequisite registered in ANOTHER phase (legitimate, silent) versus one registered in NO phase (a typo/bug). It emits a `prerequisite_not_found` diagnostic only for the latter, and only for phase handlers (those declaring an `on_<phase>` hook) -- a decorated per-item callback's `prerequisites` field is inert and not flagged. The cross-phase filter itself is unchanged.
+
+> rationale: A mistyped prerequisite silently never applied under the old behavior, so a missing cross-phase ordering constraint could corrupt output with no signal. Surfacing only the truly-unresolvable case avoids false positives on legitimate cross-phase prerequisites. (Verified by the pipeline suite's prereq-not-found test.)
+
+> status: Approved
+

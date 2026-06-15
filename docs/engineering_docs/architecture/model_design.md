@@ -6,13 +6,15 @@
 
 The type system and domain model definition function encompasses the default model
 components that provide base type definitions, format-specific processing, and style
-configuration. These components are loaded by the [dic:type-loader](#) ([CSU-008](@)) during the
+configuration. These components are overlaid by the host engine ([dic:type-loader](#), [CSU-008](@)) during the
 model discovery phase described in [FD-002](@) and collectively define the foundational
 capabilities that all domain models inherit and extend.
 
 **Model Directory Structure**: Each model provides a standard directory layout with
 `types/` (objects, floats, relations, views, specifications), `filters/`, `postprocessors/`,
-and `styles/` subdirectories. The default model (`models/default/`) establishes baseline
+and `styles/` subdirectories. Each `.lua` file under `types/` returns ONE descriptor table
+`{ kind, schema, [hooks] }`; the host reads only that table and never sniffs
+which "magic key" exists. The default model (`models/default/`) establishes baseline
 definitions for all five type categories.
 
 **Type Definitions**: [CSC-017](@) defines the foundational document object and specification types
@@ -87,45 +89,50 @@ participant "CSC-019 Default\nPostprocessors" as PP
 participant "CSU Data Manager" as DB
 participant "CSU Pipeline" as PL
 
-== Type Loading ==
+== Type Loading (overlay default then each model) ==
 E -> TL: load_model(data, pipeline, "default")
 activate TL
 
 TL -> DM: scan types/objects/
-DM --> TL: SECTION.lua
-TL -> DB: register_object_type(SECTION)
+DM --> TL: section.lua -> { kind="object", schema, hooks }
+TL -> DB: emit object type row (schema.id)
 
 TL -> DM: scan types/specifications/
-DM --> TL: spec.lua
-TL -> DB: register_specification_type(SPEC)
+DM --> TL: spec.lua -> { kind="specification", schema, hooks }
+TL -> DB: emit specification type row (schema.id)
 
 TL -> DM: scan types/floats/
 DM --> TL: figure.lua, table.lua, listing.lua,\nplantuml.lua, chart.lua, math.lua
-loop for each float type
-    TL -> DB: register_float_type(M.float)
-    alt has M.handler
-        TL -> PL: register_handler(M.handler)
-        note right: e.g., plantuml, chart,\nmath external renderers
+loop for each float descriptor
+    TL -> TL: validate { kind, schema.id, hooks }
+    TL -> DB: emit float type row (schema.id)
+    TL -> TL: index hooks into (kind, id) -> hook
+    note right: e.g. transform / prepare_task /\nhandle_result data hooks
+    alt hooks contain on_<phase>
+        TL -> PL: register_handler(derived from on_<phase> hooks)
     end
 end
 
 TL -> DM: scan types/relations/
 DM --> TL: xref_figure.lua, xref_table.lua, ...
-loop for each relation type
-    TL -> DB: register_relation_type(M.relation)
+loop for each relation descriptor
+    TL -> DB: emit relation type row (schema.id)
+    TL -> TL: index resolve / render_link hooks
 end
 
 TL -> DM: scan types/views/
 DM --> TL: toc.lua, lof.lua, abbrev.lua, ...
-loop for each view type
-    TL -> DB: register_view_type(M.view)
-    alt has M.handler
-        TL -> PL: register_handler(M.handler)
+loop for each view descriptor
+    TL -> DB: emit view type row (schema.id)
+    TL -> TL: index hooks (dataset / build_block / render_block)
+    alt hooks contain on_<phase>
+        TL -> PL: register_handler(derived from on_<phase> hooks)
     end
 end
 
-TL -> DB: propagate_inherited_attributes()
-TL --> E: types and handlers registered
+TL -> TL: host:finalize()
+note right: propagate inherited attributes,\ncreate verification SQL views,\nassert required hooks
+TL --> E: type rows emitted, hooks indexed
 deactivate TL
 
 == Filter Application (during EMIT) ==

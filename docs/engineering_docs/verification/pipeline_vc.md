@@ -242,3 +242,24 @@ Verify that relations are resolved with correct type inference and [dic:specific
 > - Unresolved relations have `is_unresolved = 1` with NULL target_ref
 
 > traceability: [HLR-PIPE-010](@), [LLR-043](@), [LLR-044](@), [LLR-045](@), [LLR-046](@)
+
+
+### VC: Prerequisite-Not-Found Diagnostic @VC-PIPE-012
+
+Verify the pipeline distinguishes a handler prerequisite that resolves to another phase from one that resolves to no registered handler, emitting a diagnostic only for the latter.
+
+> objective: Confirm `Pipeline:validate_prerequisites()` flags only a prerequisite registered in NO phase, stays silent for a legitimate cross-phase prerequisite, and only considers phase handlers.
+
+> verification_method: Test
+
+> approach:
+> - Register a phase handler whose `prerequisites` name a handler registered in ANOTHER phase; run validation and confirm no diagnostic
+> - Register a phase handler whose `prerequisites` name a handler registered in NO phase; confirm a `prerequisite_not_found` diagnostic
+> - Confirm a decorated per-item callback's `prerequisites` field is inert (not flagged)
+
+> pass_criteria:
+> - A cross-phase prerequisite produces no diagnostic (cross-phase ordering is dropped by design)
+> - A truly-unresolvable prerequisite produces exactly one `prerequisite_not_found` diagnostic
+> - Only phase handlers (those declaring an `on_<phase>` hook) are checked
+
+> traceability: [HLR-PIPE-011](@)

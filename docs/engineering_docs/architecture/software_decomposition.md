@@ -47,7 +47,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Loads view modules from models/{model}/types/views/ and invokes their generate() function to produce data for charts and other data-driven consumers.
+> description: Loads view modules from models/{model}/types/views/ and invokes their dataset hook to produce data for charts and other data-driven consumers.
 
 > traceability: [CSC-001](@)
 
@@ -93,11 +93,11 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Type Loader @CSU-008
 
-> file_path: src/core/type_loader.lua
+> file_path: src/contract/registry.lua
 
 > language: Lua
 
-> description: Loads type modules (objects, floats, views, relations, specifications) from models/{model}/types/ directories and populates the SpecIR type system tables in the database.
+> description: Host engine (registry) that overlays the default model then each requested model (later-wins-by-id, repo-bundled), reads each extension point's single descriptor table {kind, schema, [hooks]}, validates it, emits the type row into the corresponding SpecIR type table, and eager-indexes every hook into a (kind, id) -> hook map read via get_hook / get_hook_inherited; host:finalize() propagates inherited attributes, creates the verification SQL views, and asserts required hooks.
 
 > traceability: [CSC-001](@)
 
@@ -457,7 +457,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Transforms inline Code elements and standalone Code-in-Para patterns during EMIT phase, dispatching to view type handlers to produce rendered inline or block output.
+> description: Transforms inline Code elements and standalone Code-in-Para patterns during EMIT phase, resolving each view type's render (inline) or render_block (block) hook from the host hook index via get_hook_inherited to produce rendered inline or block output.
 
 > traceability: [CSC-009](@)
 
@@ -477,7 +477,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Model-agnostic dispatch layer that queries spec_float_types to discover and cache float handler modules, then dispatches on_render_CodeBlock calls to type-specific handlers.
+> description: Model-agnostic dispatch layer that resolves each float type's render hook from the host's (kind, id) -> hook index via get_hook_inherited (walking the extends chain), then invokes it to replace float CodeBlock elements with rendered content.
 
 > traceability: [CSC-009](@)
 
@@ -517,7 +517,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Model-agnostic dispatch layer that queries spec_view_types to discover and cache inline view handler modules, then dispatches on_render_Code calls by matching inline prefixes.
+> description: Model-agnostic dispatch layer that matches an inline Code prefix to a view id via the host's prefix index, then resolves and invokes that view's render hook from the host's (kind, id) -> hook index via get_hook_inherited to produce inline output.
 
 > traceability: [CSC-009](@)
 
@@ -527,7 +527,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Model-agnostic dispatch layer that queries spec_view_types to discover and cache block-level view handler modules, then dispatches on_render_CodeBlock calls for views.
+> description: Model-agnostic dispatch layer that resolves each block-level view type's render_block hook from the host's (kind, id) -> hook index via get_hook_inherited (walking the extends chain), then invokes it to produce block-level view output.
 
 > traceability: [CSC-009](@)
 
@@ -697,7 +697,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Shared infrastructure for spec object type handlers (HLR, FD, VC, etc.), providing styled headers with PID prefixes, attribute display, and an extensible create_handler() factory.
+> description: Shared infrastructure for spec object types (HLR, FD, VC, etc.), providing styled headers with PID prefixes, attribute display, and the host-owned standard object-card renderer registered as the render hook of the base requirement type, which leaf types inherit via the extends chain.
 
 > traceability: [CSC-011](@)
 
@@ -737,7 +737,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: TRANSFORM phase handler that resolves internal float types (TABLE, CSV, etc.) by dynamically loading type-specific modules; external floats are delegated to external_render_handler.
+> description: TRANSFORM phase handler that resolves internal float types (TABLE, CSV, etc.) by reading each type's transform data hook from the host hook index (get_hook) and invoking it with a frozen data context to produce the resolved AST; external floats are delegated to external_render_handler.
 
 > traceability: [CSC-012](@)
 
@@ -757,7 +757,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: TRANSFORM phase handler that loads object type modules and invokes their on_render_SpecObject to transform stored AST into styled output with headers, attributes, and bookmarks.
+> description: TRANSFORM phase handler that resolves each object type's render hook from the host via get_hook_inherited (walking the extends chain) and invokes it with a frozen render context to transform stored AST into styled output with headers, attributes, and bookmarks.
 
 > traceability: [CSC-012](@)
 
@@ -767,7 +767,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: TRANSFORM phase handler that loads specification type modules and invokes their on_render_Specification to generate the document title header.
+> description: TRANSFORM phase handler that resolves each specification type's render hook from the host via get_hook_inherited (walking the extends chain) and invokes it with a frozen render context to generate the document title header.
 
 > traceability: [CSC-012](@)
 

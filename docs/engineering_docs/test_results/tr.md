@@ -426,7 +426,7 @@
 
 > traceability: [VC-017](@)
 
-> test_file: tests/e2e/sdn_types/vc_017_03_attr_dedup.md
+> test_file: tests/e2e/sw_docs_types/vc_017_03_attr_dedup.md
 
 > duration_ms: 287
 
@@ -518,20 +518,6 @@
 
 > executed_by: E2E Test Runner
 
-### TR: 018 06 Verify Spec Missing Required @TR-018-06
-
-> result: Pass
-
-> traceability: [VC-018](@)
-
-> test_file: tests/e2e/verify/vc_018_06_verify_spec_missing_required.md
-
-> duration_ms: 181
-
-> execution_date: 2026-02-19
-
-> executed_by: E2E Test Runner
-
 ### TR: 018 07 Verify Invalid Spec Type @TR-018-07
 
 > result: Pass
@@ -566,7 +552,7 @@
 
 > traceability: [VC-019](@)
 
-> test_file: tests/e2e/sdn_types/vc_019_02_sf_type.md
+> test_file: tests/e2e/sw_docs_types/vc_019_02_sf_type.md
 
 > duration_ms: 271
 
@@ -580,7 +566,7 @@
 
 > traceability: [VC-019](@)
 
-> test_file: tests/e2e/sdn_types/vc_019_03_nfr_type.md
+> test_file: tests/e2e/sw_docs_types/vc_019_03_nfr_type.md
 
 > duration_ms: 275
 
@@ -594,7 +580,7 @@
 
 > traceability: [VC-019](@)
 
-> test_file: tests/e2e/sdn_types/vc_019_04_realizes_relation.md
+> test_file: tests/e2e/sw_docs_types/vc_019_04_realizes_relation.md
 
 > duration_ms: 265
 
@@ -720,7 +706,7 @@
 
 > traceability: [VC-025](@)
 
-> test_file: tests/e2e/sw_docs-tests/vc_025_03_traceability_matrix.md
+> test_file: models/sw_docs/tests/vc_025_03_traceability_matrix.md
 
 > duration_ms: 274
 
@@ -734,7 +720,7 @@
 
 > traceability: [VC-025](@)
 
-> test_file: tests/e2e/sw_docs-tests/vc_025_04_test_results_matrix.md
+> test_file: models/sw_docs/tests/vc_025_04_test_results_matrix.md
 
 > duration_ms: 245
 
@@ -748,7 +734,7 @@
 
 > traceability: [VC-025](@)
 
-> test_file: tests/e2e/sw_docs-tests/vc_025_05_traceability_matrix_block_empty.md
+> test_file: models/sw_docs/tests/vc_025_05_traceability_matrix_block_empty.md
 
 > duration_ms: 203
 
@@ -762,7 +748,7 @@
 
 > traceability: [VC-025](@)
 
-> test_file: tests/e2e/sw_docs-tests/vc_025_06_traceability_matrix_textblock_empty.md
+> test_file: models/sw_docs/tests/vc_025_06_traceability_matrix_textblock_empty.md
 
 > duration_ms: 205
 
@@ -776,7 +762,7 @@
 
 > traceability: [VC-025](@)
 
-> test_file: tests/e2e/sw_docs-tests/vc_025_07_test_results_matrix_block_empty.md
+> test_file: models/sw_docs/tests/vc_025_07_test_results_matrix_block_empty.md
 
 > duration_ms: 201
 
@@ -790,7 +776,7 @@
 
 > traceability: [VC-025](@)
 
-> test_file: tests/e2e/sw_docs-tests/vc_025_08_test_results_matrix_textblock_empty.md
+> test_file: models/sw_docs/tests/vc_025_08_test_results_matrix_textblock_empty.md
 
 > duration_ms: 213
 
@@ -804,7 +790,7 @@
 
 > traceability: [VC-025](@)
 
-> test_file: tests/e2e/sw_docs-tests/vc_025_09_test_execution_matrix.md
+> test_file: models/sw_docs/tests/vc_025_09_test_execution_matrix.md
 
 > duration_ms: 233
 
@@ -849,20 +835,6 @@
 > test_file: tests/e2e/output/vc_028_02_bibliography.md
 
 > duration_ms: 90
-
-> execution_date: 2026-02-19
-
-> executed_by: E2E Test Runner
-
-### TR: 028 03 Reqif Export @TR-028-03
-
-> result: Pass
-
-> traceability: [VC-028](@)
-
-> test_file: tests/e2e/reqif/vc_028_03_reqif_export.md
-
-> duration_ms: 519
 
 > execution_date: 2026-02-19
 
@@ -991,5 +963,303 @@
 > duration_ms: 82
 
 > execution_date: 2026-02-19
+
+> executed_by: E2E Test Runner
+
+### TR: Host Registry @TR-EXT-011-01
+
+> result: Pass
+
+> traceability: [VC-EXT-011](@)
+
+> test_file: tests/e2e/extension/vc_ext_011_01_host_registry.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Inherited Card Render @TR-EXT-011-02
+
+> result: Pass
+
+> traceability: [VC-EXT-011](@)
+
+> test_file: tests/e2e/extension/vc_ext_011_02_inherited_card_render.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Float Render Index @TR-EXT-011-03
+
+> result: Pass
+
+> traceability: [VC-EXT-011](@)
+
+> test_file: tests/e2e/extension/vc_ext_011_03_float_render_index.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: External Float Hooks @TR-EXT-011-04
+
+> result: Pass
+
+> traceability: [VC-EXT-011](@)
+
+> test_file: tests/e2e/extension/vc_ext_011_04_external_float_hooks.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Verification Descriptor @TR-EXT-012-01
+
+> result: Pass
+
+> traceability: [VC-EXT-012](@)
+
+> test_file: tests/e2e/extension/vc_ext_012_01_verification_descriptor.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Float Utilities @TR-014-06
+
+> result: Pass
+
+> traceability: [VC-014](@)
+
+> test_file: tests/e2e/internals/vc_014_06_float_utilities.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Emit Float @TR-014-07
+
+> result: Pass
+
+> traceability: [VC-014](@)
+
+> test_file: tests/e2e/internals/vc_014_07_emit_float.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Logger Paths @TR-014-08
+
+> result: Pass
+
+> traceability: [VC-014](@)
+
+> test_file: tests/e2e/internals/vc_014_08_logger_paths.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Manifest Over Env @TR-CFG-001-01
+
+> result: Pass
+
+> traceability: [VC-CFG-001](@)
+
+> test_file: tests/e2e/internals/vc_cfg_001_01_manifest_over_env.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Canonical Ctx @TR-EXT-009-01
+
+> result: Pass
+
+> traceability: [VC-EXT-009](@)
+
+> test_file: tests/e2e/internals/vc_ext_009_01_canonical_ctx.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Render Handler @TR-OUT-005-01
+
+> result: Pass
+
+> traceability: [VC-OUT-005](@)
+
+> test_file: tests/e2e/internals/vc_out_005_01_render_handler.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Caption Seq Cache @TR-029-03
+
+> result: Pass
+
+> traceability: [VC-029](@)
+
+> test_file: tests/e2e/ooxml/vc_029_03_caption_seq_cache.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Prereq Not Found @TR-PIPE-012-01
+
+> result: Pass
+
+> traceability: [VC-PIPE-012](@)
+
+> test_file: tests/e2e/pipeline/vc_pipe_012_01_prereq_not_found.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Type Inference @TR-015-10
+
+> result: Pass
+
+> traceability: [VC-015](@)
+
+> test_file: tests/e2e/relations/vc_015_10_type_inference.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Xref Decomposition @TR-019-05
+
+> result: Pass
+
+> traceability: [VC-019](@)
+
+> test_file: tests/e2e/sw_docs_types/vc_019_05_xref_decomposition.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Xref Dic @TR-019-06
+
+> result: Pass
+
+> traceability: [VC-019](@)
+
+> test_file: tests/e2e/sw_docs_types/vc_019_06_xref_dic.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Verify Inherited Enum @TR-018-09
+
+> result: Pass
+
+> traceability: [VC-018](@)
+
+> test_file: tests/e2e/verify/vc_018_09_verify_inherited_enum.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Verify Cast Failures @TR-018-10
+
+> result: Pass
+
+> traceability: [VC-018](@)
+
+> test_file: tests/e2e/verify/vc_018_10_verify_cast_failures.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Verify Duplicate Pid @TR-018-11
+
+> result: Pass
+
+> traceability: [VC-018](@)
+
+> test_file: tests/e2e/verify/vc_018_11_verify_duplicate_pid.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Verify Traceability Csu Fd @TR-018-12
+
+> result: Pass
+
+> traceability: [VC-018](@)
+
+> test_file: tests/e2e/verify/vc_018_12_verify_traceability_csu_fd.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Verify Cast Multitype @TR-018-13
+
+> result: Pass
+
+> traceability: [VC-018](@)
+
+> test_file: tests/e2e/verify/vc_018_13_verify_cast_multitype.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: Verify Float Last Section @TR-018-14
+
+> result: Pass
+
+> traceability: [VC-018](@)
+
+> test_file: tests/e2e/verify/vc_018_14_verify_float_last_section.md
+
+> execution_date: 2026-06-05
+
+> executed_by: E2E Test Runner
+
+
+### TR: View Render Characterization @TR-016-04
+
+> result: Pass
+
+> traceability: [VC-016](@)
+
+> test_file: tests/e2e/views/vc_016_04_view_render_characterization.md
+
+> execution_date: 2026-06-05
 
 > executed_by: E2E Test Runner

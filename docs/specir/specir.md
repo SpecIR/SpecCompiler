@@ -227,7 +227,6 @@ level,INTEGER,Heading level (2--6)
 start_line,INTEGER,Start line in source (1-indexed)
 end_line,INTEGER,End line in source
 ast,JSON,Body as Pandoc AST
-content_xhtml,TEXT,Cached HTML5 rendering
 ```
 
 Key indexes: `idx_objects_spec_label` (UNIQUE on specification_ref + label), `idx_objects_spec_pid` (on specification_ref + pid).
@@ -317,7 +316,6 @@ date_value,TEXT,For DATE datatype (YYYY-MM-DD)
 enum_ref,TEXT FK,For ENUM datatype (FK to enum_values)
 ast,JSON,For XHTML datatype (Pandoc AST)
 datatype,TEXT NOT NULL,Actual datatype used
-xhtml_value,TEXT,Cached HTML5 rendering
 ```
 
 The EAV pattern is used because the attribute set is unknown at schema creation time --- models define custom attributes at runtime.

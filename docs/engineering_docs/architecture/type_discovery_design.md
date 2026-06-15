@@ -7,13 +7,16 @@
 **Allocation:** Realized by [CSC-001](@) (Core Runtime) through [CSU-008](@) (Type Loader). The foundational type definitions are provided by [CSC-017](@) (Default Model), which all domain models extend.
 
 The type model discovery function loads model definitions from the filesystem and
-registers them with the [dic:pipeline](#) and data manager. It enables domain-specific
-extensibility by allowing models to define custom specification types, object types,
-float types, relation types, view types, and pipeline handlers.
+registers them with the [dic:pipeline](#) and data manager through ONE uniform
+descriptor contract. It enables domain-specific extensibility by allowing models to
+define custom specification types, object types, float types, relation types, view
+types, verification views, and pipeline handlers.
 
-**Model Path Resolution**: The [dic:type-loader](#) ([CSU-008](@)) resolves the model directory by
-checking `SPECCOMPILER_HOME/models/{model}` first, then falling back to the project root.
-This two-stage resolution allows global model installation while supporting project-local overrides.
+**Model Overlay**: The host engine ([CSU-008](@)) loads the `default` model first, then
+each requested overlay model in turn, later-wins-by-id, so a model overrides only the
+type ids it redefines. Models are resolved repo-bundled under
+`SPECCOMPILER_HOME/models/{model}` (then cwd); there is no out-of-tree search path,
+registry, or package manager, and a requested model with no directory is a loud error.
 
 **Directory Scanning**: The loader scans `models/{model}/types/` for category directories
 matching the five type categories:
@@ -24,27 +27,27 @@ matching the five type categories:
 
 * - Category
   - Directory
-  - Export Field
+  - Descriptor `kind`
   - Database Table
 * - Specifications
   - `specifications/`
-  - `M.specification`
+  - `specification`
   - `spec_specification_types`
 * - Objects
   - `objects/`
-  - `M.object`
+  - `object`
   - `spec_object_types`
 * - Floats
   - `floats/`
-  - `M.float`
+  - `float`
   - `spec_float_types`
 * - Relations
   - `relations/`
-  - `M.relation`
+  - `relation`
   - `spec_relation_types`
 * - Views
   - `views/`
-  - `M.view`
+  - `view`
   - `spec_view_types`
 ```
 
@@ -53,65 +56,73 @@ A typical model directory layout for the default model:
 ```
 models/default/types/
 ├── specifications/
-│   └── srs.lua        -- exports M.specification
+│   └── srs.lua        -- returns a specification descriptor
 ├── objects/
-│   ├── hlr.lua        -- exports M.object
-│   └── section.lua    -- exports M.object
+│   ├── hlr.lua        -- returns an object descriptor (hooks = {} -- pure data)
+│   └── section.lua    -- returns an object descriptor
 ├── floats/
-│   ├── figure.lua     -- exports M.float
-│   └── plantuml.lua   -- exports M.float + M.handler
+│   ├── figure.lua     -- returns a float descriptor (transform data hook)
+│   └── plantuml.lua   -- returns a float descriptor (prepare_task/handle_result)
 ├── relations/
-│   └── traces_to.lua  -- exports M.relation
+│   └── traces_to.lua  -- returns a relation descriptor
 └── views/
-    └── toc.lua        -- exports M.view
+    └── toc.lua        -- returns a view descriptor (render_block hook)
 ```
 
-**Module Loading**: Each `.lua` file in a category directory is loaded via `require()`.
-The loader inspects the module's export fields to determine the type category and calls
-the appropriate registration method on the data manager. If a
-module exports `M.handler`, the handler is also registered with the pipeline for
-phase-specific processing.
+**Descriptor Loading**: Each `.lua` file returns ONE descriptor table
+`{ kind, schema, [hooks] }`. The host validates it -- `kind` is a known
+category, `schema.id` is present (and authoritative; the filename is irrelevant),
+each declared hook is valid for the kind, and no behaviour is smuggled onto a top-level
+key -- then emits the type row into the table for that `kind` and eager-indexes each hook
+into the `(kind, id) -> hook` map. A malformed descriptor (unknown kind, missing id,
+invalid-for-kind hook, internal-render-plus-external-hooks) is a loud register-time error;
+a missing required hook (e.g. a TABLE_VIEW subtype with no `build_block`) is caught at
+`host:finalize()`.
 
-**Attribute Registration**: Object and float types may declare `attributes` tables
-describing their data schema. The loader registers these with the data manager, creating
-datatype definitions and attribute constraints (name, datatype, min/max occurs, enum
-values, bounds) in the `spec_attribute_defs` and `spec_datatype_defs` tables.
+**Attribute Registration**: Object and float schemas may declare `attributes` describing
+their data schema. The host registers these with the data manager, creating datatype
+definitions and attribute constraints (name, type, min/max occurs, enum values, bounds) in
+the `spec_attribute_defs` and `spec_datatype_defs` tables; `extends` inherits a base type's
+attributes.
 
-**Handler Registration**: Type modules may export a `M.handler` table with phase hooks
-(`on_initialize`, `on_analyze`, `on_transform`, …) and/or decorated per-item callbacks
-(`on_render_SpecObject`, `on_render_Link`, `on_render_Code`, `on_render_CodeBlock`). Phase
-hooks participate in ordering via [dic:prerequisites](#) and [dic:topological-sort](#);
-decorated callbacks are dispatched inline by a phase hook with pre-resolved inputs and do
-not carry prerequisites. Type modules that do not declare `prerequisites` are defaulted to
-an empty list by `pipeline:register_handler`.
+**Hooks (two tiers)**: A descriptor declares behaviour only under `hooks`, keyed by name,
+and each hook takes ONE frozen context as its sole argument. Per-call RENDER hooks
+(`render`, `render_block`, `render_link`, `message`) receive the render context during the
+EMIT walk (it carries pandoc/format and the Pandoc element as `subject`). DATA hooks
+(`dataset`, `build_block`, `transform`, `resolve`, `prepare_task`, `handle_result`) receive a
+data context during the TRANSFORM/ANALYZE/external-render phases. The hook NAME selects the
+tier and the return type, and the host validates the mapping. `on_<phase>` functions in `hooks`
+contributes an `on_<phase>` hook to the pipeline's order via [dic:prerequisites](#) and
+[dic:topological-sort](#); a handler with no `prerequisites` is defaulted to an empty list by
+`pipeline:register_handler`.
 
-**Base Types**: Relation type modules declare themselves as base types by exporting both
-`M.relation` (schema) and `M.resolve` (resolver function). The type loader calls
-`data:register_resolver(schema.id, M.resolve)` so the relation analyzer can dispatch
-resolution by type identifier during the ANALYZE phase. Concrete relation types use
-`M.relation.extends = "<BASE_ID>"` to inherit resolution behaviour; the `extends` chain is
-also walked by [`type_loader.get_relation_handler`](../../../src/core/type_loader.lua) so that
-decorated callbacks (e.g. `on_render_Link`) are inherited when a concrete type doesn't
-define its own.
+**Base Types and Inheritance**: A type inherits hooks and attributes from the ancestor named
+in `schema.extends`. Every consumer resolves a hook with `get_hook_inherited`, which walks the
+`extends` chain, so a shared render lives ONCE on a base type (the object card on `TRACEABLE`,
+the spec title on `SPEC_TITLE`, the matrix `render_block` on `TABLE_VIEW`) and leaf types stay
+pure schema. A relation's `resolve` data hook IS the type's resolver: the host registers it
+through an adapter ([src/contract/registry.lua](../../../src/contract/registry.lua)) so the
+ANALYZE-phase relation analyzer dispatches resolution by type id; a concrete relation type
+inherits a base resolver via `extends`.
 
-**Custom Display Text**: Relation types that need custom link display text define
-`M.handler.on_render_Link(target, ctx) -> string|nil`. The `relation_link_rewriter`
-(TRANSFORM phase) looks up the handler for each resolved link's relation type via
-[`type_loader.get_relation_handler`](../../../src/core/type_loader.lua) and invokes
-`on_render_Link` with the pre-resolved target. Returning `nil` falls through to the base
-type's handler in the `extends` chain. The base types `LABEL_REF` and `PID_REF` ship with
-defaults (title for `SECTION` targets, PID for other objects, `"<caption> <number>"` for
-floats) that concrete types inherit automatically.
+**Custom Display Text**: A relation type that needs custom link text declares a `render_link`
+render hook -- `render_link(ctx) -> string|nil` reading `ctx.subject.target`. The
+`relation_link_rewriter` (TRANSFORM phase) resolves it via `get_hook_inherited`; returning
+`nil` falls through to the base type. The base types `LABEL_REF` and `PID_REF` ship defaults
+(title for `SECTION` targets, PID for other objects, `"<caption> <number>"` for floats) that
+concrete types inherit automatically.
 
 **Component Interaction**
 
-The type discovery function is realized by the core type loader and the default model
+The type discovery function is realized by the host engine and the default model
 that provides foundational type definitions.
 
-[csc:core-runtime](#) (Core Runtime) provides [csu:type-loader](#) (Type Loader), which drives the entire
-model discovery lifecycle — resolving model paths, scanning category directories, loading
-modules via `require()`, registering types and handlers with the data manager and pipeline,
-and propagating inherited attributes and relation properties.
+[csc:core-runtime](#) (Core Runtime) provides [csu:type-loader](#) (the host engine), which
+drives the entire model discovery lifecycle — overlaying `default` then each model
+(later-wins-by-id), scanning category directories, loading each module's descriptor,
+validating it, registering the type with the data manager, indexing its hooks into the
+`(kind, id) -> hook` map, and at `finalize()` propagating inherited attributes, creating
+the verification SQL views, and asserting required hooks.
 
 [csc:default-model](#) (Default Model) provides the two foundational types that every domain model
 inherits. [csu:section-object-type](#) (SECTION Object Type) defines the implicit structural type for
@@ -145,35 +156,36 @@ loop for each category
     FS --> TL: module paths
 
     loop for each module
-        TL -> TL: require(module_path)
+        TL -> TL: require(module_path) -> descriptor
+        TL -> TL: validate {kind, schema.id, hooks}
 
-        alt has M.relation AND M.resolve
-            TL -> TL: _selector_resolvers[selector] = M.resolve
-            TL -> DB: register_relation_type(M.relation)
-        else has M.float
-            TL -> DB: register_float_type(M.float)
-        else has M.relation
-            TL -> DB: register_relation_type(M.relation)
-        else has M.object
-            TL -> DB: register_object_type(M.object)
+        alt kind == "relation"
+            TL -> DB: register_relation_type(schema)
+            TL -> DB: register_resolver(id, resolve adapter)
+        else kind == "float"
+            TL -> DB: register_float_type(schema)
+        else kind == "object"
+            TL -> DB: register_object_type(schema)
             alt has implicit_aliases
                 TL -> DB: register_implicit_aliases()
             end
-        else has M.view
-            TL -> DB: register_view_type(M.view)
-        else has M.specification
-            TL -> DB: register_specification_type(M.specification)
+        else kind == "view"
+            TL -> DB: register_view_type(schema)
+        else kind == "specification"
+            TL -> DB: register_specification_type(schema)
             alt has implicit_aliases
                 TL -> DB: register_implicit_spec_aliases()
             end
         end
 
+        TL -> TL: index hooks into (kind,id)->hook
+
         alt has attributes
-            TL -> DB: register_attributes(attributes)
+            TL -> DB: register_attributes(schema.attributes)
         end
 
-        alt has M.handler
-            TL -> P: register_handler(M.handler)
+        alt hooks contain on_<phase>
+            TL -> P: register_handler(derived from on_<phase> hooks)
         end
     end
 end
@@ -196,10 +208,11 @@ discovered modules.
 
 > traceability: [HLR-EXT-002](@)
 
-#### LLR: Exported Handlers Are Registered @LLR-EXT-021-01
+#### LLR: Declared Hooks Are Indexed @LLR-EXT-021-01
 
-When a type module exports `handler`, model loading shall call
-`pipeline:register_handler(handler)` and propagate registration errors.
+A descriptor's declared `hooks` shall be eager-indexed into the host's
+`(kind, id) -> hook` map; `on_<phase>` hooks shall be forwarded to
+`pipeline:register_handler`, propagating registration errors.
 
 > verification_method: Test
 
@@ -311,8 +324,8 @@ Selected Lua modules with `extends` chains for type definitions.
 > rationale: Lua modules as type definitions enable:
 >
 > - Type definitions are executable code, supporting computed defaults and complex attribute constraints
-> - `extends` field enables single-inheritance (e.g., HLR extends TRACEABLE) with automatic attribute propagation
-> - Module exports (M.object, M.float, M.handler) co-locate type definition with optional handler registration
+> - `extends` field enables single-inheritance (e.g., HLR extends TRACEABLE) with automatic attribute + hook propagation
+> - One descriptor table per file (`{kind, schema, hooks}`) co-locates the type definition with its declarative behaviour
 > - `require()` loading reuses Pandoc's built-in Lua module system without additional dependency
 > - Layered model loading (default first, then domain model) with ID-based override enables extension without forking the default model
 > - Alternative of YAML/JSON config rejected: no computed defaults, no handler co-location
