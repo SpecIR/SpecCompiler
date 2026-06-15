@@ -137,10 +137,15 @@ jobs:
 
       - name: Fix coverage paths for Codecov
         if: always()
-        run: sed -i 's|SF:/workspace/|SF:|g' tests/reports/coverage/merged.lcov
+        run: |
+          if [ -f tests/reports/coverage/merged.lcov ]; then
+            sed -i 's|SF:/workspace/|SF:|g' tests/reports/coverage/merged.lcov
+          else
+            echo "::notice::No coverage report generated (luacov is not present in the lean image); skipping Codecov upload."
+          fi
 
       - name: Upload coverage to Codecov
-        if: always()
+        if: always() && hashFiles('tests/reports/coverage/merged.lcov') != ''
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
