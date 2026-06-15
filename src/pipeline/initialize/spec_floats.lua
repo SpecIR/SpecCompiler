@@ -26,9 +26,8 @@ local prefix_cache = {}
 ---Uses the first alias from spec_float_types.aliases, or falls back to first 3 chars.
 ---@param data DataManager
 ---@param type_ref string The canonical type identifier (e.g., "FIGURE", "TABLE")
----@param diagnostics Diagnostics|nil Optional diagnostics for error reporting
 ---@return string prefix The type prefix (e.g., "fig", "tbl")
-local function get_type_prefix(data, type_ref, diagnostics)
+local function get_type_prefix(data, type_ref)
     if not type_ref or type_ref == "" then
         return "unk"  -- Unknown type
     end
@@ -75,12 +74,11 @@ cache_registry.register(M.clear_cache)
 ---  - Without parent: {type-prefix}-{label} (e.g., tbl-summary)
 ---@param float table Float record with type_ref, label, parent_object_id
 ---@param data DataManager
----@param diagnostics Diagnostics|nil Optional diagnostics for error reporting
 ---@return string anchor The generated anchor
-local function get_float_anchor(float, data, diagnostics)
+local function get_float_anchor(float, data)
     -- Get type prefix from database (with caching)
     local type_ref = float.type_ref or ""
-    local type_prefix = get_type_prefix(data, type_ref, diagnostics)
+    local type_prefix = get_type_prefix(data, type_ref)
     -- Use the user_label portion of the unified label (after the colon)
     local user_label = float.label and float.label:match(":(.+)$") or float.label or ""
 
@@ -149,6 +147,29 @@ end
 ---@param identifier string Code block identifier
 ---@param data DataManager Database for alias resolution
 ---@return string|nil type_ref, string|nil label, table|nil attrs
+local function parse_attrs_string(attrs_str)
+    if not attrs_str or attrs_str == "" then
+        return nil
+    end
+
+    local attrs = {}
+
+    for key, value in attrs_str:gmatch('([%w_%-]+)%s*=%s*"([^"]*)"') do
+        attrs[key] = value
+    end
+
+    for key, value in attrs_str:gmatch("([%w_%-]+)%s*=%s*([^%s\"'}]+)") do
+        if attrs[key] == nil then
+            attrs[key] = value
+        end
+    end
+
+    if next(attrs) == nil then
+        return nil
+    end
+    return attrs
+end
+
 local function parse_float_syntax(classes, identifier, data)
     if not classes or #classes == 0 then return nil, nil, nil end
 
@@ -171,13 +192,7 @@ local function parse_float_syntax(classes, identifier, data)
             -- Extract attributes string (everything between '{' and '}')
             local attrs_str = label_part:match("{(.-)}")
 
-            local attrs = nil
-            if attrs_str then
-                attrs = {}
-                for key, value in attrs_str:gmatch('([%w_]+)="([^"]*)"') do
-                    attrs[key] = value
-                end
-            end
+            local attrs = parse_attrs_string(attrs_str)
 
             -- If type has language suffix (e.g., src.python), store it in attrs
             local language = type_part:match("%.(.+)$")
@@ -221,6 +236,77 @@ end
 ---@param data DataManager
 ---@param contexts table Array of Context objects
 ---@param diagnostics Diagnostics
+---Merge parser-derived attrs with the code block's Pandoc attributes
+---(parser values win; data-* attributes are skipped). Pandoc may present
+---block attributes as a map or as {key, value} pairs — handle both.
+---@param parsed_attrs table|nil Attrs parsed from the float syntax
+---@param block_attributes table|nil Pandoc code-block attributes
+---@return table|nil float_attrs Merged attrs, or nil when empty
+local function merge_block_attrs(parsed_attrs, block_attributes)
+    local float_attrs = parsed_attrs or {}
+    if block_attributes then
+        for k, v in pairs(block_attributes) do
+            if type(k) == "string" then
+                if not k:match("^data%-") then
+                    float_attrs[k] = float_attrs[k] or v
+                end
+            elseif type(k) == "number" and type(v) == "table" and #v >= 2 then
+                local attr_key, attr_val = v[1], v[2]
+                if type(attr_key) == "string" and not attr_key:match("^data%-") then
+                    float_attrs[attr_key] = float_attrs[attr_key] or attr_val
+                end
+            end
+        end
+    end
+    if not next(float_attrs) then return nil end
+    return float_attrs
+end
+
+---Build the spec_floats insert record for one recognized code block.
+---@param data DataManager
+---@param spec_id string Specification identifier
+---@param block table Code block from doc:walk_codeblocks()
+---@param file_seq integer Per-document float sequence number
+---@param type_ref string Canonical float type
+---@param user_label string|nil Label from the float syntax
+---@param parsed_attrs table|nil Attrs parsed from the float syntax
+---@return table record Row for Queries.content.insert_float (anchor unset)
+local function build_float_record(data, spec_id, block, file_seq, type_ref, user_label, parsed_attrs)
+    local content_key = (block.file or "") .. ":" .. file_seq .. ":" .. (block.text or "")
+    local content_sha = hash_utils.sha1(content_key)
+
+    -- Compute unified label: {type_prefix}:{user_label}
+    local type_prefix = get_type_prefix(data, type_ref)
+    local label = label_utils.compute_float_label(type_prefix, user_label)
+
+    local float_attrs = merge_block_attrs(parsed_attrs, block.attributes)
+    local caption = float_attrs and float_attrs.caption
+    local attrs_json = float_attrs and pandoc.json.encode(float_attrs) or nil
+
+    local ast_json = block_to_json(block)
+    local from_file = block.file or "unknown"
+    local parent_object_id = find_parent_object(data, spec_id, from_file, block.line)
+    local first_class = block.classes and block.classes[1] or ""
+    local syntax_key = first_class:match("^([^{]+)") or first_class
+
+    return {
+        content_sha = content_sha,
+        specification_ref = spec_id,
+        type_ref = type_ref,
+        from_file = from_file,
+        file_seq = file_seq,
+        start_line = block.line,
+        label = label,
+        number = nil,
+        caption = caption,
+        raw_content = block.text or "",
+        raw_ast = ast_json,
+        parent_object_id = parent_object_id,
+        pandoc_attributes = attrs_json,
+        syntax_key = syntax_key
+    }
+end
+
 function M.on_initialize(data, contexts, diagnostics)
     local all_floats = {}
     local spec_ids = {}
@@ -242,72 +328,8 @@ function M.on_initialize(data, contexts, diagnostics)
 
                 if type_ref then
                     file_seq = file_seq + 1
-                    local content_key = (block.file or "") .. ":" .. file_seq .. ":" .. (block.text or "")
-                    local content_sha = hash_utils.sha1(content_key)
-
-                    -- Compute unified label: {type_prefix}:{user_label}
-                    local type_prefix = get_type_prefix(data, type_ref, diagnostics)
-                    local label = label_utils.compute_float_label(type_prefix, user_label)
-
-                    local float_attrs = parsed_attrs or {}
-                    local attrs_source = block.attributes
-                    if attrs_source then
-                        for k, v in pairs(attrs_source) do
-                            if type(k) == "string" then
-                                if not k:match("^data%-") then
-                                    float_attrs[k] = float_attrs[k] or v
-                                end
-                            elseif type(k) == "number" and type(v) == "table" and #v >= 2 then
-                                local attr_key, attr_val = v[1], v[2]
-                                if type(attr_key) == "string" and not attr_key:match("^data%-") then
-                                    float_attrs[attr_key] = float_attrs[attr_key] or attr_val
-                                end
-                            end
-                        end
-                    end
-                    if not next(float_attrs) then float_attrs = nil end
-
-                    local caption = float_attrs and float_attrs.caption
-                    local attrs_json = nil
-                    if float_attrs and next(float_attrs) then
-                        if pandoc and pandoc.json and pandoc.json.encode then
-                            attrs_json = pandoc.json.encode(float_attrs)
-                        else
-                            local parts = {}
-                            for k, v in pairs(float_attrs) do
-                                if type(v) == "string" then
-                                    table.insert(parts, string.format('"%s":"%s"', k, tostring(v):gsub('"', '\\"')))
-                                elseif type(v) == "number" or type(v) == "boolean" then
-                                    table.insert(parts, string.format('"%s":%s', k, tostring(v)))
-                                end
-                            end
-                            attrs_json = "{" .. table.concat(parts, ",") .. "}"
-                        end
-                    end
-
-                    local ast_json = block_to_json(block)
-                    local raw_content = block.text or ""
-                    local from_file = block.file or "unknown"
-                    local parent_object_id = find_parent_object(data, spec_id, from_file, block.line)
-                    local first_class = block.classes and block.classes[1] or ""
-                    local syntax_key = first_class:match("^([^{]+)") or first_class
-
-                    table.insert(all_floats, {
-                        content_sha = content_sha,
-                        specification_ref = spec_id,
-                        type_ref = type_ref,
-                        from_file = from_file,
-                        file_seq = file_seq,
-                        start_line = block.line,
-                        label = label,
-                        number = nil,
-                        caption = caption,
-                        raw_content = raw_content,
-                        raw_ast = ast_json,
-                        parent_object_id = parent_object_id,
-                        pandoc_attributes = attrs_json,
-                        syntax_key = syntax_key
-                    })
+                    table.insert(all_floats, build_float_record(
+                        data, spec_id, block, file_seq, type_ref, user_label, parsed_attrs))
                     total_count = total_count + 1
                 end
             end
@@ -326,7 +348,7 @@ function M.on_initialize(data, contexts, diagnostics)
         -- Insert all floats (duplicates detected by view_float_duplicate_label verification_view in VERIFY)
         for _, float in ipairs(all_floats) do
             -- Compute anchor after all objects are inserted
-            float.anchor = get_float_anchor(float, data, diagnostics)
+            float.anchor = get_float_anchor(float, data)
 
             data:execute(Queries.content.insert_float, float)
         end
@@ -339,25 +361,7 @@ function M.on_initialize(data, contexts, diagnostics)
     end
 end
 
----Check if float has cached resolution
----@param data DataManager
----@param content_sha string SHA of float content
----@return string|nil resolved_ast Cached AST or nil
-function M.get_cached_resolution(data, content_sha)
-    local cached = data:query_one(Queries.content.select_float_cached_resolution, { sha = content_sha })
-
-    return cached and cached.resolved_ast or nil
-end
-
----Update float with resolved AST
----@param data DataManager
----@param float_id integer Float id
----@param resolved_ast string Resolved AST JSON
-function M.cache_resolution(data, float_id, resolved_ast)
-    data:execute(Queries.content.update_float_resolved, { id = float_id, ast = resolved_ast })
-end
-
--- Export get_float_anchor for use by other modules (e.g., relation_handler for link rewriting)
-M.get_float_anchor = get_float_anchor
+-- Expose for cross-module use (spec_relations resolves float parents the same way)
+M.find_parent_object = find_parent_object
 
 return M

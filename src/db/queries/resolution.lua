@@ -61,81 +61,13 @@ M.float_type_from_prefix = [[
 -- FLOAT RESOLUTION (for cross-references)
 -- ============================================================================
 
--- Resolve float by label within a parent scope (scoped resolution)
--- First priority: float in same parent object
-M.float_by_label_scoped = [[
-    SELECT id, label, anchor, parent_object_id
-    FROM spec_floats
-    WHERE label = :label
-      AND parent_object_id = :parent_id
-    LIMIT 1
-]]
-
--- Resolve float by label globally (fallback when no scope match)
-M.float_by_label_global = [[
-    SELECT id, label, anchor, parent_object_id
-    FROM spec_floats
-    WHERE label = :label
-    LIMIT 1
-]]
-
--- Resolve float by anchor directly
-M.float_by_anchor = [[
-    SELECT id, label, parent_object_id
-    FROM spec_floats
-    WHERE anchor = :anchor
-    LIMIT 1
-]]
-
--- Get float's anchor for a given label within parent scope
-M.float_anchor_scoped = [[
-    SELECT anchor
-    FROM spec_floats
-    WHERE label = :label
-      AND parent_object_id = :parent_id
-    LIMIT 1
-]]
-
 -- ============================================================================
 -- OBJECT RESOLUTION (for @PID references)
 -- ============================================================================
 
--- Resolve object by PID
-M.object_by_pid = [[
-    SELECT id, pid, title_text, label, from_file
-    FROM spec_objects
-    WHERE pid = :pid
-    LIMIT 1
-]]
-
--- Resolve object by integer id
-M.object_by_id = [[
-    SELECT id, pid, title_text, label, from_file
-    FROM spec_objects
-    WHERE id = :id
-    LIMIT 1
-]]
-
--- Resolve object by label (for # selector)
-M.object_by_label = [[
-    SELECT id, pid, title_text, label, type_ref, from_file
-    FROM spec_objects
-    WHERE specification_ref = :spec_id AND label = :label
-    LIMIT 1
-]]
-
 -- ============================================================================
 -- UNIFIED LABEL RESOLUTION (# selector — objects AND floats)
 -- ============================================================================
-
--- Search both objects and floats by label (unified namespace)
-M.resolve_by_label = [[
-    SELECT id, label, type_ref, 'object' as kind FROM spec_objects
-    WHERE specification_ref = :spec_id AND label = :label
-    UNION ALL
-    SELECT id, label, type_ref, 'float' as kind FROM spec_floats
-    WHERE specification_ref = :spec_id AND label = :label
-]]
 
 -- ============================================================================
 -- RELATION RESOLVER: PID-based target lookup (@ selector)
@@ -151,17 +83,6 @@ M.object_by_pid_in_spec = [[
 M.object_by_pid_cross_doc = [[
     SELECT id, type_ref FROM spec_objects
     WHERE pid = :pid
-]]
-
--- Find scope object by PID within same specification (for explicit scope resolution)
-M.scope_object_by_pid_in_spec = [[
-    SELECT id FROM spec_objects
-    WHERE specification_ref = :spec_id AND pid = :pid
-]]
-
--- Find scope object by PID across all specifications (for explicit scope resolution)
-M.scope_object_by_pid_cross_doc = [[
-    SELECT id FROM spec_objects WHERE pid = :pid
 ]]
 
 -- ============================================================================
@@ -244,22 +165,6 @@ M.unresolved_relations_for_analysis = [[
       AND r.target_text IS NOT NULL
 ]]
 
--- Get unresolved relations (both target columns NULL)
-M.unresolved_relations = [[
-    SELECT
-        r.id,
-        r.source_object_id,
-        r.target_text,
-        r.type_ref,
-        r.from_file,
-        r.link_selector,
-        r.source_attribute
-    FROM spec_relations r
-    WHERE r.target_object_id IS NULL
-      AND r.target_float_id IS NULL
-      AND r.target_text IS NOT NULL
-]]
-
 -- Update relation with resolved target (object)
 M.resolve_relation_to_object = [[
     UPDATE spec_relations
@@ -282,18 +187,6 @@ M.resolve_relation_to_float = [[
 M.enum_value_by_type_and_key = [[
     SELECT identifier FROM enum_values
     WHERE datatype_ref = :type AND key = :key
-]]
-
--- ============================================================================
--- TYPE DEFAULTS
--- ============================================================================
-
--- Get default object type from spec_object_types
--- Used when objects don't have explicit type declaration
-M.default_object_type = [[
-    SELECT identifier FROM spec_object_types
-    WHERE is_default = 1
-    LIMIT 1
 ]]
 
 -- ============================================================================
@@ -323,11 +216,6 @@ M.object_by_file_seq = [[
 -- ============================================================================
 -- SPECIFICATION RESOLUTION
 -- ============================================================================
-
--- Get specification by identifier
-M.specification_by_id = [[
-    SELECT identifier FROM specifications WHERE identifier = :spec_id
-]]
 
 -- ============================================================================
 -- PARENT OBJECT RESOLUTION

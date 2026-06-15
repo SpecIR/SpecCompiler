@@ -21,6 +21,12 @@ local M = {}
 ---Matches both pre-3.1.10 (data-pos only) and post-3.1.10 (data-pos + wrapper).
 ---@param elem table Pandoc inline element
 ---@return boolean
+-- Inline wrappers with a single content list and a same-named constructor
+local SIMPLE_WRAPPERS = {
+    Emph = true, Strong = true, Strikeout = true,
+    Superscript = true, Subscript = true,
+}
+
 local function is_tracking_span(elem)
     if not elem or elem.t ~= "Span" then return false end
 
@@ -148,21 +154,10 @@ local function strip_inlines(inlines)
         elseif inline.t == "Image" then
             local stripped = strip_inlines(inline.caption or {})
             table.insert(result, pandoc.Image(stripped, inline.src, inline.title, inline.attr))
-        elseif inline.t == "Emph" then
+        elseif SIMPLE_WRAPPERS[inline.t] then
+            -- pandoc.Emph/Strong/... are exactly the constructors keyed by tag name
             local stripped = strip_inlines(inline.content or {})
-            table.insert(result, pandoc.Emph(stripped))
-        elseif inline.t == "Strong" then
-            local stripped = strip_inlines(inline.content or {})
-            table.insert(result, pandoc.Strong(stripped))
-        elseif inline.t == "Strikeout" then
-            local stripped = strip_inlines(inline.content or {})
-            table.insert(result, pandoc.Strikeout(stripped))
-        elseif inline.t == "Superscript" then
-            local stripped = strip_inlines(inline.content or {})
-            table.insert(result, pandoc.Superscript(stripped))
-        elseif inline.t == "Subscript" then
-            local stripped = strip_inlines(inline.content or {})
-            table.insert(result, pandoc.Subscript(stripped))
+            table.insert(result, pandoc[inline.t](stripped))
         elseif inline.t == "Quoted" then
             local stripped = strip_inlines(inline.content or {})
             table.insert(result, pandoc.Quoted(inline.quotetype, stripped))

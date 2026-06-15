@@ -4,7 +4,8 @@
 ---Provides:
 ---  - Styled headers with PID prefix (e.g., "HLR-001: Title")
 ---  - Attribute display as DefinitionList
----  - Extensible rendering via create_handler()
+---  - card_render: the host-owned standard object-card renderer (registered on
+---    the TRACEABLE base type; leaf types inherit it and stay pure schema)
 ---
 ---@module spec_object_base
 local M = {}
@@ -44,13 +45,12 @@ end
 -- ============================================================================
 
 ---Default header rendering for spec objects.
----Renders: "PID: Title" with type-specific custom-style.
+---Renders: "PID: Title" with a semantic spec-object custom style.
 ---@param ctx table Render context (spec_object, header_level, attributes, etc.)
 ---@param pandoc table Pandoc module
----@param db DataManager Database manager
 ---@param options table|nil Optional configuration {show_pid, unnumbered}
 ---@return table Pandoc Header element
-function M.header(ctx, pandoc, db, options)
+function M.header(ctx, pandoc, options)
     options = options or {}
     local obj = ctx.spec_object
     local pid = obj.pid or ""
@@ -85,9 +85,10 @@ function M.header(ctx, pandoc, db, options)
     local level = math.max((ctx.header_level or 2) - 1, 1)
     local header = pandoc.Header(level, header_content)
 
-    -- Apply custom-style based on type (e.g., "HLRHeader", "LLRHeader")
-    -- Set id to PID for anchor linking
-    local style = type_ref .. "Header"
+    -- Apply a semantic custom style. DOCX converts this wrapper into a
+    -- SpecObjectHeader paragraph instead of reusing Heading1-5.
+    -- Set id to PID for anchor linking.
+    local style = "SpecObjectHeader"
     local anchor_id = pid ~= "" and pid or ""
 
     -- Spec objects use PIDs as identifiers, so section numbering is redundant.
@@ -105,25 +106,18 @@ end
 ---Render attributes as a DefinitionList.
 ---@param ctx table Render context with attributes
 ---@param pandoc table Pandoc module
----@param db DataManager Database manager
 ---@param attr_order table|nil Optional array of attribute names in display order
 ---@return table|nil Pandoc Div containing DefinitionList, or nil if no attributes
-function M.render_attributes(ctx, pandoc, db, attr_order)
+function M.render_attributes(ctx, pandoc, attr_order)
     local attrs = ctx.attributes or {}
     local items = {}
     local rendered = {}  -- Track which attributes we've rendered
 
     -- Helper to add an attribute item
     local function add_item(name)
-        local attr_data = attrs[name]
-        -- Handle both old format (string) and new format ({value, ast})
-        local value, ast_json
-        if type(attr_data) == "table" then
-            value = attr_data.value
-            ast_json = attr_data.ast
-        else
-            value = attr_data
-        end
+        local attr_data = attrs[name] or {}
+        local value = attr_data.value
+        local ast_json = attr_data.ast
 
         if value and value ~= "" and not rendered[name] then
             -- Format name: "status" -> "STATUS", make it bold
@@ -179,10 +173,9 @@ end
 ---Renders original content followed by attributes.
 ---@param ctx table Render context
 ---@param pandoc table Pandoc module
----@param db DataManager Database manager
 ---@param options table|nil Optional configuration {attr_order, skip_attributes, attrs_first}
 ---@return table Array of Pandoc blocks
-function M.body(ctx, pandoc, db, options)
+function M.body(ctx, pandoc, options)
     options = options or {}
     local blocks = {}
 
@@ -203,7 +196,7 @@ function M.body(ctx, pandoc, db, options)
 
     -- Render attributes after body content
     if not options.skip_attributes then
-        local attr_block = M.render_attributes(ctx, pandoc, db, options.attr_order)
+        local attr_block = M.render_attributes(ctx, pandoc, options.attr_order)
         if attr_block then
             table.insert(blocks, attr_block)
         end
@@ -212,103 +205,38 @@ function M.body(ctx, pandoc, db, options)
     return blocks
 end
 
--- ============================================================================
--- Handler Factory
--- ============================================================================
+---The host-owned standard object-card renderer: header + attributes wrapped in a
+---`spec-object` Div. It is registered as the render hook of the base requirement
+---type (TRACEABLE); every leaf requirement type inherits it through the host's
+---extends-chain dispatch and declares its render options as plain SCHEMA fields
+---(show_pid/unnumbered/skip_attributes/attr_order), read here from the rendering
+---type's schema (ctx.subject.type_schema). A type wanting a non-standard render
+---declares its own hooks.render instead (e.g. COVER).
+---@param ctx table canonical ctx (subject.object/type_schema/attributes/element)
+---@return table[] blocks
+function M.card_render(ctx)
+    local subject = ctx.subject
+    local obj = subject.object
+    -- The rendering type's schema doubles as the declarative render-option set;
+    -- M.header/M.body read only their option keys (no collision with schema
+    -- structural fields).
+    local options = subject.type_schema or {}
 
----Create a handler for a spec object type.
----Supports customization via options table.
----
----Options:
----  - attr_order: array of attribute names in display order
----  - skip_attributes: boolean to skip attribute rendering
----  - unnumbered: boolean to exclude from section numbering (default true)
----  - show_pid: boolean to show PID in header (default true)
----  - header: custom header function(ctx, pandoc, db)
----  - body: custom body function(ctx, pandoc, db)
----  - body_extension: function(ctx, pandoc, db) returning additional blocks
----  - prerequisites: array of prerequisite handler names
----
----@param name string Handler name
----@param options table|nil Customization options
----@return table Handler module with on_render_SpecObject
-function M.create_handler(name, options)
-    options = options or {}
-
-    local handler = {
-        name = name,
-        prerequisites = options.prerequisites or {},
+    local render_ctx = {
+        spec_object = obj,
+        header_level = subject.header_level or (obj and obj.level) or 2,
+        attributes = subject.attributes or {},
+        original_blocks = subject.element or {},
+        output_format = ctx.format,
+        spec_id = ctx.spec_id,
     }
 
-    -- Build the header render function
-    local header_fn
-    if options.header then
-        header_fn = options.header
-    else
-        header_fn = function(ctx, p, db)
-            return M.header(ctx, p, db, options)
-        end
-    end
+    local blocks = {}
+    render_utils.add_header_blocks(blocks, M.header(render_ctx, ctx.pandoc, options))
+    render_utils.add_blocks(blocks, M.body(render_ctx, ctx.pandoc, options))
 
-    -- Build the body render function
-    local body_fn
-    if options.body then
-        body_fn = options.body
-    else
-        body_fn = function(ctx, p, db)
-            local blocks = M.body(ctx, p, db, options)
-
-            -- Add extension blocks if provided
-            if options.body_extension then
-                local extra = options.body_extension(ctx, p, db)
-                if extra then
-                    if extra.t then
-                        -- Single block
-                        table.insert(blocks, extra)
-                    else
-                        -- Array of blocks
-                        for _, b in ipairs(extra) do
-                            table.insert(blocks, b)
-                        end
-                    end
-                end
-            end
-
-            return blocks
-        end
-    end
-
-    -- Create on_render_SpecObject directly instead of using base_handler
-    function handler.on_render_SpecObject(obj, ctx)
-        local blocks = {}
-
-        -- Build render context for header/body functions
-        local render_ctx = {
-            spec_object = obj,
-            header_level = ctx.header_level or obj.level or 2,
-            attributes = ctx.attributes or {},
-            original_blocks = ctx.original_blocks or {},
-            output_format = ctx.output_format or "docx",
-            spec_id = ctx.spec_id or "default",
-            db = ctx.db,
-            api = ctx.api,
-        }
-
-        -- Call header function
-        local header_result = header_fn(render_ctx, pandoc, ctx.db)
-        render_utils.add_header_blocks(blocks, header_result)
-
-        -- Call body function
-        local body_result = body_fn(render_ctx, pandoc, ctx.db)
-        render_utils.add_blocks(blocks, body_result)
-
-        -- Wrap in spec-object container for HTML card styling.
-        -- Other formats (DOCX) treat the Div as transparent.
-        local wrapper = pandoc.Div(blocks, pandoc.Attr("", {"spec-object"}, {}))
-        return {wrapper}
-    end
-
-    return handler
+    local wrapper = ctx.pandoc.Div(blocks, ctx.pandoc.Attr("", {"spec-object"}, {}))
+    return { wrapper }
 end
 
 return M

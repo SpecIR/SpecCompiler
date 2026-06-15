@@ -37,12 +37,6 @@ M.get_objects_for_fts = [[
     WHERE o.specification_ref = :spec_id
 ]]
 
-M.get_float_raw_content = [[
-    SELECT raw_content FROM spec_floats
-    WHERE parent_object_id = :obj_id
-      AND raw_content IS NOT NULL
-]]
-
 M.get_attributes_for_fts = [[
     SELECT
         a.owner_object_id,

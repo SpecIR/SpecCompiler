@@ -279,34 +279,8 @@ function M.format_tables(content, config, log)
     for i = start_index, #tables do
         local tbl = tables[i]
 
-        -- Ensure w:tblPr exists
-        local tblPr = xml.find_child(tbl, "w:tblPr")
-        if not tblPr then
-            tblPr = xml.node("w:tblPr")
-            xml.insert_child(tbl, tblPr, 1)
-        end
-
-        -- Apply table-level borders
-        if config.borders then
-            xml.replace_child(tblPr, "w:tblBorders", create_borders(config.borders))
-        end
-
-        -- Add cell margins if configured and not already present
-        if config.cell_margins then
-            if not xml.find_child(tblPr, "w:tblCellMar") then
-                xml.add_child(tblPr, create_cell_margins(config.cell_margins))
-            end
-        end
-
-        -- Apply paragraph formatting inside table cells
-        if config.paragraph then
-            apply_paragraph_formatting(tbl, config.paragraph)
-        end
-
-        -- Apply header row formatting
-        if config.header then
-            apply_header_formatting(tbl, config.header)
-        end
+        -- Shared per-table formatting (borders, cell margins, paragraph, header)
+        M.format_table_node(tbl, config)
 
         -- Add spacing after the table by ensuring next sibling paragraph has w:before
         if config.spacing_after then

@@ -7,50 +7,17 @@ local logger = require("infra.logger")
 
 local M = {}
 
--- Create logger
-local log = logger.create_adapter(os.getenv("SPECCOMPILER_LOG_LEVEL") or "INFO")
+-- Create logger. Manifest-only configuration (HLR-CFG-001): the effective
+-- log level comes from project.yaml `logging.level` (applied by the engine via
+-- logger.configure). This module-level adapter only gates config-parse debug
+-- lines and defaults to INFO; no env override.
+local log = logger.create_adapter("INFO")
 
 ---Abort with error message and exit.
 ---@param msg string Error message
 local function abort_with_error(msg)
     io.stderr:write("ERROR: " .. msg .. "\n")
     os.exit(1)
-end
-
----Recursively extract a Pandoc metadata table to plain Lua table.
----@param meta_table table Pandoc metadata table
----@return table Extracted plain Lua table
-function M.extract_table_recursive(meta_table)
-    if type(meta_table) ~= "table" then
-        return utils.stringify(meta_table)
-    end
-
-    local result = {}
-    -- Check if it's an array (list) or object (map)
-    local is_array = #meta_table > 0
-    if is_array then
-        for i, v in ipairs(meta_table) do
-            if type(v) == "table" then
-                result[i] = M.extract_table_recursive(v)
-            else
-                result[i] = utils.stringify(v)
-            end
-        end
-    else
-        for k, v in pairs(meta_table) do
-            local key = type(k) == "string" and k or utils.stringify(k)
-            if type(v) == "table" then
-                result[key] = M.extract_table_recursive(v)
-            elseif type(v) == "boolean" then
-                result[key] = v
-            elseif type(v) == "number" then
-                result[key] = v
-            else
-                result[key] = utils.stringify(v)
-            end
-        end
-    end
-    return result
 end
 
 ---Validates project metadata structure and required fields.
@@ -161,6 +128,16 @@ function M.extract_metadata(meta)
             toc_depth = meta.docx.toc_depth and tonumber(utils.stringify(meta.docx.toc_depth)) or nil,
             number_sections = meta.docx.number_sections,
         }
+        for k, v in pairs(meta.docx) do
+            local key = type(k) == "string" and k or utils.stringify(k)
+            if docx_config[key] == nil then
+                if type(v) == "boolean" or type(v) == "number" then
+                    docx_config[key] = v
+                else
+                    docx_config[key] = utils.stringify(v)
+                end
+            end
+        end
     elseif preset then
         -- Create docx_config with just preset if style is specified at top level
         docx_config = {
@@ -250,7 +227,6 @@ function M.extract_metadata(meta)
         latex = latex_config,
         -- Bibliography/citation configuration
         bibliography = meta.bibliography and utils.stringify(meta.bibliography) or nil,
-        csl = meta.csl and utils.stringify(meta.csl) or nil,
     }
 end
 

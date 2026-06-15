@@ -1,3 +1,5 @@
+local view_utils = require("pipeline.shared.view_utils")
+local make_link_target = view_utils.make_link_target
 ---CSC Decomposition View for sw_docs.
 ---Generates a Pandoc Table showing all CSCs grouped by their parent Layer/Model CSC,
 ---with linked CSU lists per CSC. Uses path prefix matching for parent-child hierarchy
@@ -11,26 +13,14 @@
 ---
 ---@module csc_decomposition
 
-local M = {}
-
-M.view = {
+local schema = {
     id = "CSC_DECOMPOSITION",
+    extends = "TABLE_VIEW",
     long_name = "CSC Decomposition",
     description = "CSC listing grouped by parent layer with CSU details",
     inline_prefix = "csc_decomposition"
 }
 
-local prefix_matcher = require("pipeline.shared.prefix_matcher")
-local match_codeblock = prefix_matcher.codeblock_from_decl(M.view)
-
----Build link target, using cross-document .ext placeholder for objects in other specs.
-local function make_link_target(pid, target_spec, current_spec)
-    if target_spec == current_spec then
-        return "#" .. pid
-    else
-        return target_spec .. ".ext#" .. pid
-    end
-end
 
 ---Find the parent Layer/Model CSC for a Package CSC using path prefix matching.
 local function find_parent_layer(csc, layers)
@@ -78,7 +68,9 @@ end
 
 ---Generate CSC decomposition table as a Pandoc Table.
 ---Groups CSCs by parent Layer/Model with merged layer cells and linked CSU lists.
-function M.generate(data, spec_id, options)
+local function build_block(dctx)
+    local data = dctx.data
+    local spec_id = dctx.spec_id or "default"
     -- Query all CSCs with their attributes
     local all_cscs = data:query_all([[
         SELECT
@@ -221,25 +213,12 @@ function M.generate(data, spec_id, options)
     )
 end
 
-M.handler = {
-    name = "csc_decomposition_handler",
-    prerequisites = {"spec_objects"},
-
-    on_render_Code = function()
-        return nil
-    end,
-
-    on_render_CodeBlock = function(block, ctx)
-        if not match_codeblock(block) then return nil end
-
-        local data = ctx.data
-        local spec_id = ctx.spec_id or "default"
-        if not data or not pandoc then
-            return nil
-        end
-
-        return M.generate(data, spec_id, {})
-    end,
+return {
+    kind = "view",
+    schema = schema,
+    hooks = {
+        -- Expose the data generator as the view's `generate` hook (matching the
+        -- sibling matrix views), so the host indexes it for data-view lookups.
+        build_block = build_block,
+    }
 }
-
-return M

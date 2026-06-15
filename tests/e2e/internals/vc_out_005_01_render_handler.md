@@ -1,6 +1,6 @@
-# spec: Render Handler Test @SPEC-INT-011
+# spec: Test Report Title @SPEC-INT-011
 
-## COVER: Test Report Title @COVER-001
+## COVER: Cover @COVER-001
 
 > subtitle: A Comprehensive Analysis
 >

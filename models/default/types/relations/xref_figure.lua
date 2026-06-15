@@ -3,14 +3,14 @@
 ---
 ---@module xref_figure
 
-local M = {}
-
-M.relation = {
-    id = "XREF_FIGURE",
-    extends = "LABEL_REF",
-    long_name = "Figure Reference",
-    description = "Cross-reference to a figure",
-    target_type_ref = "FIGURE,PLANTUML,CHART",
+return {
+    kind = "relation",
+    schema = {
+        id = "XREF_FIGURE",
+        extends = "LABEL_REF",
+        long_name = "Figure Reference",
+        description = "Cross-reference to a figure",
+        -- CHART is provided by overlay models (e.g. abnt); harmless/unmatched in a pure-default build.
+        target_type_ref = "FIGURE,PLANTUML,CHART",
+    },
 }
-
-return M

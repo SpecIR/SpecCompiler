@@ -132,48 +132,6 @@ local function assemble_objects(data, spec_id, log)
     return blocks
 end
 
----Query and assemble spec_floats into a lookup table.
----Floats are not directly inserted into the block stream; instead,
----the backend uses this map to resolve float references.
----@param data DataManager
----@param spec_id string Specification identifier
----@param log table Logger
----@return table float_map Map of label/identifier to float data
-local function assemble_floats(data, spec_id, log)
-    local float_map = {}
-
-    local floats = data:query_all(Queries.assembly.select_floats_by_spec, { spec_id = spec_id })
-
-    for _, float in ipairs(floats or {}) do
-        float_map[float.id] = float
-        if float.label and float.label ~= "" then
-            float_map[float.label] = float
-        end
-    end
-
-    log.debug("Assembled %d floats for specification: %s", #(floats or {}), spec_id)
-    return float_map
-end
-
----Query and assemble spec_views into a lookup table.
----Views are resolved during transform phase and inserted where referenced.
----@param data DataManager
----@param spec_id string Specification identifier
----@param log table Logger
----@return table view_map Map of identifier to view data
-local function assemble_views(data, spec_id, log)
-    local view_map = {}
-
-    local views = data:query_all(Queries.assembly.select_views_by_spec, { spec_id = spec_id })
-
-    for _, view in ipairs(views or {}) do
-        view_map[view.id] = view
-    end
-
-    log.debug("Assembled %d views for specification: %s", #(views or {}), spec_id)
-    return view_map
-end
-
 ---Build document metadata from specification and attributes.
 ---NOTE: We don't add title/author/date to metadata because:
 ---  1. Custom cover pages (EMB, ABNT) render these with their own styling
@@ -205,8 +163,6 @@ end
 ---@param spec_id string Specification identifier
 ---@param log table Logger
 ---@return pandoc.Pandoc doc The assembled document
----@return table floats Float lookup map
----@return table views View lookup map
 function M.assemble_document(data, spec_id, log)
     log = log or { debug = function() end, info = function() end, warn = function() end, error = function() end }
 
@@ -273,20 +229,14 @@ function M.assemble_document(data, spec_id, log)
     normalize_header_levels(blocks)
     log.debug("Normalized header levels for proper numbering")
 
-    -- 2. Build float lookup map
-    local floats = assemble_floats(data, spec_id, log)
-
-    -- 3. Build view lookup map
-    local views = assemble_views(data, spec_id, log)
-
-    -- 4. Build metadata
+    -- 2. Build metadata
     -- Note: Model filters can suppress title/author if needed (e.g., ABNT cover page)
     local meta = {}
     if pandoc then
         meta = build_metadata(data, spec_id)
     end
 
-    -- 5. Create Pandoc document
+    -- 3. Create Pandoc document
     local doc
     if pandoc then
         doc = pandoc.Pandoc(blocks, meta)
@@ -299,46 +249,7 @@ function M.assemble_document(data, spec_id, log)
 
     log.info("Assembled document with %d blocks", #blocks)
 
-    return doc, floats, views
-end
-
----Assemble blocks for a single spec_object.
----Used for incremental assembly or previews.
----@param data DataManager
----@param object_id string Object identifier
----@param log table Logger
----@return table|nil blocks Array of Pandoc blocks
-function M.assemble_object(data, object_id, log)
-    log = log or { debug = function() end, warn = function() end }
-
-    local obj = data:query_one(Queries.assembly.select_object_ast, { id = object_id })
-
-    if obj and obj.ast then
-        local blocks = decode_ast(obj.ast)
-        if blocks then
-            log.debug("Assembled %d blocks from object: %s", #blocks, object_id)
-            return blocks
-        end
-    end
-
-    log.warn("Failed to assemble object: %s", object_id)
-    return nil
-end
-
----Get assembled float by label or identifier.
----@param floats table Float lookup map from assemble_document
----@param key string Label or identifier to look up
----@return table|nil float Float record or nil
-function M.get_float(floats, key)
-    return floats and floats[key]
-end
-
----Get assembled view by identifier.
----@param views table View lookup map from assemble_document
----@param key string Identifier to look up
----@return table|nil view View record or nil
-function M.get_view(views, key)
-    return views and views[key]
+    return doc
 end
 
 return M

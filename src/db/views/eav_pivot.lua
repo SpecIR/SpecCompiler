@@ -25,6 +25,14 @@
 
 local DT = require("core.datatypes")
 
+-- Typed column per datatype for the EAV pivot (ENUM resolves via ev.key)
+local COL_BY_DT = {
+    [DT.STRING] = "av.string_value", [DT.XHTML] = "av.string_value",
+    [DT.INTEGER] = "av.int_value", [DT.REAL] = "av.real_value",
+    [DT.BOOLEAN] = "av.bool_value", [DT.DATE] = "av.date_value",
+    [DT.ENUM] = "ev.key",
+}
+
 local M = {}
 
 -- NOTE: Performance indexes for pivot views (idx_spec_attr_owner_name,
@@ -52,44 +60,12 @@ function M.generate_object_type_view(type_id, attributes)
         local name = attr.name or attr.long_name
 
         -- Choose the appropriate typed column based on datatype
-        if attr.datatype == DT.STRING or attr.datatype == DT.XHTML then
-            col_expr = string.format(
-                "MAX(CASE WHEN av.name = '%s' THEN av.string_value END) AS %s",
-                name, name
-            )
-        elseif attr.datatype == DT.INTEGER then
-            col_expr = string.format(
-                "MAX(CASE WHEN av.name = '%s' THEN av.int_value END) AS %s",
-                name, name
-            )
-        elseif attr.datatype == DT.REAL then
-            col_expr = string.format(
-                "MAX(CASE WHEN av.name = '%s' THEN av.real_value END) AS %s",
-                name, name
-            )
-        elseif attr.datatype == DT.BOOLEAN then
-            col_expr = string.format(
-                "MAX(CASE WHEN av.name = '%s' THEN av.bool_value END) AS %s",
-                name, name
-            )
-        elseif attr.datatype == DT.DATE then
-            col_expr = string.format(
-                "MAX(CASE WHEN av.name = '%s' THEN av.date_value END) AS %s",
-                name, name
-            )
-        elseif attr.datatype == DT.ENUM then
-            -- For ENUM, join to get the key value
-            col_expr = string.format(
-                "MAX(CASE WHEN av.name = '%s' THEN ev.key END) AS %s",
-                name, name
-            )
-        else
-            -- Fallback to string_value
-            col_expr = string.format(
-                "MAX(CASE WHEN av.name = '%s' THEN av.string_value END) AS %s",
-                name, name
-            )
-        end
+        -- (ENUM joins to enum_values to surface the key; unknown -> string_value)
+        local col = COL_BY_DT[attr.datatype] or "av.string_value"
+        col_expr = string.format(
+            "MAX(CASE WHEN av.name = '%s' THEN %s END) AS %s",
+            name, col, name
+        )
         table.insert(attr_columns, col_expr)
     end
 

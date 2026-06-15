@@ -29,13 +29,10 @@ end
 
 ---Register a handler with prerequisites.
 ---
----Handlers come in two shapes on a single `M.handler` surface:
---- * Phase handlers define `on_<phase>` hooks (e.g. `on_transform`) and rely
----   on `prerequisites` to order themselves against other phase handlers.
---- * Decorated per-item callbacks (e.g. `on_render_SpecObject`,
----   `on_render_Link`) are dispatched inline by a phase handler with
----   pre-resolved inputs; they do not participate in phase ordering, so
----   `prerequisites` is not required and defaults to an empty list.
+---A handler is a phase handler: it defines one or more `on_<phase>` hooks
+---(e.g. `on_transform`) and relies on `prerequisites` to order itself against
+---other phase handlers. `prerequisites` is optional and defaults to an empty
+---list.
 ---@param handler table Handler with name field, optional prerequisites array, and on_{phase} hooks
 function M:register_handler(handler)
     if not handler.name then
@@ -49,6 +46,48 @@ function M:register_handler(handler)
     self.handlers[handler.name] = handler
 
     if self.log then self.log.debug("Registered handler: " .. handler.name) end
+end
+
+---Validate declared prerequisites once all handlers are registered (HLR-PIPE-008).
+---
+---The per-phase topological sort deliberately drops a prerequisite that does
+---not participate in the current phase, because handlers cannot be ordered
+---across phases. That filter conflates two cases: a prerequisite registered in
+---ANOTHER phase (legitimate) and one registered in NO phase (a typo/bug). This
+---pass distinguishes them, emitting a diagnostic only for the latter. The
+---cross-phase filter itself is untouched.
+function M:validate_prerequisites()
+    -- A prerequisite only constrains ordering for handlers that participate in
+    -- a phase (declare an on_<phase> hook). Non-phase handlers are skipped:
+    -- their prerequisites are inert and are not validated -- flagging them
+    -- would be noise.
+    local function is_phase_handler(handler)
+        for _, phase in pairs(M.PHASES) do
+            if handler["on_" .. phase] then return true end
+        end
+        return false
+    end
+
+    local names = {}
+    for name in pairs(self.handlers) do names[#names + 1] = name end
+    table.sort(names)  -- deterministic diagnostic order
+
+    for _, name in ipairs(names) do
+        local handler = self.handlers[name]
+        if is_phase_handler(handler) then
+            for _, prereq in ipairs(handler.prerequisites or {}) do
+                if not self.handlers[prereq] then
+                    local msg = ("handler '%s' declares prerequisite '%s' which is not "
+                        .. "registered in any phase"):format(name, prereq)
+                    if self.diagnostics and self.diagnostics.warn then
+                        self.diagnostics:warn("pipeline", 0, "prerequisite_not_found", msg)
+                    elseif self.log then
+                        self.log.warn("[PIPELINE] " .. msg)
+                    end
+                end
+            end
+        end
+    end
 end
 
 ---Topological sort of handlers for a given phase
@@ -187,6 +226,10 @@ function M:execute(docs, opts)
         skip_phases[phase] = true
     end
 
+    -- All handlers are registered by now; flag any prerequisite that resolves
+    -- to no registered handler in any phase (HLR-PIPE-008).
+    self:validate_prerequisites()
+
     local contexts = {}
     local pinfo = self.project_info or {}
     local docx_info = pinfo.docx or {}
@@ -206,9 +249,9 @@ function M:execute(docs, opts)
     -- Build base context (shared by all documents)
     local base_ctx = {
         validation = self.validation,  -- Validation policy from project.yaml
-        build_dir = pinfo.output_dir or os.getenv("BUILD_DIR") or "build",
+        build_dir = pinfo.output_dir or "build",
         log = self.log,  -- Logger for backend handlers
-        output_format = os.getenv("OUTPUT_FORMAT") or "docx",
+        output_format = pinfo.output_format or "docx",
         template = pinfo.template or "default",  -- Template name for model loading
         -- DOCX-specific context (for styles and postprocessing)
         reference_doc = reference_doc,  -- Path to generated reference.docx with custom styles
@@ -220,15 +263,27 @@ function M:execute(docs, opts)
         latex = pinfo.latex,  -- LaTeX config from project.yaml
         -- Bibliography/citation configuration
         bibliography = pinfo.bibliography,  -- Path to .bib file
-        csl = pinfo.csl,  -- Path to CSL file for citation styling
+        -- Canonical contract.ctx invariant-core inputs (HLR-EXT-009): the active
+        -- model name and a frozen project-config slice, threaded so every hook
+        -- dispatch site can build the canonical ctx.
+        model = pinfo.template or "default",
+    }
+    base_ctx.config = {
+        build_dir = base_ctx.build_dir,
+        project_root = base_ctx.project_root,
+        reference_doc = reference_doc,
+        docx = docx_info,
+        html5 = pinfo.html5,
+        latex = pinfo.latex,
+        validation = self.validation,
+        bibliography = pinfo.bibliography,
+        output_format = base_ctx.output_format,
+        log_level = (pinfo.logging or {}).level,
     }
 
-    -- Debug: Log bibliography/csl configuration
+    -- Debug: Log bibliography configuration
     if pinfo.bibliography then
         self.log.debug("[PIPELINE] Bibliography configured: %s", pinfo.bibliography)
-    end
-    if pinfo.csl then
-        self.log.debug("[PIPELINE] CSL configured: %s", pinfo.csl)
     end
 
     for _, doc in ipairs(docs) do

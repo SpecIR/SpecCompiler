@@ -3,7 +3,7 @@
 # Generic webapp tests (generation, search) live in tests/e2e/webapp/
 
 project:
-  code: TEST_SDN_WEB
+  code: TEST_SW_DOCS_WEB
   name: SW Docs View Tests
 
 template: sw_docs

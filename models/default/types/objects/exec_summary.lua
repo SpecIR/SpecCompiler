@@ -5,22 +5,16 @@
 ---  ## EXEC_SUMMARY: Executive Summary
 ---  This document provides...
 
-local spec_object_base = require("pipeline.shared.spec_object_base")
-
-local M = {}
-
-M.object = {
-    id = "EXEC_SUMMARY",
-    long_name = "Executive Summary",
-    description = "Executive summary section",
-    is_composite = true,
-    numbered = false,
-    implicit_aliases = { "executive summary", "exec summary" },
+return {
+    kind = "object",
+    schema = {
+        id = "EXEC_SUMMARY",
+        long_name = "Executive Summary",
+        description = "Executive summary section",
+        is_composite = true,
+        numbered = false,
+        implicit_aliases = { "executive summary", "exec summary" },
+        unnumbered = true,
+        skip_attributes = true,
+    },
 }
-
-M.handler = spec_object_base.create_handler("exec_summary_handler", {
-    unnumbered = true,
-    skip_attributes = true,
-})
-
-return M

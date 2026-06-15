@@ -131,9 +131,6 @@ CREATE TABLE IF NOT EXISTS spec_objects (
   -- Used to reconstruct object during EMIT phase
   ast JSON,
 
-  -- HTML5 body content (used by reqif.specir for ReqIF interoperability)
-  content_xhtml TEXT,
-
   FOREIGN KEY (specification_ref) REFERENCES specifications(identifier),
   FOREIGN KEY (type_ref) REFERENCES spec_object_types(identifier)
 );
@@ -417,9 +414,6 @@ CREATE TABLE IF NOT EXISTS spec_attribute_values (
   -- Copied from datatype_definitions.type at casting time
   -- XHTML = rich content stored in ast column
   datatype TEXT NOT NULL,
-
-  -- HTML5 rendering of XHTML attribute (used by reqif.specir for ReqIF interoperability)
-  xhtml_value TEXT,
 
   FOREIGN KEY (specification_ref) REFERENCES specifications(identifier),
   FOREIGN KEY (owner_object_id) REFERENCES spec_objects(id),

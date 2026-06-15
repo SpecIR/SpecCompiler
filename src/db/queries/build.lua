@@ -53,12 +53,4 @@ M.update_output_cache = [[
     VALUES (:spec, :path, :hash, datetime('now'))
 ]]
 
-M.invalidate_output_cache = [[
-    DELETE FROM output_cache WHERE spec_id = :spec
-]]
-
-M.get_output_cache_count = [[
-    SELECT COUNT(*) as count FROM output_cache
-]]
-
 return M

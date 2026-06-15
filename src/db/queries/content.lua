@@ -104,13 +104,6 @@ M.insert_float = [[
     )
 ]]
 
--- Get cached float resolution by content SHA
-M.select_float_cached_resolution = [[
-    SELECT resolved_ast FROM spec_floats
-    WHERE content_sha = :sha AND resolved_ast IS NOT NULL
-    LIMIT 1
-]]
-
 -- Update float resolved_ast
 M.update_float_resolved = [[
     UPDATE spec_floats SET resolved_ast = :ast WHERE id = :id
@@ -150,23 +143,6 @@ M.update_view_resolved = [[
     UPDATE spec_views SET resolved_ast = :resolved WHERE id = :id
 ]]
 
--- Get view resolved_ast by ID
-M.view_resolved_by_id = [[
-    SELECT resolved_ast FROM spec_views
-    WHERE id = :id
-      AND resolved_ast IS NOT NULL
-]]
-
--- Get view resolved_ast by expression match (fallback)
-M.view_resolved_by_expr = [[
-    SELECT resolved_ast FROM spec_views
-    WHERE specification_ref = :spec_id
-      AND view_type_ref = :view_type
-      AND raw_ast = :expr
-      AND resolved_ast IS NOT NULL
-    LIMIT 1
-]]
-
 -- ============================================================================
 -- Attribute Values
 -- ============================================================================
@@ -189,39 +165,6 @@ M.insert_attribute_value = [[
 -- ============================================================================
 -- Attribute Casting
 -- ============================================================================
-
--- Get all attributes that need casting (raw_value present, no typed value yet)
-M.pending_attribute_casts = [[
-    SELECT
-        av.id,
-        av.raw_value,
-        av.datatype,
-        ad.datatype_ref
-    FROM spec_attribute_values av
-    LEFT JOIN spec_objects so ON av.owner_object_id = so.id
-    LEFT JOIN spec_attribute_types ad ON ad.owner_type_ref = so.type_ref
-        AND ad.long_name = av.name
-    WHERE av.raw_value IS NOT NULL
-      AND av.string_value IS NULL
-      AND av.int_value IS NULL
-      AND av.real_value IS NULL
-      AND av.bool_value IS NULL
-      AND av.date_value IS NULL
-      AND av.enum_ref IS NULL
-]]
-
--- Build UPDATE for attribute casting with dynamic typed columns.
--- Returns SQL string for updating specific typed columns by id.
----@param columns string[] Column names to update (e.g., {"string_value"})
----@return string sql Parameterized UPDATE statement
-function M.build_attribute_cast_update(columns)
-    local sets = {}
-    for _, col in ipairs(columns) do
-        sets[#sets + 1] = col .. " = :" .. col
-    end
-    return "UPDATE spec_attribute_values SET " ..
-        table.concat(sets, ", ") .. " WHERE id = :id"
-end
 
 -- Get attribute values by owner object ID
 M.select_attributes_by_owner = [[
@@ -260,24 +203,6 @@ M.update_attribute_ast = [[
 -- Float Numbering
 -- ============================================================================
 
--- Get distinct counter groups for float numbering
-M.distinct_counter_groups = [[
-    SELECT DISTINCT COALESCE(ft.counter_group, ft.identifier) as counter_group
-    FROM spec_floats f
-    JOIN spec_float_types ft ON f.type_ref = ft.identifier
-    ORDER BY counter_group
-]]
-
--- Get float IDs by counter group for numbering (only captioned floats)
-M.floats_by_counter_group_for_numbering = [[
-    SELECT f.id
-    FROM spec_floats f
-    JOIN spec_float_types ft ON f.type_ref = ft.identifier
-    WHERE COALESCE(ft.counter_group, ft.identifier) = :counter_group
-      AND f.caption IS NOT NULL AND f.caption != ''
-    ORDER BY f.file_seq
-]]
-
 -- Get distinct counter groups for float numbering within a specification
 M.distinct_counter_groups_by_spec = [[
     SELECT DISTINCT COALESCE(ft.counter_group, ft.identifier) as counter_group
@@ -304,23 +229,6 @@ M.update_float_number = [[
     WHERE id = :id
 ]]
 
--- Build batch UPDATE for float numbers using CASE statement.
--- Assigns numbers to multiple floats in a single statement.
----@param ids_and_numbers table Array of {id=integer, number=integer} pairs
----@return string sql Executable UPDATE statement (no bind parameters — values are inlined)
-function M.build_batch_float_number_update(ids_and_numbers)
-    local case_parts = {}
-    local id_list = {}
-    for _, pair in ipairs(ids_and_numbers) do
-        table.insert(case_parts, string.format("WHEN %d THEN %d", pair.id, pair.number))
-        table.insert(id_list, tostring(pair.id))
-    end
-    return string.format([[
-        UPDATE spec_floats SET number = CASE id %s END
-        WHERE id IN (%s)
-    ]], table.concat(case_parts, " "), table.concat(id_list, ","))
-end
-
 -- ============================================================================
 -- Float Resolution
 -- ============================================================================
@@ -336,14 +244,6 @@ M.select_all_floats_with_types = [[
 -- Check if a float type needs external rendering
 M.select_float_type_external_render = [[
     SELECT needs_external_render FROM spec_float_types WHERE identifier = :id
-]]
-
--- Get floats by type for a specification
-M.select_floats_by_type = [[
-    SELECT id, raw_content, raw_ast, pandoc_attributes, from_file, label, caption, file_seq, anchor, type_ref
-    FROM spec_floats
-    WHERE type_ref = :type_ref AND specification_ref = :spec_id
-    ORDER BY file_seq
 ]]
 
 -- ============================================================================

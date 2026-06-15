@@ -10,7 +10,6 @@ local M = {}
 ---Process a float's resolved_ast.
 ---Returns type="image" for image-producing floats, or {float, resolved} for handler dispatch.
 ---@param float table Float record with resolved_ast
----@param build_dir string Build directory
 ---@param log table Logger
 ---@return table|nil Result for emit_float.lua
 local function process_float(float, build_dir, log)
@@ -66,10 +65,9 @@ end
 ---Collect floats from database for EMIT phase.
 ---Reads resolved_ast populated during TRANSFORM phase.
 ---@param data DataManager
----@param build_dir string Build directory
 ---@param log table Logger
 ---@return table float_results Map of syntax_key to {float, resolved, type?, paths?}
-function M.resolve_floats(data, build_dir, log)
+function M.resolve_floats(data, log)
     local float_results = {}
 
     -- Query all floats with type metadata (caption_format, counter_group)
@@ -89,7 +87,7 @@ function M.resolve_floats(data, build_dir, log)
                     float.type_ref or "unknown", float.syntax_key or tostring(float.id), float.from_file or "unknown")
             end
         else
-            local result = process_float(float, build_dir, log)
+            local result = process_float(float, log)
 
             if result then
                 -- Use syntax_key from database (stored during INITIALIZE phase)

@@ -13,6 +13,7 @@
 local logger = require("infra.logger")
 local Queries = require("db.queries")
 local cache_registry = require("pipeline.shared.cache_registry")
+local hook_ctx = require("pipeline.shared.hook_ctx")
 
 local M = {
     name = "relation_analyzer",
@@ -25,10 +26,14 @@ local inference_rules_cache = nil
 -- Cache for resolver root map (type_id → root_type_id)
 local resolver_root_cache = nil
 
+-- Cache for object-type ancestry map (type_id → set of {self + ancestors})
+local object_ancestry_cache = nil
+
 ---Clear module-level caches (required for re-entrant engine.run_project calls).
 function M.clear_cache()
     inference_rules_cache = nil
     resolver_root_cache = nil
+    object_ancestry_cache = nil
 end
 cache_registry.register(M.clear_cache)
 
@@ -95,6 +100,50 @@ local function compute_resolver_root_map(data)
 end
 
 -- ============================================================================
+-- Object-Type Ancestry
+-- ============================================================================
+
+---Build a map from each object type to its ancestors via the `extends` chain,
+---keyed by ancestor type and valued by distance (0 = the type itself, 1 = its
+---parent, ...). Used to make target-type constraints extends-aware: a constraint
+---like "SECTION" should match SECTION descendants (e.g. ABNT textual chapters
+---INTRODUCTION/DEVELOPMENT/CONCLUSION, which extend TEXTUAL -> SECTION), not only
+---objects whose type is literally SECTION. The distance lets the scorer prefer
+---the closest (most specific) match.
+---@param data DataManager
+---@return table map type_id → { ancestor_type_id → distance } (0 = self)
+local function compute_object_ancestry_map(data)
+    if object_ancestry_cache then
+        return object_ancestry_cache
+    end
+
+    local types = data:query_all([[
+        SELECT identifier, extends FROM spec_object_types
+    ]], {})
+
+    local parent_of = {}
+    for _, t in ipairs(types or {}) do
+        parent_of[t.identifier] = t.extends
+    end
+
+    local ancestry = {}
+    for _, t in ipairs(types or {}) do
+        local dist = {}
+        local current = t.identifier
+        local d = 0
+        while current and dist[current] == nil do  -- dist[current] doubles as cycle guard
+            dist[current] = d
+            current = parent_of[current]
+            d = d + 1
+        end
+        ancestry[t.identifier] = dist
+    end
+
+    object_ancestry_cache = ancestry
+    return ancestry
+end
+
+-- ============================================================================
 -- CSV Matching
 -- ============================================================================
 
@@ -124,6 +173,40 @@ local function csv_matches(csv_or_scalar, value, case_insensitive)
         end
     end
     return false
+end
+
+---Return the minimal extends-chain distance at which a target-type constraint
+---matches a resolved object's type, or nil if it doesn't match at all. Distance
+---0 is an exact-type match; larger distances are matches via ancestors (e.g. an
+---ABNT INTRODUCTION matching a "SECTION" constraint through TEXTUAL -> SECTION).
+---The scorer uses this so a type-specific xref (e.g. XREF_DIC targeting DIC,
+---distance 0) outranks the generic XREF_SEC/XREF_SECP (SECTION, distance > 0)
+---when both could match. Types absent from the ancestry map (e.g. float types,
+---which are not object types) fall back to a direct match at distance 0.
+---@param constraint string CSV or scalar of allowed target types
+---@param type_ref string|nil Resolved target's concrete type
+---@param ancestry table type_id → { ancestor → distance }
+---@return integer|nil distance Minimal matching distance, or nil if no match
+local function target_type_match_distance(constraint, type_ref, ancestry)
+    if not type_ref then
+        return nil
+    end
+    local chain = ancestry and ancestry[type_ref]
+    if chain then
+        local best = nil
+        for ancestor, distance in pairs(chain) do
+            if csv_matches(constraint, ancestor, false) then
+                if best == nil or distance < best then
+                    best = distance
+                end
+            end
+        end
+        return best
+    end
+    if csv_matches(constraint, type_ref, false) then
+        return 0
+    end
+    return nil
 end
 
 -- ============================================================================
@@ -185,9 +268,17 @@ local function resolve_targets(data, candidates, spec_id, target_text, source_ob
             seen_roots[root] = true
             local fn = data:get_resolver(root)
             if fn then
-                local result, is_ambiguous = fn(data, spec_id, target_text, source_object_id)
-                if result then
-                    resolver_results[root] = { target = result, is_ambiguous = is_ambiguous }
+                -- The resolver IS the relation type's `resolve` DATA hook: it
+                -- takes the frozen DATA ctx (target_text/source_object_id on
+                -- the subject -- source_object_id MUST NOT be dropped, it
+                -- drives local-scope label resolution) and returns one
+                -- {target, ambiguous} table.
+                local dctx = hook_ctx.build_data({}, data, nil,
+                    { target_text = target_text, source_object_id = source_object_id },
+                    "resolve", spec_id)
+                local res = fn(dctx)
+                if res and res.target then
+                    resolver_results[root] = { target = res.target, is_ambiguous = res.ambiguous }
                 end
             end
         end
@@ -205,16 +296,21 @@ end
 ---Candidates whose target_type constraint doesn't match are eliminated.
 ---@param candidates table Filtered candidates
 ---@param resolver_results table resolver_root → {target, is_ambiguous}
+---@param ancestry table Object-type ancestry map for extends-aware target matching
 ---@return string|nil inferred_type The winning type identifier
 ---@return string|nil tie_a First tied type (if ambiguous)
 ---@return string|nil tie_b Second tied type (if ambiguous)
 ---@return table|nil winning_resolution {target, is_ambiguous} from the winner's resolver root
-local function score_and_pick(candidates, resolver_results)
+local function score_and_pick(candidates, resolver_results, ancestry)
     local scored = {}
 
     for _, c in ipairs(candidates) do
         local resolved = c.resolver_root and resolver_results[c.resolver_root] or nil
         local specificity = 0
+        -- Extends-chain distance of the target-type match (0 = exact). Used as a
+        -- tie-breaker so the closest (most specific) target type wins. Candidates
+        -- without a target constraint sort last via a large sentinel.
+        local target_distance = math.huge
 
         -- Count each non-NULL constraint that matched (filtering already
         -- verified selector, attr, and source — just count them here)
@@ -222,11 +318,17 @@ local function score_and_pick(candidates, resolver_results)
         if c.rule.attr ~= nil then specificity = specificity + 1 end
         if c.rule.source ~= nil then specificity = specificity + 1 end
 
-        -- Target type: verify match (requires resolution) and count
+        -- Target type: verify match (requires resolution) and count. Matching is
+        -- extends-aware so a constraint like "SECTION" accepts SECTION descendants
+        -- (e.g. ABNT textual chapters); the match distance breaks ties in favour
+        -- of the closest target type (e.g. XREF_DIC's exact DIC beats XREF_SECP's
+        -- SECTION reached through DIC -> TRACEABLE -> SECTION).
         if c.rule.target ~= nil then
             if resolved then
-                if csv_matches(c.rule.target, resolved.target.type_ref, false) then
+                local distance = target_type_match_distance(c.rule.target, resolved.target.type_ref, ancestry)
+                if distance ~= nil then
                     specificity = specificity + 1
+                    target_distance = distance
                 else
                     goto skip  -- target type doesn't match constraint
                 end
@@ -238,19 +340,26 @@ local function score_and_pick(candidates, resolver_results)
         table.insert(scored, {
             rule = c.rule,
             specificity = specificity,
+            target_distance = target_distance,
             resolved = resolved
         })
 
         ::skip::
     end
 
-    -- Sort by specificity descending
+    -- Sort by specificity descending, then by target match distance ascending
+    -- (closer / more specific target type wins the tie).
     table.sort(scored, function(a, b)
-        return a.specificity > b.specificity
+        if a.specificity ~= b.specificity then
+            return a.specificity > b.specificity
+        end
+        return a.target_distance < b.target_distance
     end)
 
-    -- Tie detection
-    if #scored >= 2 and scored[1].specificity == scored[2].specificity then
+    -- Tie detection: ambiguous only when specificity AND target distance tie
+    if #scored >= 2
+        and scored[1].specificity == scored[2].specificity
+        and scored[1].target_distance == scored[2].target_distance then
         return nil, scored[1].rule.rel_type, scored[2].rule.rel_type, scored[1].resolved
     end
 
@@ -294,7 +403,8 @@ end
 ---@param rel table Relation row from database
 ---@param rules table Inference rules
 ---@param resolver_root_map table Type ID → resolver root ID
-local function analyze_relation(data, rel, rules, resolver_root_map)
+---@param ancestry table Object-type ancestry map for extends-aware target matching
+local function analyze_relation(data, rel, rules, resolver_root_map, ancestry)
     -- Step 1: Filter types whose constraints are compatible
     local candidates = filter_candidates(
         rules, rel.link_selector, rel.source_attribute, rel.source_type, resolver_root_map
@@ -308,7 +418,7 @@ local function analyze_relation(data, rel, rules, resolver_root_map)
     )
 
     -- Step 3: Score all 4 dimensions and pick the winner
-    local inferred, tie_a, tie_b, winning_resolved = score_and_pick(candidates, resolver_results)
+    local inferred, tie_a, tie_b, winning_resolved = score_and_pick(candidates, resolver_results, ancestry)
 
     -- Apply resolution (target_object_id or target_float_id)
     if winning_resolved then
@@ -350,9 +460,10 @@ function M.on_analyze(data, contexts, diagnostics)
         specs_to_analyze[row.specification_ref] = true
     end
 
-    -- Load inference rules and resolver root map (cached per run)
+    -- Load inference rules, resolver root map, and object-type ancestry (cached per run)
     local rules = load_inference_rules(data)
     local resolver_root_map = compute_resolver_root_map(data)
+    local ancestry = compute_object_ancestry_map(data)
 
     -- Analyze all affected specs
     for spec_id in pairs(specs_to_analyze) do
@@ -363,7 +474,7 @@ function M.on_analyze(data, contexts, diagnostics)
 
         local inferred_count = 0
         for _, rel in ipairs(relations or {}) do
-            analyze_relation(data, rel, rules, resolver_root_map)
+            analyze_relation(data, rel, rules, resolver_root_map, ancestry)
             inferred_count = inferred_count + 1
         end
 

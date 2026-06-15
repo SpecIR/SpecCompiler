@@ -8,53 +8,14 @@
 local M = {}
 
 local float_base = require("pipeline.shared.float_base")
+local registry = require("contract.registry")
+local hook_ctx = require("pipeline.shared.hook_ctx")
+local float_anchor = require("pipeline.shared.float_anchor")
 
--- Note: pandoc.json.decode only works for Pandoc AST JSON, not arbitrary JSON objects.
--- We use dkjson for decoding simple JSON like {"content":"...", "language":"c"}
-local dkjson = require("dkjson")
+-- Internal float rendering is dispatched through the host's hook index
+-- (_caps.float.<TYPE>.render), which already overlays default+template.
 
--- Cache for loaded float type handlers
-local float_handler_cache = {}
-
----Load float type handler module.
----@param type_ref string Float type (e.g., "TABLE", "MATH", "LISTING")
----@param model_name string Model name (e.g., "default")
----@return table|nil handler with on_render_CodeBlock or nil
-local function get_float_handler(type_ref, model_name)
-    if not type_ref then return nil end
-    local cache_key = type_ref:upper() .. ":" .. (model_name or "default")
-
-    if float_handler_cache[cache_key] ~= nil then
-        return float_handler_cache[cache_key] or nil
-    end
-
-    local paths = {
-        "models." .. (model_name or "default") .. ".types.floats." .. type_ref:lower(),
-        "models.default.types.floats." .. type_ref:lower()
-    }
-
-    for _, module_path in ipairs(paths) do
-        local ok, module = pcall(require, module_path)
-        if ok and module and module.handler and module.handler.on_render_CodeBlock then
-            float_handler_cache[cache_key] = module.handler
-            return module.handler
-        end
-    end
-
-    float_handler_cache[cache_key] = false
-    return nil
-end
-
----Generate bookmark ID from identifier string.
----@param identifier string The identifier to hash
----@return number Bookmark ID
-local function generate_bookmark_id(identifier)
-    local bm_id = 0
-    for i = 1, #identifier do
-        bm_id = (bm_id * 31 + identifier:byte(i)) % 100000
-    end
-    return bm_id + 1  -- Ensure non-zero
-end
+-- Bookmark ids come from float_anchor.bookmark_id (single source of truth).
 
 ---Wrap float content with caption and source lines.
 ---Uses format-agnostic markers that filters convert to format-specific output.
@@ -83,11 +44,14 @@ local function render_with_decoration(float, content, preset)
     -- Get caption config for format-agnostic Div
     local config = float_base.get_caption_config(type_ref, preset, float)
 
-    -- Add bookmark start marker (format-agnostic)
-    if float.anchor or float.label then
-        local bm_id = generate_bookmark_id(float.anchor or float.label)
+    -- Add bookmark start marker (format-agnostic). The bookmark NAME is the
+    -- float's canonical reference anchor -- the single string every PAGEREF /
+    -- cross-reference to this float must resolve to (see float_anchor / VC-ABNT-002).
+    local ref_anchor = float_anchor.ref_anchor(float)
+    if ref_anchor then
+        local bm_id = float_anchor.bookmark_id(ref_anchor)
         table.insert(blocks, pandoc.RawBlock('speccompiler',
-            string.format('bookmark-start:%d:%s', bm_id, float.anchor or float.label)))
+            string.format('bookmark-start:%d:%s', bm_id, ref_anchor)))
     end
 
     -- Create format-agnostic caption Div (filters will convert to OOXML/HTML)
@@ -97,7 +61,7 @@ local function render_with_decoration(float, content, preset)
             {pandoc.Para{pandoc.Str(float.caption)}},
             pandoc.Attr("", {"speccompiler-caption"}, {
                 ["seq-name"] = config.seq_name,
-                ["float-id"] = float.anchor or float.label or "",
+                ["float-id"] = ref_anchor or "",
                 ["float-type"] = type_ref,
                 ["float-number"] = tostring(float.number or ""),
                 ["prefix"] = config.prefix,
@@ -139,8 +103,8 @@ local function render_with_decoration(float, content, preset)
     end
 
     -- Add bookmark end marker (format-agnostic)
-    if float.anchor or float.label then
-        local bm_id = generate_bookmark_id(float.anchor or float.label)
+    if ref_anchor then
+        local bm_id = float_anchor.bookmark_id(ref_anchor)
         table.insert(blocks, pandoc.RawBlock('speccompiler',
             string.format('bookmark-end:%d', bm_id)))
     end
@@ -166,21 +130,12 @@ end
 ---@param spec_id string Specification ID
 ---@param log table Logger
 ---@param preset table|nil Preset configuration for caption prefixes/styles
----@param template string|nil Template name (e.g., "emb", "abnt")
 ---@return pandoc.Pandoc Transformed document
-function M.transform_floats_in_doc(doc, float_results, data, spec_id, log, preset, template)
-    local model_name = template or "default"
+function M.transform_floats_in_doc(doc, float_results, data, spec_id, log, preset, pctx, diagnostics)
 
-    -- Context passed to float handler modules
-    local handler_ctx = {
-        data = data,
-        spec_id = spec_id,
-        log = log,
-        dkjson = dkjson,
-        pandoc = pandoc,
-        preset = preset,
-        template = model_name,
-    }
+    -- The host owns internal float render dispatch; its _caps.float index is
+    -- already overlaid (default then template), so no per-model lookup here.
+    local host = registry.current()
 
     return doc:walk({
         -- Handle CodeBlock float references only
@@ -220,9 +175,18 @@ function M.transform_floats_in_doc(doc, float_results, data, spec_id, log, prese
             -- Dispatch to float type handler based on float.type_ref
             local float_type_ref = result.float and result.float.type_ref
             if float_type_ref then
-                local handler = get_float_handler(float_type_ref, model_name)
-                if handler and handler.on_render_CodeBlock then
-                    local handler_result = handler.on_render_CodeBlock(block, handler_ctx, result.float, result.resolved)
+                -- nil here covers BOTH "type not registered" and "registered but
+                -- no render hook" (e.g. FIGURE renders via the image fallback);
+                -- both correctly fall through below.
+                local render = host and host:get_hook_inherited("float", float_type_ref:upper(), "render")
+                if render then
+                    local fctx = hook_ctx.build(pctx, data, diagnostics, {
+                        element = block,
+                        float = result.float,
+                        resolved = result.resolved,
+                        preset = preset,
+                    }, "render", spec_id)
+                    local handler_result = render(fctx)
                     if handler_result then
                         -- Wrap with decoration (caption, bookmarks)
                         local content = type(handler_result) == "table" and handler_result.t and {handler_result} or

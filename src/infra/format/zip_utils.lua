@@ -368,6 +368,5 @@ M.path_exists = path_exists
 --- Check if path is a directory
 -- @param path string - Path to check
 -- @return boolean
-M.is_directory = is_directory
 
 return M

@@ -83,20 +83,4 @@ function M:update_cache(spec_id, output_path)
     end
 end
 
----Invalidate cache for a specification
----@param spec_id string Specification ID
-function M:invalidate(spec_id)
-    self.data:execute(Queries.build.invalidate_output_cache, { spec = spec_id })
-end
-
----Get cache stats
----@return table stats Cache statistics
-function M:get_stats()
-    local total = self.data:query_one(Queries.build.get_output_cache_count)
-
-    return {
-        entries = total and total.count or 0
-    }
-end
-
 return M

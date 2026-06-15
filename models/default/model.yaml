@@ -1,0 +1,19 @@
+# Model manifest (HLR-EXT-010).
+#
+# Declarative metadata consumed by the host engine to resolve the model
+# overlay chain. Declaration only -- contains no behaviour. The host loads
+# the chain in `extends` order first, then this model (later wins by id).
+#
+# Fields:
+#   name        canonical model name (matches the models/<name>/ directory)
+#   description human-readable summary
+#   extends     parent models overlaid before this one (root model => [])
+#   requires    other models this model depends on at build time
+
+name: default
+description: >-
+  Base SpecCompiler model. Provides the core spec-object, float, view,
+  relation and specification type categories plus DOCX / HTML5 / LaTeX
+  rendering, filters, postprocessors and the default verification views.
+extends: []
+requires: []

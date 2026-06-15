@@ -4,7 +4,8 @@
 ---Provides:
 ---  - Default header rendering (H1 document title)
 ---  - Configurable title formatting (unnumbered, with/without PID)
----  - Extensible rendering via create_handler()
+---  - title_render: the host-owned standard title renderer (registered on the
+---    SPEC_TITLE base type; concrete spec types inherit it and stay pure schema)
 ---
 ---@module specification_base
 local M = {}
@@ -48,50 +49,20 @@ function M.header(ctx, pandoc, options)
     return title_div
 end
 
--- ============================================================================
--- Handler Factory
--- ============================================================================
-
----Create a handler for a specification type.
----Supports customization via options table.
----
----Options:
----  - unnumbered: boolean (default true) - exclude from section numbering
----  - show_pid: boolean (default false) - show "PID: Title" vs just "Title"
----  - style: string (default "Title") - custom-style for the header
----  - header: custom header function(ctx, pandoc)
----
----@param name string Handler name (e.g., "srs_handler")
----@param options table|nil Customization options
----@return table Handler module with on_render_Specification
-function M.create_handler(name, options)
-    options = options or {}
-
-    local handler = {
-        name = name,
-        prerequisites = options.prerequisites or {},
-    }
-
-    -- Header function: use custom or default
-    if options.header then
-        handler.header = options.header
-    else
-        handler.header = function(ctx, pandoc)
-            return M.header(ctx, pandoc, options)
-        end
-    end
-
-    ---Render the specification header.
-    ---Called by specification_render_handler during TRANSFORM phase.
-    ---@param ctx table Render context {specification, spec_id}
-    ---@param pandoc table Pandoc module
-    ---@param data DataManager Database manager
-    ---@return table|nil header Pandoc Header block, or nil to skip
-    function handler.on_render_Specification(ctx, pandoc, data)
-        return handler.header(ctx, pandoc)
-    end
-
-    return handler
+---The host-owned standard specification-title renderer (a styled Title Div).
+---Registered as the render hook of the SPEC_TITLE base type; concrete spec types
+---inherit it through the host's extends-chain dispatch and declare their options
+---(show_pid, style) as plain SCHEMA fields, read here from the rendering type's
+---schema (ctx.subject.type_schema). A spec wanting a custom render declares its
+---own hooks.render (e.g. SBES_PAPER); the default SPEC type does NOT extend
+---SPEC_TITLE, so untyped H1 documents render no title.
+---@param ctx table canonical ctx (subject.specification/type_schema, pandoc)
+---@return table|nil header Pandoc Div, or nil
+function M.title_render(ctx)
+    return M.header(
+        { specification = ctx.subject.specification, spec_id = ctx.spec_id },
+        ctx.pandoc,
+        ctx.subject.type_schema or {})
 end
 
 return M

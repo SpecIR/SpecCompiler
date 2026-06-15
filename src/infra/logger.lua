@@ -90,9 +90,8 @@ end
 
 --- Format level string with optional color
 ---@param level string
----@param is_diagnostic boolean
 ---@return string
-local function format_level(level, is_diagnostic)
+local function format_level(level)
     local upper = level:upper()
     local padded = string.format("%-5s", upper)
 
@@ -113,6 +112,24 @@ local function format_level(level, is_diagnostic)
     end
 end
 
+---Build the console-line prefix parts: optional DEBUG-mode timestamp plus the
+---formatted level tag.
+---@param level string
+---@return table parts
+local function console_preamble(level)
+    local parts = {}
+    if state.level == LEVELS.DEBUG then
+        local ts = timestamp()
+        if use_colors() then
+            table.insert(parts, colors.dim .. ts .. colors.reset)
+        else
+            table.insert(parts, ts)
+        end
+    end
+    table.insert(parts, format_level(level))
+    return parts
+end
+
 --- Emit a log entry (operational/progress info)
 ---@param level string "debug" | "info" | "progress"
 ---@param message string
@@ -125,20 +142,7 @@ function M.log(level, message, extra)
     end
 
     if use_console() then
-        -- Console format
-        local parts = {}
-
-        -- Timestamp only in DEBUG mode
-        if state.level == LEVELS.DEBUG then
-            local ts = timestamp()
-            if use_colors() then
-                table.insert(parts, colors.dim .. ts .. colors.reset)
-            else
-                table.insert(parts, ts)
-            end
-        end
-
-        table.insert(parts, format_level(level, false))
+        local parts = console_preamble(level)
         table.insert(parts, message)
 
         io.stderr:write(table.concat(parts, " ") .. "\n")
@@ -165,20 +169,7 @@ end
 ---@param line number|nil Line number
 function M.diagnostic(level, message, source, line)
     if use_console() then
-        -- Console format
-        local parts = {}
-
-        -- Timestamp only in DEBUG mode
-        if state.level == LEVELS.DEBUG then
-            local ts = timestamp()
-            if use_colors() then
-                table.insert(parts, colors.dim .. ts .. colors.reset)
-            else
-                table.insert(parts, ts)
-            end
-        end
-
-        table.insert(parts, format_level(level, true))
+        local parts = console_preamble(level)
 
         -- Add source:line if present
         if source then

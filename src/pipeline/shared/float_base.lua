@@ -15,17 +15,6 @@ function M.update_resolved_ast(data, identifier, result_json)
         { id = identifier, ast = result_json })
 end
 
----Query all floats of a specific type for a specification.
----@param data DataManager
----@param ctx Context
----@param type_ref string Type reference (e.g., "FIGURE", "TABLE")
----@return table|nil floats Array of float records
-function M.query_floats_by_type(data, ctx, type_ref)
-    local spec_id = ctx.spec_id or "default"
-    return data:query_all(Queries.content.select_floats_by_type,
-        { type_ref = type_ref, spec_id = spec_id })
-end
-
 ---Decode attributes JSON from a float record.
 ---@param float table Float record with pandoc_attributes field
 ---@return table attrs Decoded attributes (empty table if none)
@@ -43,14 +32,6 @@ function M.decode_attributes(float)
 end
 
 ---Create a logger wrapper from diagnostics.
----Routes debug/info to operational logs, warn/error to diagnostics (if available) or logger.
----@param diagnostics Diagnostics|nil
----@return table log Logger with debug/error/info/warn methods
-function M.create_log(diagnostics)
-    local logger = require("infra.logger")
-    return logger.create_diagnostic_adapter(diagnostics, "FLOAT")
-end
-
 -- ============================================================================
 -- Source/Caption Decoration (format-agnostic)
 -- ============================================================================
@@ -155,6 +136,14 @@ function M.decode_image_attrs(float)
         local h = tostring(attrs.height)
         if not h:match('[a-z%%]') then h = h .. 'px' end
         table.insert(img_attrs, {"height", h})
+    end
+
+    if attrs.placement then
+        table.insert(img_attrs, {"placement", tostring(attrs.placement)})
+    end
+
+    if attrs["float-placement"] then
+        table.insert(img_attrs, {"float-placement", tostring(attrs["float-placement"])})
     end
 
     return img_attrs

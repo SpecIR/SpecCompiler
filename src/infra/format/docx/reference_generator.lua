@@ -11,26 +11,6 @@ local M = {}
 -- DOCX Manipulation (via zip_utils)
 -- ============================================================================
 
----Execute a shell command and return output.
----@param cmd string The command to execute
----@return string|nil output Command output, or nil on error
----@return string|nil error Error message if command failed
-local function exec(cmd)
-    local handle = io.popen(cmd .. " 2>&1")
-    if not handle then
-        return nil, "Failed to execute command: " .. cmd
-    end
-
-    local output = handle:read("*a")
-    local ok = handle:close()
-
-    if not ok then
-        return nil, "Command failed: " .. cmd .. "\n" .. (output or "")
-    end
-
-    return output, nil
-end
-
 ---Get Pandoc's default reference.docx as binary data.
 ---@return string|nil data Binary data of reference.docx
 ---@return string|nil error Error message if failed
@@ -78,7 +58,9 @@ end
 ---Merge custom styles into styles.xml content.
 ---Replaces existing styles with same ID, adds new ones.
 ---@param styles_xml string The original styles.xml content
----@param preset table The preset with paragraph_styles, character_styles, table_styles
+---@param preset table The preset with paragraph_styles and character_styles
+---(table styling is applied directly by the DOCX postprocessor, not via preset
+---styles, so table_styles are not emitted here)
 ---@return string merged_xml The merged styles.xml content
 function M.merge_styles(styles_xml, preset)
     -- Build map of custom styles by ID
@@ -210,35 +192,6 @@ function M.update_settings_mirror_margins(settings_xml, mirror_margins)
 
     -- Add <w:mirrorMargins/> before </w:settings>
     return settings_xml:gsub('</w:settings>', '<w:mirrorMargins/></w:settings>')
-end
-
----Update document.xml with A4 page size in sectPr.
----Pandoc's default reference.docx has empty sectPr which causes LibreOffice
----to use system defaults (US Letter) during PDF export.
----@param document_xml string The original document.xml content
----@param width number Page width in twips (default 11906 for A4)
----@param height number Page height in twips (default 16838 for A4)
----@return string updated_xml The updated document.xml content
-function M.update_document_page_size(document_xml, width, height)
-    width = width or 11906   -- A4 width in twips
-    height = height or 16838 -- A4 height in twips
-
-    local page_size_xml = string.format('<w:pgSz w:w="%d" w:h="%d"/>', width, height)
-
-    -- Replace empty self-closing sectPr with one containing page size
-    local modified = document_xml:gsub(
-        '<w:sectPr%s*/>',
-        '<w:sectPr>' .. page_size_xml .. '</w:sectPr>'
-    )
-
-    -- Also add page size to sectPr elements that don't have it
-    -- Pattern: <w:sectPr> followed by </w:sectPr> without pgSz in between
-    modified = modified:gsub(
-        '(<w:sectPr>)(%s*)(</w:sectPr>)',
-        '%1%2' .. page_size_xml .. '%2%3'
-    )
-
-    return modified
 end
 
 -- ============================================================================

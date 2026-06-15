@@ -185,6 +185,17 @@ return {
             shading = { pattern = "clear", fill = "F5F5F5" },
         },
         {
+            id = "SpecObjectHeader",
+            name = "Spec Object Header",
+            based_on = "Normal",
+            next = "FirstParagraph",
+            font = { name = "Calibri Light", size = 16, bold = true, color = "0F4C64" },
+            spacing = { before = 14, after = 6, line = 1.15 },
+            indent = { first_line = "0in" },
+            keep_next = true,
+            outline_level = 0,
+        },
+        {
             id = "FigureCenter",
             name = "Figure Center",
             based_on = "Normal",
@@ -303,27 +314,6 @@ return {
     -- ========================================================================
     -- Table Styles
     -- ========================================================================
-    table_styles = {
-        {
-            id = "TableGrid",
-            name = "Table Grid",
-            borders = {
-                top = { style = "single", width = 0.5, color = "000000" },
-                bottom = { style = "single", width = 0.5, color = "000000" },
-                left = { style = "single", width = 0.5, color = "000000" },
-                right = { style = "single", width = 0.5, color = "000000" },
-                inside_h = { style = "single", width = 0.5, color = "000000" },
-                inside_v = { style = "single", width = 0.5, color = "000000" },
-            },
-            cell_margins = {
-                top = "0.05in",
-                bottom = "0.05in",
-                left = "0.08in",
-                right = "0.08in",
-            },
-            autofit = true,
-        },
-    },
 
     -- ========================================================================
     -- Float Source Attribution

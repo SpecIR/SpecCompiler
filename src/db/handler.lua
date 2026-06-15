@@ -23,11 +23,7 @@ function M.new(config)
 end
 
 function M:execute(sql, params)
-    local stmt, err = self.db:prepare(sql)
-    if not stmt then
-        local errmsg = self.db:errmsg() or "unknown error"
-        error("Failed to prepare SQL: " .. tostring(err) .. " (" .. errmsg .. ")\nSQL: " .. sql)
-    end
+    local stmt = self:prepare_statement(sql)
     if params then
         stmt:bind_names(params)
     end
@@ -38,11 +34,7 @@ end
 
 function M:query_all(sql, params)
     local results = {}
-    local stmt, err = self.db:prepare(sql)
-    if not stmt then
-        local errmsg = self.db:errmsg() or "unknown error"
-        error("Failed to prepare SQL: " .. tostring(err) .. " (" .. errmsg .. ")\nSQL: " .. sql)
-    end
+    local stmt = self:prepare_statement(sql)
     if params then
         stmt:bind_names(params)
     end

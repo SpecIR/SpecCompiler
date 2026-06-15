@@ -1,9 +1,10 @@
--- Test oracle for VC-021: Handler Registration Interface
--- Verifies successful handler export registration and strict registration failures.
+-- Test oracle for VC-021: Handler Registration Interface (host engine)
+-- Verifies the host registers a module's pipeline phase handler (phase_handler
+-- with an on_<phase> hook) and surfaces strict-pipeline registration failures.
 
 return function(_, _)
     local utils = require("type_loader_test_utils")
-    local type_loader = require("core.type_loader")
+    local registry = require("contract.registry")
     local uv = require("luv")
 
     local root = uv.cwd()
@@ -13,17 +14,21 @@ return function(_, _)
         local created_ok, create_ok_err = utils.create_model(root, success_model, {
             ["objects/object_with_handler.lua"] = [[
                 return {
-                    object = { id = "VC021_OBJ_OK", long_name = "VC021 Object OK" },
-                    handler = {
-                        name = "vc021_handler_ok",
-                        prerequisites = { "initialize" },
-                        on_initialize = function() end
-                    }
+                    kind = "object",
+                    schema = {
+                        id = "VC021_OBJ_OK",
+                        long_name = "VC021 Object OK",
+                        phase_prerequisites = { "initialize" },
+                    },
+                    hooks = {
+                        on_initialize = function() end,
+                    },
                 }
             ]],
             ["objects/object_without_handler.lua"] = [[
                 return {
-                    object = { id = "VC021_OBJ_NO_HANDLER", long_name = "No Handler Object" }
+                    kind = "object",
+                    schema = { id = "VC021_OBJ_NO_HANDLER", long_name = "No Handler Object" }
                 }
             ]]
         })
@@ -34,8 +39,10 @@ return function(_, _)
         local created_bad, create_bad_err = utils.create_model(root, failure_model, {
             ["objects/object_with_invalid_handler.lua"] = [[
                 return {
-                    object = { id = "VC021_OBJ_BAD", long_name = "VC021 Object BAD" },
-                    handler = {
+                    kind = "object",
+                    schema = { id = "VC021_OBJ_BAD", long_name = "VC021 Object BAD" },
+                    -- Legacy channel: must be rejected loudly at register time
+                    phase_handler = {
                         name = "vc021_handler_bad",
                         on_initialize = function() end
                     }
@@ -61,12 +68,12 @@ return function(_, _)
         }
 
         utils.clear_loaded_model(success_model)
-        type_loader.load_model(data_ok, strict_pipeline, success_model)
+        registry.new{ data = data_ok, pipeline = strict_pipeline }:load_model(success_model)
 
         if #registered_handlers ~= 1 then
             error("Expected exactly one registered handler, got " .. tostring(#registered_handlers))
         end
-        if registered_handlers[1].name ~= "vc021_handler_ok" then
+        if registered_handlers[1].name ~= "vc021_obj_ok_handler" then
             error("Unexpected registered handler name: " .. tostring(registered_handlers[1].name))
         end
         if type(registered_handlers[1].prerequisites) ~= "table"
@@ -77,13 +84,13 @@ return function(_, _)
         local data_bad = { execute = function() end }
         local ok_bad, bad_err = pcall(function()
             utils.clear_loaded_model(failure_model)
-            type_loader.load_model(data_bad, strict_pipeline, failure_model)
+            registry.new{ data = data_bad, pipeline = strict_pipeline }:load_model(failure_model)
         end)
         if ok_bad then
             error("Expected invalid handler registration to fail")
         end
-        if not tostring(bad_err):match("handler prerequisites missing") then
-            error("Unexpected invalid handler error: " .. tostring(bad_err))
+        if not tostring(bad_err):find("folded into", 1, true) then
+            error("Unexpected legacy phase_handler error: " .. tostring(bad_err))
         end
     end)
 

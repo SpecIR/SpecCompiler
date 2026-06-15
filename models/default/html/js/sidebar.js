@@ -241,6 +241,7 @@ var SpecCompiler = SpecCompiler || {};
 
           // Navigate via router
           if (SpecCompiler.Router && currentDocId) {
+            setActiveElement(currentDocId, elementId);
             SpecCompiler.Router.navigate('#/' + currentDocId + '/' + elementId);
           }
         }
@@ -287,7 +288,12 @@ var SpecCompiler = SpecCompiler || {};
     });
 
     // Find and highlight matching link
-    var link = container.querySelector('a[href="#' + id + '"]');
+    var link = null;
+    try {
+      link = container.querySelector('a[href="#' + CSS.escape(id) + '"]');
+    } catch (e) {
+      link = container.querySelector('a[href="#' + id + '"]');
+    }
     if (link) {
       link.classList.add('active');
 
@@ -311,6 +317,24 @@ var SpecCompiler = SpecCompiler || {};
       // Scroll into view in sidebar
       link.scrollIntoView({ block: 'nearest', behavior: 'auto' });
     }
+  }
+
+  /**
+   * Set the active element from an explicit user action or route update.
+   * This keeps the sidebar highlight and inspector-follow state in sync even
+   * before a scroll event fires.
+   * @param {string} specId - Specification/document ID
+   * @param {string} elementId - Element ID
+   */
+  function setActiveElement(specId, elementId) {
+    if (!specId || !elementId) return;
+
+    if (specId === currentDocId) {
+      highlightTocItem(elementId);
+    }
+
+    lastSpyId = elementId;
+    emitActiveElement(specId, elementId);
   }
 
   /**
@@ -454,6 +478,7 @@ var SpecCompiler = SpecCompiler || {};
 
         if (SpecCompiler.Router) {
           if (elementId) {
+            setActiveElement(docId, elementId);
             SpecCompiler.Router.navigate('#/' + docId + '/' + elementId);
           } else {
             SpecCompiler.Router.navigate('#/' + docId);
@@ -480,6 +505,7 @@ var SpecCompiler = SpecCompiler || {};
     showDoc: showDoc,
     updateTOC: updateTOC,
     highlightTocItem: highlightTocItem,
+    setActiveElement: setActiveElement,
     toggleMobile: toggleMobile
   };
 

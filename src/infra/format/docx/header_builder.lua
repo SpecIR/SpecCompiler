@@ -309,13 +309,8 @@ end
 ---  rid: relationship ID (e.g., "rId9100")
 ---  element: "header" or "footer" (defaults to "header")
 ---@param log table Logger instance
----@param options table|nil Optional settings
----  title_pg: boolean — add w:titlePg if missing (default true)
 ---@return string Modified document.xml content
-function M.inject_section_references(content, references, log, options)
-    options = options or {}
-    local add_title_pg = options.title_pg ~= false
-
+function M.inject_section_references(content, references, log)
     local doc = xml.parse(content)
     if not doc or not doc.root then
         return content
@@ -363,7 +358,7 @@ function M.inject_section_references(content, references, log, options)
         end
 
         -- Add titlePg if any "first" type reference exists and titlePg is missing
-        if add_title_pg and not has_titlePg then
+        if not has_titlePg then
             local has_first = false
             for _, ref in ipairs(references) do
                 if ref.type == "first" then has_first = true; break end
@@ -373,44 +368,6 @@ function M.inject_section_references(content, references, log, options)
             end
         end
 
-        -- Inject pgSz and pgMar if missing (required by MS Word for proper section handling)
-        -- OOXML requires strict element ordering: ...type, pgSz, pgMar, ..., titlePg...
-        if options.page_layout then
-            local has_pgSz = false
-            local has_pgMar = false
-            local titlePg_pos = nil
-            local kids = sectPr.kids or {}
-            for i, kid in ipairs(kids) do
-                local local_name = kid.name or ""
-                if local_name == "pgSz" then has_pgSz = true end
-                if local_name == "pgMar" then has_pgMar = true end
-                if local_name == "titlePg" then titlePg_pos = i end
-            end
-            local layout = options.page_layout
-            -- Insert pgSz/pgMar BEFORE titlePg (OOXML element order compliance)
-            local insert_pos = titlePg_pos or (#kids + 1)
-            if not has_pgMar then
-                xml.insert_child(sectPr, xml.node("w:pgMar", {
-                    ["w:top"]    = tostring(layout.margin_top or 1440),
-                    ["w:right"]  = tostring(layout.margin_right or 1440),
-                    ["w:bottom"] = tostring(layout.margin_bottom or 1440),
-                    ["w:left"]   = tostring(layout.margin_left or 1440),
-                    ["w:header"] = tostring(layout.margin_header or 720),
-                    ["w:footer"] = tostring(layout.margin_footer or 720),
-                    ["w:gutter"] = tostring(layout.gutter or 0),
-                }), insert_pos)
-            end
-            if not has_pgSz then
-                local pgSz_attrs = {
-                    ["w:w"] = tostring(layout.width or 11906),
-                    ["w:h"] = tostring(layout.height or 16838),
-                }
-                if layout.orient then
-                    pgSz_attrs["w:orient"] = layout.orient
-                end
-                xml.insert_child(sectPr, xml.node("w:pgSz", pgSz_attrs), insert_pos)
-            end
-        end
     end
 
     if count > 0 then

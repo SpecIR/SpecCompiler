@@ -121,14 +121,6 @@ function M.extract_value_from_para(para)
     return raw_value, value_inlines
 end
 
----Extract only string value (without returning inlines).
----@param para table
----@return string
-function M.extract_para_value(para)
-    local raw_value = M.extract_value_from_para(para)
-    return raw_value
-end
-
 ---Extract content blocks from a BlockQuote (unwraps Div sourcepos wrappers).
 ---@param bq table
 ---@return table

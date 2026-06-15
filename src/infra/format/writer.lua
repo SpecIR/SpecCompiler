@@ -46,9 +46,6 @@ local function compose_filters(base_filter, extension_filter)
             return result
         end,
         -- Mark as composed so downstream can detect
-        _composed = true,
-        _base = base_filter,
-        _extension = extension_filter,
     }
 end
 

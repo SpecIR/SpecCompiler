@@ -171,6 +171,6 @@ end
 -- View resolution is handled by individual view type modules
 -- (models/{model}/types/views/{view_name}.lua) which implement their own
 -- on_initialize, on_transform, and on_render_Code handlers.
--- These are registered via the type_loader and run in the pipeline.
+-- These are registered as host descriptors (hooks) and run in the pipeline.
 
 return M

@@ -11,9 +11,8 @@
 ---Both syntaxes produce a Pandoc Table via resolved_ast during TRANSFORM phase.
 ---
 ---@module allocation_matrix
-local M = {}
 
-M.view = {
+local schema = {
     id = "ALLOCATION_MATRIX",
     long_name = "Allocation Matrix",
     description = "HLR to CSU allocation chain via SF, FD, CSC",
@@ -21,20 +20,9 @@ M.view = {
 }
 
 local prefix_matcher = require("pipeline.shared.prefix_matcher")
-local match_codeblock = prefix_matcher.codeblock_from_decl(M.view)
-
----Build link target, using cross-document .ext placeholder for objects in other specs.
----@param pid string Target PID
----@param target_spec string Specification owning the target object
----@param current_spec string Current specification being rendered
----@return string Link href
-local function make_link_target(pid, target_spec, current_spec)
-    if target_spec == current_spec then
-        return "#" .. pid
-    else
-        return target_spec .. ".ext#" .. pid
-    end
-end
+local view_utils = require("pipeline.shared.view_utils")
+local make_link_target = view_utils.make_link_target
+local match_codeblock = prefix_matcher.codeblock_from_decl(schema)
 
 ---Generate allocation matrix as a Pandoc Table.
 ---Queries the full HLR -> SF -> FD -> CSC -> CSU chain via spec_relations.
@@ -42,7 +30,7 @@ end
 ---@param spec_id string Specification identifier
 ---@param options table|nil View options
 ---@return pandoc.Block Pandoc Table element
-function M.generate(data, spec_id, options)
+local function generate(params, data, spec_id)
     local relations = data:query_all([[
         SELECT DISTINCT
             hlr.pid AS hlr_pid,
@@ -147,83 +135,77 @@ function M.generate(data, spec_id, options)
     return pandoc.utils.from_simple_table(simple_table)
 end
 
--- ============================================================================
--- Handler
--- ============================================================================
+-- Phase ordering: needs objects and relations stored first
+schema.phase_prerequisites = { "spec_objects", "spec_relations" }
 
-M.handler = {
-    name = "allocation_matrix_handler",
-    prerequisites = {"spec_objects", "spec_relations"},
+return {
+    kind = "view",
+    schema = schema,
+    hooks = {
+        ---EMIT: Render CodeBlock elements with allocation_matrix class.
+        ---@param block table Pandoc CodeBlock element
+        ---@param ctx Context
+        ---@return table|nil Replacement block
+        render_block = function(ctx)
+            local block = ctx.subject.element
+            if not match_codeblock(block) then return nil end
 
-    ---TRANSFORM: Pre-compute allocation matrix and store in resolved_ast.
-    ---@param data DataManager
-    ---@param contexts Context[]
-    ---@param diagnostics Diagnostics
-    on_transform = function(data, contexts, diagnostics)
-        for _, ctx in ipairs(contexts) do
+            local data = ctx.data
             local spec_id = ctx.spec_id or "default"
 
-            local views = data:query_all([[
-                SELECT id FROM spec_views
+            if not data or not pandoc then
+                return nil
+            end
+
+            -- Look up resolved_ast from spec_views
+            local view = data:query_one([[
+                SELECT resolved_ast FROM spec_views
                 WHERE specification_ref = :spec_id
                   AND view_type_ref = 'ALLOCATION_MATRIX'
-                  AND resolved_ast IS NULL
+                  AND resolved_ast IS NOT NULL
+                LIMIT 1
             ]], { spec_id = spec_id })
 
-            for _, view in ipairs(views or {}) do
-                local table_elem = M.generate(data, spec_id, {})
+            if view and view.resolved_ast then
+                local ok, doc = pcall(pandoc.read, view.resolved_ast, "json")
+                if ok and doc and doc.blocks and #doc.blocks > 0 then
+                    return doc.blocks[1]
+                end
+            end
 
-                if table_elem and pandoc then
-                    local doc = pandoc.Pandoc({table_elem})
-                    local ast_json = pandoc.write(doc, "json")
+            -- Fallback: generate on-the-fly
+            return generate({}, data, spec_id)
+        end,
 
-                    data:execute([[
-                        UPDATE spec_views SET resolved_ast = :ast
-                        WHERE id = :id
-                    ]], { id = view.id, ast = ast_json })
+        ---TRANSFORM: Pre-compute allocation matrix and store in resolved_ast.
+        ---@param data DataManager
+        ---@param contexts Context[]
+        ---@param diagnostics Diagnostics
+        on_transform = function(data, contexts, diagnostics)
+            for _, ctx in ipairs(contexts) do
+                local spec_id = ctx.spec_id or "default"
+
+                local views = data:query_all([[
+                    SELECT id FROM spec_views
+                    WHERE specification_ref = :spec_id
+                      AND view_type_ref = 'ALLOCATION_MATRIX'
+                      AND resolved_ast IS NULL
+                ]], { spec_id = spec_id })
+
+                for _, view in ipairs(views or {}) do
+                    local table_elem = generate({}, data, spec_id)
+
+                    if table_elem and pandoc then
+                        local doc = pandoc.Pandoc({table_elem})
+                        local ast_json = pandoc.write(doc, "json")
+
+                        data:execute([[
+                            UPDATE spec_views SET resolved_ast = :ast
+                            WHERE id = :id
+                        ]], { id = view.id, ast = ast_json })
+                    end
                 end
             end
         end
-    end,
-
-    ---EMIT: Inline Code handler returns nil (Para walker handles block output).
-    on_render_Code = function(code, ctx)
-        return nil
-    end,
-
-    ---EMIT: Render CodeBlock elements with allocation_matrix class.
-    ---@param block table Pandoc CodeBlock element
-    ---@param ctx Context
-    ---@return table|nil Replacement block
-    on_render_CodeBlock = function(block, ctx)
-        if not match_codeblock(block) then return nil end
-
-        local data = ctx.data
-        local spec_id = ctx.spec_id or "default"
-
-        if not data or not pandoc then
-            return nil
-        end
-
-        -- Look up resolved_ast from spec_views
-        local view = data:query_one([[
-            SELECT resolved_ast FROM spec_views
-            WHERE specification_ref = :spec_id
-              AND view_type_ref = 'ALLOCATION_MATRIX'
-              AND resolved_ast IS NOT NULL
-            LIMIT 1
-        ]], { spec_id = spec_id })
-
-        if view and view.resolved_ast then
-            local ok, doc = pcall(pandoc.read, view.resolved_ast, "json")
-            if ok and doc and doc.blocks and #doc.blocks > 0 then
-                return doc.blocks[1]
-            end
-        end
-
-        -- Fallback: generate on-the-fly
-        return M.generate(data, spec_id, {})
-    end
+    }
 }
-
-return M

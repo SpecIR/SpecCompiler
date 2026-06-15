@@ -12,9 +12,8 @@
 ---  - EMIT: Query spec_floats by counter_group, return Pandoc BulletList
 ---
 ---@module lof
-local M = {}
 
-M.view = {
+local schema = {
     id = "LOF",
     long_name = "List of Floats",
     description = "List of figures, tables, or other floats",
@@ -46,8 +45,8 @@ local function parse_params(text)
 end
 
 local prefix_matcher = require("pipeline.shared.prefix_matcher")
-local match_lof_code = prefix_matcher.from_decl(M.view)
-local match_lof_codeblock = prefix_matcher.codeblock_from_decl(M.view)
+local match_lof_code = prefix_matcher.from_decl(schema)
+local match_lof_codeblock = prefix_matcher.codeblock_from_decl(schema)
 
 -- ============================================================================
 -- Data Generation
@@ -58,7 +57,7 @@ local match_lof_codeblock = prefix_matcher.codeblock_from_decl(M.view)
 ---@param data DataManager Database instance
 ---@param spec_id string Specification identifier
 ---@return table entries Array of {number, label, caption, anchor, type}
-function M.generate(params, data, spec_id)
+local function generate(params, data, spec_id)
     params = params or {}
     local counter_group = params.counter_group or "FIGURE"
 
@@ -96,67 +95,68 @@ function M.generate(params, data, spec_id)
 end
 
 -- ============================================================================
--- Handler
+-- Hooks
 -- ============================================================================
 
-M.handler = {
-    name = "lof_handler",
-    prerequisites = {"spec_floats"},  -- Needs floats to be populated
+return {
+    kind = "view",
+    schema = schema,
+    hooks = {
+        ---EMIT: Render inline Code elements with lof:/lot: syntax.
+        ---NOTE: LOF/LOT generates block-level content (BulletList), so inline Code
+        ---cannot be replaced directly. Return nil to keep original or use CodeBlock.
+        ---@param code table Pandoc Code element
+        ---@param ctx Context
+        ---@return table|nil Inline elements (placeholder) or nil
+        render = function(ctx)
+            local code = ctx.subject.element
+            local rest, prefix = match_lof_code(code.text or "")
+            if rest == nil then return nil end
 
-    ---EMIT: Render inline Code elements with lof:/lot: syntax.
-    ---NOTE: LOF/LOT generates block-level content (BulletList), so inline Code
-    ---cannot be replaced directly. Return nil to keep original or use CodeBlock.
-    ---@param code table Pandoc Code element
-    ---@param ctx Context
-    ---@return table|nil Inline elements (placeholder) or nil
-    on_render_Code = function(code, ctx)
-        local rest, prefix = match_lof_code(code.text or "")
-        if rest == nil then return nil end
+            -- LOF/LOT generates block content - inline Code cannot be replaced with blocks.
+            -- Return a placeholder or nil to keep the original code element.
+            -- Use ``` lof: ``` or ``` lot: ``` code block syntax for actual list rendering.
+            local placeholder = prefix == "lot" and "[LOT]" or "[LOF]"
+            return { pandoc.Str(placeholder) }
+        end,
 
-        -- LOF/LOT generates block content - inline Code cannot be replaced with blocks.
-        -- Return a placeholder or nil to keep the original code element.
-        -- Use ``` lof: ``` or ``` lot: ``` code block syntax for actual list rendering.
-        local placeholder = prefix == "lot" and "[LOT]" or "[LOF]"
-        return { pandoc.Str(placeholder) }
-    end,
+        ---EMIT: Render CodeBlock elements with lof/lot class.
+        ---@param block table Pandoc CodeBlock element
+        ---@param ctx Context
+        ---@return table|nil Replacement block
+        render_block = function(ctx)
+            local block = ctx.subject.element
+            local rest, prefix = match_lof_codeblock(block)
+            if not prefix then return nil end
 
-    ---EMIT: Render CodeBlock elements with lof/lot class.
-    ---@param block table Pandoc CodeBlock element
-    ---@param ctx Context
-    ---@return table|nil Replacement block
-    on_render_CodeBlock = function(block, ctx)
-        local rest, prefix = match_lof_codeblock(block)
-        if not prefix then return nil end
+            local params = parse_params(rest)
 
-        local params = parse_params(rest)
+            -- lot: defaults to TABLE counter_group
+            if prefix == "lot" and not params.counter_group then
+                params.counter_group = "TABLE"
+            end
 
-        -- lot: defaults to TABLE counter_group
-        if prefix == "lot" and not params.counter_group then
-            params.counter_group = "TABLE"
-        end
+            local data = ctx.data
+            local spec_id = ctx.spec_id or "default"
 
-        local data = ctx.data
-        local spec_id = ctx.spec_id or "default"
+            if not data or not pandoc then
+                return nil
+            end
 
-        if not data or not pandoc then
-            return nil
-        end
+            local entries = generate(params, data, spec_id)
+            if #entries == 0 then
+                local group = params.counter_group or "FIGURE"
+                return pandoc.Para{pandoc.Str("[No " .. group:lower() .. "s found]")}
+            end
 
-        local entries = M.generate(params, data, spec_id)
-        if #entries == 0 then
-            local group = params.counter_group or "FIGURE"
-            return pandoc.Para{pandoc.Str("[No " .. group:lower() .. "s found]")}
-        end
+            -- Build Pandoc BulletList
+            local items = {}
+            for _, entry in ipairs(entries) do
+                local link = pandoc.Link({pandoc.Str(entry.display)}, "#" .. entry.anchor)
+                table.insert(items, {pandoc.Plain{link}})
+            end
 
-        -- Build Pandoc BulletList
-        local items = {}
-        for _, entry in ipairs(entries) do
-            local link = pandoc.Link({pandoc.Str(entry.display)}, "#" .. entry.anchor)
-            table.insert(items, {pandoc.Plain{link}})
-        end
-
-        return pandoc.BulletList(items)
-    end
+            return pandoc.BulletList(items)
+        end,
+    },
 }
-
-return M
