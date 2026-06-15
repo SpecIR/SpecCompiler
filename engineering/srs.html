@@ -9,6 +9,7 @@ Mechanism: During assembly, CSU-034 inserts CodeBlock elements at the correct fi
 Lifecycle: Created during assembly, consumed during float/view emission, never present in final output." />
   <title>srs_html5</title>
   <style>
+
 html {
 color: #1a1a1a;
 background-color: #fdfdfd;
@@ -110,8 +111,8 @@ background-color: transparent;
 overflow: visible;
 }
 hr {
-background-color: #1a1a1a;
 border: none;
+border-top: 1px solid #1a1a1a;
 height: 1px;
 margin: 1em 0;
 }
@@ -244,7 +245,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
 <li><a href="#SRS-001-sec4" id="toc-SRS-001-sec4"><span class="toc-section-number">4</span> Pipeline Requirements</a></li>
 <li><a href="#SRS-001-sec5" id="toc-SRS-001-sec5"><span class="toc-section-number">5</span> Storage Requirements</a></li>
 <li><a href="#SRS-001-sec6" id="toc-SRS-001-sec6"><span class="toc-section-number">6</span> Types Domain Requirements</a></li>
-<li><a href="#SRS-001-sec7" id="toc-SRS-001-sec7"><span class="toc-section-number">7</span> Extension Requirements</a></li>
+<li><a href="#SRS-001-sec7" id="toc-SRS-001-sec7"><span class="toc-section-number">7</span> Extension Requirements</a>
+<ul>
+<li><a href="#SRS-001-sec7.1" id="toc-SRS-001-sec7.1"><span class="toc-section-number">7.1</span> Host Engine + Descriptor Plugins
+(Refactor Deltas)</a></li>
+</ul></li>
 <li><a href="#SRS-001-sec8" id="toc-SRS-001-sec8"><span class="toc-section-number">8</span> Output Requirements</a></li>
 <li><a href="#SRS-001-sec9" id="toc-SRS-001-sec9"><span class="toc-section-number">9</span> Audit &amp; Integrity
 Requirements</a></li>
@@ -262,8 +267,8 @@ a document processing pipeline for structured specifications.</p>
 <div data-pos="9:1-10:1">
 <p>The document is organized in two parts. The first part defines the
 SpecIR data model, the six core types that the <a href="#TERM-15" data-pos="9:115-9:132">Pipeline</a> operates on. The second part
-specifies the functional requirements, grouped into System Features (<a href="#SF-001" data-pos="9:231-9:242">SF-001</a> through <a href="#SF-006" data-pos="9:251-9:262">SF-006</a>), each decomposed into
-High-Level Requirements.</p>
+specifies the functional requirements, grouped into System Features (<a href="#SF-001" data-pos="9:231-9:242">Pipeline Execution</a> through <a href="#SF-006" data-pos="9:251-9:262">Audit and Integrity</a>), each
+decomposed into High-Level Requirements.</p>
 </div>
 <h1 data-number="2" data-pos="3:1-4:1" data-source-file="./dic.md" id="SRS-001-sec2"><span class="header-section-number">2</span> SpecIR
 Types</h1>
@@ -278,8 +283,8 @@ content tables as a formal tuple specifying the Markdown syntax that
 produces it.</p>
 </div>
 <div class="spec-object">
-<section id="SpecIR-01" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">SpecIR-01:
+<section id="SpecIR-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">SpecIR-01:
 Specification</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
@@ -295,7 +300,7 @@ contains attributes and all spec objects within that document.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p><strong>Formal definition:</strong>
-<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>S</mi><mo>=</mo><mrow><mo>(</mo><mi>τ</mi><mo>,</mo><mi>n</mi><mo>,</mo><mtext>pid</mtext><mo>,</mo><mstyle mathvariant="script"><mi>A</mi></mstyle><mo>,</mo><mstyle mathvariant="script"><mi>O</mi></mstyle><mo>)</mo></mrow></mrow></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo>,</mo><mi>n</mi><mo>,</mo><mtext mathvariant="normal">pid</mtext><mo>,</mo><mi>𝒜</mi><mo>,</mo><mi>𝒪</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">S = \left( \tau,n,\text{pid},\mathcal{A},\mathcal{O} \right)</annotation></semantics></math>
 — a tuple of type, title, project identifier, attributes, and child
 objects.</p>
 <p><strong>Syntax:</strong> <code data-pos="9:15-9:41"># [TypeRef:] Text [@PID]</code></p>
@@ -307,9 +312,9 @@ examples.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="SpecIR-02" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">SpecIR-02: Spec
-Object</h2>
+<section id="SpecIR-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">SpecIR-02:
+Spec Object</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="3:1-4:1" data-source-file="./dictionary/spec_object.md">
@@ -326,7 +331,7 @@ child objects.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p><strong>Formal definition:</strong>
-<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>O</mi><mo>=</mo><mrow><mo>(</mo><mi>τ</mi><mo>,</mo><mtext>title</mtext><mo>,</mo><mtext>pid</mtext><mo>,</mo><mi>β</mi><mo>,</mo><mstyle mathvariant="script"><mi>A</mi></mstyle><mo>,</mo><mstyle mathvariant="script"><mi>F</mi></mstyle><mo>,</mo><mstyle mathvariant="script"><mi>R</mi></mstyle><mo>,</mo><mstyle mathvariant="script"><mi>V</mi></mstyle><mo>,</mo><mstyle mathvariant="script"><mi>O</mi></mstyle><mo>)</mo></mrow></mrow></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo>,</mo><mtext mathvariant="normal">title</mtext><mo>,</mo><mtext mathvariant="normal">pid</mtext><mo>,</mo><mi>β</mi><mo>,</mo><mi>𝒜</mi><mo>,</mo><mi>ℱ</mi><mo>,</mo><mi>ℛ</mi><mo>,</mo><mi>𝒱</mi><mo>,</mo><mi>𝒪</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">O = \left( \tau,\text{title},\text{pid},\beta,\mathcal{A},\mathcal{F},\mathcal{R},\mathcal{V},\mathcal{O} \right)</annotation></semantics></math>
 — a tuple of type, title, project identifier, body content, attributes,
 floats, relations, views, and child objects.</p>
 <p><strong>Syntax:</strong> <code data-pos="9:15-9:52">##...###### [TypeRef:] Title [@PID]</code></p>
@@ -338,9 +343,9 @@ auto-generation, and examples.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="SpecIR-03" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">SpecIR-03: Spec
-Float</h2>
+<section id="SpecIR-03" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">SpecIR-03:
+Spec Float</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="3:1-4:1" data-source-file="./dictionary/spec_float.md">
@@ -357,7 +362,7 @@ cross-referenced by their label. Some floats require external rendering
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p><strong>Formal definition:</strong>
-<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>F</mi><mo>=</mo><mrow><mo>(</mo><mi>τ</mi><mo>,</mo><mtext>label</mtext><mo>,</mo><mstyle mathvariant="script"><mtext>kv</mtext></mstyle><mo>,</mo><mtext>content</mtext><mo>)</mo></mrow></mrow></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo>,</mo><mtext mathvariant="normal">label</mtext><mo>,</mo><mtext mathvariant="script">𝓀𝓋</mtext><mo>,</mo><mtext mathvariant="normal">content</mtext><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">F = \left( \tau,\text{label},\mathcal{\text{kv}},\text{content} \right)</annotation></semantics></math>
 — a tuple of type, label, key-value metadata, and raw content.</p>
 <p><strong>Syntax:</strong> <code data-pos="9:15-9:67">```TypeRef:Label[{Key=Value, ...}] Content ```</code></p>
 <p><strong>Full specification:</strong> See the CommonSpec Language
@@ -368,8 +373,8 @@ examples.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="SpecIR-04" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">SpecIR-04:
+<section id="SpecIR-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">SpecIR-04:
 Attribute</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
@@ -387,7 +392,7 @@ definitions constrain which attributes each object type can have.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p><strong>Formal definition:</strong>
-<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>A</mi><mo>=</mo><mrow><mo>(</mo><mi>τ</mi><mo>,</mo><mi>β</mi><mo>,</mo><mstyle mathvariant="script"><mi>R</mi></mstyle><mo>)</mo></mrow></mrow></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo>,</mo><mi>β</mi><mo>,</mo><mi>ℛ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A = \left( \tau,\beta,\mathcal{R} \right)</annotation></semantics></math>
 — a triple of attribute type, blockquote content, and child
 relations.</p>
 <p><strong>Syntax:</strong> <code data-pos="9:15-9:33">&gt; TypeRef: value</code></p>
@@ -401,9 +406,9 @@ constraints, and examples.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="SpecIR-05" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">SpecIR-05: Spec
-Relation</h2>
+<section id="SpecIR-05" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">SpecIR-05:
+Spec Relation</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="3:1-4:1" data-source-file="./dictionary/spec_relation.md">
@@ -422,11 +427,11 @@ wins.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p><strong>Formal definition:</strong>
-<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>R</mi><mo>=</mo><mrow><mo>(</mo><mi>s</mi><mo>,</mo><mi>t</mi><mo>,</mo><mi>σ</mi><mo>,</mo><mi>α</mi><mo>)</mo></mrow></mrow></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>s</mi><mo>,</mo><mi>t</mi><mo>,</mo><mi>σ</mi><mo>,</mo><mi>α</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">R = (s,t,\sigma,\alpha)</annotation></semantics></math>
 — a 4-tuple of source object, target element, link selector, and source
 attribute.</p>
 <p><strong>Type inference:</strong>
-<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>ρ</mi><mo>=</mo><mtext>infer</mtext><mrow><mo>(</mo><mi>σ</mi><mo>,</mo><mi>α</mi><mo>,</mo><msub><mi>τ</mi><mi>s</mi></msub><mo>,</mo><msub><mi>τ</mi><mi>t</mi></msub><mo>)</mo></mrow></mrow></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mo>=</mo><mtext mathvariant="normal">infer</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>σ</mi><mo>,</mo><mi>α</mi><mo>,</mo><msub><mi>τ</mi><mi>s</mi></msub><mo>,</mo><msub><mi>τ</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\rho = \text{infer}\left( \sigma,\alpha,\tau_{s},\tau_{t} \right)</annotation></semantics></math>
 — the relation type is inferred by constraint matching with
 most-specific-wins across selector, attribute, source type, and target
 type.</p>
@@ -441,9 +446,9 @@ Specification for the complete inference algorithm and examples.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="SpecIR-06" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">SpecIR-06: Spec
-View</h2>
+<section id="SpecIR-06" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">SpecIR-06:
+Spec View</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="3:1-4:1" data-source-file="./dictionary/spec_view.md">
@@ -459,7 +464,7 @@ assembly based on specification data.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p><strong>Formal definition:</strong>
-<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mrow><mi>V</mi><mo>=</mo><mrow><mo>(</mo><mi>τ</mi><mo>,</mo><mi>ω</mi><mo>)</mo></mrow></mrow></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>τ</mi><mo>,</mo><mi>ω</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">V = (\tau,\omega)</annotation></semantics></math>
 — a pair of view type and parameter string.</p>
 <p><strong>Syntax:</strong> <code data-pos="9:15-9:42">`TypeRef:[ViewParam]`</code></p>
 <p><strong>Full specification:</strong> See the CommonSpec Language
@@ -479,9 +484,9 @@ system shall do.</p>
 </div>
 <h1 data-number="4" data-pos="1:1-2:1" data-source-file="./requirements/pipeline.md" id="SRS-001-sec4"><span class="header-section-number">4</span> Pipeline Requirements</h1>
 <div class="spec-object">
-<section id="SF-001" class="unnumbered spec-object-header" data-custom-style="SFHeader">
-<h2 class="unnumbered" data-custom-style="SFHeader">SF-001: Pipeline
-Execution</h2>
+<section id="SF-001" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">SF-001:
+Pipeline Execution</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="5:1-6:1" data-source-file="./requirements/pipeline.md">
@@ -547,9 +552,9 @@ validation gates, and deterministic handler ordering.
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-PIPE-001" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-PIPE-001:
-Five-Phase Lifecycle</h3>
+<section id="HLR-PIPE-001" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-001: Five-Phase
+Lifecycle</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="15:1-16:1" data-source-file="./requirements/pipeline.md">
@@ -577,8 +582,8 @@ resolution, type inference)
 (PlantUML, charts), prepare for output
 </div></li>
 <li><div data-pos="22:6-23:1">
-<strong>VERIFY</strong>: Run proof views to validate data integrity,
-type constraints, cardinality rules
+<strong>VERIFY</strong>: Run verification views to validate data
+integrity, type constraints, cardinality rules
 </div></li>
 <li><div data-pos="23:6-24:1">
 <strong>EMIT</strong>: Assemble final documents and write to output
@@ -600,9 +605,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-PIPE-002" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-PIPE-002:
-Handler Registration and Prerequisites</h3>
+<section id="HLR-PIPE-002" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-002: Handler Registration
+and Prerequisites</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="32:1-33:1" data-source-file="./requirements/pipeline.md">
@@ -643,9 +648,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-PIPE-003" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-PIPE-003:
-Topological Ordering via Kahn’s Algorithm</h3>
+<section id="HLR-PIPE-003" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-003: Topological Ordering
+via Kahn’s Algorithm</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="48:1-49:1" data-source-file="./requirements/pipeline.md">
@@ -691,9 +696,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-PIPE-004" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-PIPE-004: Phase
-Abort on VERIFY Errors</h3>
+<section id="HLR-PIPE-004" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-004: Phase Abort on VERIFY
+Errors</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="65:1-66:1" data-source-file="./requirements/pipeline.md">
@@ -724,9 +729,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-PIPE-005" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-PIPE-005: Batch
-Dispatch for All Phases</h3>
+<section id="HLR-PIPE-005" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-005: Batch Dispatch for
+All Phases</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="76:1-77:1" data-source-file="./requirements/pipeline.md">
@@ -761,9 +766,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-PIPE-006" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-PIPE-006:
-Context Creation and Propagation</h3>
+<section id="HLR-PIPE-006" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-006: Context Creation and
+Propagation</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="89:1-90:1" data-source-file="./requirements/pipeline.md">
@@ -837,9 +842,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-PIPE-007" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-PIPE-007:
-CommonSpec Input Parsing</h3>
+<section id="HLR-PIPE-007" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-007: CommonSpec Input
+Parsing</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="114:1-115:1" data-source-file="./requirements/pipeline.md">
@@ -894,9 +899,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-PIPE-008" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-PIPE-008:
-Include File Expansion</h3>
+<section id="HLR-PIPE-008" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-008: Include File
+Expansion</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="134:1-135:1" data-source-file="./requirements/pipeline.md">
@@ -946,8 +951,8 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-PIPE-009" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-PIPE-009: PID
+<section id="HLR-PIPE-009" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-009: PID
 Auto-Generation</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
@@ -993,9 +998,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-PIPE-010" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-PIPE-010:
-Relation Type Inference</h3>
+<section id="HLR-PIPE-010" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-010: Relation Type
+Inference</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="169:1-170:1" data-source-file="./requirements/pipeline.md">
@@ -1046,10 +1051,53 @@ Approved
 </dl>
 </div>
 </div>
+<div class="spec-object">
+<section id="HLR-PIPE-011" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-011:
+Prerequisite-Not-Found Diagnostic</h3>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="187:1-188:1" data-source-file="./requirements/pipeline.md">
+<p>The system shall distinguish a handler prerequisite that resolves to
+another phase from one that resolves to no registered handler at all,
+emitting a diagnostic only for the latter.</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DESCRIPTION:</strong></dt>
+<dd>
+The per-phase topological sort deliberately drops a prerequisite that
+does not participate in the current phase (handlers cannot be ordered
+across phases). <code data-pos="189:172-189:207">Pipeline:validate_prerequisites()</code>, run
+once when all handlers are registered, distinguishes the two cases the
+filter conflates: a prerequisite registered in ANOTHER phase
+(legitimate, silent) versus one registered in NO phase (a typo/bug). It
+emits a <code data-pos="189:425-189:449">prerequisite_not_found</code>
+diagnostic only for the latter, and only for phase handlers (those
+declaring an <code data-pos="189:530-189:542">on_&lt;phase&gt;</code>
+hook) – a decorated per-item callback’s <code data-pos="189:584-189:599">prerequisites</code> field is inert and not
+flagged. The cross-phase filter itself is unchanged.
+</dd>
+<dt><strong>RATIONALE:</strong></dt>
+<dd>
+A mistyped prerequisite silently never applied under the old behavior,
+so a missing cross-phase ordering constraint could corrupt output with
+no signal. Surfacing only the truly-unresolvable case avoids false
+positives on legitimate cross-phase prerequisites. (Verified by the
+pipeline suite’s prereq-not-found test.)
+</dd>
+<dt><strong>STATUS:</strong></dt>
+<dd>
+Approved
+</dd>
+</dl>
+</div>
+</div>
 <h1 data-number="5" data-pos="1:1-2:1" data-source-file="./requirements/storage.md" id="SRS-001-sec5"><span class="header-section-number">5</span> Storage Requirements</h1>
 <div class="spec-object">
-<section id="SF-002" class="unnumbered spec-object-header" data-custom-style="SFHeader">
-<h2 class="unnumbered" data-custom-style="SFHeader">SF-002:
+<section id="SF-002" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">SF-002:
 Specification Persistence</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
@@ -1109,9 +1157,9 @@ for large specification projects.
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-STOR-001" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-STOR-001:
-SQLite Persistence</h3>
+<section id="HLR-STOR-001" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-STOR-001: SQLite
+Persistence</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="15:1-16:1" data-source-file="./requirements/storage.md">
@@ -1142,9 +1190,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-STOR-002" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-STOR-002: EAV
-Attribute Model</h3>
+<section id="HLR-STOR-002" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-STOR-002: EAV Attribute
+Model</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="30:1-31:1" data-source-file="./requirements/storage.md">
@@ -1175,9 +1223,8 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-STOR-003" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-STOR-003: Build
-Cache</h3>
+<section id="HLR-STOR-003" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-STOR-003: Build Cache</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="46:1-47:1" data-source-file="./requirements/storage.md">
@@ -1206,9 +1253,8 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-STOR-004" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-STOR-004:
-Output Cache</h3>
+<section id="HLR-STOR-004" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-STOR-004: Output Cache</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="60:1-61:1" data-source-file="./requirements/storage.md">
@@ -1239,9 +1285,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-STOR-006" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-STOR-006: EAV
-Pivot Views for External Queries</h3>
+<section id="HLR-STOR-006" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-STOR-006: EAV Pivot Views for
+External Queries</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="76:1-77:1" data-source-file="./requirements/storage.md">
@@ -1279,9 +1325,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-STOR-005" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-STOR-005:
-Incremental Rebuild Support</h3>
+<section id="HLR-STOR-005" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-STOR-005: Incremental Rebuild
+Support</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="99:1-100:1" data-source-file="./requirements/storage.md">
@@ -1313,8 +1359,8 @@ Approved
 </div>
 <h1 data-number="6" data-pos="1:1-2:1" data-source-file="./requirements/types.md" id="SRS-001-sec6"><span class="header-section-number">6</span> Types Domain Requirements</h1>
 <div class="spec-object">
-<section id="SF-003" class="unnumbered spec-object-header" data-custom-style="SFHeader">
-<h2 class="unnumbered" data-custom-style="SFHeader">SF-003: Type
+<section id="SF-003" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">SF-003: Type
 System</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
@@ -1327,20 +1373,20 @@ System</h2>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 Groups requirements for the six core containers that store parsed
-specification data plus the proof-view validation framework.
+specification data plus the verification-view validation framework.
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
 <dd>
 A typed container model enables schema validation, type-specific
-rendering, and data integrity checking through SQL proof views.
+rendering, and data integrity checking through SQL verification views.
 </dd>
 </dl>
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-TYPE-001" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-TYPE-001:
-Specifications Container</h3>
+<section id="HLR-TYPE-001" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-TYPE-001: Specifications
+Container</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="15:1-16:1" data-source-file="./requirements/types.md">
@@ -1393,9 +1439,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-TYPE-002" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-TYPE-002: Spec
-Objects Container</h3>
+<section id="HLR-TYPE-002" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-TYPE-002: Spec Objects
+Container</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="34:1-35:1" data-source-file="./requirements/types.md">
@@ -1469,9 +1515,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-TYPE-003" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-TYPE-003: Spec
-Floats Container</h3>
+<section id="HLR-TYPE-003" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-TYPE-003: Spec Floats
+Container</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="59:1-60:1" data-source-file="./requirements/types.md">
@@ -1554,9 +1600,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-TYPE-004" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-TYPE-004: Spec
-Views Container</h3>
+<section id="HLR-TYPE-004" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-TYPE-004: Spec Views
+Container</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="86:1-87:1" data-source-file="./requirements/types.md">
@@ -1612,9 +1658,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-TYPE-005" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-TYPE-005: Spec
-Relations Container</h3>
+<section id="HLR-TYPE-005" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-TYPE-005: Spec Relations
+Container</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="106:1-107:1" data-source-file="./requirements/types.md">
@@ -1676,9 +1722,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-TYPE-006" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-TYPE-006: Spec
-Attributes Container</h3>
+<section id="HLR-TYPE-006" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-TYPE-006: Spec Attributes
+Container</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="127:1-128:1" data-source-file="./requirements/types.md">
@@ -1745,14 +1791,13 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-TYPE-007" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-TYPE-007: Type
-Validation</h3>
+<section id="HLR-TYPE-007" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-TYPE-007: Type Validation</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="150:1-151:1" data-source-file="./requirements/types.md">
-<p>The type system shall provide proof views that detect data integrity
-violations across all specification containers.</p>
+<p>The type system shall provide verification views that detect data
+integrity violations across all specification containers.</p>
 </div>
 <div data-pos="31:1-32:1">
 <p>The type system described above is not fixed at compile time. The
@@ -1765,8 +1810,8 @@ presets.</p>
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p>Proof views are SQL queries registered in the <a href="#TERM-21" data-pos="152:62-152:83">VERIFY Phase</a> phase that check for
-constraint violations:</p>
+<p>Verification views are SQL queries registered in the <a href="#TERM-21" data-pos="152:69-152:90">VERIFY Phase</a> phase that
+check for constraint violations:</p>
 <ul>
 <li><div data-pos="154:5-155:1">
 Specification-level (missing required attributes, invalid types)
@@ -1803,9 +1848,9 @@ Approved
 </div>
 <h1 data-number="7" data-pos="1:1-2:1" data-source-file="./requirements/extension.md" id="SRS-001-sec7"><span class="header-section-number">7</span> Extension Requirements</h1>
 <div class="spec-object">
-<section id="SF-005" class="unnumbered spec-object-header" data-custom-style="SFHeader">
-<h2 class="unnumbered" data-custom-style="SFHeader">SF-005: Extension
-Framework</h2>
+<section id="SF-005" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">SF-005:
+Extension Framework</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="5:1-6:1" data-source-file="./requirements/extension.md">
@@ -1867,13 +1912,238 @@ customization without modifying the core pipeline.
 </dl>
 </div>
 </div>
+<h2 data-number="7.1" data-pos="13:1-14:1" data-source-file="./requirements/extension.md" id="SRS-001-sec7.1"><span class="header-section-number">7.1</span> Host Engine + Descriptor
+Plugins (Refactor Deltas)</h2>
+<div data-pos="15:1-21:1" data-source-file="./requirements/extension.md">
+<p>The extension framework was unified onto <strong>one declarative
+contract</strong>: a model-agnostic <strong>Host Engine</strong> (<code data-pos="16:18-16:45">src/contract/registry.lua</code>) that loads
+<strong>Descriptor Plugins</strong>. The four former registration
+mechanisms (type loader if/elseif dispatch, the external-renderer
+require-time registry, the verification-view loader, the data-view
+loader) and the four <code data-pos="19:1-19:21">{model}:{type_ref}</code> handler caches are
+collapsed into one host with a single eager <code data-pos="20:1-20:21">(kind, id) -&gt; hook</code> index.</p>
+</div>
+<div data-pos="22:1-23:1" data-source-file="./requirements/extension.md">
+<p><strong>The descriptor is the contract.</strong> Every extension
+point is one module that declares:</p>
+</div>
+<div class="sourceCode" id="cb1" data-pos="24:1-35:1" data-source-file="./requirements/extension.md"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">kind</span>   <span class="op">=</span> <span class="st">&quot;object|float|view|relation|specification|verification|dataview&quot;</span><span class="op">,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span> <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;HLR&quot;</span><span class="op">,</span> <span class="va">long_name</span> <span class="op">=</span> <span class="op">...,</span> <span class="va">extends</span> <span class="op">=</span> <span class="st">&quot;TRACEABLE&quot;</span><span class="op">,</span> <span class="va">attributes</span> <span class="op">=</span> <span class="op">{...},</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>             <span class="co">-- kind-specific: inline_prefix/aliases/materializer_type/counter_group (view);</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>             <span class="co">--   caption_format/needs_external_render (float); link_selector/source_type_ref/</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>             <span class="co">--   target_type_ref (relation); view/policy_key/sql/disabled (verification) },</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="va">hooks</span>  <span class="op">=</span> <span class="op">{</span> <span class="va">render</span><span class="op">=,</span> <span class="va">render_link</span><span class="op">=,</span> <span class="va">resolve</span><span class="op">=,</span> <span class="va">materialize</span><span class="op">=,</span> <span class="va">generate</span><span class="op">=,</span> <span class="va">prepare_task</span><span class="op">=,</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>             <span class="va">handle_result</span><span class="op">=,</span> <span class="va">message</span><span class="op">=,</span> <span class="va">on_</span><span class="op">&lt;</span><span class="va">phase</span><span class="op">&gt;=</span> <span class="op">},</span>  <span class="co">-- absent hook =&gt; host default</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div data-pos="36:1-43:1" data-source-file="./requirements/extension.md">
+<p>The host introspects only the declared <code data-pos="36:40-36:47">hooks</code>; <strong>role is inferred from which
+hooks are present</strong> (a relation with <code data-pos="37:28-37:37">resolve</code> is a resolver; a float with <code data-pos="37:66-37:80">prepare_task</code>/<code data-pos="37:81-37:96">handle_result</code> renders externally and may
+NOT also declare <code data-pos="38:45-38:53">render</code>). Type <code data-pos="38:61-38:65">id</code> is read from <code data-pos="39:1-39:12">schema.id</code> (the filename is discovery sugar,
+never the identity), and a missing <code data-pos="39:82-39:93">schema.id</code> or an unknown kind is a LOUD
+register-time error. The host runs once per build: <code data-pos="41:1-41:27">host:load_model(default)</code> then each overlay
+model (later-wins-by-id), then <code data-pos="41:77-41:89">finalize()</code> (attribute inheritance +
+verification SQL views).</p>
+</div>
+<div data-pos="44:1-45:1" data-source-file="./requirements/extension.md">
+<p><strong>Requirement deltas:</strong></p>
+</div>
+<table data-pos="47:1-48:1;46:1-56:1" data-source-file="./requirements/extension.md">
+<thead>
+<tr>
+<th>ID</th>
+<th>Status</th>
+<th>Delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HLR-EXT-001</td>
+<td>Changed</td>
+<td>Type <code data-pos="48:32-48:36">id</code> comes from descriptor
+<code data-pos="48:59-48:70">schema.id</code>; the filename is
+irrelevant; categories are discovery sugar, not lowercased
+identity.</td>
+</tr>
+<tr>
+<td>HLR-EXT-002</td>
+<td>Kept</td>
+<td>Frozen in-tree model layout (see also HLR-EXT-010 <code data-pos="49:74-49:86">model.yaml</code>).</td>
+</tr>
+<tr>
+<td>HLR-EXT-003</td>
+<td>Changed</td>
+<td>A plugin returns one descriptor <code data-pos="50:59-50:82">{kind, schema, hooks}</code>; the host
+introspects declared <code data-pos="50:114-50:121">hooks</code> instead
+of five divergent <code data-pos="50:148-50:159">M.handler</code>
+interfaces.</td>
+</tr>
+<tr>
+<td>HLR-EXT-004</td>
+<td>Changed</td>
+<td>One declarative <code data-pos="51:43-51:51">schema</code> per kind
+(the IR columns that kind needs); inheritance via <code data-pos="51:111-51:120">extends</code>.</td>
+</tr>
+<tr>
+<td>HLR-EXT-005</td>
+<td><strong>Retired</strong></td>
+<td>The per-type model→default <code data-pos="52:58-52:67">require</code> fallback is gone; the host overlay
+(default then template, later-wins-by-id) replaces it. A fully-absent
+requested model is a loud error.</td>
+</tr>
+<tr>
+<td>HLR-EXT-006</td>
+<td>Changed</td>
+<td>External rendering is <code data-pos="53:49-53:63">prepare_task</code>/<code data-pos="53:64-53:79">handle_result</code> <strong>hooks</strong>
+indexed by the host, not a require-time <code data-pos="53:130-53:165">external_render.register_renderer</code> side
+effect.</td>
+</tr>
+<tr>
+<td>HLR-EXT-007</td>
+<td>Changed</td>
+<td>Data-view generation is a <code data-pos="54:53-54:63">generate</code> <strong>hook</strong> the host
+indexes; <code data-pos="54:91-54:104">data_loader</code> retains only
+the chart-config injection + a loose-load fallback for
+unregistered/fixture generators.</td>
+</tr>
+<tr>
+<td>HLR-EXT-008</td>
+<td><strong>Retired</strong></td>
+<td>The <code data-pos="55:35-55:55">{model}:{type_ref}</code> handler
+caches (incl. the <code data-pos="55:82-55:91">= false</code> negative
+cache) are deleted; the eager <code data-pos="55:131-55:148">(kind,id)-&gt;hook</code> index replaces them.
+A nil index (“not registered”) is a distinct loud state from
+“registered, no such hook”.</td>
+</tr>
+</tbody>
+</table>
+<div data-pos="57:1-58:1" data-source-file="./requirements/extension.md">
+<p><strong>New requirement stubs:</strong></p>
+</div>
 <div class="spec-object">
-<section id="HLR-EXT-001" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-EXT-001:
+<section id="HLR-EXT-009" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-EXT-009:
+Canonical Context</h3>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="61:1-65:1" data-source-file="./requirements/extension.md">
+<p>The host shall pass every plugin hook a single frozen canonical <code data-pos="61:65-61:70">ctx</code> whose invariant core (<code data-pos="62:2-62:66">data, pandoc, log, diagnostics, format, spec_id, model, config</code>)
+is guaranteed non-nil and asserted at build time; only <code data-pos="63:34-63:43">subject</code> is polymorphic (shape documented
+per kind). <code data-pos="64:1-64:21">ctx:require(field)</code> fails
+loudly on nil. (<code data-pos="64:44-64:66">src/contract/ctx.lua</code>.)</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>STATUS:</strong></dt>
+<dd>
+Approved
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="HLR-EXT-010" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-EXT-010:
+Model Manifest</h3>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="70:1-74:1" data-source-file="./requirements/extension.md">
+<p>Each in-tree model shall carry a <code data-pos="70:34-70:46">model.yaml</code> (<code data-pos="70:48-70:54">name</code>, <code data-pos="70:56-70:69">description</code>, <code data-pos="70:71-70:80">extends</code>, <code data-pos="70:82-70:92">requires</code>) that declares the overlay chain.
+Models stay repo-bundled under <code data-pos="71:65-71:81">models/&lt;name&gt;/</code>; there is no
+out-of-tree search path, registry, or package manager. (A symlinked
+model is not Docker-safe and must be vendored in-tree to ship.)</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>STATUS:</strong></dt>
+<dd>
+Approved
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="HLR-EXT-011" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-EXT-011:
+Descriptor + Role Inference</h3>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="79:1-84:1" data-source-file="./requirements/extension.md">
+<p>A plugin shall return one descriptor <code data-pos="79:38-79:61">{kind, schema, hooks}</code>. The host classifies
+each <code data-pos="80:1-80:8">hooks</code> field by name (per-item
+hooks dispatched inline; <code data-pos="80:58-80:70">on_&lt;phase&gt;</code> hooks synthesized into
+<code data-pos="81:1-81:28">pipeline:register_handler</code>), infers
+role from the hooks present, and validates an optional <code data-pos="82:1-82:14">schema.role</code> echo against them. Malformed
+descriptors (unknown kind, missing <code data-pos="82:79-82:90">schema.id</code>, hook invalid for the kind,
+internal-render-plus-external-hooks) are loud register-time errors.</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>STATUS:</strong></dt>
+<dd>
+Approved
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="HLR-EXT-012" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-EXT-012:
+Verification Descriptor</h3>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="89:1-93:1" data-source-file="./requirements/extension.md">
+<p>A verification view shall be a <code data-pos="89:32-89:53">kind=&quot;verification&quot;</code> descriptor (<code data-pos="90:2-90:46">schema = {policy_key, view, sql, disabled}</code>,
+<code data-pos="90:48-90:67">hooks = {message}</code>) forwarded to the
+host’s ordered policy_key registry, preserving override (later model
+wins, in place) and <code data-pos="92:1-92:16">disabled=true</code>
+removal semantics. (Closes the HLR-TYPE-007 contract gap.)</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>STATUS:</strong></dt>
+<dd>
+Approved
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="HLR-CFG-001" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-CFG-001:
+Manifest-Only Configuration</h3>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="98:1-103:1" data-source-file="./requirements/extension.md">
+<p>All build configuration shall come from <code data-pos="98:41-98:55">project.yaml</code>, read once into a frozen
+<code data-pos="98:81-98:89">config</code> slice. <code data-pos="99:8-99:19">os.getenv</code> is permitted ONLY to bootstrap
+the toolchain (<code data-pos="99:66-99:85">SPECCOMPILER_HOME</code>,
+<code data-pos="100:1-100:20">SPECCOMPILER_DIST</code>) and for terminal
+autodetect (<code data-pos="100:51-100:57">TERM</code>, <code data-pos="100:59-100:63">CI</code>, <code data-pos="100:65-100:75">NO_COLOR</code>, <code data-pos="101:1-101:23">NUMBER_OF_PROCESSORS</code>). The former
+config-leak env reads (<code data-pos="101:60-101:75">OUTPUT_FORMAT</code>, <code data-pos="101:77-101:88">BUILD_DIR</code>, <code data-pos="102:1-102:25">SPECCOMPILER_LOG_LEVEL</code>) are removed; the
+manifest is authoritative.</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>STATUS:</strong></dt>
+<dd>
+Approved
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="HLR-EXT-001" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-EXT-001:
 Model-Specific Type Handler Loading</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="15:1-16:1" data-source-file="./requirements/extension.md">
+<div data-pos="108:1-109:1" data-source-file="./requirements/extension.md">
 <p>The system shall load type-specific handlers from model
 directories.</p>
 </div>
@@ -1883,24 +2153,24 @@ directories.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p>Type handlers control how specification content is rendered during
-the <a href="#TERM-22" data-pos="17:87-17:111">TRANSFORM Phase</a>
+the <a href="#TERM-22" data-pos="110:87-110:111">TRANSFORM Phase</a>
 phase. The loading mechanism supports:</p>
 <ul>
-<li><div data-pos="19:5-20:1">
-<strong>Object types</strong>: Loaded from <code data-pos="19:35-19:76">models/{model}/types/objects/{type}.lua</code>
+<li><div data-pos="112:5-113:1">
+<strong>Object types</strong>: Loaded from <code data-pos="112:35-112:76">models/{model}/types/objects/{type}.lua</code>
 </div></li>
-<li><div data-pos="20:5-21:1">
-<strong>Specification types</strong>: Loaded from <code data-pos="20:42-20:90">models/{model}/types/specifications/{type}.lua</code>
+<li><div data-pos="113:5-114:1">
+<strong>Specification types</strong>: Loaded from <code data-pos="113:42-113:90">models/{model}/types/specifications/{type}.lua</code>
 </div></li>
-<li><div data-pos="21:5-22:1">
-<strong>Float types</strong>: Loaded from <code data-pos="21:34-21:74">models/{model}/types/floats/{type}.lua</code>
+<li><div data-pos="114:5-115:1">
+<strong>Float types</strong>: Loaded from <code data-pos="114:34-114:74">models/{model}/types/floats/{type}.lua</code>
 </div></li>
-<li><div data-pos="22:5-23:1">
-<strong>View types</strong>: Loaded from <code data-pos="22:33-22:72">models/{model}/types/views/{type}.lua</code>
+<li><div data-pos="115:5-116:1">
+<strong>View types</strong>: Loaded from <code data-pos="115:33-115:72">models/{model}/types/views/{type}.lua</code>
 </div></li>
 </ul>
-<p>Module loading uses <code data-pos="24:23-24:34">require()</code>
-with path <code data-pos="24:45-24:85">models.{model}.types.{category}.{type}</code>.
+<p>Module loading uses <code data-pos="117:23-117:34">require()</code>
+with path <code data-pos="117:45-117:85">models.{model}.types.{category}.{type}</code>.
 Type names are converted to lowercase for file lookup (e.g., “HLR” -&gt;
 “hlr.lua”).</p>
 </dd>
@@ -1918,12 +2188,12 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-EXT-002" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-EXT-002: Model
-Directory Structure</h3>
+<section id="HLR-EXT-002" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-EXT-002:
+Model Directory Structure</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="33:1-34:1" data-source-file="./requirements/extension.md">
+<div data-pos="126:1-127:1" data-source-file="./requirements/extension.md">
 <p>The system shall organize model content in a standardized directory
 hierarchy.</p>
 </div>
@@ -1933,18 +2203,18 @@ hierarchy.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p>Each model follows this structure:</p>
-<pre data-pos="37:3-38:1;38:3-39:1;39:3-40:1;40:3-41:1;41:3-42:1;42:3-43:1;43:3-44:1;44:3-45:1;45:3-46:1;46:3-47:1;47:3-48:1;48:3-49:1;49:3-50:1"><code>models/{model_name}/
+<pre data-pos="130:3-131:1;131:3-132:1;132:3-133:1;133:3-134:1;134:3-135:1;135:3-136:1;136:3-137:1;137:3-138:1;138:3-139:1;139:3-140:1;140:3-141:1;141:3-142:1;142:3-143:1"><code>models/{model_name}/
   types/
     objects/       -- Spec object type handlers (HLR, LLR, VC, etc.)
     specifications/-- Specification type handlers (SRS, SDD, SVC)
     floats/        -- Float type handlers (TABLE, PLANTUML, CHART)
     views/         -- View type handlers (ABBREV, SYMBOL, MATH)
     relations/     -- Relation type definitions (TRACES_TO, etc.)
-  data_views/      -- Data view generators for chart data injection
+  verification_views/ -- Verification descriptors (SQL views + message hooks)
   filters/         -- Pandoc filters (docx.lua, html.lua, markdown.lua)
   postprocessors/  -- Format-specific postprocessors
   styles/          -- Style presets and templates</code></pre>
-<p>Model names are referenced via project configuration <code data-pos="51:56-51:66">template</code> field or context <code data-pos="51:84-51:96">model_name</code>. The “default” model provides
+<p>Model names are referenced via project configuration <code data-pos="144:56-144:66">template</code> field or context <code data-pos="144:84-144:96">model_name</code>. The “default” model provides
 base implementations with fallback behavior.</p>
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
@@ -1961,12 +2231,12 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-EXT-003" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-EXT-003:
+<section id="HLR-EXT-003" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-EXT-003:
 Handler Registration Interface</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="60:1-61:1" data-source-file="./requirements/extension.md">
+<div data-pos="153:1-154:1" data-source-file="./requirements/extension.md">
 <p>Type handlers shall provide standardized registration interfaces for
 pipeline integration.</p>
 </div>
@@ -1978,49 +2248,49 @@ pipeline integration.</p>
 <p>Each handler category defines specific interfaces:</p>
 <p><strong>Object Type Handlers</strong> export:</p>
 <ul>
-<li><div data-pos="65:5-66:1">
-<code data-pos="65:5-65:15">M.object</code>: Type schema with id,
+<li><div data-pos="158:5-159:1">
+<code data-pos="158:5-158:15">M.object</code>: Type schema with id,
 long_name, description, attributes
 </div></li>
-<li><div data-pos="66:5-67:1">
-<code data-pos="66:5-66:47">M.handler.on_render_SpecObject(obj, ctx)</code>:
+<li><div data-pos="159:5-160:1">
+<code data-pos="159:5-159:47">M.handler.on_render_SpecObject(obj, ctx)</code>:
 Render function returning Pandoc blocks
 </div></li>
 </ul>
 <p><strong>Specification Type Handlers</strong> export:</p>
 <ul>
-<li><div data-pos="69:5-70:1">
-<code data-pos="69:5-69:22">M.specification</code>: Type schema with id,
-long_name, attributes
+<li><div data-pos="162:5-163:1">
+<code data-pos="162:5-162:22">M.specification</code>: Type schema with
+id, long_name, attributes
 </div></li>
-<li><div data-pos="70:5-71:1">
-<code data-pos="70:5-70:59">M.handler.on_render_Specification(ctx, pandoc, data)</code>:
+<li><div data-pos="163:5-164:1">
+<code data-pos="163:5-163:59">M.handler.on_render_Specification(ctx, pandoc, data)</code>:
 Render document title
 </div></li>
 </ul>
 <p><strong>Float Type Handlers</strong> export:</p>
 <ul>
-<li><div data-pos="73:5-74:1">
-<code data-pos="73:5-73:14">M.float</code>: Type schema with id,
+<li><div data-pos="166:5-167:1">
+<code data-pos="166:5-166:14">M.float</code>: Type schema with id,
 caption_format, counter_group, aliases, needs_external_render
 </div></li>
-<li><div data-pos="74:5-75:1">
-<code data-pos="74:5-74:46">M.transform(raw_content, type_ref, log)</code>:
+<li><div data-pos="167:5-168:1">
+<code data-pos="167:5-167:46">M.transform(raw_content, type_ref, log)</code>:
 For internal transforms (TABLE, CSV)
 </div></li>
-<li><div data-pos="75:5-76:1">
-<code data-pos="75:5-75:61">external_render.register_renderer(type_ref, callbacks)</code>:
+<li><div data-pos="168:5-169:1">
+<code data-pos="168:5-168:61">external_render.register_renderer(type_ref, callbacks)</code>:
 For external renders (PLANTUML, CHART)
 </div></li>
 </ul>
 <p><strong>View Type Handlers</strong> export:</p>
 <ul>
-<li><div data-pos="78:5-79:1">
-<code data-pos="78:5-78:13">M.view</code>: Type schema with id,
+<li><div data-pos="171:5-172:1">
+<code data-pos="171:5-171:13">M.view</code>: Type schema with id,
 inline_prefix, aliases
 </div></li>
-<li><div data-pos="79:5-80:1">
-<code data-pos="79:5-79:42">M.handler.on_render_Code(code, ctx)</code>:
+<li><div data-pos="172:5-173:1">
+<code data-pos="172:5-172:42">M.handler.on_render_Code(code, ctx)</code>:
 Inline code rendering
 </div></li>
 </ul>
@@ -2039,12 +2309,12 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-EXT-004" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-EXT-004: Type
-Definition Schema</h3>
+<section id="HLR-EXT-004" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-EXT-004:
+Type Definition Schema</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="88:1-89:1" data-source-file="./requirements/extension.md">
+<div data-pos="181:1-182:1" data-source-file="./requirements/extension.md">
 <p>Type definitions shall declare metadata schema that controls
 registration and behavior.</p>
 </div>
@@ -2054,36 +2324,36 @@ registration and behavior.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p>Type schemas provide metadata stored in registry tables:</p>
-<p><strong>Object Types</strong> (<code data-pos="92:21-92:40">spec_object_types</code>):</p>
-<div class="sourceCode" id="cb2" data-pos="93:3-94:1;94:3-95:1;95:3-96:1;96:3-97:1;97:3-98:1;98:3-99:1;99:3-100:1;100:3-101:1;101:3-102:1;102:3-103:1;103:3-104:1;104:3-105:1;105:3-106:1;106:3-107:1;107:3-108:1;108:3-109:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cn">M</span><span class="op">.</span><span class="va">object</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;HLR&quot;</span><span class="op">,</span>                    <span class="co">-- Unique identifier (uppercase)</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">long_name</span> <span class="op">=</span> <span class="st">&quot;High-Level Requirement&quot;</span><span class="op">,</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span> <span class="op">=</span> <span class="st">&quot;A top-level system requirement&quot;</span><span class="op">,</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">extends</span> <span class="op">=</span> <span class="st">&quot;TRACEABLE&quot;</span><span class="op">,</span>         <span class="co">-- Base type for inheritance</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">header_unnumbered</span> <span class="op">=</span> <span class="kw">true</span><span class="op">,</span>      <span class="co">-- Exclude from section numbering</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">header_style_id</span> <span class="op">=</span> <span class="st">&quot;Heading2&quot;</span><span class="op">,</span>  <span class="co">-- Custom-style for headers</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">body_style_id</span> <span class="op">=</span> <span class="st">&quot;Normal&quot;</span><span class="op">,</span>      <span class="co">-- Custom-style for body</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">attributes</span> <span class="op">=</span> <span class="op">{</span>                 <span class="co">-- Attribute definitions</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;status&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;ENUM&quot;</span><span class="op">,</span> <span class="va">values</span> <span class="op">=</span> <span class="op">{...},</span> <span class="va">min_occurs</span> <span class="op">=</span> <span class="dv">1</span> <span class="op">},</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;rationale&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;XHTML&quot;</span> <span class="op">},</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;created&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;DATE&quot;</span> <span class="op">},</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p><strong>Float Types</strong> (<code data-pos="110:20-110:38">spec_float_types</code>):</p>
-<div class="sourceCode" id="cb3" data-pos="111:3-112:1;112:3-113:1;113:3-114:1;114:3-115:1;115:3-116:1;116:3-117:1;117:3-118:1;118:3-119:1;119:3-120:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cn">M</span><span class="op">.</span><span class="va">float</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;CHART&quot;</span><span class="op">,</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">caption_format</span> <span class="op">=</span> <span class="st">&quot;Figure&quot;</span><span class="op">,</span>     <span class="co">-- Caption prefix</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">counter_group</span> <span class="op">=</span> <span class="st">&quot;FIGURE&quot;</span><span class="op">,</span>      <span class="co">-- Counter sharing (FIGURE, CHART, PLANTUML)</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">aliases</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;echarts&quot;</span> <span class="op">},</span>       <span class="co">-- Alternative syntax identifiers</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">needs_external_render</span> <span class="op">=</span> <span class="kw">true</span><span class="op">,</span>  <span class="co">-- Requires external tool</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p><strong>View Types</strong> (<code data-pos="121:19-121:36">spec_view_types</code>):</p>
-<div class="sourceCode" id="cb4" data-pos="122:3-123:1;123:3-124:1;124:3-125:1;125:3-126:1;126:3-127:1;127:3-128:1;128:3-129:1;129:3-130:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cn">M</span><span class="op">.</span><span class="va">view</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;ABBREV&quot;</span><span class="op">,</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">inline_prefix</span> <span class="op">=</span> <span class="st">&quot;abbrev&quot;</span><span class="op">,</span>      <span class="co">-- Syntax: `abbrev: content`</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">aliases</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;sigla&quot;</span><span class="op">,</span> <span class="st">&quot;acronym&quot;</span> <span class="op">},</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">needs_external_render</span> <span class="op">=</span> <span class="kw">false</span><span class="op">,</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><strong>Object Types</strong> (<code data-pos="185:21-185:40">spec_object_types</code>):</p>
+<div class="sourceCode" id="cb3" data-pos="186:3-187:1;187:3-188:1;188:3-189:1;189:3-190:1;190:3-191:1;191:3-192:1;192:3-193:1;193:3-194:1;194:3-195:1;195:3-196:1;196:3-197:1;197:3-198:1;198:3-199:1;199:3-200:1;200:3-201:1;201:3-202:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cn">M</span><span class="op">.</span><span class="va">object</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;HLR&quot;</span><span class="op">,</span>                    <span class="co">-- Unique identifier (uppercase)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">long_name</span> <span class="op">=</span> <span class="st">&quot;High-Level Requirement&quot;</span><span class="op">,</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span> <span class="op">=</span> <span class="st">&quot;A top-level system requirement&quot;</span><span class="op">,</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">extends</span> <span class="op">=</span> <span class="st">&quot;TRACEABLE&quot;</span><span class="op">,</span>         <span class="co">-- Base type for inheritance</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">header_unnumbered</span> <span class="op">=</span> <span class="kw">true</span><span class="op">,</span>      <span class="co">-- Exclude from section numbering</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="va">header_style_id</span> <span class="op">=</span> <span class="st">&quot;Heading2&quot;</span><span class="op">,</span>  <span class="co">-- Custom-style for headers</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">body_style_id</span> <span class="op">=</span> <span class="st">&quot;Normal&quot;</span><span class="op">,</span>      <span class="co">-- Custom-style for body</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">attributes</span> <span class="op">=</span> <span class="op">{</span>                 <span class="co">-- Attribute definitions</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;status&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;ENUM&quot;</span><span class="op">,</span> <span class="va">values</span> <span class="op">=</span> <span class="op">{...},</span> <span class="va">min_occurs</span> <span class="op">=</span> <span class="dv">1</span> <span class="op">},</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;rationale&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;XHTML&quot;</span> <span class="op">},</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;created&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;DATE&quot;</span> <span class="op">},</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><strong>Float Types</strong> (<code data-pos="203:20-203:38">spec_float_types</code>):</p>
+<div class="sourceCode" id="cb4" data-pos="204:3-205:1;205:3-206:1;206:3-207:1;207:3-208:1;208:3-209:1;209:3-210:1;210:3-211:1;211:3-212:1;212:3-213:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cn">M</span><span class="op">.</span><span class="va">float</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;CHART&quot;</span><span class="op">,</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">caption_format</span> <span class="op">=</span> <span class="st">&quot;Figure&quot;</span><span class="op">,</span>     <span class="co">-- Caption prefix</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">counter_group</span> <span class="op">=</span> <span class="st">&quot;FIGURE&quot;</span><span class="op">,</span>      <span class="co">-- Counter sharing (FIGURE, CHART, PLANTUML)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">aliases</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;echarts&quot;</span> <span class="op">},</span>       <span class="co">-- Alternative syntax identifiers</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">needs_external_render</span> <span class="op">=</span> <span class="kw">true</span><span class="op">,</span>  <span class="co">-- Requires external tool</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><strong>View Types</strong> (<code data-pos="214:19-214:36">spec_view_types</code>):</p>
+<div class="sourceCode" id="cb5" data-pos="215:3-216:1;216:3-217:1;217:3-218:1;218:3-219:1;219:3-220:1;220:3-221:1;221:3-222:1;222:3-223:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cn">M</span><span class="op">.</span><span class="va">view</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;ABBREV&quot;</span><span class="op">,</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">inline_prefix</span> <span class="op">=</span> <span class="st">&quot;abbrev&quot;</span><span class="op">,</span>      <span class="co">-- Syntax: `abbrev: content`</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">aliases</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;sigla&quot;</span><span class="op">,</span> <span class="st">&quot;acronym&quot;</span> <span class="op">},</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">needs_external_render</span> <span class="op">=</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
 <dd>
@@ -2099,14 +2369,19 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-EXT-005" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-EXT-005: Model
-Path Resolution</h3>
+<section id="HLR-EXT-005" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-EXT-005:
+Model Path Resolution</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="138:1-139:1" data-source-file="./requirements/extension.md">
+<div data-pos="231:1-232:1" data-source-file="./requirements/extension.md">
 <p>The system shall resolve model paths using environment configuration
 with fallback.</p>
+</div>
+<div data-pos="253:1-254:1" data-source-file="./requirements/extension.md">
+<p><em>Retired in the Host Engine Refactor: the per-type require
+fallback is replaced by the host overlay; <code data-pos="253:102-253:121">SPECCOMPILER_HOME</code>-then-cwd resolution
+is kept, and a fully-absent model is a loud error.</em></p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -2115,20 +2390,20 @@ with fallback.</p>
 <dd>
 <p>Model path resolution follows this order:</p>
 <ol type="1">
-<li><div data-pos="142:6-143:1">
-Check <code data-pos="142:12-142:31">SPECCOMPILER_HOME</code>
-environment variable: <code data-pos="142:54-142:89">$SPECCOMPILER_HOME/models/{model}</code>
+<li><div data-pos="235:6-236:1">
+Check <code data-pos="235:12-235:31">SPECCOMPILER_HOME</code>
+environment variable: <code data-pos="235:54-235:89">$SPECCOMPILER_HOME/models/{model}</code>
 </div></li>
-<li><div data-pos="143:6-144:1">
-Fall back to current working directory: <code data-pos="143:46-143:64">./models/{model}</code>
+<li><div data-pos="236:6-237:1">
+Fall back to current working directory: <code data-pos="236:46-236:64">./models/{model}</code>
 </div></li>
 </ol>
 <p>For type modules not found in the specified model, the system falls
 back to the “default” model:</p>
-<div class="sourceCode" id="cb5" data-pos="147:3-148:1;148:3-149:1;149:3-150:1;150:3-151:1;151:3-152:1;152:3-153:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Try model-specific path first</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">module</span> <span class="op">=</span> <span class="fu">require</span><span class="op">(</span><span class="st">&quot;models.&quot;</span> <span class="op">..</span> <span class="va">model_name</span> <span class="op">..</span> <span class="st">&quot;.types.floats.table&quot;</span><span class="op">)</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- Fallback to default model</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">module</span> <span class="op">=</span> <span class="fu">require</span><span class="op">(</span><span class="st">&quot;models.default.types.floats.table&quot;</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6" data-pos="240:3-241:1;241:3-242:1;242:3-243:1;243:3-244:1;244:3-245:1;245:3-246:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Try model-specific path first</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">module</span> <span class="op">=</span> <span class="fu">require</span><span class="op">(</span><span class="st">&quot;models.&quot;</span> <span class="op">..</span> <span class="va">model_name</span> <span class="op">..</span> <span class="st">&quot;.types.floats.table&quot;</span><span class="op">)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">-- Fallback to default model</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">module</span> <span class="op">=</span> <span class="fu">require</span><span class="op">(</span><span class="st">&quot;models.default.types.floats.table&quot;</span><span class="op">)</span></span></code></pre></div>
 <p>This enables partial model customization where models only override
 specific types.</p>
 </dd>
@@ -2140,20 +2415,20 @@ inherit base implementations.
 </dd>
 <dt><strong>STATUS:</strong></dt>
 <dd>
-Approved
+Retired
 </dd>
 </dl>
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-EXT-006" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-EXT-006:
+<section id="HLR-EXT-006" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-EXT-006:
 External Renderer Registration</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="163:1-164:1" data-source-file="./requirements/extension.md">
-<p>External renderers shall register callbacks for task preparation and
-result handling.</p>
+<div data-pos="258:1-259:1" data-source-file="./requirements/extension.md">
+<p>External renderers shall declare task-preparation and result-handling
+hooks on their float descriptor.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -2161,23 +2436,30 @@ result handling.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p>Float types requiring external tools (PlantUML, ECharts, etc.)
-register with the external render handler:</p>
-<div class="sourceCode" id="cb6" data-pos="167:3-168:1;168:3-169:1;169:3-170:1;170:3-171:1;171:3-172:1;172:3-173:1;173:3-174:1;174:3-175:1;175:3-176:1;176:3-177:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="va">external_render</span><span class="op">.</span>register_renderer<span class="op">(</span><span class="st">&quot;PLANTUML&quot;</span><span class="op">,</span> <span class="op">{</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">prepare_task</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">float</span><span class="op">,</span> <span class="va">build_dir</span><span class="op">,</span> <span class="va">log</span><span class="op">,</span> <span class="va">data</span><span class="op">,</span> <span class="va">model_name</span><span class="op">)</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Return task descriptor with cmd, args, output_path, context</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span><span class="op">,</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">handle_result</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">task</span><span class="op">,</span> <span class="va">success</span><span class="op">,</span> <span class="va">stdout</span><span class="op">,</span> <span class="va">stderr</span><span class="op">,</span> <span class="va">data</span><span class="op">,</span> <span class="va">log</span><span class="op">)</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Update resolved_ast in database</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="op">})</span></span></code></pre></div>
+declare the hook pair in their descriptor; the host indexes them like
+every other hook (no separate registration call):</p>
+<div class="sourceCode" id="cb7" data-pos="262:3-263:1;263:3-264:1;264:3-265:1;265:3-266:1;266:3-267:1;267:3-268:1;268:3-269:1;269:3-270:1;270:3-271:1;271:3-272:1;272:3-273:1;273:3-274:1;274:3-275:1;275:3-276:1;276:3-277:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- models/{model}/types/floats/plantuml.lua</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">kind</span> <span class="op">=</span> <span class="st">&quot;float&quot;</span><span class="op">,</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span> <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;PLANTUML&quot;</span><span class="op">,</span> <span class="va">needs_external_render</span> <span class="op">=</span> <span class="kw">true</span><span class="op">,</span> <span class="co">--[[ ... ]]</span> <span class="op">},</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">hooks</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">prepare_task</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">ctx</span><span class="op">)</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- Return task descriptor with cmd, args, output_path, context</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">handle_result</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">ctx</span><span class="op">)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- Update resolved_ast in database</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p>The core orchestrates: query items -&gt; prepare tasks -&gt; cache
 filter -&gt; batch spawn -&gt; dispatch results. This enables parallel
-execution across all external renders.</p>
+execution across all external renders. A float declares either a <code data-pos="278:194-278:202">render</code> hook or the external pair —
+never both (validated at register time).</p>
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
 <dd>
-Registration pattern decouples type-specific rendering logic from core
-orchestration. Callbacks enable types to control task preparation and
+The descriptor hook pair decouples type-specific rendering logic from
+core orchestration. Hooks enable types to control task preparation and
 result interpretation while core handles parallelization and caching.
 </dd>
 <dt><strong>STATUS:</strong></dt>
@@ -2188,38 +2470,43 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-EXT-007" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-EXT-007: Data
-View Generator Loading</h3>
+<section id="HLR-EXT-007" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-EXT-007:
+Data View Generator Loading</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="187:1-188:1" data-source-file="./requirements/extension.md">
-<p>The system shall load data view generators from model directories for
-chart data injection.</p>
+<div data-pos="287:1-288:1" data-source-file="./requirements/extension.md">
+<p>The system shall provide chart data through <code data-pos="287:45-287:54">dataset</code> hooks on view descriptors.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p>Data views are Lua modules that generate data for charts:</p>
-<div class="sourceCode" id="cb7" data-pos="191:3-192:1;192:3-193:1;193:3-194:1;194:2-195:1;195:3-196:1;196:3-197:1;197:3-198:1;198:3-199:1;199:3-200:1;200:2-201:1;201:3-202:1;202:3-203:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- models/{model}/data_views/{view_name}.lua</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="cn">M</span> <span class="op">=</span> <span class="op">{}</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="cn">M</span><span class="op">.</span>generate<span class="op">(</span><span class="va">params</span><span class="op">,</span> <span class="va">data</span><span class="op">)</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- params: user parameters from code block attributes</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- data: DataManager instance for SQL queries</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">{</span> <span class="va">source</span> <span class="op">=</span> <span class="op">{</span> <span class="op">{</span><span class="st">&quot;x&quot;</span><span class="op">,</span> <span class="st">&quot;y&quot;</span><span class="op">},</span> <span class="op">{</span><span class="dv">1</span><span class="op">,</span> <span class="dv">10</span><span class="op">},</span> <span class="op">{</span><span class="dv">2</span><span class="op">,</span> <span class="dv">20</span><span class="op">}</span> <span class="op">}</span> <span class="op">}</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="cn">M</span></span></code></pre></div>
-<p>Views are loaded via <code data-pos="204:24-204:84">data_loader.load_view(view_name, model_name, data, params)</code>.
-Resolution tries the specified model first, then falls back to
-default.</p>
+<p>A data view is a view descriptor (<code data-pos="289:50-289:94">models/{model}/types/views/{view_name}.lua</code>)
+that declares a <code data-pos="289:112-289:121">dataset</code> data
+hook returning <code data-pos="289:142-289:160">{ source = ... }</code>
+for the chart consumer:</p>
+<div class="sourceCode" id="cb8" data-pos="291:3-292:1;292:3-293:1;293:3-294:1;294:3-295:1;295:3-296:1;296:3-297:1;297:3-298:1;298:3-299:1;299:3-300:1;300:3-301:1;301:3-302:1;302:3-303:1;303:3-304:1;304:3-305:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- models/{model}/types/views/gaussian.lua</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">kind</span> <span class="op">=</span> <span class="st">&quot;view&quot;</span><span class="op">,</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span> <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;GAUSSIAN&quot;</span> <span class="op">},</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">hooks</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">dataset</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">dctx</span><span class="op">)</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- dctx.subject.params: user parameters from code block attributes</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- dctx.data: DataManager instance for SQL queries</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="op">{</span> <span class="va">source</span> <span class="op">=</span> <span class="op">{</span> <span class="op">{</span><span class="st">&quot;x&quot;</span><span class="op">,</span> <span class="st">&quot;y&quot;</span><span class="op">},</span> <span class="op">{</span><span class="dv">1</span><span class="op">,</span> <span class="dv">10</span><span class="op">},</span> <span class="op">{</span><span class="dv">2</span><span class="op">,</span> <span class="dv">20</span><span class="op">}</span> <span class="op">}</span> <span class="op">}</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><code data-pos="306:3-306:26">data_loader.load_view</code> resolves
+the hook through the host index (<code data-pos="306:69-306:109">host:get_hook(&quot;view&quot;, NAME, &quot;dataset&quot;)</code>,
+already overlaid default -&gt; model), with a loose-module fallback for
+non-indexed fixture views.</p>
 <p>Usage in code blocks:</p>
-<div class="sourceCode" id="cb8" data-pos="207:3-208:1;208:3-209:1;209:3-210:1;210:3-211:1"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="in">```chart:gaussian{view=&quot;gaussian&quot; sigma=2.0}</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="in">{...echarts config...}</span></span></code></pre></div>
-<pre data-pos="211:3-212:1"><code></code></pre>
+<div class="sourceCode" id="cb9" data-pos="309:3-310:1;310:3-311:1;311:3-312:1;312:3-313:1"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="in">```chart:gaussian{view=&quot;gaussian&quot; sigma=2.0}</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="in">{...echarts config...}</span></span></code></pre></div>
+<pre data-pos="313:3-314:1"><code></code></pre>
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
 <dd>
@@ -2235,40 +2522,44 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-EXT-008" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-EXT-008:
+<section id="HLR-EXT-008" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-EXT-008:
 Handler Caching</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="220:1-221:1" data-source-file="./requirements/extension.md">
+<div data-pos="322:1-323:1" data-source-file="./requirements/extension.md">
 <p>The system shall cache loaded type handlers to avoid repeated module
 loading.</p>
+</div>
+<div data-pos="353:1-354:1" data-source-file="./requirements/extension.md">
+<p><em>Retired in the Host Engine Refactor: the per-(model,type) handler
+caches (incl. the negative cache) are replaced by the eager <code data-pos="353:128-353:145">(kind,id)-&gt;hook</code> index.</em></p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p>Each handler loader maintains a cache keyed by <code data-pos="222:63-222:83">{model}:{type_ref}</code>:</p>
-<div class="sourceCode" id="cb10" data-pos="224:3-225:1;225:3-226:1;226:2-227:1;227:3-228:1;228:3-229:1;229:3-230:1;230:3-231:1;231:3-232:1;232:2-233:1;233:3-234:1;234:3-235:1;235:3-236:1;236:3-237:1;237:3-238:1;238:3-239:1;239:2-240:1;240:3-241:1;241:3-242:1;242:3-243:1;243:3-244:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">type_handlers</span> <span class="op">=</span> <span class="op">{}</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> load_type_handler<span class="op">(</span><span class="va">type_ref</span><span class="op">,</span> <span class="va">model_name</span><span class="op">)</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">local</span> <span class="va">cache_key</span> <span class="op">=</span> <span class="va">model_name</span> <span class="op">..</span> <span class="st">&quot;:&quot;</span> <span class="op">..</span> <span class="va">type_ref</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">type_handlers</span><span class="op">[</span><span class="va">cache_key</span><span class="op">]</span> <span class="op">~=</span> <span class="kw">nil</span> <span class="cf">then</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">type_handlers</span><span class="op">[</span><span class="va">cache_key</span><span class="op">]</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Load module via require()</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">local</span> <span class="va">ok</span><span class="op">,</span> <span class="va">module</span> <span class="op">=</span> <span class="fu">pcall</span><span class="op">(</span><span class="fu">require</span><span class="op">,</span> <span class="va">module_path</span><span class="op">)</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">ok</span> <span class="kw">and</span> <span class="va">module</span> <span class="cf">then</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">type_handlers</span><span class="op">[</span><span class="va">cache_key</span><span class="op">]</span> <span class="op">=</span> <span class="va">module</span><span class="op">.</span><span class="va">handler</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">module</span><span class="op">.</span><span class="va">handler</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">type_handlers</span><span class="op">[</span><span class="va">cache_key</span><span class="op">]</span> <span class="op">=</span> <span class="kw">false</span>  <span class="co">-- Cache negative result</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">nil</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div>
-<p>Cache stores <code data-pos="245:16-245:23">false</code> for failed
+<p>Each handler loader maintains a cache keyed by <code data-pos="324:63-324:83">{model}:{type_ref}</code>:</p>
+<div class="sourceCode" id="cb11" data-pos="326:3-327:1;327:3-328:1;328:2-329:1;329:3-330:1;330:3-331:1;331:3-332:1;332:3-333:1;333:3-334:1;334:2-335:1;335:3-336:1;336:3-337:1;337:3-338:1;338:3-339:1;339:3-340:1;340:3-341:1;341:2-342:1;342:3-343:1;343:3-344:1;344:3-345:1;345:3-346:1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">type_handlers</span> <span class="op">=</span> <span class="op">{}</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="kw">function</span> load_type_handler<span class="op">(</span><span class="va">type_ref</span><span class="op">,</span> <span class="va">model_name</span><span class="op">)</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">local</span> <span class="va">cache_key</span> <span class="op">=</span> <span class="va">model_name</span> <span class="op">..</span> <span class="st">&quot;:&quot;</span> <span class="op">..</span> <span class="va">type_ref</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">type_handlers</span><span class="op">[</span><span class="va">cache_key</span><span class="op">]</span> <span class="op">~=</span> <span class="kw">nil</span> <span class="cf">then</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">type_handlers</span><span class="op">[</span><span class="va">cache_key</span><span class="op">]</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Load module via require()</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">local</span> <span class="va">ok</span><span class="op">,</span> <span class="va">module</span> <span class="op">=</span> <span class="fu">pcall</span><span class="op">(</span><span class="fu">require</span><span class="op">,</span> <span class="va">module_path</span><span class="op">)</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="va">ok</span> <span class="kw">and</span> <span class="va">module</span> <span class="cf">then</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">type_handlers</span><span class="op">[</span><span class="va">cache_key</span><span class="op">]</span> <span class="op">=</span> <span class="va">module</span><span class="op">.</span><span class="va">handler</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">module</span><span class="op">.</span><span class="va">handler</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="va">type_handlers</span><span class="op">[</span><span class="va">cache_key</span><span class="op">]</span> <span class="op">=</span> <span class="kw">false</span>  <span class="co">-- Cache negative result</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">nil</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code></pre></div>
+<p>Cache stores <code data-pos="347:16-347:23">false</code> for failed
 lookups to avoid repeated require() calls for non-existent modules.</p>
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
@@ -2279,16 +2570,16 @@ without custom handlers.
 </dd>
 <dt><strong>STATUS:</strong></dt>
 <dd>
-Approved
+Retired
 </dd>
 </dl>
 </div>
 </div>
 <h1 data-number="8" data-pos="1:1-2:1" data-source-file="./requirements/output.md" id="SRS-001-sec8"><span class="header-section-number">8</span> Output Requirements</h1>
 <div class="spec-object">
-<section id="SF-004" class="unnumbered spec-object-header" data-custom-style="SFHeader">
-<h2 class="unnumbered" data-custom-style="SFHeader">SF-004: Multi-Format
-Publication</h2>
+<section id="SF-004" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">SF-004:
+Multi-Format Publication</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="5:1-6:1" data-source-file="./requirements/output.md">
@@ -2313,8 +2604,8 @@ single Markdown source.
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-OUT-001" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-OUT-001:
+<section id="HLR-OUT-001" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-OUT-001:
 Document Assembly</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
@@ -2371,9 +2662,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-OUT-002" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-OUT-002: Float
-Resolution</h3>
+<section id="HLR-OUT-002" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-OUT-002:
+Float Resolution</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="33:1-34:1" data-source-file="./requirements/output.md">
@@ -2423,9 +2714,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-OUT-003" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-OUT-003: Float
-Numbering</h3>
+<section id="HLR-OUT-003" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-OUT-003:
+Float Numbering</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="51:1-52:1" data-source-file="./requirements/output.md">
@@ -2474,8 +2765,8 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-OUT-004" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-OUT-004:
+<section id="HLR-OUT-004" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-OUT-004:
 Multi-Format Output</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
@@ -2529,9 +2820,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-OUT-005" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-OUT-005: DOCX
-Generation</h3>
+<section id="HLR-OUT-005" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-OUT-005:
+DOCX Generation</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="89:1-90:1" data-source-file="./requirements/output.md">
@@ -2583,9 +2874,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-OUT-006" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-OUT-006: HTML5
-Generation</h3>
+<section id="HLR-OUT-006" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-OUT-006:
+HTML5 Generation</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="107:1-108:1" data-source-file="./requirements/output.md">
@@ -2633,8 +2924,8 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-OUT-007" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-OUT-007:
+<section id="HLR-OUT-007" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-OUT-007:
 Full-Text Search Indexing</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
@@ -2691,9 +2982,9 @@ Approved
 <h1 data-number="9" data-pos="1:1-2:1" data-source-file="./requirements/audit.md" id="SRS-001-sec9"><span class="header-section-number">9</span> Audit &amp; Integrity
 Requirements</h1>
 <div class="spec-object">
-<section id="SF-006" class="unnumbered spec-object-header" data-custom-style="SFHeader">
-<h2 class="unnumbered" data-custom-style="SFHeader">SF-006: Audit and
-Integrity</h2>
+<section id="SF-006" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">SF-006:
+Audit and Integrity</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="5:1-6:1" data-source-file="./requirements/audit.md">
@@ -2768,9 +3059,9 @@ processing trails for traceability evidence.
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-AUDIT-001" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-AUDIT-001:
-Content-Addressed Hashing</h3>
+<section id="HLR-AUDIT-001" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-AUDIT-001: Content-Addressed
+Hashing</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="16:1-17:1" data-source-file="./requirements/audit.md">
@@ -2817,9 +3108,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-AUDIT-002" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-AUDIT-002:
-Include Dependency Tracking</h3>
+<section id="HLR-AUDIT-002" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-AUDIT-002: Include Dependency
+Tracking</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="34:1-35:1" data-source-file="./requirements/audit.md">
@@ -2866,9 +3157,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-AUDIT-003" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-AUDIT-003:
-Structured Diagnostic Reporting</h3>
+<section id="HLR-AUDIT-003" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-AUDIT-003: Structured
+Diagnostic Reporting</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="52:1-53:1" data-source-file="./requirements/audit.md">
@@ -2889,7 +3180,7 @@ and <code data-pos="56:105-56:146">diagnostics:warn(file, line, code, msg)</code
 </div></li>
 <li><div data-pos="57:6-58:1">
 <strong>Structured data</strong>: Each diagnostic record contains file
-path, line number, diagnostic code, and human-readable message
+path, line number, diagnostic key, and human-readable message
 </div></li>
 <li><div data-pos="58:6-59:1">
 <strong>Severity control</strong>: The <code data-pos="58:32-58:46">has_errors()</code> method enables the <a href="#TERM-15" data-pos="58:66-58:83">Pipeline</a> to determine abort
@@ -2901,15 +3192,14 @@ Phase</a> phase
 structured logger with file and line context
 </div></li>
 </ol>
-<p>Diagnostic codes follow domain prefixes (e.g., SD-102 for invalid
-enum, SD-201 for missing required attribute, SD-301 for dangling
-reference).</p>
+<p>Diagnostic keys are stable identifiers (e.g., <code data-pos="61:49-61:63">invalid_enum</code>, <code data-pos="61:65-61:83">missing_required</code>, <code data-pos="61:85-61:104">dangling_relation</code>) suitable for filtering
+and CI policy.</p>
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
 <dd>
 Structured diagnostics with source locations enable IDE integration,
 CI/CD reporting, and user-friendly error resolution. Machine-parseable
-diagnostic codes enable automated error classification.
+diagnostic keys enable automated error classification.
 </dd>
 <dt><strong>STATUS:</strong></dt>
 <dd>
@@ -2919,9 +3209,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-AUDIT-004" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-AUDIT-004:
-Structured Logging</h3>
+<section id="HLR-AUDIT-004" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-AUDIT-004: Structured
+Logging</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="70:1-71:1" data-source-file="./requirements/audit.md">
@@ -2965,9 +3255,9 @@ Approved
 </div>
 </div>
 <div class="spec-object">
-<section id="HLR-AUDIT-005" class="unnumbered spec-object-header" data-custom-style="HLRHeader">
-<h3 class="unnumbered" data-custom-style="HLRHeader">HLR-AUDIT-005:
-Build Reproducibility</h3>
+<section id="HLR-AUDIT-005" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-AUDIT-005: Build
+Reproducibility</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="86:1-87:1" data-source-file="./requirements/audit.md">
@@ -3023,9 +3313,8 @@ Approved
 </div>
 <h1 data-number="10" data-pos="1:1-2:1" data-source-file="./dictionary/concepts.md" id="SRS-001-sec10"><span class="header-section-number">10</span> System Concepts</h1>
 <div class="spec-object">
-<section id="TERM-COMMONSPEC" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-COMMONSPEC:
-CommonSpec</h2>
+<section id="TERM-COMMONSPEC" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-COMMONSPEC: CommonSpec</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="5:1-6:1" data-source-file="./dictionary/concepts.md">
@@ -3059,8 +3348,8 @@ CommonSpec
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-SPECIR" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-SPECIR:
+<section id="TERM-SPECIR" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-SPECIR:
 SpecIR</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
@@ -3099,9 +3388,9 @@ Specification Intermediate Representation
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-20" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-20: ANALYZE
-Phase</h2>
+<section id="TERM-20" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-20:
+ANALYZE Phase</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="39:1-40:1" data-source-file="./dictionary/concepts.md">
@@ -3122,9 +3411,9 @@ TRANSFORM.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-30" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-30: Build
-Cache</h2>
+<section id="TERM-30" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-30:
+Build Cache</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="49:1-50:1" data-source-file="./dictionary/concepts.md">
@@ -3144,9 +3433,9 @@ cached hash to skip unchanged files.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-28" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-28: Counter
-Group</h2>
+<section id="TERM-28" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-28:
+Counter Group</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="59:1-60:1" data-source-file="./dictionary/concepts.md">
@@ -3166,8 +3455,8 @@ producing Figure 1, Figure 2, etc.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-36" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-36: CSC
+<section id="TERM-36" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-36: CSC
 (Computer Software Component)</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
@@ -3188,8 +3477,8 @@ structural components for design allocation.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-37" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-37: CSU
+<section id="TERM-37" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-37: CSU
 (Computer Software Unit)</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
@@ -3210,13 +3499,13 @@ allocated to functional descriptions.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-35" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-35: Data
-View</h2>
+<section id="TERM-35" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-35:
+Data View</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="89:1-90:1" data-source-file="./dictionary/concepts.md">
-<p>A <strong>Lua module</strong> generating data for chart
+<p>A <strong>view descriptor</strong> whose <code data-pos="89:29-89:38">dataset</code> data hook generates data for chart
 injection.</p>
 </div>
 </div>
@@ -3226,16 +3515,19 @@ injection.</p>
 <dd>
 <p><strong>Purpose:</strong> Produces structured data that can be
 injected into chart floats.</p>
-<p><strong>Implementation:</strong> Lua scripts that query database and
-return chart-compatible data structures.</p>
+<p><strong>Implementation:</strong> A <code data-pos="95:25-95:34">dataset</code> DATA hook receives a frozen data
+context (reading <code data-pos="95:85-95:101">subject.params</code>)
+and returns a <code data-pos="95:117-95:144">{ source / data / links }</code> dataset. The
+descriptor is resolved from <code data-pos="95:186-95:225">models/{requested}/types/views/{view}</code>
+with fallback to <code data-pos="95:243-95:278">models/default/types/views/{view}</code>.</p>
 </dd>
 </dl>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-EAV" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-EAV: EAV
-Model</h2>
+<section id="TERM-EAV" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-EAV:
+EAV Model</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="99:1-100:1" data-source-file="./dictionary/concepts.md">
@@ -3256,9 +3548,9 @@ name), Value (typed content).</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-23" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-23: EMIT
-Phase</h2>
+<section id="TERM-23" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-23:
+EMIT Phase</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="109:1-110:1" data-source-file="./dictionary/concepts.md">
@@ -3278,8 +3570,9 @@ final output documents.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-04" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-04: Float</h2>
+<section id="TERM-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-04:
+Float</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="119:1-120:1" data-source-file="./dictionary/concepts.md">
@@ -3289,9 +3582,9 @@ caption and cross-reference. See <a href="#SpecIR-03" data-pos="119:87-119:106">
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-34" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-34: External
-Renderer</h2>
+<section id="TERM-34" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-34:
+External Renderer</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="123:1-124:1" data-source-file="./dictionary/concepts.md">
@@ -3312,14 +3605,15 @@ for data visualization.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-16" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-16:
+<section id="TERM-16" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-16:
 Handler</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="133:1-134:1" data-source-file="./dictionary/concepts.md">
-<p>A <strong>modular component</strong> that processes specific content
-types through pipeline phases.</p>
+<p>A <strong>named hook</strong> that a type descriptor contributes to
+the pipeline, indexed by the host engine and dispatched by capability
+rather than declared on a <code data-pos="133:152-133:163">M.handler</code> surface.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -3327,20 +3621,36 @@ types through pipeline phases.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p><strong>Purpose:</strong> Encapsulates processing logic for a content
-type across all pipeline phases.</p>
-<p><strong>Structure:</strong> Implements phase methods (initialize,
-analyze, verify, transform, emit) for its content type.</p>
+type. Behaviour lives only under a descriptor’s <code data-pos="137:108-137:115">hooks</code> table; the host classifies each
+hook by name and indexes it into the <code data-pos="137:185-137:205">(kind, id) -&gt; hook</code> map.</p>
+<p><strong>Structure:</strong> Two kinds of contributions, both keyed by
+hook name:</p>
+<ul>
+<li><div data-pos="141:5-142:1">
+<strong>Phase participation</strong> — <code data-pos="141:31-141:43">on_&lt;phase&gt;</code> functions (<code data-pos="141:55-141:70">on_initialize</code>, <code data-pos="141:72-141:84">on_analyze</code>, <code data-pos="141:86-141:100">on_transform</code>, <code data-pos="141:102-141:113">on_verify</code>, <code data-pos="141:115-141:124">on_emit</code>) declared in <code data-pos="141:138-141:145">hooks</code> beside the behavior hooks; the
+host synthesizes them into <code data-pos="141:204-141:231">pipeline:register_handler</code> under the
+derived name <code data-pos="141:255-141:276">&lt;lower(id)&gt;_handler</code>, ordered via
+<code data-pos="141:290-141:318">schema.phase_prerequisites</code>. Each
+runs once per phase with full pipeline context.
+</div></li>
+<li><div data-pos="142:5-143:1">
+<strong>Per-item hooks</strong> — RENDER hooks (<code data-pos="142:40-142:48">render</code>, <code data-pos="142:50-142:64">render_block</code>, <code data-pos="142:66-142:79">render_link</code>, <code data-pos="142:81-142:90">message</code>) and DATA hooks (<code data-pos="142:108-142:117">dataset</code>, <code data-pos="142:119-142:132">build_block</code>, <code data-pos="142:134-142:145">transform</code>, <code data-pos="142:147-142:156">resolve</code>, <code data-pos="142:158-142:172">prepare_task</code>, <code data-pos="142:174-142:189">handle_result</code>). The hook NAME selects
+one of two context tiers (a frozen render ctx or a frozen data ctx) and
+the return type the hook owes. Consumers resolve them via <code data-pos="142:344-142:364">get_hook_inherited</code>, which walks the
+<code data-pos="142:382-142:391">extends</code> chain.
+</div></li>
+</ul>
 </dd>
 </dl>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-19" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-19: INITIALIZE
-Phase</h2>
+<section id="TERM-19" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-19:
+INITIALIZE Phase</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="143:1-144:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="146:1-147:1" data-source-file="./dictionary/concepts.md">
 <p>The <strong>first phase</strong> in the pipeline that parses AST and
 populates IR containers.</p>
 </div>
@@ -3358,21 +3668,26 @@ processing.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-33" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-33: Model</h2>
+<section id="TERM-33" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-33:
+Model</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="153:1-154:1" data-source-file="./dictionary/concepts.md">
-<p>A <strong>collection of type definitions</strong>, handlers, and
-styles for a domain.</p>
+<div data-pos="156:1-157:1" data-source-file="./dictionary/concepts.md">
+<p>A <strong>collection of type descriptors</strong> and styles for a
+domain, overlaid onto the <code data-pos="156:81-156:90">default</code>
+model by the host engine.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p><strong>Purpose:</strong> Bundles related type definitions, handlers,
-and styling for specific documentation domains.</p>
+<p><strong>Purpose:</strong> Bundles related type descriptors (each
+carrying its own <code data-pos="160:72-160:79">hooks</code>) and
+styling for specific documentation domains. The host overlays <code data-pos="160:147-160:156">default</code> then each model
+later-wins-by-id, so a model overrides only the type ids it
+redefines.</p>
 <p><strong>Examples:</strong> SRS model for software requirements, HRS
 model for hardware requirements.</p>
 </dd>
@@ -3380,12 +3695,12 @@ model for hardware requirements.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-31" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-31: Output
-Cache</h2>
+<section id="TERM-31" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-31:
+Output Cache</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="163:1-164:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="166:1-167:1" data-source-file="./dictionary/concepts.md">
 <p><strong>Timestamps</strong> for incremental output generation.</p>
 </div>
 </div>
@@ -3402,11 +3717,12 @@ against cached output timestamp.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-17" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-17: Phase</h2>
+<section id="TERM-17" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-17:
+Phase</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="173:1-174:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="176:1-177:1" data-source-file="./dictionary/concepts.md">
 <p>A <strong>distinct stage</strong> in document processing with
 specific responsibilities.</p>
 </div>
@@ -3424,12 +3740,12 @@ EMIT.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-15" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-15:
+<section id="TERM-15" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-15:
 Pipeline</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="183:1-184:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="186:1-187:1" data-source-file="./dictionary/concepts.md">
 <p>The <strong>5-phase processing system</strong> (INITIALIZE -&gt;
 ANALYZE -&gt; TRANSFORM -&gt; VERIFY -&gt; EMIT).</p>
 </div>
@@ -3447,12 +3763,12 @@ the next phase begins.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-24" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-24:
+<section id="TERM-24" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-24:
 Prerequisites</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="193:1-194:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="196:1-197:1" data-source-file="./dictionary/concepts.md">
 <p><strong>Handler dependencies</strong> that determine execution
 order.</p>
 </div>
@@ -3470,12 +3786,12 @@ dependencies are satisfied.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-25" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-25:
+<section id="TERM-25" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-25:
 Topological Sort</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="203:1-204:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="206:1-207:1" data-source-file="./dictionary/concepts.md">
 <p><strong>Kahn’s algorithm</strong> for ordering handlers by
 prerequisites.</p>
 </div>
@@ -3493,12 +3809,12 @@ topologically sorted handler sequence.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-22" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-22: TRANSFORM
-Phase</h2>
+<section id="TERM-22" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-22:
+TRANSFORM Phase</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="213:1-214:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="216:1-217:1" data-source-file="./dictionary/concepts.md">
 <p>The <strong>third phase</strong> in the pipeline that materializes
 views and rewrites content.</p>
 </div>
@@ -3516,12 +3832,12 @@ VERIFY.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-27" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-27: Type
-Alias</h2>
+<section id="TERM-27" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-27:
+Type Alias</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="223:1-224:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="226:1-227:1" data-source-file="./dictionary/concepts.md">
 <p><strong>Alternative syntax identifier</strong> for a type (e.g.,
 “csv” -&gt; “TABLE”).</p>
 </div>
@@ -3532,42 +3848,52 @@ Alias</h2>
 <dd>
 <p><strong>Purpose:</strong> Provides shorthand or alternative names for
 types.</p>
-<p><strong>Example:</strong> <code data-pos="229:16-229:21">csv</code>
+<p><strong>Example:</strong> <code data-pos="232:16-232:21">csv</code>
 is an alias for the TABLE type in float definitions.</p>
 </dd>
 </dl>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-38" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-38: Type
-Loader</h2>
+<section id="TERM-38" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-38:
+Type Loader</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="233:1-234:1" data-source-file="./dictionary/concepts.md">
-<p><strong>System that discovers and loads</strong> type handlers from
-model directories.</p>
+<div data-pos="236:1-237:1" data-source-file="./dictionary/concepts.md">
+<p>The <strong>host engine</strong> (<code data-pos="236:22-236:49">src/contract/registry.lua</code>) that overlays
+models and registers their type descriptors.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p><strong>Purpose:</strong> Dynamically discovers and instantiates type
-handlers from model definitions.</p>
-<p><strong>Implementation:</strong> Scans model directories for handler
-definitions and registers them.</p>
+<p><strong>Purpose:</strong> Discovers each model’s type descriptors and
+registers them with the SpecIR type tables, the data manager, and the
+pipeline.</p>
+<p><strong>Implementation:</strong> Overlays the <code data-pos="242:36-242:45">default</code> model then each requested model
+(later-wins-by-id; resolved repo-bundled under <code data-pos="242:125-242:159">SPECCOMPILER_HOME/models/{model}</code> then
+cwd, no out-of-tree path). For each <code data-pos="242:201-242:235">models/{model}/types/{category}/</code> file
+it loads the single returned descriptor <code data-pos="242:281-242:308">{ kind, schema, [hooks] }</code>, validates
+it (known <code data-pos="242:330-242:336">kind</code>, present <code data-pos="242:346-242:357">schema.id</code>, each hook valid for the
+kind, no behaviour on top-level keys), emits the type row, and
+eager-indexes each hook into a <code data-pos="242:477-242:497">(kind, id) -&gt; hook</code> map read via
+<code data-pos="242:511-242:521">get_hook</code> / <code data-pos="242:524-242:544">get_hook_inherited</code> (which walks the
+<code data-pos="242:562-242:571">extends</code> chain). <code data-pos="242:580-242:597">host:finalize()</code> then propagates
+inherited attributes, creates the verification SQL views, and asserts
+required hooks.</p>
 </dd>
 </dl>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-26" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-26: Type
-Registry</h2>
+<section id="TERM-26" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-26:
+Type Registry</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="243:1-244:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="246:1-247:1" data-source-file="./dictionary/concepts.md">
 <p><strong>Database tables</strong> (spec_*_types) storing type
 definitions.</p>
 </div>
@@ -3585,22 +3911,22 @@ spec_attribute_types, etc.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-21" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-21: VERIFY
-Phase</h2>
+<section id="TERM-21" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-21:
+VERIFY Phase</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="253:1-254:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="256:1-257:1" data-source-file="./dictionary/concepts.md">
 <p>The <strong>fourth phase</strong> in the pipeline that validates
-content via proof views.</p>
+content via verification views.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p><strong>Purpose:</strong> Validates document content using proof
-views and constraint checking.</p>
+<p><strong>Purpose:</strong> Validates document content using
+verification views and constraint checking.</p>
 <p><strong>Position:</strong> Fourth phase after TRANSFORM, before
 EMIT.</p>
 </dd>
@@ -3608,12 +3934,12 @@ EMIT.</p>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-AST" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-AST: Abstract
-Syntax Tree</h2>
+<section id="TERM-AST" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-AST:
+Abstract Syntax Tree</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="263:1-264:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="266:1-267:1" data-source-file="./dictionary/concepts.md">
 <p>The <strong>tree representation</strong> of document structure
 produced by Pandoc.</p>
 </div>
@@ -3645,12 +3971,12 @@ Abstract Syntax Tree
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-FTS" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-FTS: Full-Text
-Search</h2>
+<section id="TERM-FTS" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-FTS:
+Full-Text Search</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="281:1-282:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="284:1-285:1" data-source-file="./dictionary/concepts.md">
 <p><strong>FTS5 virtual tables</strong> enabling search across
 specification content.</p>
 </div>
@@ -3682,12 +4008,12 @@ Full-Text Search
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-HLR" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-HLR:
+<section id="TERM-HLR" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-HLR:
 High-Level Requirement</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="299:1-300:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="302:1-303:1" data-source-file="./dictionary/concepts.md">
 <p>A <strong>top-level functional or non-functional requirement</strong>
 that captures what the system must do or satisfy.</p>
 </div>
@@ -3717,12 +4043,12 @@ High-Level Requirement
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-IR" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-IR:
+<section id="TERM-IR" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-IR:
 Intermediate Representation</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="315:1-316:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="318:1-319:1" data-source-file="./dictionary/concepts.md">
 <p>The <strong>database-backed representation</strong> of parsed
 document content.</p>
 </div>
@@ -3754,14 +4080,14 @@ Intermediate Representation
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-PID" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-PID: Project
-Identifier</h2>
+<section id="TERM-PID" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-PID:
+Project Identifier</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="333:1-334:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="336:1-337:1" data-source-file="./dictionary/concepts.md">
 <p>A <strong>unique identifier</strong> assigned to spec objects for
-cross-referencing (e.g., <code data-pos="333:79-333:89">@REQ-001</code>).</p>
+cross-referencing (e.g., <code data-pos="336:79-336:89">@REQ-001</code>).</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -3774,7 +4100,7 @@ PID
 <dd>
 <p><strong>Purpose:</strong> Provides unique, human-readable identifiers
 for traceability and cross-referencing.</p>
-<p><strong>Syntax:</strong> Written as <code data-pos="345:26-345:32">@PID</code> in header text (e.g., <code data-pos="345:55-345:91">## HLR: Requirement Title @REQ-001</code>).</p>
+<p><strong>Syntax:</strong> Written as <code data-pos="348:26-348:32">@PID</code> in header text (e.g., <code data-pos="348:55-348:91">## HLR: Requirement Title @REQ-001</code>).</p>
 <p><strong>Auto-generation:</strong> PIDs can be auto-generated from
 type prefix and sequence number.</p>
 </dd>
@@ -3790,12 +4116,12 @@ Project Identifier
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-PROOF" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-PROOF: Proof
+<section id="TERM-VERIFICATIONVIEW" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-VERIFICATIONVIEW: Verification
 View</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="351:1-352:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="354:1-355:1" data-source-file="./dictionary/concepts.md">
 <p>A <strong>SQL query</strong> that validates data integrity
 constraints during the VERIFY phase.</p>
 </div>
@@ -3821,18 +4147,18 @@ Core
 </dd>
 <dt><strong>TERM:</strong></dt>
 <dd>
-Proof View
+Verification View
 </dd>
 </dl>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-SQLITE" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-SQLITE: SQLite
-Database</h2>
+<section id="TERM-SQLITE" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-SQLITE:
+SQLite Database</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="369:1-370:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="372:1-373:1" data-source-file="./dictionary/concepts.md">
 <p>The <strong>embedded database engine</strong> storing the IR and
 build cache.</p>
 </div>
@@ -3864,12 +4190,12 @@ SQLite Database
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-TRACEABLE" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-TRACEABLE:
-Traceable Object</h2>
+<section id="TERM-TRACEABLE" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-TRACEABLE: Traceable
+Object</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="387:1-388:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="390:1-391:1" data-source-file="./dictionary/concepts.md">
 <p>A <strong>specification object</strong> that participates in
 traceability relationships.</p>
 </div>
@@ -3901,12 +4227,12 @@ Traceable Object
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-TYPE" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-TYPE:
+<section id="TERM-TYPE" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-TYPE:
 Type</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="405:1-406:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="408:1-409:1" data-source-file="./dictionary/concepts.md">
 <p>A <strong>category definition</strong> that governs behavior for
 objects, floats, relations, or views.</p>
 </div>
@@ -3920,11 +4246,13 @@ objects, floats, relations, or views.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p><strong>Purpose:</strong> Defines the schema, validation rules, and
-rendering behavior for a category of elements.</p>
+<code data-pos="418:58-418:65">hooks</code> behaviour for a category of
+elements.</p>
 <p><strong>Categories:</strong> Object types (HLR, SECTION), float types
 (FIGURE, TABLE), relation types (TRACES_TO), view types (TOC, LOF).</p>
-<p><strong>Registration:</strong> Types are loaded from model
-directories and stored in the type registry.</p>
+<p><strong>Registration:</strong> Each type is one descriptor (<code data-pos="422:50-422:75">{ kind, schema, hooks }</code>) loaded from a
+model’s category directory, validated by the host engine, and emitted
+into the type registry.</p>
 </dd>
 <dt><strong>DOMAIN:</strong></dt>
 <dd>
@@ -3938,12 +4266,12 @@ Type
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-VC" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-VC:
+<section id="TERM-VC" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-VC:
 Verification Case</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="423:1-424:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="426:1-427:1" data-source-file="./dictionary/concepts.md">
 <p>A <strong>test specification</strong> that verifies a requirement or
 set of requirements.</p>
 </div>
@@ -3958,8 +4286,8 @@ VC
 <dd>
 <p><strong>Purpose:</strong> Defines how requirements are verified
 through test procedures and expected results.</p>
-<p><strong>Traceability:</strong> VCs trace to HLRs via <code data-pos="435:43-435:57">traceability</code> attribute links.</p>
-<p><strong>Naming:</strong> VC PIDs follow the pattern <code data-pos="437:42-437:63">VC-{category}-{seq}</code> (e.g., <code data-pos="437:71-437:84">VC-PIPE-001</code>).</p>
+<p><strong>Traceability:</strong> VCs trace to HLRs via <code data-pos="438:43-438:57">traceability</code> attribute links.</p>
+<p><strong>Naming:</strong> VC PIDs follow the pattern <code data-pos="440:42-440:63">VC-{category}-{seq}</code> (e.g., <code data-pos="440:71-440:84">VC-PIPE-001</code>).</p>
 </dd>
 <dt><strong>DOMAIN:</strong></dt>
 <dd>
@@ -3973,12 +4301,12 @@ Verification Case
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-COMPOSITE" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-COMPOSITE:
-Composite Object Type</h2>
+<section id="TERM-COMPOSITE" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-COMPOSITE: Composite Object
+Type</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="441:1-442:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="444:1-445:1" data-source-file="./dictionary/concepts.md">
 <p>A <strong>spec object type</strong> whose instances receive
 hierarchical PIDs qualified by the parent specification PID.</p>
 </div>
@@ -3991,10 +4319,10 @@ hierarchical PIDs qualified by the parent specification PID.</p>
 document structure (e.g., SECTION) from traceable types that receive
 standalone PIDs (e.g., HLR, VC).</p>
 <p><strong>PID behavior:</strong> Composite objects get hierarchical
-PIDs derived from the specification PID (e.g., <code data-pos="451:103-451:117">SRS-sec1.2.3</code>). Non-composite objects
-get independent PIDs from their <code data-pos="451:174-451:186">pid_prefix</code> and <code data-pos="451:191-451:203">pid_format</code> (e.g., <code data-pos="451:211-451:220">HLR-001</code>).</p>
-<p><strong>Configuration:</strong> Set via <code data-pos="453:30-453:51">is_composite = true</code> in the type
-definition module.</p>
+PIDs derived from the specification PID (e.g., <code data-pos="454:103-454:117">SRS-sec1.2.3</code>). Non-composite objects
+get independent PIDs from their <code data-pos="454:174-454:186">pid_prefix</code> and <code data-pos="454:191-454:203">pid_format</code> (e.g., <code data-pos="454:211-454:220">HLR-001</code>).</p>
+<p><strong>Configuration:</strong> Set via <code data-pos="456:30-456:51">is_composite = true</code> in the descriptor’s
+<code data-pos="456:72-456:80">schema</code>.</p>
 </dd>
 <dt><strong>DOMAIN:</strong></dt>
 <dd>
@@ -4008,12 +4336,12 @@ Composite Object Type
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-SELECTOR" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-SELECTOR:
-Relation Selector</h2>
+<section id="TERM-SELECTOR" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-SELECTOR: Relation
+Selector</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="457:1-458:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="460:1-461:1" data-source-file="./dictionary/concepts.md">
 <p>The <strong>URL scheme portion</strong> of a Markdown link that
 drives relation type inference.</p>
 </div>
@@ -4024,9 +4352,9 @@ drives relation type inference.</p>
 <dd>
 <p><strong>Purpose:</strong> Identifies what kind of relation a Markdown
 link represents, enabling type-driven inference.</p>
-<p><strong>Selectors:</strong> <code data-pos="467:18-467:21">@</code>
-(PID reference, e.g., <code data-pos="467:44-467:58">[HLR-001](@)</code>), <code data-pos="467:61-467:64">#</code> (label reference, e.g., <code data-pos="467:89-467:107">[fig:diagram](#)</code>), <code data-pos="467:110-467:117">@cite</code> (bibliographic citation).</p>
-<p><strong>Configuration:</strong> Each relation type declares a <code data-pos="469:52-469:67">link_selector</code> value in <code data-pos="469:77-469:98">spec_relation_types</code>. Selectors are
+<p><strong>Selectors:</strong> <code data-pos="470:18-470:21">@</code>
+(PID reference, e.g., <code data-pos="470:44-470:58">[HLR-001](@)</code>), <code data-pos="470:61-470:64">#</code> (label reference, e.g., <code data-pos="470:89-470:107">[fig:diagram](#)</code>), <code data-pos="470:110-470:117">@cite</code> (bibliographic citation).</p>
+<p><strong>Configuration:</strong> Each relation type declares a <code data-pos="472:52-472:67">link_selector</code> value in <code data-pos="472:77-472:98">spec_relation_types</code>. Selectors are
 model-defined, not hardcoded.</p>
 </dd>
 <dt><strong>DOMAIN:</strong></dt>
@@ -4041,12 +4369,12 @@ Relation Selector
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-SPECIFICITY" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-SPECIFICITY:
-Specificity Scoring</h2>
+<section id="TERM-SPECIFICITY" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-SPECIFICITY: Specificity
+Scoring</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="473:1-474:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="476:1-477:1" data-source-file="./dictionary/concepts.md">
 <p>The <strong>constraint-matching score</strong> used to select the
 best relation type during type inference.</p>
 </div>
@@ -4077,12 +4405,12 @@ Specificity Scoring
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-PIR" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-PIR: Processed
-Intermediate Representation</h2>
+<section id="TERM-PIR" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-PIR:
+Processed Intermediate Representation</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="489:1-490:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="492:1-493:1" data-source-file="./dictionary/concepts.md">
 <p>The <strong>complete specification state</strong> after all pipeline
 phases have executed, captured as a hash for output cache
 invalidation.</p>
@@ -4119,12 +4447,12 @@ Processed Intermediate Representation
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-NDJSON" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-NDJSON:
+<section id="TERM-NDJSON" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-NDJSON:
 Newline-Delimited JSON</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="507:1-508:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="510:1-511:1" data-source-file="./dictionary/concepts.md">
 <p>A <strong>text format</strong> where each line is a valid JSON
 object, used for structured log output.</p>
 </div>
@@ -4139,8 +4467,8 @@ NDJSON
 <dd>
 <p><strong>Purpose:</strong> Provides machine-parseable structured
 logging suitable for CI/CD log aggregation and filtering with tools like
-<code data-pos="517:127-517:131">jq</code>.</p>
-<p><strong>Format:</strong> One JSON object per line with fields: <code data-pos="519:53-519:60">level</code>, <code data-pos="519:62-519:71">message</code>, <code data-pos="519:73-519:84">timestamp</code>, and optional context
+<code data-pos="520:127-520:131">jq</code>.</p>
+<p><strong>Format:</strong> One JSON object per line with fields: <code data-pos="522:53-522:60">level</code>, <code data-pos="522:62-522:71">message</code>, <code data-pos="522:73-522:84">timestamp</code>, and optional context
 fields.</p>
 <p><strong>Usage:</strong> The logger emits NDJSON when output is not
 connected to a TTY (e.g., piped to a file or running in CI).</p>
@@ -4157,13 +4485,13 @@ Newline-Delimited JSON
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-PROOFPOLICY" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-PROOFPOLICY:
-Proof Policy</h2>
+<section id="TERM-VALIDATIONPOLICY" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-VALIDATIONPOLICY: Validation
+Policy</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="525:1-526:1" data-source-file="./dictionary/concepts.md">
-<p>A <strong>configuration mapping</strong> from proof view <code data-pos="525:45-525:57">policy_key</code> to severity level,
+<div data-pos="528:1-529:1" data-source-file="./dictionary/concepts.md">
+<p>A <strong>configuration mapping</strong> from verification view <code data-pos="528:52-528:64">policy_key</code> to severity level,
 controlling which violations are reported and at what severity.</p>
 </div>
 </div>
@@ -4172,10 +4500,10 @@ controlling which violations are reported and at what severity.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p><strong>Purpose:</strong> Allows projects to control validation
-strictness by mapping each proof view to a severity level.</p>
-<p><strong>Severity levels:</strong> <code data-pos="535:24-535:31">error</code> (blocks output generation), <code data-pos="535:60-535:66">warn</code> (reported but build continues),
-<code data-pos="535:99-535:107">ignore</code> (suppressed).</p>
-<p><strong>Configuration:</strong> Set in the <code data-pos="537:33-537:46">validation:</code> section of <code data-pos="537:58-537:72">project.yaml</code> (e.g., <code data-pos="537:80-537:110">traceability_hlr_to_vc: warn</code>).</p>
+strictness by mapping each verification view to a severity level.</p>
+<p><strong>Severity levels:</strong> <code data-pos="538:24-538:31">error</code> (blocks output generation), <code data-pos="538:60-538:66">warn</code> (reported but build continues),
+<code data-pos="538:99-538:107">ignore</code> (suppressed).</p>
+<p><strong>Configuration:</strong> Set in the <code data-pos="540:33-540:46">validation:</code> section of <code data-pos="540:58-540:72">project.yaml</code> (e.g., <code data-pos="540:80-540:110">traceability_hlr_to_vc: warn</code>).</p>
 <p><strong>Default:</strong> When a policy_key is not configured, the
 system applies its built-in default severity.</p>
 </dd>
@@ -4185,19 +4513,19 @@ Core
 </dd>
 <dt><strong>TERM:</strong></dt>
 <dd>
-Proof Policy
+Validation Policy
 </dd>
 </dl>
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-DIAGNOSTIC" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-DIAGNOSTIC:
-Diagnostic Record</h2>
+<section id="TERM-DIAGNOSTIC" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-DIAGNOSTIC: Diagnostic
+Record</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="543:1-544:1" data-source-file="./dictionary/concepts.md">
-<p>A <strong>structured error or warning record</strong> emitted by <a href="#TERM-16" data-pos="543:53-543:65">TERM-16</a>s during <a href="#TERM-15" data-pos="543:74-543:86">TERM-15</a> processing.</p>
+<div data-pos="546:1-547:1" data-source-file="./dictionary/concepts.md">
+<p>A <strong>structured error or warning record</strong> emitted by <a href="#TERM-16" data-pos="546:53-546:65">Handler</a>s during <a href="#TERM-15" data-pos="546:74-546:86">Pipeline</a> processing.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -4207,10 +4535,13 @@ Diagnostic Record</h2>
 <p><strong>Purpose:</strong> Provides machine-parseable and
 human-readable feedback on specification errors and warnings throughout
 all pipeline phases.</p>
-<p><strong>Fields:</strong> Each record contains <code data-pos="553:36-553:42">file</code> (source path), <code data-pos="553:58-553:64">line</code> (source line number), <code data-pos="553:87-553:93">code</code> (domain-prefixed identifier, e.g.,
-<code data-pos="553:129-553:137">SD-301</code>), and <code data-pos="553:144-553:149">msg</code> (human-readable description).</p>
-<p><strong>Severity:</strong> Errors trigger abort after <a href="#TERM-21" data-pos="555:44-555:56">TERM-21</a> phase; warnings are
-reported but do not block output generation.</p>
+<p><strong>Fields:</strong> Each record contains <code data-pos="556:36-556:42">file</code> (source path), <code data-pos="556:58-556:64">line</code> (source line number), <code data-pos="556:87-556:93">code</code> (stable diagnostic key, usually the
+verification view <code data-pos="556:148-556:160">policy_key</code>,
+e.g., <code data-pos="556:168-556:187">dangling_relation</code>), and
+<code data-pos="556:194-556:199">msg</code> (human-readable
+description).</p>
+<p><strong>Severity:</strong> Errors trigger abort after <a href="#TERM-21" data-pos="558:44-558:56">VERIFY Phase</a> phase;
+warnings are reported but do not block output generation.</p>
 </dd>
 <dt><strong>DOMAIN:</strong></dt>
 <dd>
@@ -4224,12 +4555,11 @@ Diagnostic Record
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-BUILDGRAPH" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-BUILDGRAPH:
-Build Graph</h2>
+<section id="TERM-BUILDGRAPH" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-BUILDGRAPH: Build Graph</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="559:1-560:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="562:1-563:1" data-source-file="./dictionary/concepts.md">
 <p>A <strong>dependency tracking structure</strong> recording include
 file hierarchies for incremental rebuild support.</p>
 </div>
@@ -4240,11 +4570,11 @@ file hierarchies for incremental rebuild support.</p>
 <dd>
 <p><strong>Purpose:</strong> Tracks which files are included by each
 root document, enabling change detection across include hierarchies.</p>
-<p><strong>Storage:</strong> Stored in the <code data-pos="569:30-569:43">build_graph</code> table with columns <code data-pos="569:63-569:74">root_path</code> (the including document),
-<code data-pos="569:101-569:112">node_path</code> (the included file),
-and <code data-pos="569:138-569:149">node_sha1</code> (content hash at
+<p><strong>Storage:</strong> Stored in the <code data-pos="572:30-572:43">build_graph</code> table with columns <code data-pos="572:63-572:74">root_path</code> (the including document),
+<code data-pos="572:101-572:112">node_path</code> (the included file),
+and <code data-pos="572:138-572:149">node_sha1</code> (content hash at
 build time).</p>
-<p><strong>Usage:</strong> Queried by <a href="#TERM-30" data-pos="571:25-571:37">TERM-30</a> <code data-pos="571:38-571:73">is_document_dirty_with_includes()</code> to
+<p><strong>Usage:</strong> Queried by <a href="#TERM-30" data-pos="574:25-574:37">Build Cache</a> <code data-pos="574:38-574:73">is_document_dirty_with_includes()</code> to
 determine if any included file has changed since the last successful
 build.</p>
 </dd>
@@ -4260,16 +4590,16 @@ Build Graph
 </div>
 </div>
 <div class="spec-object">
-<section id="TERM-PLACEHOLDERBLOCK" class="unnumbered spec-object-header" data-custom-style="DICHeader">
-<h2 class="unnumbered" data-custom-style="DICHeader">TERM-PLACEHOLDERBLOCK: Placeholder
+<section id="TERM-PLACEHOLDERBLOCK" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-PLACEHOLDERBLOCK: Placeholder
 Block</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="575:1-576:1" data-source-file="./dictionary/concepts.md">
+<div data-pos="578:1-579:1" data-source-file="./dictionary/concepts.md">
 <p>A <strong>CodeBlock marker</strong> inserted during document assembly
-for deferred <a href="#SpecIR-03" data-pos="575:71-575:85">SpecIR-03</a>
-and <a href="#SpecIR-06" data-pos="575:90-575:104">SpecIR-06</a>
-resolution.</p>
+for deferred <a href="#SpecIR-03" data-pos="578:71-578:85">Spec
+Float</a> and <a href="#SpecIR-06" data-pos="578:90-578:104">Spec
+View</a> resolution.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -4277,11 +4607,11 @@ resolution.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p><strong>Purpose:</strong> Marks positions in the assembled Pandoc
-document where floats and views will be substituted during the <a href="#TERM-23" data-pos="583:119-583:131">TERM-23</a> phase.</p>
-<p><strong>Mechanism:</strong> During assembly, <a href="sdd.html#CSU-034" data-pos="585:35-585:47">CSU-034</a> inserts
-CodeBlock elements at the correct <code data-pos="585:90-585:100">file_seq</code> positions. Downstream handlers
-(<a href="sdd.html#CSU-035" data-pos="585:133-585:145">CSU-035</a> for
-floats, <a href="sdd.html#CSU-036" data-pos="585:158-585:170">CSU-036</a> for views) match these
+document where floats and views will be substituted during the <a href="#TERM-23" data-pos="586:119-586:131">EMIT Phase</a> phase.</p>
+<p><strong>Mechanism:</strong> During assembly, <a href="sdd.html#CSU-034" data-pos="588:35-588:47">sdd: Document
+Assembler</a> inserts CodeBlock elements at the correct <code data-pos="588:90-588:100">file_seq</code> positions. Downstream handlers
+(<a href="sdd.html#CSU-035" data-pos="588:133-588:145">sdd: Float
+Emitter</a> for floats, <a href="sdd.html#CSU-036" data-pos="588:158-588:170">sdd: View Emitter</a> for views) match these
 placeholders by label and replace them with rendered content.</p>
 <p><strong>Lifecycle:</strong> Created during assembly, consumed during
 float/view emission, never present in final output.</p>

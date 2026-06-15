@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>specir_html5</title>
   <style>
+
 html {
 color: #1a1a1a;
 background-color: #fdfdfd;
@@ -107,8 +108,8 @@ background-color: transparent;
 overflow: visible;
 }
 hr {
-background-color: #1a1a1a;
 border: none;
+border-top: 1px solid #1a1a1a;
 height: 1px;
 margin: 1em 0;
 }
@@ -237,8 +238,8 @@ it via a web application.</p>
 </div>
 <div data-pos="23:1-24:1">
 <p><strong>Typed.</strong> The schema enforces a type system: every
-object, float, relation, and view references a declared type. Proof
-views express structural constraints as SQL queries.</p>
+object, float, relation, and view references a declared type.
+Verification views express structural constraints as SQL queries.</p>
 </div>
 <div data-pos="25:1-26:1">
 <p><strong>Queryable.</strong> Standard SQL gives immediate access to
@@ -920,22 +921,17 @@ headers.</p>
 <td>JSON</td>
 <td>Body as Pandoc AST</td>
 </tr>
-<tr>
-<td>content_xhtml</td>
-<td>TEXT</td>
-<td>Cached HTML5 rendering</td>
-</tr>
 </tbody>
 </table>
-<div data-pos="233:1-234:1">
-<p>Key indexes: <code data-pos="233:14-233:38">idx_objects_spec_label</code> (UNIQUE on
-specification_ref + label), <code data-pos="233:78-233:100">idx_objects_spec_pid</code> (on
+<div data-pos="232:1-233:1">
+<p>Key indexes: <code data-pos="232:14-232:38">idx_objects_spec_label</code> (UNIQUE on
+specification_ref + label), <code data-pos="232:78-232:100">idx_objects_spec_pid</code> (on
 specification_ref + pid).</p>
 </div>
-<h2 data-number="3.3" data-pos="235:1-236:1" id="spec_floats"><span class="header-section-number">3.3</span> spec_floats</h2>
-<div data-pos="237:1-238:1">
+<h2 data-number="3.3" data-pos="234:1-235:1" id="spec_floats"><span class="header-section-number">3.3</span> spec_floats</h2>
+<div data-pos="236:1-237:1">
 <p>Numbered floating elements. Created from fenced code blocks with
-<code data-pos="237:66-237:80">syntax:label</code>.</p>
+<code data-pos="236:66-236:80">syntax:label</code>.</p>
 </div>
 <a id="csv-tbl-floats" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_floats columns</figcaption>
@@ -1035,9 +1031,9 @@ specification_ref + pid).</p>
 </tr>
 </tbody>
 </table>
-<h2 data-number="3.4" data-pos="260:1-261:1" id="spec_relations"><span class="header-section-number">3.4</span> spec_relations</h2>
-<div data-pos="262:1-263:1">
-<p>Traceability links between objects. Created from <code data-pos="262:50-262:63">[target](@)</code> and <code data-pos="262:68-262:81">[target](#)</code> syntax.</p>
+<h2 data-number="3.4" data-pos="259:1-260:1" id="spec_relations"><span class="header-section-number">3.4</span> spec_relations</h2>
+<div data-pos="261:1-262:1">
+<p>Traceability links between objects. Created from <code data-pos="261:50-261:63">[target](@)</code> and <code data-pos="261:68-261:81">[target](#)</code> syntax.</p>
 </div>
 <a id="csv-tbl-relations" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_relations columns</figcaption>
@@ -1117,9 +1113,9 @@ specification_ref + pid).</p>
 </tr>
 </tbody>
 </table>
-<h2 data-number="3.5" data-pos="281:1-282:1" id="spec_views"><span class="header-section-number">3.5</span> spec_views</h2>
-<div data-pos="283:1-284:1">
-<p>Dynamic content blocks. Created from inline code with <code data-pos="283:55-283:73">`type:param`</code> syntax.</p>
+<h2 data-number="3.5" data-pos="280:1-281:1" id="spec_views"><span class="header-section-number">3.5</span> spec_views</h2>
+<div data-pos="282:1-283:1">
+<p>Dynamic content blocks. Created from inline code with <code data-pos="282:55-282:73">`type:param`</code> syntax.</p>
 </div>
 <a id="csv-tbl-views" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_views columns</figcaption>
@@ -1184,8 +1180,8 @@ specification_ref + pid).</p>
 </tr>
 </tbody>
 </table>
-<h2 data-number="3.6" data-pos="299:1-300:1" id="spec_attribute_values"><span class="header-section-number">3.6</span> spec_attribute_values</h2>
-<div data-pos="301:1-302:1">
+<h2 data-number="3.6" data-pos="298:1-299:1" id="spec_attribute_values"><span class="header-section-number">3.6</span> spec_attribute_values</h2>
+<div data-pos="300:1-301:1">
 <p>Typed attribute storage using the Entity-Attribute-Value (EAV)
 pattern.</p>
 </div>
@@ -1275,144 +1271,139 @@ pattern.</p>
 <td>TEXT NOT NULL</td>
 <td>Actual datatype used</td>
 </tr>
-<tr>
-<td>xhtml_value</td>
-<td>TEXT</td>
-<td>Cached HTML5 rendering</td>
-</tr>
 </tbody>
 </table>
-<div data-pos="323:1-324:1">
+<div data-pos="321:1-322:1">
 <p>The EAV pattern is used because the attribute set is unknown at
 schema creation time — models define custom attributes at runtime.</p>
 </div>
-<h1 data-number="4" data-pos="325:1-326:1" id="non-core-tables"><span class="header-section-number">4</span> Non-Core Tables</h1>
-<div data-pos="327:1-328:1">
+<h1 data-number="4" data-pos="323:1-324:1" id="non-core-tables"><span class="header-section-number">4</span> Non-Core Tables</h1>
+<div data-pos="325:1-326:1">
 <p>The following tables are <strong>not part of the SpecIR
 specification</strong>. They are SpecCompiler implementation details for
 incremental builds, full-text search, and output caching. External tools
 should ignore these tables.</p>
 </div>
-<div data-pos="329:1-330:1">
-<p><strong>Authoritative source:</strong> <code data-pos="329:27-329:52">src/db/schema/build.lua</code> and <code data-pos="329:57-329:83">src/db/schema/search.lua</code></p>
+<div data-pos="327:1-328:1">
+<p><strong>Authoritative source:</strong> <code data-pos="327:27-327:52">src/db/schema/build.lua</code> and <code data-pos="327:57-327:83">src/db/schema/search.lua</code></p>
 </div>
-<h2 data-number="4.1" data-pos="331:1-332:1" id="build-infrastructure"><span class="header-section-number">4.1</span>
+<h2 data-number="4.1" data-pos="329:1-330:1" id="build-infrastructure"><span class="header-section-number">4.1</span>
 Build Infrastructure</h2>
-<div data-pos="333:1-338:1">
+<div data-pos="331:1-336:1">
 <ul>
-<li><div data-pos="333:3-334:1">
+<li><div data-pos="331:3-332:1">
 <strong>build_graph</strong> — tracks file include/dependency
-relationships for incremental builds. Columns: <code data-pos="333:101-333:112">root_path</code>, <code data-pos="333:114-333:125">node_path</code>, <code data-pos="333:127-333:138">node_sha1</code>.
+relationships for incremental builds. Columns: <code data-pos="331:101-331:112">root_path</code>, <code data-pos="331:114-331:125">node_path</code>, <code data-pos="331:127-331:138">node_sha1</code>.
 </div></li>
-<li><div data-pos="334:3-335:1">
+<li><div data-pos="332:3-333:1">
 <strong>source_files</strong> — stores SHA1 hashes of source files for
-change detection. Columns: <code data-pos="334:90-334:96">path</code>,
-<code data-pos="334:98-334:104">sha1</code>.
+change detection. Columns: <code data-pos="332:90-332:96">path</code>,
+<code data-pos="332:98-332:104">sha1</code>.
 </div></li>
-<li><div data-pos="335:3-336:1">
+<li><div data-pos="333:3-334:1">
 <strong>output_cache</strong> — tracks generated output files and their
-source state. Columns: <code data-pos="335:87-335:96">spec_id</code>,
-<code data-pos="335:98-335:111">output_path</code>, <code data-pos="335:113-335:123">pir_hash</code>, <code data-pos="335:125-335:139">generated_at</code>.
+source state. Columns: <code data-pos="333:87-333:96">spec_id</code>,
+<code data-pos="333:98-333:111">output_path</code>, <code data-pos="333:113-333:123">pir_hash</code>, <code data-pos="333:125-333:139">generated_at</code>.
 </div></li>
 </ul>
 </div>
-<h2 data-number="4.2" data-pos="337:1-338:1" id="full-text-search"><span class="header-section-number">4.2</span> Full-Text Search</h2>
-<div data-pos="339:1-344:1">
+<h2 data-number="4.2" data-pos="335:1-336:1" id="full-text-search"><span class="header-section-number">4.2</span> Full-Text Search</h2>
+<div data-pos="337:1-342:1">
 <ul>
-<li><div data-pos="339:3-340:1">
+<li><div data-pos="337:3-338:1">
 <strong>fts_objects</strong> — FTS5 virtual table indexing spec object
 text.
 </div></li>
-<li><div data-pos="340:3-341:1">
+<li><div data-pos="338:3-339:1">
 <strong>fts_attributes</strong> — FTS5 virtual table indexing attribute
 values.
 </div></li>
-<li><div data-pos="341:3-342:1">
+<li><div data-pos="339:3-340:1">
 <strong>fts_floats</strong> — FTS5 virtual table indexing float content.
 </div></li>
 </ul>
 </div>
-<div data-pos="343:1-344:1">
+<div data-pos="341:1-342:1">
 <p>These tables are populated during the EMIT phase and used by the
 HTML5 web application for browser-native search.</p>
 </div>
-<h1 data-number="5" data-pos="345:1-346:1" id="views"><span class="header-section-number">5</span> Views</h1>
-<h2 data-number="5.1" data-pos="347:1-348:1" id="eav-pivot-views"><span class="header-section-number">5.1</span> EAV Pivot Views</h2>
-<div data-pos="349:1-350:1">
+<h1 data-number="5" data-pos="343:1-344:1" id="views"><span class="header-section-number">5</span> Views</h1>
+<h2 data-number="5.1" data-pos="345:1-346:1" id="eav-pivot-views"><span class="header-section-number">5.1</span> EAV Pivot Views</h2>
+<div data-pos="347:1-348:1">
 <p>SpecIR dynamically generates per-type views that pivot the EAV table
 into a columnar format:</p>
 </div>
-<pre data-pos="351:1-354:1"><code>view_{TYPE}_objects</code></pre>
-<div data-pos="355:1-356:1">
-<p>For example, <code data-pos="355:14-355:32">view_HLR_objects</code>
-provides columns like <code data-pos="355:55-355:60">pid</code>, <code data-pos="355:62-355:74">title_text</code>, <code data-pos="355:76-355:84">status</code>, <code data-pos="355:86-355:96">priority</code>, <code data-pos="355:98-355:109">rationale</code> — one row per HLR object,
+<pre data-pos="349:1-352:1"><code>view_{TYPE}_objects</code></pre>
+<div data-pos="353:1-354:1">
+<p>For example, <code data-pos="353:14-353:32">view_HLR_objects</code>
+provides columns like <code data-pos="353:55-353:60">pid</code>, <code data-pos="353:62-353:74">title_text</code>, <code data-pos="353:76-353:84">status</code>, <code data-pos="353:86-353:96">priority</code>, <code data-pos="353:98-353:109">rationale</code> — one row per HLR object,
 with attributes as typed columns instead of EAV rows. These views are
 generated at runtime after type definitions are loaded.</p>
 </div>
-<div data-pos="357:1-358:1">
+<div data-pos="355:1-356:1">
 <p>External tools querying SpecIR should prefer these pivot views over
 raw EAV joins.</p>
 </div>
-<h2 data-number="5.2" data-pos="359:1-360:1" id="public-api-views"><span class="header-section-number">5.2</span> Public API Views</h2>
-<div data-pos="361:1-362:1">
+<h2 data-number="5.2" data-pos="357:1-358:1" id="public-api-views"><span class="header-section-number">5.2</span> Public API Views</h2>
+<div data-pos="359:1-360:1">
 <p>SpecIR defines stable public views for BI tools and dashboards. These
 views abstract internal schema complexity and provide stable column
 names.</p>
 </div>
-<div data-pos="363:1-364:1">
-<p><strong>Authoritative source:</strong> <code data-pos="363:27-363:56">src/db/views/public_api.lua</code></p>
+<div data-pos="361:1-362:1">
+<p><strong>Authoritative source:</strong> <code data-pos="361:27-361:56">src/db/views/public_api.lua</code></p>
 </div>
-<div data-pos="365:1-373:1">
+<div data-pos="363:1-371:1">
 <ul>
-<li><div data-pos="365:3-366:1">
+<li><div data-pos="363:3-364:1">
 <strong>public_traceability_matrix</strong> — all resolved
 object-to-object relations with source/target PIDs, types, and titles.
 </div></li>
-<li><div data-pos="366:3-367:1">
+<li><div data-pos="364:3-365:1">
 <strong>public_coverage_report</strong> — traceability status of each
 object (orphan, traces_only, traced_by_only, fully_traced).
 </div></li>
-<li><div data-pos="367:3-368:1">
+<li><div data-pos="365:3-366:1">
 <strong>public_dangling_references</strong> — unresolved relations
 (broken links).
 </div></li>
-<li><div data-pos="368:3-369:1">
+<li><div data-pos="366:3-367:1">
 <strong>public_float_inventory</strong> — all floats with type, caption,
 number, and parent object.
 </div></li>
-<li><div data-pos="369:3-370:1">
+<li><div data-pos="367:3-368:1">
 <strong>public_object_summary</strong> — object counts by type.
 </div></li>
-<li><div data-pos="370:3-371:1">
+<li><div data-pos="368:3-369:1">
 <strong>public_specification_list</strong> — all specifications with
 object/float/relation counts.
 </div></li>
 </ul>
 </div>
-<h1 data-number="6" data-pos="372:1-373:1" id="interoperability"><span class="header-section-number">6</span> Interoperability</h1>
-<div data-pos="374:1-375:1">
+<h1 data-number="6" data-pos="370:1-371:1" id="interoperability"><span class="header-section-number">6</span> Interoperability</h1>
+<div data-pos="372:1-373:1">
 <p>SpecIR is designed as a hub for specification interchange:</p>
 </div>
-<div data-pos="376:1-382:1">
+<div data-pos="374:1-380:1">
 <ul>
-<li><div data-pos="376:3-377:1">
+<li><div data-pos="374:3-375:1">
 <strong>CommonSpec</strong> compiles into SpecIR via SpecCompiler.
 </div></li>
-<li><div data-pos="377:3-378:1">
+<li><div data-pos="375:3-376:1">
 <strong>ReqIF</strong> can be exported from SpecIR (current) and
 imported into SpecIR (planned).
 </div></li>
-<li><div data-pos="378:3-379:1">
+<li><div data-pos="376:3-377:1">
 <strong>SQL</strong> provides direct read/write access for custom
 tooling, dashboards, and integrations.
 </div></li>
-<li><div data-pos="379:3-380:1">
+<li><div data-pos="377:3-378:1">
 <strong>Any format</strong> that can express typed objects, attributes,
 and relations can map to and from SpecIR.
 </div></li>
 </ul>
 </div>
-<div data-pos="381:1-382:1">
+<div data-pos="379:1-380:1">
 <p>The formal separation of the SpecIR schema from the SpecCompiler
 implementation enables third-party tools to produce and consume SpecIR
 databases without depending on SpecCompiler.</p>
