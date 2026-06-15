@@ -1,3 +1,15 @@
+# Build, test, and publish the SpecCompiler image.
+#
+# The image is a thin overlay on the OFFICIAL pandoc image (Dockerfile.lean):
+# stock pandoc + our four C extensions + Lua source. There is no toolchain
+# image and no pandoc/GHC compilation — that was the pre-lean build
+# (Dockerfile, kept as the maintainer/air-gapped path).
+#
+# Published tags:
+#   :latest / :<sha> / semver  — the `full` target (core + deno/charts +
+#                                plantuml), what users and model overlays
+#                                (e.g. specc-abnt) consume.
+#   :lean                      — the core-only target (no external renderers).
 name: Build, Test, and Publish
 
 on:
@@ -9,7 +21,7 @@ on:
       - 'tests/**'
       - 'scripts/**'
       - 'assets/**'
-      - 'Dockerfile'
+      - 'Dockerfile.lean'
       - '.github/workflows/docker-publish.yml'
     tags: ['v*']
   pull_request:
@@ -20,92 +32,15 @@ on:
       - 'tests/**'
       - 'scripts/**'
       - 'assets/**'
-      - 'Dockerfile'
+      - 'Dockerfile.lean'
       - '.github/workflows/docker-publish.yml'
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  TOOLCHAIN_IMAGE: ghcr.io/${{ github.repository_owner }}/speccompiler-toolchain:latest
 
 jobs:
-  # ---------------------------------------------------------------------------
-  # Rebuild the toolchain image only when its source files change.
-  # Toolchain = Lua + Pandoc/GHC + Deno + PlantUML + all Lua native extensions.
-  # Normal source-code pushes skip this job entirely.
-  # ---------------------------------------------------------------------------
-  build-toolchain:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - name: Lowercase toolchain image name
-        run: echo "TOOLCHAIN_IMAGE=${TOOLCHAIN_IMAGE,,}" >> $GITHUB_ENV
-
-      - name: Check if toolchain files changed
-        id: check
-        run: |
-          # Fallback to listing all files if there is no prior commit (first push)
-          CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git ls-tree --name-only -r HEAD)
-          if echo "$CHANGED" | grep -qE \
-            '^(Dockerfile|scripts/versions\.env|scripts/build\.sh|src/tools/amath/|src/tools/echarts-render\.ts|src/tools/mml2omml\.ts)'; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Check if toolchain image exists in registry
-        id: image-exists
-        run: |
-          if docker manifest inspect ${{ env.TOOLCHAIN_IMAGE }} > /dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Set up Docker Buildx
-        if: steps.check.outputs.changed == 'true' || steps.image-exists.outputs.exists == 'false'
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GHCR
-        if: (steps.check.outputs.changed == 'true' || steps.image-exists.outputs.exists == 'false') && github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push toolchain
-        if: (steps.check.outputs.changed == 'true' || steps.image-exists.outputs.exists == 'false') && github.event_name != 'pull_request'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Dockerfile
-          target: toolchain
-          push: true
-          tags: ${{ env.TOOLCHAIN_IMAGE }}
-          cache-from: type=gha,scope=toolchain
-          cache-to: type=gha,mode=max,scope=toolchain
-
-      - name: Make toolchain package public
-        if: (steps.check.outputs.changed == 'true' || steps.image-exists.outputs.exists == 'false') && github.event_name != 'pull_request'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          curl -sf -X PATCH \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/orgs/${{ github.repository_owner }}/packages/container/speccompiler-toolchain" \
-            -d '{"visibility":"public"}' || echo "::warning::Could not set toolchain package visibility to public"
-
   build-and-test:
-    needs: build-toolchain
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -114,10 +49,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Lowercase image names
-        run: |
-          echo "IMAGE_NAME=${IMAGE_NAME,,}" >> $GITHUB_ENV
-          echo "TOOLCHAIN_IMAGE=${TOOLCHAIN_IMAGE,,}" >> $GITHUB_ENV
+      - name: Lowercase image name
+        run: echo "IMAGE_NAME=${IMAGE_NAME,,}" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -142,19 +75,31 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
-      - name: Build and push
+      - name: Build and push (full)
         id: build-push
         uses: docker/build-push-action@v6
         with:
           context: .
-          target: runtime
+          file: Dockerfile.lean
+          target: full
           push: ${{ github.event_name != 'pull_request' }}
           load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: TOOLCHAIN_IMAGE=${{ env.TOOLCHAIN_IMAGE }}
-          cache-from: type=gha,scope=main
-          cache-to: type=gha,mode=max,scope=main
+          cache-from: type=gha,scope=lean
+          cache-to: type=gha,mode=max,scope=lean
+
+      - name: Build and push (lean core)
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.lean
+          target: lean
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:lean
+          cache-from: type=gha,scope=lean
+          cache-to: type=gha,mode=max,scope=lean
 
       - name: Make package public
         if: github.event_name != 'pull_request'
@@ -177,11 +122,10 @@ jobs:
             -v "${{ github.workspace }}:/workspace" \
             -w /workspace \
             -e SPECCOMPILER_HOME=/workspace \
+            -e SPECCOMPILER_DIST=/opt/speccompiler \
+            --entrypoint bash \
             "${IMAGE}" \
-            sh -c '
-              [ -e vendor ] || ln -s /opt/speccompiler/vendor vendor
-              bash tests/run.sh --coverage
-            '
+            tests/run.sh --coverage
 
       - name: Upload coverage reports
         if: always()
@@ -238,7 +182,7 @@ jobs:
               -v "${{ github.workspace }}:/workspace" \
               -w /workspace \
               "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}" \
-              /opt/speccompiler/bin/speccompiler-core "$project"
+              build "$project"
           done
           cp docs/engineering_docs/build/docx/*.docx release-docs/ 2>/dev/null || true
           cp docs/engineering_docs/build/www/index.html release-docs/html5/engineering.html 2>/dev/null || true
@@ -258,20 +202,19 @@ jobs:
             THIRD_PARTY_NOTICES
           generate_release_notes: true
           body: |
-            ## Install
+            ## Install (native, stock pandoc)
 
-            ```bash
-            curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/scripts/install.sh | bash
-            ```
-
-            Or clone and build locally:
             ```bash
             git clone https://github.com/${{ github.repository }}.git
-            cd SpecCompiler && bash scripts/docker_build.sh && bash scripts/install.sh
+            cd SpecCompiler && bash scripts/install-native.sh
             ```
 
             ## Docker Image
 
+            Thin overlay on the official pandoc image — no compiler toolchain:
+
             ```bash
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
+            # core-only variant (no chart/plantuml renderers):
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:lean
             ```

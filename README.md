@@ -54,20 +54,24 @@ Docker is recommended. One-liner (Linux/Mac/WSL2):
 curl -fsSL https://raw.githubusercontent.com/SpecIR/SpecCompiler/main/scripts/install.sh | bash
 ```
 
-Or clone and build the Docker image locally:
+Or clone and build the Docker image locally — a thin overlay on the official
+pandoc image, no compiler toolchain:
 ```bash
 git clone https://github.com/SpecIR/SpecCompiler.git
 cd SpecCompiler
-bash scripts/docker_build.sh
+docker build -f Dockerfile.lean --target full -t speccompiler-core:latest .
 bash scripts/install.sh
 ```
 
-For native ubuntu/debian (builds all dependencies from source):
+For native ubuntu/debian (stock apt pandoc + compiled Lua extensions):
 ```bash
 git clone https://github.com/SpecIR/SpecCompiler.git
 cd SpecCompiler
-bash scripts/build.sh --install
+bash scripts/install-native.sh
 ```
+
+(`scripts/build.sh` / `scripts/docker_build.sh` remain as the maintainer path
+for building the entire toolchain — custom pandoc included — from source.)
 
 Build the docs.
 
