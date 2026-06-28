@@ -200,6 +200,9 @@ end
 ---@param dir string Directory path
 ---@return boolean success
 function M.ensure_dir(dir)
+    dir = tostring(dir or ""):gsub("/+$", "")
+    if dir == "" then return false end
+
     local stat = uv.fs_stat(dir)
     if stat then return true end
 

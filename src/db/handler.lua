@@ -9,6 +9,9 @@ function M.new(config)
     self.log = config.log
     self.sqlite = sqlite
     self.db = sqlite.open(config.db_file)
+    if not self.db then
+        error("Failed to open SQLite database: " .. tostring(config.db_file))
+    end
     -- Disable journaling entirely: the SpecIR database is rebuilt from source
     -- on each run, so crash recovery and durability are unnecessary.
     -- Eliminates journal file I/O that causes SQLITE_IOERR on ZFS/COW filesystems.
