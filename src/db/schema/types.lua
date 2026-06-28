@@ -315,6 +315,13 @@ CREATE TABLE IF NOT EXISTS implicit_type_aliases (
   -- FK to spec_object_types.identifier
   object_type_id TEXT NOT NULL,
 
+  -- Optional heading level the alias is restricted to. NULL means "any level"
+  -- (default). Structural types that render at a fixed depth (e.g. an ABNT
+  -- CONCLUSION chapter, always H2 in source) set this so a same-titled section
+  -- deeper in the document ("### Considerações Finais") is NOT mis-typed as the
+  -- chapter and promoted to chapter-level rendering.
+  alias_level INTEGER,
+
   FOREIGN KEY (object_type_id) REFERENCES spec_object_types(identifier)
 );
 

@@ -354,6 +354,22 @@ Level 2-6 headers declare requirements, design elements, sections, or any typed 
 
 If `@PID` is omitted, a PID is auto-generated using the type's `pid_prefix` and `pid_format`.
 
+A spec object owns the content that follows it until the section is closed. A section closes automatically at the next header of equal or shallower level, and child headers must go exactly one level deeper (jumping from `##` to `####` is reported as a broken hierarchy). To close a section **without** opening a new heading -- so that the next paragraphs or `include`d sections belong to the parent -- end it with a `----` thematic break:
+
+```src.markdown:src-section-close{caption="Closing a section with ----"}
+## Pesquisa-Ação @SEC-PA
+
+### Considerações Iniciais
+
+Intro that belongs to "Considerações Iniciais".
+
+----
+
+This paragraph belongs to the chapter, not the section above.
+```
+
+The `----` is consumed (it never renders as a horizontal rule). Do not use an empty `##` as a "section reset": an empty heading is rejected because it would render as a blank numbered chapter and shift all later numbering.
+
 ### Attributes
 
 Blockquotes declare attributes using the `key: value` pattern. They belong to the most recently opened Specification or SpecObject header and do not need to appear immediately after it:

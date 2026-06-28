@@ -1,11 +1,30 @@
 # E2E Test Suite: Assembly
-# Verifies: Document assembly preserves file_seq order (not alphabetical from_file)
+# Verifies document assembly: file_seq ordering and heading-hierarchy well-formedness.
+#
+# Traceability (docs/engineering_docs):
+#   HLR-OUT-001 Document Assembly   - preserves file_seq order; adjusts header
+#                                     levels for cross-file includes
+#   HLR-PIPE-008 Include Expansion  - include nesting / path resolution
+#
+# Test case -> VC mapping:
+#   vc_out_001_01_assembly_order    -> VC-OUT-001  document ordering with includes
+#   vc_out_008_01_heading_hierarchy -> VC-OUT-008  deep-include multi-level: asserts
+#                                                   real DOCX Heading styles
+#                                                   (siblings / children / ascending)
+#   vc_out_008_02_broken_hierarchy  -> VC-OUT-008  object_broken_hierarchy rejects
+#                                                   skipped levels, orphaned roots,
+#                                                   and empty headings; leaves valid
+#                                                   hierarchies untouched
+#   vc_out_009_01_section_close     -> VC-OUT-009  `----` closes a section's scope
+#                                                   (end_line truncates), the marker is
+#                                                   consumed, trailing content keeps order
+#                                                   [HLR-PIPE-012]
+#   vc_out_010_01_cross_format_levels -> VC-OUT-010  LaTeX and DOCX render the same
+#                                                   heading at the same depth (no
+#                                                   cross-format nesting divergence)
 
 project:
   code: TEST_ASSEMBLY
   name: Document Assembly Tests
 
 output_format: json
-
-# Test case mapping:
-# - vc_assembly_001_order.md -> Document ordering with includes

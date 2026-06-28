@@ -22,6 +22,8 @@ The system shall reconstruct a complete Pandoc document from [dic:intermediate-r
 > 4. **Spec views**: Placeholder CodeBlocks for views at their document positions (expanded later by the view emitter)
 >
 > The assembled document includes Pandoc metadata built from specification attributes (title, author, date). The result is a valid `pandoc.Pandoc` document suitable for format-specific output.
+>
+> Header-level adjustment rescales the shallowest header level to the top output level uniformly; it therefore assumes the source header levels form a well-formed tree (contiguous nesting, a single root depth). That precondition is enforced declaratively by the `object_broken_hierarchy` verification view, which rejects skipped levels and orphaned roots before emission rather than letting a malformed hierarchy mis-render silently.
 
 > rationale: Decoupling parsing from rendering enables format-agnostic processing through the pipeline. Database-backed assembly allows cross-document operations (shared numbering, cross-references) that sequential file processing cannot achieve.
 

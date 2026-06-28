@@ -196,7 +196,8 @@ local function insert_object(data, schema)
         for _, alias in ipairs(schema.implicit_aliases) do
             data:execute(Queries.types.insert_implicit_alias, {
                 alias = alias,
-                type_id = schema.id
+                type_id = schema.id,
+                alias_level = schema.implicit_alias_level
             })
         end
     end

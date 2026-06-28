@@ -223,3 +223,68 @@ Verify that [dic:full-text-search](#) virtual tables are populated with specific
 > - AST content is converted to plain text before indexing (no JSON fragments)
 
 > traceability: [HLR-OUT-007](@), [LLR-082](@), [LLR-083](@)
+
+
+### VC: Heading Hierarchy Well-formedness @VC-OUT-008
+
+Verify that header levels assembled across cross-file includes form a well-formed tree, that the renderer maps them to the correct heading depth, and that structurally invalid hierarchies are rejected before emission.
+
+> objective: Confirm that the `object_broken_hierarchy` verification view rejects skipped heading levels and orphaned roots, that a heading's level survives deep include nesting unchanged, and that the assembler maps valid levels to the correct DOCX Heading style (siblings share a style, children nest one deeper, ascending returns to the shallower style).
+
+> verification_method: Test
+
+> approach:
+> - Build a five-file-deep include chain mixing descents, an ascent (level 4 back to level 2), and sibling chapters; generate DOCX and assert the `w:pStyle` of each heading in document order
+> - Build fixtures with a skipped level (`##` then `####`) and with an orphaned root (a document opening at level 3 with a shallower level-2 heading later, including the case where the chapter is one include deeper than the section)
+> - Build a contiguous multi-level control with an ascent
+
+> pass_criteria:
+> - Include nesting never changes a heading's level; level is governed only by the markdown `#`-count
+> - Valid hierarchy maps to `Heading1/2/3` so that siblings share a style, each child is exactly one level deeper, and an ascent returns to the shallower style
+> - A skipped level raises an `object_broken_hierarchy` error naming the skipped level
+> - An orphaned root raises an `object_broken_hierarchy` error, including when the parent chapter is one include deep
+> - The contiguous control raises no `object_broken_hierarchy` diagnostic
+
+> traceability: [HLR-OUT-001](@), [HLR-PIPE-008](@)
+
+
+### VC: Section Scope Termination @VC-OUT-009
+
+Verify that a `----` thematic break closes the current section's scope, is consumed from output, and that empty headings are rejected.
+
+> objective: Confirm that a `----` truncates the enclosing spec object's `end_line` (so trailing content/floats are contained by the parent), that the marker produces no horizontal rule in the DOCX, that content after the marker keeps its document position, and that an empty heading is reported by `object_broken_hierarchy`.
+
+> verification_method: Test
+
+> approach:
+> - Build a section containing body, a `----`, and trailing content; query `spec_objects.end_line` and assert it truncates at the marker
+> - Generate DOCX and assert no horizontal-rule border is emitted and the trailing content is still present in document order
+> - Build a fixture with an empty `##` heading and assert an `object_broken_hierarchy` error is raised
+
+> pass_criteria:
+> - The section's `end_line` ends at the last block before the `----`, not at the next header
+> - The DOCX contains no horizontal-rule paragraph for the consumed marker
+> - Content following the `----` renders in its original position
+> - An empty heading raises `object_broken_hierarchy` and the message directs the author to use `----`
+
+> traceability: [HLR-PIPE-012](@), [HLR-OUT-001](@)
+
+
+### VC: Cross-Format Heading Consistency @VC-OUT-010
+
+Verify that LaTeX and DOCX render the same heading at the same depth, since both are produced from one assembled IR.
+
+> objective: Confirm that a heading maps to the same depth in every output format — a section is `\section` in LaTeX and Heading2 in DOCX, never one nesting level deeper in one format than the other.
+
+> verification_method: Test
+
+> approach:
+> - Build one multi-level fixture (chapter / section / subsection) to both LaTeX and DOCX
+> - Extract the ordered (depth, title) sequence from each: LaTeX `\chapter`/`\section`/`\subsection` -> 1/2/3; DOCX Heading1/2/3 -> 1/2/3
+> - Assert the two sequences are identical
+
+> pass_criteria:
+> - The number of headings matches across formats
+> - Each heading's depth is identical in LaTeX and DOCX
+
+> traceability: [HLR-OUT-001](@), [HLR-OUT-004](@)

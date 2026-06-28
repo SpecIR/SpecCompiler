@@ -263,6 +263,91 @@ WHERE ad.min_occurs > 0
   );
 ]]
 
+-- Broken heading hierarchy: header levels that do not form a well-formed tree.
+-- The IR stores each header's literal markdown level (## -> 2, ### -> 3); the
+-- assembler later rescales the shallowest level to H1 (normalize_header_levels)
+-- and the writers map level -> Heading style / \section depth. That rescale is
+-- uniform and unvalidated, so a malformed source hierarchy passes through
+-- silently and mis-renders (e.g. a skipped level produces a Word "1.0.1" number,
+-- an orphaned opening heading becomes a chapter). This view enumerates the two
+-- structurally-invalid cases, in document (file_seq) order, per specification:
+--
+--   skipped_level: a heading more than one level deeper than the preceding
+--                  heading (e.g. ## directly to ####), which leaves a phantom
+--                  missing intermediate level.
+--   orphan_root:   the document's first heading sits deeper than its shallowest
+--                  heading, i.e. a shallower heading appears later and the
+--                  opening heading has no parent at its own level.
+--
+-- Ascending any number of levels (#### -> ##) is valid (it closes subsections),
+-- and include nesting never changes a header's level, so neither is flagged.
+M.view_object_broken_hierarchy = [[
+CREATE VIEW IF NOT EXISTS view_object_broken_hierarchy AS
+WITH ordered AS (
+  SELECT
+    so.id AS object_id,
+    so.specification_ref,
+    so.from_file,
+    so.start_line,
+    so.title_text,
+    so.level,
+    so.file_seq,
+    LAG(so.level)      OVER (PARTITION BY so.specification_ref ORDER BY so.file_seq) AS prev_level,
+    LAG(so.title_text) OVER (PARTITION BY so.specification_ref ORDER BY so.file_seq) AS prev_title
+  FROM spec_objects so
+),
+roots AS (
+  SELECT specification_ref,
+         MIN(level)    AS root_level,
+         MIN(file_seq) AS first_seq
+  FROM spec_objects
+  GROUP BY specification_ref
+)
+SELECT
+  o.object_id,
+  o.from_file,
+  o.start_line,
+  o.title_text,
+  o.level,
+  o.prev_level AS context_level,
+  o.prev_title AS context_title,
+  'skipped_level' AS defect
+FROM ordered o
+WHERE o.prev_level IS NOT NULL
+  AND o.level > o.prev_level + 1
+UNION ALL
+SELECT
+  o.object_id,
+  o.from_file,
+  o.start_line,
+  o.title_text,
+  o.level,
+  r.root_level AS context_level,
+  NULL AS context_title,
+  'orphan_root' AS defect
+FROM ordered o
+JOIN roots r
+  ON r.specification_ref = o.specification_ref
+ AND o.file_seq = r.first_seq
+WHERE o.level > r.root_level
+UNION ALL
+-- empty_title: a heading with no title text. It renders as an empty numbered
+-- heading (e.g. a blank chapter "3"), corrupting downstream numbering. This is
+-- the failure mode of the empty-`##` "section reset" hack; authors should close
+-- a section with a `----` thematic break instead of an empty heading.
+SELECT
+  o.object_id,
+  o.from_file,
+  o.start_line,
+  o.title_text,
+  o.level,
+  NULL AS context_level,
+  NULL AS context_title,
+  'empty_title' AS defect
+FROM ordered o
+WHERE o.title_text IS NULL OR TRIM(o.title_text) = '';
+]]
+
 -- ============================================================================
 -- Relation verification_views
 -- ============================================================================

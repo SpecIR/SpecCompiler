@@ -179,6 +179,27 @@ Nested objects:
 Passwords shall be at least 12 characters.
 ```
 
+#### Scope and Section Close
+
+A spec object's **scope** --- the body content and floats it contains --- runs from its header until the section is closed. A section closes in one of two ways:
+
+1. **Automatically**, at the next header of equal or shallower level (the usual case). A child object must be exactly one heading level deeper than its parent; skipping a level (for example `##` directly to `####`) is rejected as a broken hierarchy.
+2. **Manually**, at a `----` thematic break. The marker closes the current section so that following content belongs to the parent scope, and it is **consumed** --- it produces no horizontal rule in the output.
+
+A `----` is the correct way to end a section without opening a new heading. It replaces the anti-pattern of an empty `##` used as a "section reset": an **empty heading** (a header with no title) is rejected, because it would render as a blank numbered heading and corrupt downstream numbering.
+
+```
+## Pesquisa-Ação @SEC-PA
+
+### Considerações Iniciais
+
+Intro body that belongs to "Considerações Iniciais".
+
+----
+
+This trailing paragraph belongs to the chapter, not to the section above.
+```
+
 ### Spec Float
 
 A **Spec Float** is a numbered floating element --- a figure, table, diagram, code listing, or math expression. Floats are created from fenced code blocks with a `TypeRef:Label` info string. They are automatically numbered within their counter group and can be cross-referenced by label.

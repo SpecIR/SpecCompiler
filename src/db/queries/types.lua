@@ -44,8 +44,8 @@ M.insert_object_type = [[
 ]]
 
 M.insert_implicit_alias = [[
-    INSERT OR REPLACE INTO implicit_type_aliases (alias, object_type_id)
-    VALUES (:alias, :type_id)
+    INSERT OR REPLACE INTO implicit_type_aliases (alias, object_type_id, alias_level)
+    VALUES (:alias, :type_id, :alias_level)
 ]]
 
 -- ============================================================================
@@ -143,10 +143,12 @@ M.spec_type_exists = [[
     SELECT 1 FROM spec_specification_types WHERE identifier = :type_ref
 ]]
 
--- Resolve implicit object type alias from title
+-- Resolve implicit object type alias from title, honouring the optional
+-- per-alias level restriction (NULL alias_level matches any header level).
 M.implicit_object_type_alias = [[
     SELECT object_type_id FROM implicit_type_aliases
     WHERE alias = :alias COLLATE NOCASE
+      AND (alias_level IS NULL OR alias_level = :level)
     LIMIT 1
 ]]
 

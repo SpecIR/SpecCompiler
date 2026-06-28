@@ -70,33 +70,44 @@ end
 
 ---Generate source attribution as Pandoc block.
 ---The source text is parsed as markdown to handle citations.
----Returns a Div with custom-style so it renders with proper styling.
+---Returns a semantic Div with custom-style so it renders with proper styling.
 ---@param float table Float record with attributes
 ---@param preset table|nil Preset configuration
+---@param caption_config table|nil Per-float caption/source configuration
 ---@return table|nil Pandoc Div block with styled source paragraph, or nil
-function M.get_source_block(float, preset)
+function M.get_source_block(float, preset, caption_config)
     local source = M.get_source_text(float, preset)
     if not source then
         return nil
     end
 
-    -- Get source style and template from preset.floats (required for source formatting)
-    local source_style = preset and preset.floats and preset.floats.source_style
-    local source_template = preset and preset.floats and preset.floats.source_template
+    caption_config = caption_config or {}
+    local floats_cfg = (preset and preset.floats) or {}
+
+    -- Per-float source style wins over the generic preset fallback. ABNT, for
+    -- example, declares FigureSource/TableSource in enhanced_captions.
+    local source_style = caption_config.source_style or floats_cfg.source_style
+    local source_template = nil
+    if caption_config.source_prefix then
+        source_template = tostring(caption_config.source_prefix) .. "%s"
+    else
+        source_template = floats_cfg.source_template
+    end
     if not source_style or not source_template then return nil end
     local source_text = string.format(source_template, source)
 
-    -- Parse source_text as markdown to handle citations
-    -- This converts @citation patterns to proper Cite elements
+    -- Parse source_text as markdown. Plain source="@key" is enough for
+    -- Pandoc's citation parser to emit a Cite node.
     local parsed_doc = pandoc.read(source_text, 'markdown')
     local content_blocks = parsed_doc.blocks
 
     -- Create Pandoc Div with custom-style attribute
     -- Pandoc's writers will apply the custom-style as a paragraph style
-    local source_div = pandoc.Div(
-        content_blocks,
-        pandoc.Attr("", {}, { ["custom-style"] = source_style })
-    )
+    local source_div = pandoc.Div(content_blocks, pandoc.Attr("", {"speccompiler-source"}, {
+        ["custom-style"] = source_style,
+        ["float-type"] = tostring(float.type_ref or ""):upper(),
+        ["source-style"] = source_style,
+    }))
 
     return source_div
 end

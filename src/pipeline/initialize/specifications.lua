@@ -120,6 +120,26 @@ local function get_block_end_line(block)
     return nil
 end
 
+---Detect a thematic break (`----`, the Pandoc HorizontalRule), possibly wrapped
+---in a sourcepos Div. Used as a manual section terminator: a `----` closes the
+---current spec object's scope so that following content (and any floats) is
+---contained by the parent section instead of the one just closed. Authoring a
+---thematic break is the explicit alternative to relying on the next header to
+---close a section; the marker itself is consumed (it does not render).
+---@param block table Pandoc block
+---@return boolean
+local function is_thematic_break(block)
+    if not block then return false end
+    if block.t == "HorizontalRule" then return true end
+    if block.t == "Div" then
+        local content = block.content or (block.c and block.c[2]) or {}
+        if #content == 1 and content[1] and content[1].t == "HorizontalRule" then
+            return true
+        end
+    end
+    return false
+end
+
 ---Get source file from a block's attributes (from include expansion)
 ---@param block table Pandoc block
 ---@return string|nil source_file
@@ -194,13 +214,18 @@ local function is_valid_specification_type(data, type_ref)
     return result and #result > 0
 end
 
----Resolve implicit type from title via implicit_type_aliases table
+---Resolve implicit type from title via implicit_type_aliases table.
+---An alias restricted to a specific heading level (alias_level) only matches a
+---header at that level, so a section titled like a structural chapter (e.g.
+---"### Considerações Finais") is not mis-typed as the chapter.
 ---@param data DataManager
 ---@param title string
+---@param level number Header level of the candidate object
 ---@return string|nil object_type_id
-local function resolve_implicit_type(data, title)
+local function resolve_implicit_type(data, title, level)
     local trimmed = title:match("^%s*(.-)%s*$")
-    local result = data:query_one(Queries.types.implicit_object_type_alias, { alias = trimmed })
+    local result = data:query_one(Queries.types.implicit_object_type_alias,
+        { alias = trimmed, level = level })
     return result and result.object_type_id or nil
 end
 
@@ -260,26 +285,43 @@ end
 ---@return integer|nil end_line Last source line of the section
 local function collect_section_blocks(blocks, start_idx, end_idx, pid, header_line)
     local section_blocks = {}
+    -- A `----` thematic break manually closes the section: its scope (end_line)
+    -- ends at the last block before the marker, so trailing content/floats are
+    -- contained by the parent. The marker is consumed (never rendered). Content
+    -- after the marker (before the next header) stays in document order.
+    local scope_end_line = nil
+    local closed = false
     for j = start_idx, end_idx do
         local block = blocks[j]
-        if block.t == "Header" and pid and block.attr then
-            block.attr.identifier = pid
-            -- Strip @PID notation from header inlines — PID is stored
-            -- separately and should not appear in rendered output
-            if block.content then
-                strip_pid_from_inlines(block.content, pid)
+        if is_thematic_break(block) then
+            if not closed then
+                local prev = section_blocks[#section_blocks]
+                if prev then
+                    scope_end_line = get_block_end_line(prev) or get_block_line(prev)
+                end
+                closed = true
             end
+            -- consume the marker: do not add it to section_blocks
+        else
+            if block.t == "Header" and pid and block.attr then
+                block.attr.identifier = pid
+                -- Strip @PID notation from header inlines — PID is stored
+                -- separately and should not appear in rendered output
+                if block.content then
+                    strip_pid_from_inlines(block.content, pid)
+                end
+            end
+            table.insert(section_blocks, block)
         end
-        table.insert(section_blocks, block)
     end
 
-    local end_line = nil
-    if #section_blocks > 0 then
+    local end_line = scope_end_line
+    if not end_line and #section_blocks > 0 then
         end_line = get_block_end_line(section_blocks[#section_blocks])
             or get_block_line(section_blocks[#section_blocks])
-        if not end_line then
-            end_line = header_line + #section_blocks
-        end
+    end
+    if not end_line then
+        end_line = header_line + #section_blocks
     end
 
     return section_blocks, end_line
@@ -307,8 +349,9 @@ local function resolve_header_type(data, diagnostics, header, type_ref, title, h
                 type_ref = implicit_spec_type
             end
         else
-            -- Try implicit object type from title (level 2+)
-            local implicit_type = resolve_implicit_type(data, title)
+            -- Try implicit object type from title (level 2+); the candidate's
+            -- header level gates level-restricted aliases.
+            local implicit_type = resolve_implicit_type(data, title, header.level)
             if implicit_type and is_valid_object_type(data, implicit_type) then
                 type_ref = implicit_type
             end

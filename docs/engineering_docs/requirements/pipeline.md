@@ -192,3 +192,16 @@ The system shall distinguish a handler prerequisite that resolves to another pha
 
 > status: Approved
 
+
+#### HLR: Section Scope Termination @HLR-PIPE-012
+
+A [dic:spec-object](#)'s scope shall be closed either automatically by the next header of equal-or-shallower level, or manually by a `----` thematic break, and a heading shall not be empty.
+
+> description: When the INITIALIZE phase delimits each header's section, the scope (the `end_line` that governs which trailing content and floats the object contains) ends at the first `----` thematic break inside the section, if present, rather than only at the next header. The thematic break is consumed — it is removed from the rendered body and produces no horizontal rule. Content between the marker and the next header keeps its document position but is contained by the parent section. This gives authors an explicit way to close a section without introducing a heading, replacing the anti-pattern of an empty `##` used as a "section reset".
+>
+> An empty heading (a header whose title is blank) is rejected: it would otherwise render as an empty numbered heading and corrupt downstream numbering. The `object_broken_hierarchy` verification view reports it as an error and directs the author to use `----` instead.
+
+> rationale: Section scope previously closed only at the next header, so authors who wanted trailing content to belong to a parent section resorted to an empty heading, which renders as a blank numbered chapter and shifts all subsequent numbering. A consumed thematic break expresses the intent precisely with no rendering artifact, and rejecting empty headings removes the failure mode entirely.
+
+> status: Approved
+

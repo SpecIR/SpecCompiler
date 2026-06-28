@@ -71,8 +71,8 @@ local function render_with_decoration(float, content, preset)
         )
     end
 
-    -- Get source line (already format-agnostic Pandoc Div with custom-style)
-    local source_block = float_base.get_source_block(float, preset)
+    -- Get source line (format-agnostic semantic Div with custom-style)
+    local source_block = float_base.get_source_block(float, preset, config)
 
     if position == 'before' then
         -- Caption above content, source below
