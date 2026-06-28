@@ -13,7 +13,7 @@ local hook_ctx = require("pipeline.shared.hook_ctx")
 
 local M = {
     name = "relation_link_rewriter",
-    prerequisites = { "float_numbering" }
+    prerequisites = { "float_numbering", "spec_floats_transform" }
 }
 
 ---Preload the float type alias map: canonical_prefix -> {all_aliases}.
@@ -206,6 +206,7 @@ local function rewrite_links(data, spec_id, relation_lookup, select_query, sourc
     for _, row in ipairs(rows or {}) do
         local decoded = pandoc.json.decode(row.ast)
         if decoded then
+            local original_is_single_block = decoded.t ~= nil
             local blocks = ast_utils.extract_blocks(decoded)
 
             if blocks and #blocks > 0 then
@@ -265,7 +266,8 @@ local function rewrite_links(data, spec_id, relation_lookup, select_query, sourc
 
                 -- If modified, update the stored AST
                 if modified then
-                    local new_ast = pandoc.json.encode(temp_doc.blocks)
+                    local payload = original_is_single_block and temp_doc.blocks[1] or temp_doc.blocks
+                    local new_ast = pandoc.json.encode(payload)
                     data:execute(update_query, { id = row.id, ast = new_ast })
                 end
             end
@@ -285,6 +287,16 @@ function M.on_transform(data, contexts, diagnostics)
             Queries.content.objects_with_ast, "id", Queries.content.update_object_ast)
         rewrite_links(data, spec_id, relation_lookup,
             Queries.content.attributes_with_ast, "owner_object_id", Queries.content.update_attribute_ast)
+        rewrite_links(data, spec_id, relation_lookup,
+            [[
+                SELECT id, parent_object_id, resolved_ast AS ast
+                FROM spec_floats
+                WHERE specification_ref = :spec_id
+                  AND resolved_ast IS NOT NULL
+                  AND parent_object_id IS NOT NULL
+            ]],
+            "parent_object_id",
+            [[ UPDATE spec_floats SET resolved_ast = :ast WHERE id = :id ]])
     end
     data:commit()
 end

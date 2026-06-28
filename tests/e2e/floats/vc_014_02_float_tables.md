@@ -21,16 +21,16 @@ Type C	100	20%
 ## List Table
 
 ```list-table:list-example{caption="List Table Example" header-rows=1}
-- - Feature
+* - Feature
   - Status
   - Notes
-- - Authentication
+* - Authentication
   - Complete
   - OAuth2 implemented
-- - Authorization
+* - Authorization
   - In Progress
   - Role-based access
-- - Logging
+* - Logging
   - Pending
-  - Structured logs needed
+  - Structured logs needed; see [SPEC-FLOAT-002-sec1](@), [csv:csv-example](#), and [smith2024](@cite)
 ```

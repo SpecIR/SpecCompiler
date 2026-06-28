@@ -2,10 +2,12 @@ local logger = require("infra.logger")
 local Queries = require("db.queries")
 local hash_utils = require("infra.hash_utils")
 local cache_registry = require("pipeline.shared.cache_registry")
+local registry = require("contract.registry")
+local hook_ctx = require("pipeline.shared.hook_ctx")
 
 local M = {
     name = "spec_relations",
-    prerequisites = {"spec_objects", "attributes"}  -- Needs attributes for AST link extraction
+    prerequisites = {"spec_objects", "attributes", "spec_floats_initialize"}  -- Needs attributes/floats for link extraction
 }
 
 -- Import spec_floats for get_type_prefix (label/prefix normalization) and
@@ -159,23 +161,39 @@ end
 
 local function find_links(node, links)
     if node == nil then return end
+    local node_type = type(node)
+    if node_type ~= "table" and node_type ~= "userdata" then return end
 
     if node.t == "Link" then
         links[#links + 1] = node
         return
     end
 
-    if node.t then
-        if node.content then
-            for i = 1, #node.content do
-                find_links(node.content[i], links)
-            end
+    local traversed_named = false
+
+    if node.content then
+        for i = 1, #node.content do
+            find_links(node.content[i], links)
         end
-        return
+        traversed_named = true
+    elseif node.c then
+        find_links(node.c, links)
+        traversed_named = true
+    end
+    for _, key in ipairs({ "caption", "head", "bodies", "body", "foot", "rows", "cells", "contents" }) do
+        if node[key] then
+            find_links(node[key], links)
+            traversed_named = true
+        end
     end
 
-    for i = 1, #node do
-        find_links(node[i], links)
+    if traversed_named then return end
+
+    local ok_len, len = pcall(function() return #node end)
+    if ok_len then
+        for i = 1, len do
+            find_links(node[i], links)
+        end
     end
 end
 
@@ -315,6 +333,84 @@ local function process_attribute_links(data, ctx, spec_id, seen_keys)
     return relation_count, attr_link_count
 end
 
+local function process_table_float_links(data, ctx, spec_id, diagnostics)
+    local host = registry.current()
+    if not host then return 0 end
+
+    local floats = data:query_all([[
+        SELECT id, type_ref, from_file, start_line, raw_content, parent_object_id,
+               pandoc_attributes, syntax_key
+        FROM spec_floats
+        WHERE specification_ref = :spec_id
+          AND type_ref = 'TABLE'
+          AND raw_content IS NOT NULL
+          AND raw_content != ''
+          AND parent_object_id IS NOT NULL
+    ]], { spec_id = spec_id }) or {}
+
+    local relation_count = 0
+
+    for _, float in ipairs(floats) do
+        local transform = host:get_hook_inherited("float", float.type_ref, "transform")
+        if not transform then goto continue_float end
+
+        local dctx = hook_ctx.build_data({ log = ctx.log or logger }, data, diagnostics, {
+            raw_content = float.raw_content,
+            float = float,
+        }, "transform", spec_id)
+
+        local resolved = transform(dctx)
+        if not resolved then goto continue_float end
+
+        local decoded = pandoc.json.decode(resolved)
+        if not decoded then goto continue_float end
+
+        local elements = type(decoded) == "table" and decoded or { decoded }
+        local links = {}
+        find_links(elements, links)
+        local seen_float_links = {}
+
+        for _, link in ipairs(links) do
+            local target = extract_json_link_target(link)
+            local content = link.content or (link.c and link.c[2])
+            local content_text = content and stringify_inlines(content) or ""
+            local raw_key = tostring(target or "") .. "|" .. content_text
+            if seen_float_links[raw_key] then goto continue_link end
+            seen_float_links[raw_key] = true
+
+            local link_obj = {
+                t = "Link",
+                target = target,
+                content = content_text,
+                classes = link.classes or {},
+                attributes = link.attributes or {},
+            }
+
+            local target_text, _, prefix, explicit_scope, selector = parse_link_syntax(link_obj, data)
+            if target_text then
+                relation_count = relation_count + 1
+                insert_relation(
+                    data,
+                    spec_id,
+                    float.parent_object_id,
+                    build_stored_target_text(target_text, prefix, explicit_scope),
+                    nil,
+                    float.from_file or (ctx.doc and ctx.doc.source_path or "unknown"),
+                    float.start_line or 0,
+                    nil,
+                    selector
+                )
+            end
+
+            ::continue_link::
+        end
+
+        ::continue_float::
+    end
+
+    return relation_count
+end
+
 ---@param data DataManager
 ---@param contexts Context[]
 ---@param diagnostics Diagnostics
@@ -337,12 +433,13 @@ function M.on_initialize(data, contexts, diagnostics)
 
         local spec_id = ctx.spec_id or "default"
 
-        if not doc.walk_links then goto continue end
-
         local attr_relation_keys = {}
         local attr_relations_count, attr_link_count = process_attribute_links(data, ctx, spec_id, attr_relation_keys)
         local relation_count = attr_relations_count
-        relation_count = relation_count + process_document_links(data, doc, spec_id, attr_relation_keys)
+        if doc.walk_links then
+            relation_count = relation_count + process_document_links(data, doc, spec_id, attr_relation_keys)
+        end
+        relation_count = relation_count + process_table_float_links(data, ctx, spec_id, diagnostics)
 
         -- Log summary
         if attr_link_count > 0 then
