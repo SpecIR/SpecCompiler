@@ -74,7 +74,7 @@ Results Reports. Each type declares version, status, and date attributes.
 Summary) computes requirement coverage statistics. [csu:requirements-summary-view](#) (Requirements Summary)
 generates requirement status dashboards.
 
-[csc:sw-docs-verification-views](#) (SW Docs Analyze Queries) provides domain-specific traceability verification rules.
+[csc:sw-docs-analyze-queries](#) (SW Docs Analyze Queries) provides domain-specific traceability verification rules.
 [csu:vc-missing-hlr-traceability](#) (VC Missing HLR Traceability) ensures every verification case traces to at least
 one HLR. [csu:tr-missing-vc-traceability](#) (TR Missing VC Traceability) ensures every test result traces to a
 verification case. [csu:hlr-missing-vc-coverage](#) (HLR Missing VC Coverage) ensures every HLR is covered by at

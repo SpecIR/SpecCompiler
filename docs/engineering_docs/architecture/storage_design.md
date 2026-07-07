@@ -66,7 +66,7 @@ high-level query API used by all pipeline phases — inserting spec entities dur
 updating references during RESOLVE, and reading assembled content during EMIT. [csu:build-cache](#)
 (Build Cache) queries `build_graph` to detect changed documents via SHA1 comparison of every
 recorded node (root and includes). [csu:output-cache](#) (Output Cache) tracks generated output
-files and the hash of their serialized render input to skip redundant generation. [csu:verification-view-definitions](#) (Analyze Query Definitions) materializes SQL analyze query
+files and the hash of their serialized render input to skip redundant generation. [csu:analyze-query-loader](#) (Analyze Query Loader) materializes SQL analyze query
 views at build time for the ANALYZE phase.
 
 [csc:db-schema](#) (DB Schema) defines the database structure through composable modules.

@@ -160,3 +160,24 @@ Verify analyze queries detect data integrity violations.
 > - Error messages include file path and line number
 
 > traceability: [HLR-TYPE-007](@), [LLR-068](@), [LLR-069](@)
+
+
+### VC: UTF-8 Label Slugification @VC-INT-016
+
+Verify that generated object labels transliterate UTF-8 titles into stable ASCII slugs.
+
+> objective: Confirm object label generation produces deterministic cross-reference labels for titles containing accents, punctuation, and non-ASCII characters.
+
+> verification_method: Test
+
+> approach:
+> - Process a document with typed headings containing UTF-8 characters
+> - Execute the pipeline through initialization and resolution
+> - Query generated `spec_objects.label` values
+
+> pass_criteria:
+> - Accented characters are transliterated consistently
+> - Punctuation and whitespace normalize to stable slug separators
+> - Generated labels remain usable as `(#)` cross-reference targets
+
+> traceability: [HLR-TYPE-002](@), [LLR-057](@), [LLR-058](@), [LLR-059](@)

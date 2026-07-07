@@ -359,7 +359,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > path: src/pipeline/
 
-> description: Phase handlers implementing initialize, analyze, transform, verify, and emit behavior across five pipeline phases.
+> description: Phase handlers implementing initialize, resolve, transform, analyze, and emit behavior across five pipeline phases.
 
 ##### CSU: Include Expansion Filter @CSU-030
 
@@ -373,7 +373,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Analyze Handler @CSU-031
 
-> file_path: src/pipeline/verify/verify_handler.lua
+> file_path: src/pipeline/analyze/analyze_handler.lua
 
 > language: Lua
 
@@ -381,19 +381,19 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > traceability: [CSC-003](@)
 
-##### Analyze Handlers Package
+##### Resolve Handlers Package
 
 #### CSC: Analyze Handlers @CSC-008
 
 > component_type: Package
 
-> path: src/pipeline/analyze/
+> path: src/pipeline/resolve/
 
 > description: RESOLVE phase handlers for relation resolution, relation type inference, and attribute casting.
 
 ##### CSU: Attribute Caster @CSU-032
 
-> file_path: src/pipeline/analyze/attribute_caster.lua
+> file_path: src/pipeline/resolve/attribute_caster.lua
 
 > language: Lua
 
@@ -403,7 +403,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Relation Resolver @CSU-033
 
-> file_path: src/pipeline/analyze/relation_resolver.lua
+> file_path: src/pipeline/resolve/relation_resolver.lua
 
 > language: Lua
 
@@ -413,7 +413,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Relation Type Inferrer @CSU-161
 
-> file_path: src/pipeline/analyze/relation_type_inferrer.lua
+> file_path: src/pipeline/resolve/relation_type_inferrer.lua
 
 > language: Lua
 

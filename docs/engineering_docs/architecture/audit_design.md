@@ -147,16 +147,16 @@ The audit subsystem is realized through core runtime components and the default 
 view package.
 
 [csc:core-runtime](#) (Core Runtime) provides the verification infrastructure. [csu:build-engine](#) (Build
-Engine) drives the build lifecycle and content-addressed hash computation. [csu:verification-view-loader](#)
+Engine) drives the build lifecycle and content-addressed hash computation. [csu:analyze-query-loader](#)
 (Analyze Query Loader) discovers and loads analyze query modules from model directories, registering them with
 the data manager for ANALYZE phase execution. [csu:validation-policy](#) (Validation Policy) maps analyze query
 `policy_key` values to configured severity levels (error, warn, ignore) from `project.yaml`.
-[csu:verify-handler](#) (Analyze Handler) iterates over registered analyze queries during ANALYZE, querying each
+[csu:analyze-handler](#) (Analyze Handler) iterates over registered analyze queries during ANALYZE, querying each
 via [csu:data-manager](#) (Data Manager) and emitting violations through [csu:diagnostics-collector](#) (Diagnostics
 Collector). [csu:pipeline-orchestrator](#) (Pipeline Orchestrator) inspects diagnostics after ANALYZE and aborts
 before EMIT if errors exist.
 
-[csc:default-verification-views](#) (Default Analyze Queries) provides the baseline verification rules organized by the
+[csc:default-analyze-queries](#) (Default Analyze Queries) provides the baseline verification rules organized by the
 SpecIR 5-tuple. Specification analyze queries: [csu:spec-missing-required](#) (Spec Missing Required) validates that
 required specification attributes are present, and [csu:spec-invalid-type](#) (Spec Invalid Type) validates
 that specification types are registered. Object analyze queries: [csu:object-missing-required](#) (Object Missing Required)

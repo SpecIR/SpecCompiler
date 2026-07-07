@@ -260,7 +260,7 @@ Given an XHTML [dic:attribute](#) raw_value, [csu:attribute-parser](#) shall pre
 
 #### LLR: Analyze Query Registration @LLR-068
 
-Given a [dic:verification-view](#) SQL string, [csu:verification-view-loader](#) shall register it as a `CREATE VIEW` in the [dic:specir](#) database during the [dic:analyze-phase](#) phase.
+Given a [dic:analyze-query](#) SQL string, [csu:analyze-query-loader](#) shall register it as a `CREATE VIEW` in the [dic:specir](#) database during the [dic:analyze-phase](#) phase.
 
 > verification_method: Test
 

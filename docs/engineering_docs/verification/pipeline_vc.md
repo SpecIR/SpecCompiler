@@ -263,3 +263,45 @@ Verify the pipeline distinguishes a handler prerequisite that resolves to anothe
 > - Only phase handlers (those declaring an `on_<phase>` hook) are checked
 
 > traceability: [HLR-PIPE-011](@)
+
+
+### VC: Incremental Stale Relation Rebind @VC-PIPE-013
+
+Verify that incremental rebuilds remove stale relation bindings when a target specification changes.
+
+> objective: Confirm relation resolution is recomputed from current database state instead of preserving stale target references across incremental builds.
+
+> verification_method: Test
+
+> approach:
+> - Build a two-document project with a relation from one document to a target object in another document
+> - Modify the target document so the previous target is no longer valid
+> - Rebuild incrementally and query `spec_relations`
+
+> pass_criteria:
+> - The old target binding is removed
+> - The relation is either rebound to the current valid target or marked unresolved
+> - No stale `target_ref` survives the rebuild
+
+> traceability: [HLR-PIPE-010](@), [LLR-043](@), [LLR-044](@), [LLR-045](@), [LLR-046](@)
+
+
+### VC: Incremental Cross-Document View Freshness @VC-PIPE-014
+
+Verify that cross-document view output is regenerated when source data in another document changes.
+
+> objective: Confirm output cache validation uses the assembled render input, including live view data, so cross-document view changes cannot serve stale output.
+
+> verification_method: Test
+
+> approach:
+> - Build a multi-document project containing a view whose rendered content depends on another document
+> - Modify the source document data used by the view
+> - Rebuild incrementally and compare the emitted output
+
+> pass_criteria:
+> - The affected output is regenerated
+> - The rendered view reflects the updated cross-document data
+> - The output cache does not suppress emission when the assembled render input changes
+
+> traceability: [HLR-OUT-001](@), [HLR-OUT-004](@), [HLR-STOR-004](@), [LLR-049](@)
