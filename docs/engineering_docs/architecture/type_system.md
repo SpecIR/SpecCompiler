@@ -99,7 +99,7 @@ pipeline.
   - id, source_type_ref, target_type_ref, link_selector
 * - Views
   - spec_view_types
-  - id, materializer_type, counter_group
+  - id, inline_prefix, aliases
 ```
 
 ### Hook Contract

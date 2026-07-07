@@ -26,31 +26,6 @@ local function dirname(path)
     return dir or "."
 end
 
----Compute current hashes for all known includes of a document.
----Queries build_graph for include paths from previous build.
----@param data DataManager Data manager instance
----@param root_path string Root document path
----@return table include_hashes Map of include_path -> current_sha1
-local function compute_include_hashes(data, root_path)
-    local include_hashes = {}
-
-    -- Get include paths from previous build
-    local includes = data:query_all([[
-        SELECT node_path FROM build_graph WHERE root_path = :root
-    ]], { root = root_path })
-
-    for _, inc in ipairs(includes or {}) do
-        local hash, err = hash_utils.sha1_file(inc.node_path)
-        if hash then
-            include_hashes[inc.node_path] = hash
-        end
-        -- If file doesn't exist anymore, it won't be in include_hashes
-        -- which will cause a cache miss (good - we want to rebuild)
-    end
-
-    return include_hashes
-end
-
 ---Check whether the current project invocation will emit DOCX output.
 ---@param project_info table Project configuration from config.extract_metadata()
 ---@return boolean
@@ -98,10 +73,11 @@ local function check_reference_cache(db, project_info, log)
     local template = project_info.template or "default"
     local preset_name = (project_info.docx and project_info.docx.preset) or "default"
 
-    -- Determine paths
+    -- Determine paths: hash the whole extends chain so edits to an extended
+    -- base preset also invalidate reference.docx
     local preset_loader = require("infra.format.docx.preset_loader")
-    local preset_path = preset_loader.resolve_path(speccompiler_home, template, preset_name)
-    if not preset_path then
+    local preset_paths = preset_loader.resolve_chain_paths(speccompiler_home, template, preset_name)
+    if not preset_paths then
         log.debug("Preset not found: %s/%s, skipping reference cache check", template, preset_name)
         return
     end
@@ -114,7 +90,7 @@ local function check_reference_cache(db, project_info, log)
     end
 
     -- Check if rebuild is needed
-    if reference_cache.needs_rebuild(db, preset_path, reference_path) then
+    if reference_cache.needs_rebuild(db, preset_paths, reference_path) then
         logger.info("Rebuilding reference.docx (preset changed)", {
             preset = template .. "/" .. preset_name,
             reference_path = reference_path
@@ -129,7 +105,7 @@ local function check_reference_cache(db, project_info, log)
         )
 
         if ok then
-            local hash_ok, hash_err = reference_cache.update_hash(db, preset_path)
+            local hash_ok, hash_err = reference_cache.update_hash(db, preset_paths)
             if hash_ok then
                 logger.info("reference.docx rebuilt successfully", {
                     reference_path = reference_path
@@ -195,13 +171,12 @@ local function register_core_handlers(pipeline)
     pipeline:register_handler(require("pipeline.initialize.spec_relations"))
     pipeline:register_handler(require("pipeline.initialize.spec_views"))
     pipeline:register_handler(require("pipeline.initialize.attributes"))
+    -- RESOLVE phase
+    pipeline:register_handler(require("pipeline.resolve.pid_generator"))
+    pipeline:register_handler(require("pipeline.resolve.relation_resolver"))
     -- ANALYZE phase
-    pipeline:register_handler(require("pipeline.analyze.pid_generator"))
-    pipeline:register_handler(require("pipeline.analyze.relation_analyzer"))
-    -- VERIFY phase
-    pipeline:register_handler(require("pipeline.verify.verify_handler"))
+    pipeline:register_handler(require("pipeline.analyze.analyze_handler"))
     -- TRANSFORM phase
-    pipeline:register_handler(require("pipeline.transform.view_materializer"))
     pipeline:register_handler(require("pipeline.transform.spec_floats"))
     pipeline:register_handler(require("pipeline.transform.external_render_handler"))
     pipeline:register_handler(require("pipeline.transform.specification_render_handler"))
@@ -213,7 +188,7 @@ local function register_core_handlers(pipeline)
     pipeline:register_handler(require("pipeline.emit.emitter"))
 end
 
----Load model types and verification views, initialize database views.
+---Load model types and analyze queries, initialize database views.
 ---@param data DataManager
 ---@param pipeline Pipeline
 ---@param template string Model template name
@@ -232,7 +207,7 @@ local function load_models(data, pipeline, template)
     registry.set_current(host)
 
     -- DB views are initialized after the host has registered types + created
-    -- verification views (so they see the populated type/verification state).
+    -- analyze queries (so they see the populated type/verification state).
     local schema_init = require("db.schema.init")
     schema_init.initialize_views(data)
 end
@@ -257,8 +232,7 @@ local function process_documents(project_info, data, log)
             error("Failed to hash " .. file_path .. ": " .. (hash_err or "unknown"))
         end
 
-        local include_hashes = compute_include_hashes(data, file_path)
-        local is_dirty = cache:is_document_dirty_with_includes(file_path, current_hash, include_hashes)
+        local is_dirty = cache:is_document_dirty(file_path, current_hash)
 
         if not is_dirty then
             log.info("[%d/%d] Cached: %s", i, #project_info.files, file_path)
@@ -317,20 +291,15 @@ end
 ---@param diag Diagnostics
 ---@param pending_cache_updates table Deferred updates
 ---@param cache table Build cache
----@param data DataManager
 ---@param db table Database handler
-local function finalize(diag, pending_cache_updates, cache, data, db)
+local function finalize(diag, pending_cache_updates, cache, db)
     -- Apply deferred cache updates ONLY after successful verification.
     -- If verification found errors, don't update hashes — this forces
     -- re-processing on the next build so cross-doc relations get a fresh
     -- chance to resolve (prevents cache poisoning from partial builds).
     if not diag:has_errors() then
         for _, update in ipairs(pending_cache_updates) do
-            cache:update_document_hash(update.file_path, update.hash)
-            cache:update_build_graph(update.file_path, update.includes)
-            for _, inc in ipairs(update.includes) do
-                include_handler.track_include(data, update.file_path, inc.path, inc.hash)
-            end
+            cache:update_build_graph(update.file_path, update.hash, update.includes)
         end
     end
 
@@ -396,7 +365,7 @@ function M.run_project(project_info)
     local run_ok, run_err = pcall(function()
         local walkers, cached_spec_ids, pending_cache_updates, cache = process_documents(project_info, data, log)
         pipeline:execute(walkers, { cached_spec_ids = cached_spec_ids })
-        finalize(diag, pending_cache_updates, cache, data, db)
+        finalize(diag, pending_cache_updates, cache, db)
     end)
 
     if not run_ok then

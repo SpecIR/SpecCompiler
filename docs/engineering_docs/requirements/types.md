@@ -8,7 +8,7 @@ Dynamic type system providing typed containers for [dic:specification](#), [dic:
 > data plus the verification-view validation framework.
 
 > rationale: A typed container model enables schema validation, type-specific rendering,
-> and data integrity checking through SQL verification views.
+> and data integrity checking through SQL analyze queries.
 
 #### HLR: Specifications Container @HLR-TYPE-001
 
@@ -111,7 +111,7 @@ The type system shall provide a spec_relations container for tracking links betw
 > - `specification_ref`: Foreign key to parent specification
 > - `source_ref`: Foreign key to source spec_object
 > - `target_text`: Raw link target from syntax (e.g., "REQ-001", "fig:diagram")
-> - `target_ref`: Resolved target identifier (populated in [dic:analyze-phase](#) phase)
+> - `target_ref`: Resolved target identifier (populated in [dic:resolve-phase](#) phase)
 > - `type_ref`: Relation type from `spec_relation_types` (e.g., "TRACES", "XREF_FIGURE")
 > - `from_file`: Source file path
 >
@@ -147,15 +147,14 @@ The type system shall provide a spec_attributes container for structured metadat
 
 #### HLR: Type Validation @HLR-TYPE-007
 
-The type system shall provide verification views that detect data integrity violations across all specification containers.
+The type system shall provide analyze queries that detect data integrity violations across all specification containers.
 
-> description: Verification views are SQL queries registered in the [dic:verify-phase](#) phase that check for constraint violations:
+> description: Verification views are SQL queries registered in the [dic:analyze-phase](#) phase that check for constraint violations:
 >
 > - Specification-level (missing required attributes, invalid types)
 > - Object-level (missing required, cardinality, cast failures, invalid enum/date, bounds)
 > - Float-level (orphans, duplicate labels, render failures, invalid types)
 > - Relation-level (unresolved, dangling, ambiguous)
-> - View-level (materialization failures, query errors)
 >
 > The validation policy (configurable in project.yaml) determines severity: error, warn, or ignore.
 

@@ -657,8 +657,8 @@ includes/missing.md
     -- Verify doc_e was NOT cached (deferred cache fix)
     local s7_e_cached = with_db(s7_out .. "/specir.db", function(db)
         return query_scalar(db,
-            "SELECT sha1 FROM source_files WHERE path = :path",
-            { path = s7_dir .. "/doc_e.md" }, "sha1")
+            "SELECT node_sha1 FROM build_graph WHERE root_path = :path AND node_path = :path",
+            { path = s7_dir .. "/doc_e.md" }, "node_sha1")
     end)
     if s7_e_cached then
         return fail("S7: doc_e hash was persisted despite build failure (deferred cache bug)")

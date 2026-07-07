@@ -110,7 +110,7 @@ Primary entry points:
 
 **TOR-STF-026:** The framework shall provide an independent mutation testing tool (`tests/mutation/mutate.sh`) that is not discovered or invoked by the main test runner.
 
-**TOR-STF-027:** Mutation testing shall support SQL verification view mutations (in-memory) and Lua source mutations (on-disk with backup/restore safety).
+**TOR-STF-027:** Mutation testing shall support SQL analyze query mutations (in-memory) and Lua source mutations (on-disk with backup/restore safety).
 
 ## 4. Environment Requirements
 

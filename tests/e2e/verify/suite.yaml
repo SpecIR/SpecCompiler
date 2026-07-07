@@ -16,6 +16,6 @@ expect_errors: true
 # - vc_verify_001_object_attrs.md -> missing_required, invalid_cast, invalid_enum (Object attribute violations)
 # - vc_verify_002_floats.md       -> float_orphan, float_duplicate_label, float_render_failure (Float violations)
 # - vc_verify_003_relations.md    -> unresolved_relation, ambiguous_relation (Relation violations)
-# - vc_verify_004_views.md        -> no unexpected view_materialization_failure diagnostics
+# - vc_verify_004_views.md        -> no view diagnostics for unregistered or valid view syntax
 # - vc_verify_005_spec_missing_required.md -> spec_missing_required (Specification missing required attribute)
 # - vc_verify_006_invalid_spec_type.md     -> spec_invalid_type (Invalid specification type)

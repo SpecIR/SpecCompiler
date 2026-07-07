@@ -66,7 +66,8 @@ end
 function FloatResolver:get_pending_floats(spec_id)
     -- Get ALL floats that need resolution (both external and internal)
     return self.data:query_all([[
-        SELECT id, type_ref, syntax_key, from_file, raw_content, content_sha, resolved_ast
+        SELECT id, type_ref, syntax_key, from_file, raw_content, content_sha, resolved_ast,
+               pandoc_attributes
         FROM spec_floats
         WHERE specification_ref = :spec
           AND (resolved_ast IS NULL OR content_sha IS NULL)

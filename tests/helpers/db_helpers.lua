@@ -144,8 +144,7 @@ function M.create_test_db()
             from_file TEXT NOT NULL,
             file_seq INTEGER NOT NULL,
             raw_ast TEXT,
-            resolved_ast TEXT,
-            resolved_data JSON
+            resolved_ast TEXT
         );
 
         CREATE TABLE IF NOT EXISTS spec_attribute_values (
@@ -176,12 +175,6 @@ function M.create_test_db()
             PRIMARY KEY (root_path, node_path)
         );
         CREATE INDEX IF NOT EXISTS idx_build_graph_root ON build_graph(root_path);
-
-        -- Source files for incremental builds
-        CREATE TABLE IF NOT EXISTS source_files (
-            path TEXT PRIMARY KEY,
-            sha1 TEXT NOT NULL
-        );
 
         -- Output cache for incremental builds
         CREATE TABLE IF NOT EXISTS output_cache (

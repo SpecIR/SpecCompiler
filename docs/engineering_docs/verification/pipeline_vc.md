@@ -4,7 +4,7 @@
 
 Verify that the [dic:pipeline](#) executes all five phases in correct order.
 
-> objective: Confirm [dic:initialize-phase](#), [dic:analyze-phase](#), [dic:transform-phase](#), [dic:verify-phase](#), [dic:emit-phase](#) execute sequentially
+> objective: Confirm [dic:initialize-phase](#), [dic:resolve-phase](#), [dic:transform-phase](#), [dic:analyze-phase](#), [dic:emit-phase](#) execute sequentially
 
 > verification_method: Test
 
@@ -15,7 +15,7 @@ Verify that the [dic:pipeline](#) executes all five phases in correct order.
 
 > pass_criteria:
 > - All 5 phases execute for every document
-> - Phase order is always INITIALIZE < ANALYZE < TRANSFORM < VERIFY < EMIT
+> - Phase order is always INITIALIZE < RESOLVE < TRANSFORM < ANALYZE < EMIT
 
 > traceability: [HLR-PIPE-001](@), [LLR-020](@), [LLR-021](@), [LLR-022](@)
 
@@ -74,11 +74,11 @@ Verify pipeline stops before EMIT if errors exist.
 > approach:
 > - Create document with validation errors (missing required attribute)
 > - Execute pipeline
-> - Verify EMIT handlers are not invoked after VERIFY errors are reported
+> - Verify EMIT handlers are not invoked after ANALYZE errors are reported
 
 > pass_criteria:
-> - diagnostics.has_errors() returns true after VERIFY
-> - TRANSFORM phase has already completed before VERIFY
+> - diagnostics.has_errors() returns true after ANALYZE
+> - TRANSFORM phase has already completed before ANALYZE
 > - EMIT phase handlers never called
 
 > traceability: [HLR-PIPE-004](@), [LLR-026](@), [LLR-027](@)
@@ -88,7 +88,7 @@ Verify pipeline stops before EMIT if errors exist.
 
 Verify that every phase uses batch-dispatched `on_{phase}` hooks.
 
-> objective: Confirm each handler hook receives the full contexts array for INITIALIZE, ANALYZE, TRANSFORM, VERIFY, and EMIT
+> objective: Confirm each handler hook receives the full contexts array for INITIALIZE, RESOLVE, TRANSFORM, ANALYZE, and EMIT
 
 > verification_method: Test
 
@@ -208,7 +208,7 @@ Verify that spec objects without explicit `@PID` receive auto-generated PIDs.
 
 > approach:
 > - Create a document with typed objects lacking `@PID` annotations
-> - Execute pipeline through ANALYZE phase
+> - Execute pipeline through RESOLVE phase
 > - Query `spec_objects.pid` values and verify format matches type definition
 > - Create a document with both explicit and auto-generated PIDs; verify no collisions
 
@@ -231,7 +231,7 @@ Verify that relations are resolved with correct type inference and [dic:specific
 
 > approach:
 > - Create documents with relations matching different specificity levels
-> - Execute pipeline through ANALYZE phase
+> - Execute pipeline through RESOLVE phase
 > - Query `spec_relations` for resolved `type_ref` and `target_ref` values
 > - Create an ambiguous case (two types with equal specificity) and verify ambiguity flag
 

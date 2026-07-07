@@ -8,4 +8,4 @@ A **Spec View** represents a dynamic query or generated content block. Views are
 >
 > **Syntax:** `` `TypeRef:[ViewParam]` ``
 >
-> **Full specification:** See the CommonSpec Language Specification for view types, materialization strategies, and examples.
+> **Full specification:** See the CommonSpec Language Specification for view types, rendering, and examples.

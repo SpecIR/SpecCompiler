@@ -10,7 +10,7 @@ The type model discovery function loads model definitions from the filesystem an
 registers them with the [dic:pipeline](#) and data manager through ONE uniform
 descriptor contract. It enables domain-specific extensibility by allowing models to
 define custom specification types, object types, float types, relation types, view
-types, verification views, and pipeline handlers.
+types, analyze queries, and pipeline handlers.
 
 **Model Overlay**: The host engine ([CSU-008](@)) loads the `default` model first, then
 each requested overlay model in turn, later-wins-by-id, so a model overrides only the
@@ -90,7 +90,7 @@ and each hook takes ONE frozen context as its sole argument. Per-call RENDER hoo
 (`render`, `render_block`, `render_link`, `message`) receive the render context during the
 EMIT walk (it carries pandoc/format and the Pandoc element as `subject`). DATA hooks
 (`dataset`, `build_block`, `transform`, `resolve`, `prepare_task`, `handle_result`) receive a
-data context during the TRANSFORM/ANALYZE/external-render phases. The hook NAME selects the
+data context during the TRANSFORM/RESOLVE/external-render phases. The hook NAME selects the
 tier and the return type, and the host validates the mapping. `on_<phase>` functions in `hooks`
 contributes an `on_<phase>` hook to the pipeline's order via [dic:prerequisites](#) and
 [dic:topological-sort](#); a handler with no `prerequisites` is defaulted to an empty list by
@@ -102,7 +102,7 @@ in `schema.extends`. Every consumer resolves a hook with `get_hook_inherited`, w
 the spec title on `SPEC_TITLE`, the matrix `render_block` on `TABLE_VIEW`) and leaf types stay
 pure schema. A relation's `resolve` data hook IS the type's resolver: the host registers it
 through an adapter ([src/contract/registry.lua](../../../src/contract/registry.lua)) so the
-ANALYZE-phase relation analyzer dispatches resolution by type id; a concrete relation type
+RESOLVE-phase relation analyzer dispatches resolution by type id; a concrete relation type
 inherits a base resolver via `extends`.
 
 **Custom Display Text**: A relation type that needs custom link text declares a `render_link`

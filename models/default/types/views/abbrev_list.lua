@@ -22,8 +22,6 @@ local schema = {
     description = "List of all abbreviations defined in the document",
     inline_prefix = "abbrev_list",
     aliases = { "sigla_list", "acronym_list" },
-    materializer_type = "abbrev_list",
-    view_subtype_ref = "ABBREV",
 }
 
 -- ============================================================================

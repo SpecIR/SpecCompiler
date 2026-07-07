@@ -15,12 +15,12 @@ Deterministic compilation, reproducible builds, and audit trail integrity.
 
 The system shall compute SHA1 content hashes for all source documents and include files to enable change detection.
 
-> description: The build engine computes SHA1 hashes for each document. Hashes are compared against cached values in the `source_files` table:
+> description: The build engine computes SHA1 hashes for each document. Hashes are compared against the cached values recorded as `build_graph` nodes (the root document is its own node, alongside its includes):
 >
-> 1. If the content hash matches the cached hash, the system checks include file hashes
+> 1. Every node of the document's build graph is compared against its current file hash
 > 2. If all hashes match, the document is skipped (cached [dic:intermediate-representation](#) state is reused)
-> 3. If any hash differs, the document is rebuilt from source
-> 4. After successful rebuild (no [dic:verify-phase](#) errors), hashes are updated in the `source_files` table
+> 3. If any hash differs, a node file is missing, or no root node is recorded, the document is rebuilt from source
+> 4. After successful rebuild (no [dic:analyze-phase](#) errors), the `build_graph` nodes are rewritten with current hashes
 >
 > This provides O(1) change detection without parsing unchanged documents.
 
@@ -55,7 +55,7 @@ The system shall collect and report processing errors and warnings with source l
 >
 > 1. **Collection**: [dic:handler](#)s report issues via `diagnostics:error(file, line, code, msg)` and `diagnostics:warn(file, line, code, msg)`
 > 2. **Structured data**: Each diagnostic record contains file path, line number, diagnostic key, and human-readable message
-> 3. **Severity control**: The `has_errors()` method enables the [dic:pipeline](#) to determine abort conditions after the [dic:verify-phase](#) phase
+> 3. **Severity control**: The `has_errors()` method enables the [dic:pipeline](#) to determine abort conditions after the [dic:analyze-phase](#) phase
 > 4. **Output integration**: Diagnostics are emitted through the structured logger with file and line context
 >
 > Diagnostic keys are stable identifiers (e.g., `invalid_enum`, `missing_required`, `dangling_relation`) suitable for filtering and CI policy.

@@ -13,12 +13,16 @@ return {
         target_type_ref = "DIC",
     },
     hooks = {
-        -- Render dictionary refs as the entry's title alone (the prose context
-        -- already implies "this is a term"; the PID would be noise).
+        -- Render dictionary refs as glossary-like inline terms. Dictionary
+        -- entries are often shared by SRS/SDD/SVC documents, so suppress the
+        -- generic cross-spec prefix: the prose needs the term, not its source.
         render_link = function(ctx)
             local target = ctx.subject.target
             if target.title and target.title ~= "" then
-                return target.title
+                return {
+                    text = "<" .. target.title .. ">",
+                    suppress_spec_prefix = true,
+                }
             end
         end,
     },

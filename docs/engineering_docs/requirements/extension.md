@@ -25,10 +25,10 @@ require-time registry, the verification-view loader, the data-view loader) and t
 {
   kind   = "object|float|view|relation|specification|verification|dataview",
   schema = { id = "HLR", long_name = ..., extends = "TRACEABLE", attributes = {...},
-             -- kind-specific: inline_prefix/aliases/materializer_type/counter_group (view);
+             -- kind-specific: inline_prefix/aliases (view);
              --   caption_format/needs_external_render (float); link_selector/source_type_ref/
              --   target_type_ref (relation); view/policy_key/sql/disabled (verification) },
-  hooks  = { render=, render_link=, resolve=, materialize=, generate=, prepare_task=,
+  hooks  = { render=, render_link=, resolve=, generate=, prepare_task=,
              handle_result=, message=, on_<phase>= },  -- absent hook => host default
 }
 ```
@@ -86,7 +86,7 @@ hook invalid for the kind, internal-render-plus-external-hooks) are loud registe
 
 #### HLR: Verification Descriptor @HLR-EXT-012
 
-A verification view shall be a `kind="verification"` descriptor
+A analyze query shall be a `kind="verification"` descriptor
 (`schema = {policy_key, view, sql, disabled}`, `hooks = {message}`) forwarded to the host's
 ordered policy_key registry, preserving override (later model wins, in place) and
 `disabled=true` removal semantics. (Closes the HLR-TYPE-007 contract gap.)
@@ -135,7 +135,7 @@ The system shall organize model content in a standardized directory hierarchy.
 >     floats/        -- Float type handlers (TABLE, PLANTUML, CHART)
 >     views/         -- View type handlers (ABBREV, SYMBOL, MATH)
 >     relations/     -- Relation type definitions (TRACES_TO, etc.)
->   verification_views/ -- Verification descriptors (SQL views + message hooks)
+>   analyze_queries/ -- Verification descriptors (SQL views + message hooks)
 >   filters/         -- Pandoc filters (docx.lua, html.lua, markdown.lua)
 >   postprocessors/  -- Format-specific postprocessors
 >   styles/          -- Style presets and templates

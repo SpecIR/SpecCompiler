@@ -212,7 +212,7 @@ Given a CodeBlock class string, [csu:float-parser](#) shall resolve the [dic:spe
 
 #### LLR: External Render Delegation @LLR-062
 
-When a [dic:spec-view](#) has `needs_external_render = 1` in `spec_view_types`, [csu:view-materializer](#) shall delegate it to the registered [dic:external-renderer](#).
+When a [dic:spec-view](#) has `needs_external_render = 1` in `spec_view_types`, [csu:external-render-handler](#) shall delegate it to the registered [dic:external-renderer](#).
 
 > verification_method: Test
 
@@ -258,9 +258,9 @@ Given an XHTML [dic:attribute](#) raw_value, [csu:attribute-parser](#) shall pre
 
 > traceability: [HLR-TYPE-006](@)
 
-#### LLR: Verification View Registration @LLR-068
+#### LLR: Analyze Query Registration @LLR-068
 
-Given a [dic:verification-view](#) SQL string, [csu:verification-view-loader](#) shall register it as a `CREATE VIEW` in the [dic:specir](#) database during the [dic:verify-phase](#) phase.
+Given a [dic:verification-view](#) SQL string, [csu:verification-view-loader](#) shall register it as a `CREATE VIEW` in the [dic:specir](#) database during the [dic:analyze-phase](#) phase.
 
 > verification_method: Test
 
@@ -284,7 +284,7 @@ Selected layered model loading where domain models extend and override the defau
 >
 > - Default model loads first, establishing baseline types (SECTION, SPEC, float types, relations, views)
 > - Domain model loads second; types with matching IDs replace defaults, new IDs add to the registry
-> - Verification views follow the same pattern: domain verification views override defaults by `policy_key`
+> - Verification views follow the same pattern: domain analyze queries override defaults by `policy_key`
 > - Attribute inheritance propagated iteratively after all types are loaded, enabling parent attributes to flow to child types across model boundaries
 > - Filter, postprocessor, and style directories follow conventional naming for predictable discovery
 > - Alternative of mixin composition rejected: ordering ambiguity when multiple mixins define the same attribute

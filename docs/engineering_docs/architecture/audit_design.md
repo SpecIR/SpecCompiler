@@ -4,7 +4,7 @@
 
 > traceability: [SF-006](@)
 
-**Allocation:** Realized by [CSC-001](@) (Core Runtime) and [CSC-020](@) (Default Verification Views) through [CSU-031](@) (Verify Handler) and [CSU-065](@) (Hash Utilities).
+**Allocation:** Realized by [CSC-001](@) (Core Runtime) and [CSC-020](@) (Default Analyze Queries) through [CSU-031](@) (Analyze Handler) and [CSU-065](@) (Hash Utilities).
 
 The audit and integrity function ensures deterministic compilation, reproducible builds,
 and audit trail integrity. It encompasses content-addressed hashing for incremental build
@@ -18,8 +18,9 @@ compared against stored values to detect changes. SHA1 hashing uses Pandoc's bui
 `pandoc.sha1()` when available, falling back to `vendor/sha2.lua` in standalone worker mode.
 
 **Document Change Detection**: Each document's content is hashed and compared against the
-`source_files` table. Unchanged documents (same content hash and include hashes) skip
-parsing and reuse cached [dic:intermediate-representation](#) state, providing significant performance improvement
+hashes recorded as `build_graph` nodes (the root document is its own node, alongside its
+includes). Unchanged documents (every node hash matching) skip parsing and reuse cached
+[dic:intermediate-representation](#) state, providing significant performance improvement
 for large projects.
 
 **Structured Logging**: NDJSON (Newline-Delimited JSON) logging provides machine-parseable
@@ -31,26 +32,26 @@ Levels: DEBUG, INFO, WARN, ERROR.
 configuration, and tool versions, the system produces identical outputs. Content-addressed
 hashing of documents, includes, and the P-IR state ensures deterministic compilation.
 
-**Verification Execution**: The Verify Handler [CSU-031](@) executes in batch mode during
-the VERIFY phase. It iterates over all registered verification views,
+**Verification Execution**: The Analyze Handler [CSU-031](@) executes in batch mode during
+the ANALYZE phase. It iterates over all registered analyze queries,
 querying each via the Data Manager [CSU-012](@). For each violation row returned, the
 handler consults the Validation Policy [CSU-009](@) to determine the configured severity
 level. Error-level violations are emitted as structured diagnostics via the Diagnostics
-Collector [CSU-004](@). Violations at the ignore level are suppressed entirely. Each verification view
+Collector [CSU-004](@). Violations at the ignore level are suppressed entirely. Each analyze query
 enforces constraints declared by the type metamodel, ensuring that registered types
 satisfy their validation rules.
 
 After verification completes, the handler stores the verification result (error and
 warning counts) in all pipeline contexts. The Pipeline Orchestrator [CSU-006](@) checks
-for errors after VERIFY and aborts before EMIT if any exist.
+for errors after ANALYZE and aborts before EMIT if any exist.
 
-**Verification Views — Entity-Based Taxonomy**
+**Analyze Queries — Entity-Based Taxonomy**
 
-Verification views follow the SpecIR 5-tuple: **S** (Specification), **O** (Object), **F** ([dic:float](#)), **R** (Relation), **V** (View). Each verification view is identified by its `policy_key`.
+Verification views follow the SpecIR 5-tuple: **S** (Specification), **O** (Object), **F** ([dic:float](#)), **R** (Relation), **V** (View). Each analyze query is identified by its `policy_key`.
 
 *Specification Verification views (S)*
 
-```list-table:tbl-verification-spec{caption="Specification verification views"}
+```list-table:tbl-verification-spec{caption="Specification analyze queries"}
 > header-rows: 1
 > aligns: l,l,l
 
@@ -67,7 +68,7 @@ Verification views follow the SpecIR 5-tuple: **S** (Specification), **O** (Obje
 
 *Spec Object Verification views (O)*
 
-```list-table:tbl-verification-object{caption="Spec object verification views"}
+```list-table:tbl-verification-object{caption="Spec object analyze queries"}
 > header-rows: 1
 > aligns: l,l,l
 
@@ -99,7 +100,7 @@ Verification views follow the SpecIR 5-tuple: **S** (Specification), **O** (Obje
 
 *Spec Float Verification views (F)*
 
-```list-table:tbl-verification-float{caption="Spec float verification views"}
+```list-table:tbl-verification-float{caption="Spec float analyze queries"}
 > header-rows: 1
 > aligns: l,l,l
 
@@ -122,7 +123,7 @@ Verification views follow the SpecIR 5-tuple: **S** (Specification), **O** (Obje
 
 *Spec Relation Verification views (R)*
 
-```list-table:tbl-verification-relation{caption="Spec relation verification views"}
+```list-table:tbl-verification-relation{caption="Spec relation analyze queries"}
 > header-rows: 1
 > aligns: l,l,l
 
@@ -140,20 +141,6 @@ Verification views follow the SpecIR 5-tuple: **S** (Specification), **O** (Obje
   - Float reference is unambiguous
 ```
 
-*Spec View Verification views (V)*
-
-```list-table:tbl-verification-view{caption="Spec view verification views"}
-> header-rows: 1
-> aligns: l,l,l
-
-* - Policy Key
-  - View Name
-  - Validates
-* - `view_materialization_failure`
-  - view_view_materialization_failure
-  - View materialization succeeded
-```
-
 **Component Interaction**
 
 The audit subsystem is realized through core runtime components and the default verification
@@ -161,30 +148,29 @@ view package.
 
 [csc:core-runtime](#) (Core Runtime) provides the verification infrastructure. [csu:build-engine](#) (Build
 Engine) drives the build lifecycle and content-addressed hash computation. [csu:verification-view-loader](#)
-(Verification View Loader) discovers and loads verification view modules from model directories, registering them with
-the data manager for VERIFY phase execution. [csu:validation-policy](#) (Validation Policy) maps verification view
+(Analyze Query Loader) discovers and loads analyze query modules from model directories, registering them with
+the data manager for ANALYZE phase execution. [csu:validation-policy](#) (Validation Policy) maps analyze query
 `policy_key` values to configured severity levels (error, warn, ignore) from `project.yaml`.
-[csu:verify-handler](#) (Verify Handler) iterates over registered verification views during VERIFY, querying each
+[csu:verify-handler](#) (Analyze Handler) iterates over registered analyze queries during ANALYZE, querying each
 via [csu:data-manager](#) (Data Manager) and emitting violations through [csu:diagnostics-collector](#) (Diagnostics
-Collector). [csu:pipeline-orchestrator](#) (Pipeline Orchestrator) inspects diagnostics after VERIFY and aborts
+Collector). [csu:pipeline-orchestrator](#) (Pipeline Orchestrator) inspects diagnostics after ANALYZE and aborts
 before EMIT if errors exist.
 
-[csc:default-verification-views](#) (Default Verification Views) provides the baseline verification rules organized by the
-SpecIR 5-tuple. Specification verification views: [csu:spec-missing-required](#) (Spec Missing Required) validates that
+[csc:default-verification-views](#) (Default Analyze Queries) provides the baseline verification rules organized by the
+SpecIR 5-tuple. Specification analyze queries: [csu:spec-missing-required](#) (Spec Missing Required) validates that
 required specification attributes are present, and [csu:spec-invalid-type](#) (Spec Invalid Type) validates
-that specification types are registered. Object verification views: [csu:object-missing-required](#) (Object Missing Required)
+that specification types are registered. Object analyze queries: [csu:object-missing-required](#) (Object Missing Required)
 checks required object attributes, [csu:object-cardinality-over](#) (Object Cardinality Over) enforces max_occurs
 limits, [csu:object-cast-failures](#) (Object Cast Failures) validates attribute type casts, [csu:object-invalid-enum](#) (Object
 Invalid Enum) checks enum values against allowed sets, [csu:object-invalid-date](#) (Object Invalid Date)
 validates YYYY-MM-DD date format, and [csu:object-bounds-violation](#) (Object Bounds Violation) checks numeric
-bounds. Float verification views: [csu:float-orphan](#) (Float Orphan) detects floats without parent objects,
+bounds. Float analyze queries: [csu:float-orphan](#) (Float Orphan) detects floats without parent objects,
 [csu:float-duplicate-label](#) (Float Duplicate Label) enforces label uniqueness per specification, [csu:float-render-failure](#)
 (Float Render Failure) flags failed external renders, and [csu:float-invalid-type](#) (Float Invalid Type)
-validates float type registration. Relation verification views: [csu:relation-unresolved](#) (Relation Unresolved) detects
+validates float type registration. Relation analyze queries: [csu:relation-unresolved](#) (Relation Unresolved) detects
 links whose targets cannot be resolved, [csu:relation-dangling](#) (Relation Dangling) detects resolved
 references pointing to nonexistent objects, and [csu:relation-ambiguous](#) (Relation Ambiguous) flags
-ambiguous float references. View verification views: [csu:view-materialization-failure](#) (View Materialization Failure) detects
-failed view computations.
+ambiguous float references.
 
 ```puml:fd-006-audit{caption="Audit and Integrity: Build Caching and Verification"}
 @startuml
@@ -193,8 +179,8 @@ skinparam sequenceMessageAlign center
 
 participant "CSU Build Engine" as E
 participant "CSU Hash Utilities" as H
-participant "CSU Verification View Loader" as PL
-participant "CSU Verify Handler" as VH
+participant "CSU Analyze Query Loader" as PL
+participant "CSU Analyze Handler" as VH
 participant "CSU Validation\nPolicy" as VP
 participant "CSU Data Manager" as DB
 
@@ -202,56 +188,47 @@ participant "CSU Data Manager" as DB
 E -> H: sha1_file(document_path)
 H --> E: content_hash
 
-E -> DB: SELECT sha1 FROM source_files\nWHERE path = :path
-DB --> E: cached_hash
+E -> DB: SELECT node_path, node_sha1\nFROM build_graph WHERE root_path = :path
+DB --> E: nodes[] (root + includes)
 
-alt content_hash == cached_hash
-    E -> E: check include hashes
-    E -> DB: SELECT * FROM build_graph\nWHERE root_path = :path
-    DB --> E: includes[]
+loop for each include node
+    E -> H: sha1_file(node_path)
+    H --> E: node_hash
+end
 
-    loop for each include
-        E -> H: sha1_file(include_path)
-        H --> E: include_hash
-    end
-
-    alt all include hashes match
-        E -> E: skip (use cached IR)
-    else include changed
-        E -> E: rebuild document
-    end
-else content changed
+alt root node present and every node hash matches
+    E -> E: skip (use cached IR)
+else node changed / missing / no root node
     E -> E: rebuild document
 end
 
 == After Rebuild ==
-E -> DB: UPDATE source_files SET sha1
-E -> DB: UPDATE build_graph entries
+E -> DB: rewrite build_graph nodes\n(root self-node + includes)
 
-== Verification View Loading ==
+== Analyze Query Loading ==
 E -> PL: load_model("default")
-PL -> PL: scan verification_views/*.lua
-PL -> PL: register verification views by policy_key
+PL -> PL: scan analyze_queries/*.lua
+PL -> PL: register analyze queries by policy_key
 
 E -> PL: load_model(template)
-note right: Override/extend verification views\nby policy_key
+note right: Override/extend analyze queries\nby policy_key
 
 E -> PL: create_views(data)
-loop for each registered verification view
-    PL -> DB: exec_sql(verification_view.sql)
-    note right: CREATE VIEW {verification_view.view}
+loop for each registered analyze query
+    PL -> DB: exec_sql(analyze_query.sql)
+    note right: CREATE VIEW {analyze_query.view}
 end
 
-== VERIFY Phase ==
-VH -> PL: get_verification_views()
-PL --> VH: verification_view_registry[]
+== ANALYZE Phase ==
+VH -> PL: get_analyze_queries()
+PL --> VH: analyze_query_registry[]
 
-loop for each verification view
-    VH -> DB: SELECT * FROM {verification_view.view}
+loop for each analyze query
+    VH -> DB: SELECT * FROM {analyze_query.view}
     DB --> VH: violation rows[]
 
     loop for each violation
-        VH -> VP: get_level(verification_view.policy_key)
+        VH -> VP: get_level(analyze_query.policy_key)
         VP --> VH: severity
 
         alt level == "error"
@@ -268,8 +245,8 @@ VH -> VH: store verification_result\nin contexts
 
 #### LLR: Deferred Hash Update on Success @LLR-084
 
-When build completes with no [dic:verify-phase](#) errors, [csu:build-engine](#) shall update
-[dic:build-cache](#) `source_files` hashes via [csu:build-cache](#); when errors are present,
+When build completes with no [dic:analyze-phase](#) errors, [csu:build-engine](#) shall rewrite
+the [dic:build-graph](#) node hashes via [csu:build-cache](#); when errors are present,
 hashes shall not be updated.
 
 > verification_method: Test
@@ -278,7 +255,7 @@ hashes shall not be updated.
 
 #### LLR: Cache Hit Skips Pipeline @LLR-085
 
-When all `source_files` and [dic:build-graph](#) hashes match current content,
+When all [dic:build-graph](#) node hashes (root and includes) match current content,
 [csu:build-engine](#) shall skip [dic:pipeline](#) processing and reuse cached [dic:intermediate-representation](#)
 state.
 

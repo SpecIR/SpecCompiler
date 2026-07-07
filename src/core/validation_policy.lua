@@ -1,7 +1,7 @@
 -- src/core/validation_policy.lua
--- Per-policy-key severity levels for verification views ("error" | "warn" |
+-- Per-policy-key severity levels for analyze queries ("error" | "warn" |
 -- "ignore"), defaulted from the host's registered views and overridable via
--- project.yaml `validation:`. Consumed by verify_handler:get_level().
+-- project.yaml `validation:`. Consumed by analyze_handler:get_level().
 local M = {}
 
 function M.new(config)
@@ -11,9 +11,9 @@ function M.new(config)
     local default_policies = {}
 
     if host then
-        for _, verification_view in ipairs(host:get_verification_views()) do
-            if verification_view.policy_key then
-                default_policies[verification_view.policy_key] = "error"
+        for _, analyze_query in ipairs(host:get_analyze_queries()) do
+            if analyze_query.policy_key then
+                default_policies[analyze_query.policy_key] = "error"
             end
         end
     end

@@ -1,6 +1,6 @@
 ---PID utilities for SpecCompiler.
 ---Shared functions for parsing and generating project identifiers (PIDs).
----Extracted from specifications.lua for reuse across INITIALIZE and ANALYZE phases.
+---Extracted from specifications.lua for reuse across INITIALIZE and RESOLVE phases.
 ---
 ---@module pid_utils
 local M = {}

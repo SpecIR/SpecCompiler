@@ -1,7 +1,7 @@
 ---Relation Link Rewriter Handler for SpecCompiler.
 ---Pipeline handler for TRANSFORM phase.
 ---
----Rewrites links in stored AST using resolved relation data from ANALYZE phase.
+---Rewrites links in stored AST using resolved relation data from RESOLVE phase.
 ---Uses the relation lookup (keyed by source_object_id + selector + target_text)
 ---to correctly rewrite scoped references to the right target anchor and display text.
 ---
@@ -68,10 +68,24 @@ local function add_alias_keys(lookup, prefix_aliases, r, entry)
     end
 end
 
+---Normalize relation render hook output.
+---Hooks historically returned a string. A hook may now return
+---{ text = "...", suppress_spec_prefix = true } when the local display text
+---should not receive the generic cross-document specification prefix.
+---@param value any Hook return value
+---@return string|nil text
+---@return boolean suppress_spec_prefix
+local function normalize_link_display(value)
+    if type(value) == "table" then
+        return value.text or value.display_text or value[1], value.suppress_spec_prefix == true
+    end
+    return value, false
+end
+
 ---Build relation-aware anchor lookup for link rewriting.
 ---Uses resolved spec_relations to map (source_object_id, selector, target_text)
 ---to the correct target anchor and display text. This respects scoped resolution:
----each source object's links resolve to the targets determined in ANALYZE phase.
+---each source object's links resolve to the targets determined in RESOLVE phase.
 ---@param data DataManager
 ---@param spec_id string Specification identifier
 ---@return table lookup Map of "source_id|selector|target_text" -> {spec, anchor, display_text}
@@ -101,8 +115,9 @@ local function build_relation_lookup(data, spec_id, pctx, diagnostics)
             -- both of which register a default hook, so the lookup always
             -- resolves something. Cross-document spec prefix is added below.
             local local_display
+            local suppress_spec_prefix = false
             if on_link then
-                local_display = on_link(hook_ctx.build(pctx, data, diagnostics, {
+                local rendered = on_link(hook_ctx.build(pctx, data, diagnostics, {
                     target = {
                         pid = r.object_pid,
                         title = r.object_title_text or "",
@@ -114,6 +129,7 @@ local function build_relation_lookup(data, spec_id, pctx, diagnostics)
                     is_cross_doc = r.object_spec ~= spec_id,
                     selector = r.link_selector,
                 }, "render_link", spec_id))
+                local_display, suppress_spec_prefix = normalize_link_display(rendered)
             end
             -- Safety net: if a relation type lacks any render_link hook up its
             -- extends chain (e.g. a custom type that sets extends = nil),
@@ -123,7 +139,7 @@ local function build_relation_lookup(data, spec_id, pctx, diagnostics)
             end
 
             local display_text
-            if r.object_spec ~= spec_id then
+            if r.object_spec ~= spec_id and not suppress_spec_prefix then
                 display_text = r.object_spec .. ": " .. local_display
             else
                 display_text = local_display
@@ -276,7 +292,7 @@ local function rewrite_links(data, spec_id, relation_lookup, select_query, sourc
 end
 
 ---Rewrite links in stored AST using resolved anchors.
----Resolution is handled by relation_analyzer in ANALYZE phase.
+---Resolution is handled by relation_resolver in RESOLVE phase.
 function M.on_transform(data, contexts, diagnostics)
     data:begin_transaction()
     for _, ctx in ipairs(contexts) do

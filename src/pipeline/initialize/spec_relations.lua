@@ -69,7 +69,7 @@ local find_parent_object = spec_floats.find_parent_object
 
 ---Parse link syntax to extract target, type, prefix, scope, and selector.
 ---Supports: [PID](@), [type:label](#), [scope:type:label](#), [key](@cite), [key](@citep)
----INITIALIZE phase: type_ref is ALWAYS nil (type inference deferred to ANALYZE).
+---INITIALIZE phase: type_ref is ALWAYS nil (type inference deferred to RESOLVE).
 ---@param link table Link object
 ---@param data DataManager|nil Optional data manager for dynamic type resolution
 ---@return string|nil target_text, string|nil type_ref, string|nil prefix, string|nil explicit_scope, string|nil selector
@@ -252,7 +252,7 @@ local function process_document_links(data, doc, spec_id, skip_keys)
                         spec_id,
                         parent_id,
                         stored_target_text,
-                        nil,  -- type_ref = NULL, inferred in ANALYZE
+                        nil,  -- type_ref = NULL, inferred in RESOLVE
                         link.file or "unknown",
                         link.line or 0,  -- link_line
                         nil,  -- source_attribute (body text)
@@ -314,7 +314,7 @@ local function process_attribute_links(data, ctx, spec_id, seen_keys)
                             spec_id,
                             attr.owner_object_id,
                             stored_target_text,
-                            nil,  -- type_ref = NULL, inferred in ANALYZE
+                            nil,  -- type_ref = NULL, inferred in RESOLVE
                             attr.owner_file or (ctx.doc and ctx.doc.source_path or "unknown"),
                             attr.owner_line or 0,  -- link_line (owner's start_line as best approximation)
                             attr.attr_name,

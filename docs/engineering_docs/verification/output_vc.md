@@ -229,7 +229,7 @@ Verify that [dic:full-text-search](#) virtual tables are populated with specific
 
 Verify that header levels assembled across cross-file includes form a well-formed tree, that the renderer maps them to the correct heading depth, and that structurally invalid hierarchies are rejected before emission.
 
-> objective: Confirm that the `object_broken_hierarchy` verification view rejects skipped heading levels and orphaned roots, that a heading's level survives deep include nesting unchanged, and that the assembler maps valid levels to the correct DOCX Heading style (siblings share a style, children nest one deeper, ascending returns to the shallower style).
+> objective: Confirm that the `object_broken_hierarchy` analyze query rejects skipped heading levels and orphaned roots, that a heading's level survives deep include nesting unchanged, and that the assembler maps valid levels to the correct DOCX Heading style (siblings share a style, children nest one deeper, ascending returns to the shallower style).
 
 > verification_method: Test
 

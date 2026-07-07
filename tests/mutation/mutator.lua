@@ -102,8 +102,8 @@ end
 
 ---Clear all verification-view-related modules from package.loaded (forces re-require).
 ---@param model_name string e.g., "default" or "sw_docs"
-local function clear_verification_view_modules(model_name)
-    local prefix = "models." .. model_name .. ".verification_views."
+local function clear_analyze_query_modules(model_name)
+    local prefix = "models." .. model_name .. ".analyze_queries."
     for module_name, _ in pairs(package.loaded) do
         if module_name:sub(1, #prefix) == prefix then
             package.loaded[module_name] = nil
@@ -208,14 +208,14 @@ local function run_sql_mutations()
 
     -- Discover which models have SQL verification view definitions
     local model_sql_modules = {
-        { model = "default", require_path = "models.default.verification_views.sql" },
-        { model = "sw_docs", require_path = "models.sw_docs.verification_views.sql" },
+        { model = "default", require_path = "models.default.analyze_queries.sql" },
+        { model = "sw_docs", require_path = "models.sw_docs.analyze_queries.sql" },
     }
 
     -- Ensure pristine module state: clear any stale verification view modules from
     -- previous runs (e.g., if run.sh invokes mutator after the normal suite).
     for _, msm in ipairs(model_sql_modules) do
-        clear_verification_view_modules(msm.model)
+        clear_analyze_query_modules(msm.model)
     end
 
     -- Load original SQL modules fresh from disk
@@ -226,7 +226,7 @@ local function run_sql_mutations()
         end
     end
 
-    -- Find test suites that exercise verification_views (expect_errors mode)
+    -- Find test suites that exercise analyze_queries (expect_errors mode)
     local verify_suite = speccompiler_home .. "/tests/e2e/verify"
     local casting_neg_suite = speccompiler_home .. "/tests/e2e/casting_negative"
 
@@ -311,10 +311,10 @@ local function run_sql_mutations()
                 local mutated_sql = shallow_clone(orig_sql_module)
                 mutated_sql[view_name] = mutation.sql
 
-                -- 2. Clear verification_view module cache, then inject mutated SQL.
-                -- Order matters: clear_verification_view_modules removes ALL models.X.verification_views.*
+                -- 2. Clear analyze_query module cache, then inject mutated SQL.
+                -- Order matters: clear_analyze_query_modules removes ALL models.X.analyze_queries.*
                 -- entries (including the sql module), so inject AFTER clearing.
-                clear_verification_view_modules(msm.model)
+                clear_analyze_query_modules(msm.model)
                 package.loaded[msm.require_path] = mutated_sql
 
                 -- 3. Run each test file and compare diagnostics to baseline
@@ -355,7 +355,7 @@ local function run_sql_mutations()
                 end
 
                 -- 4. Restore original (clear first, then set — same order as inject)
-                clear_verification_view_modules(msm.model)
+                clear_analyze_query_modules(msm.model)
                 package.loaded[msm.require_path] = orig_sql_module
 
                 -- 5. Record result
@@ -517,7 +517,7 @@ local function run_lua_mutations(target_path, suites)
             for dir in handle:lines() do
                 if dir ~= e2e_dir and file_exists(dir .. "/suite.yaml") then
                     local suite_config = parse_yaml(read_file(dir .. "/suite.yaml") or "")
-                    -- Skip expect_errors suites (they test verification_views, not source logic)
+                    -- Skip expect_errors suites (they test analyze_queries, not source logic)
                     if suite_config.expect_errors ~= "true" then
                         for _, md_file in ipairs(discover_suite_tests(dir)) do
                             table.insert(suites, { suite = dir, file = md_file })

@@ -33,22 +33,26 @@ rather than as columns, enabling dynamic schema extension through model definiti
 Each attribute row references its parent entity (object or float), attribute definition,
 and stores the value as text with type casting at query time.
 
-**[dic:build-cache](#)**: The build cache ([CSU-010](@)) tracks document content hashes in the
-`source_files` table. Before parsing a document, the engine computes its SHA1 hash and
-compares against the stored value. Unchanged documents skip parsing entirely and reuse
-their cached SpecIR state. To support incremental builds, the
-`build_graph` table tracks include dependencies so that changes to included files also
-trigger rebuilds. When the document hash matches, the Build Engine ([CSU-005](@)) queries
-the `build_graph` table for all include dependencies recorded during the previous build.
-It then computes a SHA1 hash for each include file via the Hash Utilities ([CSU-065](@)).
-If an include file is missing, the hash returns nil, which forces a cache miss and a full
-document rebuild. The resulting path-to-hash map is compared against the stored values; any
-mismatch invalidates the cache and triggers reparsing of the root document.
+**[dic:build-cache](#)**: The build cache ([CSU-010](@)) records, per document, the full
+file set the last successful build read — the root document itself plus every included
+file — as nodes of the `build_graph` table, each with the SHA1 it had at build time (the
+root is its own node). Before parsing, the Build Engine ([CSU-005](@)) hashes the root and
+the build cache walks the recorded nodes, hashing include files via the Hash Utilities
+([CSU-065](@)). The document is dirty — reparsed from source — when any node's current
+hash differs, a node file is missing (hash returns nil, forcing the parse to fail fast
+with a clear include-not-found error), or no root node is recorded (first build, or the
+previous build failed before the deferred cache update). Unchanged documents skip parsing
+entirely and reuse their cached SpecIR state.
 
-**[dic:output-cache](#)**: The output cache tracks generated output files and their input hashes.
-Before generating an output file, the emitter checks whether the input hash matches
-the stored value. If current, the output generation is skipped. This provides incremental
-output generation independent of the build cache.
+**[dic:output-cache](#)**: The output cache stores, per generated output file, the SHA1 of
+the exact serialized document that was fed to Pandoc — assembled from the database, views
+rendered, and the format filter applied. Before invoking Pandoc, the emitter serializes
+the assembled document, hashes it, and skips the invocation when the stored hash matches
+and no file dependency (bibliography, LaTeX class archive, reference.docx for DOCX) is
+newer than the output. Because the hash covers the render input itself rather than a
+model of its dependencies, any change that affects the rendered document — including
+cross-document view data such as traceability matrices, and template filter changes —
+invalidates the cache by construction.
 
 **Component Interaction**
 
@@ -59,11 +63,11 @@ operations from static definitions.
 (Database Handler) wraps raw SQLite operations and connection management with DELETE journal
 mode for single-file reliability. [csu:data-manager](#) (Data Manager) builds on the handler to provide the
 high-level query API used by all pipeline phases — inserting spec entities during INITIALIZE,
-updating references during ANALYZE, and reading assembled content during EMIT. [csu:build-cache](#)
-(Build Cache) queries `source_files` and `build_graph` to detect changed documents via SHA1
-comparison. [csu:output-cache](#) (Output Cache) tracks generated output files and their input hashes
-to skip redundant generation. [csu:verification-view-definitions](#) (Verification View Definitions) materializes SQL verification view
-views at build time for the VERIFY phase.
+updating references during RESOLVE, and reading assembled content during EMIT. [csu:build-cache](#)
+(Build Cache) queries `build_graph` to detect changed documents via SHA1 comparison of every
+recorded node (root and includes). [csu:output-cache](#) (Output Cache) tracks generated output
+files and the hash of their serialized render input to skip redundant generation. [csu:verification-view-definitions](#) (Analyze Query Definitions) materializes SQL analyze query
+views at build time for the ANALYZE phase.
 
 [csc:db-schema](#) (DB Schema) defines the database structure through composable modules.
 [csu:schema-aggregator](#) (Schema Aggregator) is the entry point, composing: [csu:content-schema](#) (Content Schema)
@@ -101,7 +105,7 @@ E -> DB: DataManager.new(db_handler, log)
 DB -> SCH: require Schema
 SCH -> SCH: compose content.SQL\n+ types.SQL + build.SQL\n+ search.SQL
 DB -> SQL: exec_sql(Schema.SQL)
-note right: Creates all tables:\nspecifications, spec_objects,\nspec_floats, spec_views,\nspec_relations, spec_attribute_values,\nsource_files, build_graph,\nspec_*_types, spec_attribute_defs
+note right: Creates all tables:\nspecifications, spec_objects,\nspec_floats, spec_views,\nspec_relations, spec_attribute_values,\nbuild_graph, output_cache,\nspec_*_types, spec_attribute_defs
 
 == View Initialization ==
 E -> VW: initialize_views(data)
@@ -116,38 +120,31 @@ end
 
 == Build Cache Check ==
 E -> E: sha1(document_content)
-E -> DB: query source_files(path)
-DB -> QRY: build.document_hash_check
-QRY -> SQL: SELECT sha1 FROM source_files
-SQL --> E: cached_hash
+E -> DB: query build_graph(root_path)
+DB -> QRY: build.get_nodes_for_root
+QRY -> SQL: SELECT node_path, node_sha1
+SQL --> E: nodes[] (root + includes)
 
-alt hash matches
-    E -> DB: query build_graph(root_path)
-    DB -> QRY: build.include_dependencies
-    QRY --> E: includes[]
-    E -> E: verify include hashes
-    alt all match
-        E -> E: skip parsing (use cached IR)
-    else include changed
-        E -> E: reparse document
-    end
-else content changed
+alt every node hash matches (root node present)
+    E -> E: skip parsing (use cached IR)
+else node changed / missing / no root node
     E -> E: reparse document
 end
 
-== After Parse ==
+== After Successful Build (deferred) ==
 E -> DB: INSERT/UPDATE spec entities
-E -> DB: UPDATE source_files hash
-E -> DB: UPDATE build_graph entries
+E -> DB: rewrite build_graph nodes\n(root self-node + includes)
 
 == Output Cache ==
-E -> DB: query output_cache(spec_id, format)
-DB -> QRY: build.output_cache_check
-alt output current
-    E -> E: skip generation
+E -> E: assemble + render views + apply filter
+E -> E: sha1(serialized pandoc input)
+E -> DB: query output_cache(spec_id, output_path)
+DB -> QRY: build.get_output_cache
+alt stored hash matches and deps not newer
+    E -> E: skip pandoc invocation
 else stale
     E -> E: generate output
-    E -> DB: UPDATE output_cache
+    E -> DB: UPDATE output_cache (input hash)
 end
 @enduml
 ```
@@ -185,8 +182,9 @@ typed columns (`string_value`, `int_value`, `real_value`, `bool_value`,
 #### LLR: Build Cache Clean on Hash Match @LLR-047
 
 Given a document path and its current SHA1 hash, [csu:build-cache](#)
-`is_document_dirty()` shall query the [dic:build-cache](#) `source_files` table and
-return `false` when the stored `sha1` matches.
+`is_document_dirty()` shall walk the document's [dic:build-graph](#) nodes and
+return `false` when the root node is recorded and every node's stored
+`node_sha1` matches its current file hash.
 
 > verification_method: Test
 
@@ -194,8 +192,9 @@ return `false` when the stored `sha1` matches.
 
 #### LLR: Build Cache Dirty on Missing Entry @LLR-048
 
-Given a document path not present in the [dic:build-cache](#) `source_files` table,
-[csu:build-cache](#) `is_document_dirty()` shall return `true`.
+Given a document path with no root node recorded in the [dic:build-graph](#)
+(first build, or a previous build that failed before the deferred cache
+update), [csu:build-cache](#) `is_document_dirty()` shall return `true`.
 
 > verification_method: Test
 
@@ -203,9 +202,10 @@ Given a document path not present in the [dic:build-cache](#) `source_files` tab
 
 #### LLR: Output Cache Stale on Hash Mismatch @LLR-049
 
-Given a spec_id, output_path, and current [dic:processed-intermediate-representation](#) hash, [csu:output-cache](#)
-`is_output_current()` shall return `false` when the stored `pir_hash` in the
-[dic:output-cache](#) differs.
+Given a spec_id, output_path, and the SHA1 of the serialized document to be
+rendered (the exact Pandoc input, after assembly, view rendering, and format
+filtering), [csu:output-cache](#) `is_output_current()` shall return `false`
+when the stored hash in the [dic:output-cache](#) differs.
 
 > verification_method: Test
 
@@ -222,9 +222,10 @@ shall return `false` regardless of hash match.
 
 #### LLR: Include-Aware Dirty Check @LLR-051
 
-Given a root document path, [csu:build-cache](#) `is_document_dirty_with_includes()`
-shall check both the root hash and all [dic:build-graph](#) `node_sha1` entries,
-returning `true` if any differs.
+Given a root document path, [csu:build-cache](#) `is_document_dirty()` shall
+compare every [dic:build-graph](#) node — the root itself and all includes —
+against current file hashes, returning `true` if any differs or a node file
+is missing.
 
 > verification_method: Test
 
@@ -234,7 +235,7 @@ returning `true` if any differs.
 
 After a successful build, [csu:build-cache](#) and [csu:build-queries](#) `update_build_graph()`
 shall delete old [dic:build-graph](#) rows for `root_path` and insert the
-current include tree.
+current file set: the root document as its own node plus the include tree.
 
 > verification_method: Test
 
@@ -268,12 +269,13 @@ Selected SHA1 content hashing for incremental build detection.
 > rationale: Content-addressed hashing provides deterministic cache invalidation:
 >
 > - SHA1 of document content detects actual changes, ignoring timestamp-only modifications
-> - Include dependency tracking via `build_graph` table ensures changes to included files trigger rebuilds
+> - One `build_graph` table records the whole file set of a build (root as its own node plus includes), so a single node walk answers the dirty check
 > - Missing include files force cache miss (hash returns nil), preventing stale IR state
 > - Deferred cache updates (after successful pipeline execution) prevent stale entries on error
-> - Output cache tracks generated files independently, enabling incremental output generation
+> - The output cache keys on the hash of the serialized render input (the exact Pandoc input), not on a model of its dependencies — cross-document view data and template filter changes invalidate by construction
 > - Uses Pandoc's built-in `pandoc.sha1()` when available, falling back to `vendor/sha2.lua` in standalone mode
 > - Alternative of file timestamps rejected: unreliable across platforms (git checkout, copy, WSL2 clock skew)
+> - Alternative of per-spec dependency-model hashing (the previous "P-IR hash") rejected: it missed inbound relations and live view queries, serving stale outputs after cross-document edits
 
 
 ### DD: Dynamic SQL View Generation for EAV Pivots @DD-DB-002

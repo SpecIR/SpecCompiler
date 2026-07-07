@@ -23,7 +23,7 @@ The schema has four domains:
 * - Content
   - `specifications`, `spec_objects`, `spec_floats`, `spec_relations`, `spec_views`, `spec_attribute_values`
 * - Build cache
-  - `build_graph`, `source_files`, `output_cache`
+  - `build_graph`, `output_cache`
 * - Search (FTS5)
   - `fts_objects`, `fts_attributes`, `fts_floats`
 ```
@@ -95,11 +95,8 @@ entity "spec_view_types" as spec_view_types {
   --
   long_name : TEXT
   description : TEXT
-  counter_group : TEXT
   aliases : TEXT
   inline_prefix : TEXT
-  materializer_type : TEXT
-  view_subtype_ref : TEXT
   needs_external_render : INTEGER
 }
 
@@ -210,7 +207,6 @@ entity "spec_views" as spec_views {
   start_line : INTEGER
   raw_ast : JSON
   resolved_ast : JSON
-  resolved_data : JSON
 }
 
 entity "spec_attribute_values" as spec_attribute_values {

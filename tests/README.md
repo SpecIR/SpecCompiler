@@ -107,7 +107,7 @@ Separate framework for measuring test suite effectiveness. See
 ./tests/mutation/mutate.sh --sql
 
 # Lua source mutations (on-disk with safety backup)
-./tests/mutation/mutate.sh --lua src/pipeline/verify/verify_handler.lua
+./tests/mutation/mutate.sh --lua src/pipeline/analyze/analyze_handler.lua
 ```
 
 Reports: `tests/reports/mutation/sql_report.json`, `tests/reports/mutation/lua_report.json`.

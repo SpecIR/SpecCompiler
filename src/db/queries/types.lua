@@ -55,12 +55,10 @@ M.insert_implicit_alias = [[
 M.insert_view_type = [[
     INSERT OR REPLACE INTO spec_view_types (
         identifier, long_name, description, aliases,
-        inline_prefix, materializer_type, counter_group, view_subtype_ref,
-        needs_external_render
+        inline_prefix, needs_external_render
     ) VALUES (
         :identifier, :long_name, :description, :aliases,
-        :inline_prefix, :materializer_type, :counter_group, :view_subtype_ref,
-        :needs_external_render
+        :inline_prefix, :needs_external_render
     )
 ]]
 

@@ -18,12 +18,27 @@ local function ensure_schema(db)
     db:exec_sql(BUILD_META_SCHEMA)
 end
 
+--- Compute the combined hash of a preset chain (top preset + extended bases).
+---@param preset_paths string[] Paths to every preset.lua in the extends chain
+---@return string|nil hash Combined hash, or nil if any file is unreadable
+local function chain_hash(preset_paths)
+    local hashes = {}
+    for _, path in ipairs(preset_paths) do
+        local hash = hash_utils.sha1_file(path)
+        if not hash then
+            return nil
+        end
+        hashes[#hashes + 1] = hash
+    end
+    return table.concat(hashes, ":")
+end
+
 --- Check if reference.docx needs to be rebuilt
 ---@param db table Database handler (from core.db)
----@param preset_path string Path to preset.lua
+---@param preset_paths string[] Paths to every preset.lua in the extends chain
 ---@param reference_path string Path to reference.docx
 ---@return boolean needs_rebuild
-function M.needs_rebuild(db, preset_path, reference_path)
+function M.needs_rebuild(db, preset_paths, reference_path)
     -- Check if reference.docx exists
     local f = io.open(reference_path, "r")
     if not f then
@@ -31,18 +46,11 @@ function M.needs_rebuild(db, preset_path, reference_path)
     end
     f:close()
 
-    -- Check if preset file exists
-    f = io.open(preset_path, "r")
-    if not f then
-        return false  -- No preset, can't rebuild
-    end
-    f:close()
-
     -- Ensure build_meta table exists
     ensure_schema(db)
 
-    -- Compare SHA1 hashes
-    local current_hash = hash_utils.sha1_file(preset_path)
+    -- Compare combined hashes across the whole extends chain
+    local current_hash = chain_hash(preset_paths)
     if not current_hash then
         return true  -- Can't compute hash, rebuild to be safe
     end
@@ -63,13 +71,13 @@ end
 
 --- Update the stored preset hash after rebuild
 ---@param db table Database handler (from core.db)
----@param preset_path string Path to preset.lua
+---@param preset_paths string[] Paths to every preset.lua in the extends chain
 ---@return boolean success
 ---@return string|nil error
-function M.update_hash(db, preset_path)
-    local hash = hash_utils.sha1_file(preset_path)
+function M.update_hash(db, preset_paths)
+    local hash = chain_hash(preset_paths)
     if not hash then
-        return false, "Cannot compute hash for: " .. preset_path
+        return false, "Cannot compute hash for preset chain"
     end
 
     -- Ensure build_meta table exists

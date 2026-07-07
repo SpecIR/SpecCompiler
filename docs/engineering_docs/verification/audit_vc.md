@@ -4,7 +4,7 @@
 
 Verify that SHA1 content hashing correctly detects document changes and skips unchanged documents.
 
-> objective: Confirm that the build engine computes SHA1 hashes, caches them in `source_files`, and correctly distinguishes dirty from clean documents
+> objective: Confirm that the build engine computes SHA1 hashes, caches them as `build_graph` nodes, and correctly distinguishes dirty from clean documents
 
 > verification_method: Test
 
@@ -12,13 +12,13 @@ Verify that SHA1 content hashing correctly detects document changes and skips un
 > - Build a project with two documents
 > - Rebuild without changes; verify both documents are skipped (cache hit)
 > - Modify one document; rebuild and verify only the modified document is reprocessed
-> - Verify `source_files` table contains updated hash after successful build
+> - Verify the `build_graph` root node contains the updated hash after successful build
 
 > pass_criteria:
 > - Unchanged documents produce cache hits (no re-parsing)
 > - Modified documents produce cache misses (full reprocessing)
-> - Hash values in `source_files` table match actual file content SHA1
-> - Hashes are not updated when VERIFY phase produces errors
+> - Hash values in `build_graph` nodes match actual file content SHA1
+> - Hashes are not updated when ANALYZE phase produces errors
 
 > traceability: [HLR-AUDIT-001](@), [LLR-084](@), [LLR-085](@)
 

@@ -19,7 +19,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > path: src/core/
 
-> description: Pipeline orchestration, metadata/config extraction, model loading, verification view loading, validation policy, and runtime control.
+> description: Pipeline orchestration, metadata/config extraction, model loading, analyze query loading, validation policy, and runtime control.
 
 ##### CSU: Pandoc Filter Entry Point @CSU-001
 
@@ -77,17 +77,17 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Pipeline lifecycle orchestrator that manages a 5-phase (INITIALIZE, ANALYZE, TRANSFORM, VERIFY, EMIT) execution model with declarative handler prerequisites and topological sorting.
+> description: Pipeline lifecycle orchestrator that manages a 5-phase (INITIALIZE, RESOLVE, TRANSFORM, ANALYZE, EMIT) execution model with declarative handler prerequisites and topological sorting.
 
 > traceability: [CSC-001](@)
 
-##### CSU: Verification View Loader @CSU-007
+##### CSU: Analyze Query Loader @CSU-007
 
-> file_path: src/core/verification_view_loader.lua
+> file_path: src/core/analyze_query_loader.lua
 
 > language: Lua
 
-> description: Discovers, loads, and registers verification view modules from models/{model}/verification_views/, maintaining an in-memory registry of verification view definitions used for verification policies.
+> description: Discovers, loads, and registers analyze query modules from models/{model}/analyze_queries/, maintaining an in-memory registry of analyze query definitions used for verification policies.
 
 > traceability: [CSC-001](@)
 
@@ -107,7 +107,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Manages configurable validation severity levels (error/warn/ignore) for policy keys, building default policies from loaded verification view definitions and allowing project-level overrides.
+> description: Manages configurable validation severity levels (error/warn/ignore) for policy keys, building default policies from loaded analyze query definitions and allowing project-level overrides.
 
 > traceability: [CSC-001](@)
 
@@ -119,7 +119,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > path: src/db/
 
-> description: Canonical insert/query API for SpecIR, transaction handling, build cache, output cache, and verification view definitions.
+> description: Canonical insert/query API for SpecIR, transaction handling, build cache, output cache, and analyze query definitions.
 
 ##### CSU: Build Cache @CSU-010
 
@@ -161,13 +161,13 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > traceability: [CSC-002](@)
 
-##### CSU: Verification View Definitions @CSU-014
+##### CSU: Analyze Query Definitions @CSU-014
 
 > file_path: src/db/proof_views.lua
 
 > language: Lua
 
-> description: Defines SQL CREATE VIEW statements for all verification views used in the VERIFY phase, organized by entity type (specifications, objects, floats, relations, views).
+> description: Defines SQL CREATE VIEW statements for all analyze queries used in the ANALYZE phase, organized by entity type (specifications, objects, floats, relations, views).
 
 > traceability: [CSC-002](@)
 
@@ -257,7 +257,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: DDL for build infrastructure tables (build_graph, source_files, output_cache) that enable incremental builds through file dependency tracking and content hashing.
+> description: DDL for build infrastructure tables (build_graph, output_cache) that enable incremental builds through file dependency tracking and content hashing.
 
 > traceability: [CSC-006](@)
 
@@ -371,13 +371,13 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > traceability: [CSC-003](@)
 
-##### CSU: Verify Handler @CSU-031
+##### CSU: Analyze Handler @CSU-031
 
 > file_path: src/pipeline/verify/verify_handler.lua
 
 > language: Lua
 
-> description: VERIFY phase handler that iterates over all registered verification views, queries each for violations, and emits structured diagnostics based on validation policy.
+> description: ANALYZE phase handler that iterates over all registered analyze queries, queries each for violations, and emits structured diagnostics based on validation policy.
 
 > traceability: [CSC-003](@)
 
@@ -389,7 +389,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > path: src/pipeline/analyze/
 
-> description: ANALYZE phase handlers for relation resolution, relation type inference, and attribute casting.
+> description: RESOLVE phase handlers for relation resolution, relation type inference, and attribute casting.
 
 ##### CSU: Attribute Caster @CSU-032
 
@@ -407,7 +407,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: ANALYZE phase handler that resolves spec_relation targets by matching PIDs and header IDs across specifications, populating target_object_id and target_float_id foreign keys.
+> description: RESOLVE phase handler that resolves spec_relation targets by matching PIDs and header IDs across specifications, populating target_object_id and target_float_id foreign keys.
 
 > traceability: [CSC-008](@)
 
@@ -417,7 +417,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: ANALYZE phase handler that infers relation types using 4-dimension unweighted specificity scoring (selector, source_attribute, source_type, target_type) after relation_resolver has populated targets.
+> description: RESOLVE phase handler that infers relation types using 4-dimension unweighted specificity scoring (selector, source_attribute, source_type, target_type) after relation_resolver has populated targets.
 
 > traceability: [CSC-008](@)
 
@@ -587,7 +587,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: INITIALIZE phase handler that extracts link-based relations (`[PID](@)` and `[PID](#)`) from object ASTs and stores them in spec_relations. Type inference and link rewriting are delegated to relation_type_inferrer (ANALYZE) and relation_link_rewriter (TRANSFORM).
+> description: INITIALIZE phase handler that extracts link-based relations (`[PID](@)` and `[PID](#)`) from object ASTs and stores them in spec_relations. Type inference and link rewriting are delegated to relation_type_inferrer (RESOLVE) and relation_link_rewriter (TRANSFORM).
 
 > traceability: [CSC-010](@)
 
@@ -719,7 +719,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > path: src/pipeline/transform/
 
-> description: TRANSFORM phase handlers for view materialization, external rendering, and spec object/specification rendering.
+> description: TRANSFORM phase handlers for external rendering and spec object/specification rendering.
 
 ##### CSU: External Render Handler @CSU-060
 
@@ -768,16 +768,6 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 > language: Lua
 
 > description: TRANSFORM phase handler that resolves each specification type's render hook from the host via get_hook_inherited (walking the extends chain) and invokes it with a frozen render context to generate the document title header.
-
-> traceability: [CSC-012](@)
-
-##### CSU: View Materializer @CSU-064
-
-> file_path: src/pipeline/transform/view_materializer.lua
-
-> language: Lua
-
-> description: TRANSFORM phase handler that pre-computes view data (TOC, traceability matrices, etc.) by querying the database and storing structured JSON in spec_views.resolved_data.
 
 > traceability: [CSC-012](@)
 
@@ -1095,19 +1085,19 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > traceability: [CSC-019](@)
 
-##### Default Verification Views Package
+##### Default Analyze Queries Package
 
-#### CSC: Default Verification Views @CSC-020
+#### CSC: Default Analyze Queries @CSC-020
 
 > component_type: Package
 
-> path: models/default/verification_views/
+> path: models/default/analyze_queries/
 
-> description: SQL verification view queries for detecting constraint violations across specifications, objects, floats, relations, and views.
+> description: SQL analyze query queries for detecting constraint violations across specifications, objects, floats, relations, and views.
 
 ##### CSU: Spec Missing Required @CSU-089
 
-> file_path: models/default/verification_views/sd_101_spec_missing_required.lua
+> file_path: models/default/analyze_queries/sd_101_spec_missing_required.lua
 
 > language: Lua
 
@@ -1117,7 +1107,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Spec Invalid Type @CSU-090
 
-> file_path: models/default/verification_views/sd_102_spec_invalid_type.lua
+> file_path: models/default/analyze_queries/sd_102_spec_invalid_type.lua
 
 > language: Lua
 
@@ -1127,7 +1117,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Object Missing Required @CSU-091
 
-> file_path: models/default/verification_views/sd_201_object_missing_required.lua
+> file_path: models/default/analyze_queries/sd_201_object_missing_required.lua
 
 > language: Lua
 
@@ -1137,7 +1127,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Object Cardinality Over @CSU-092
 
-> file_path: models/default/verification_views/sd_202_object_cardinality_over.lua
+> file_path: models/default/analyze_queries/sd_202_object_cardinality_over.lua
 
 > language: Lua
 
@@ -1147,7 +1137,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Object Cast Failures @CSU-093
 
-> file_path: models/default/verification_views/sd_203_object_cast_failures.lua
+> file_path: models/default/analyze_queries/sd_203_object_cast_failures.lua
 
 > language: Lua
 
@@ -1157,7 +1147,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Object Invalid Enum @CSU-094
 
-> file_path: models/default/verification_views/sd_204_object_invalid_enum.lua
+> file_path: models/default/analyze_queries/sd_204_object_invalid_enum.lua
 
 > language: Lua
 
@@ -1167,7 +1157,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Object Invalid Date @CSU-095
 
-> file_path: models/default/verification_views/sd_205_object_invalid_date.lua
+> file_path: models/default/analyze_queries/sd_205_object_invalid_date.lua
 
 > language: Lua
 
@@ -1177,7 +1167,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Object Bounds Violation @CSU-096
 
-> file_path: models/default/verification_views/sd_206_object_bounds_violation.lua
+> file_path: models/default/analyze_queries/sd_206_object_bounds_violation.lua
 
 > language: Lua
 
@@ -1187,7 +1177,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Float Orphan @CSU-097
 
-> file_path: models/default/verification_views/sd_301_float_orphan.lua
+> file_path: models/default/analyze_queries/sd_301_float_orphan.lua
 
 > language: Lua
 
@@ -1197,7 +1187,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Float Duplicate Label @CSU-098
 
-> file_path: models/default/verification_views/sd_302_float_duplicate_label.lua
+> file_path: models/default/analyze_queries/sd_302_float_duplicate_label.lua
 
 > language: Lua
 
@@ -1207,7 +1197,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Float Render Failure @CSU-099
 
-> file_path: models/default/verification_views/sd_303_float_render_failure.lua
+> file_path: models/default/analyze_queries/sd_303_float_render_failure.lua
 
 > language: Lua
 
@@ -1217,7 +1207,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Float Invalid Type @CSU-100
 
-> file_path: models/default/verification_views/sd_304_float_invalid_type.lua
+> file_path: models/default/analyze_queries/sd_304_float_invalid_type.lua
 
 > language: Lua
 
@@ -1227,7 +1217,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Relation Unresolved @CSU-101
 
-> file_path: models/default/verification_views/sd_401_relation_unresolved.lua
+> file_path: models/default/analyze_queries/sd_401_relation_unresolved.lua
 
 > language: Lua
 
@@ -1237,7 +1227,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Relation Dangling @CSU-102
 
-> file_path: models/default/verification_views/sd_402_relation_dangling.lua
+> file_path: models/default/analyze_queries/sd_402_relation_dangling.lua
 
 > language: Lua
 
@@ -1247,21 +1237,11 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: Relation Ambiguous @CSU-103
 
-> file_path: models/default/verification_views/sd_407_relation_ambiguous.lua
+> file_path: models/default/analyze_queries/sd_407_relation_ambiguous.lua
 
 > language: Lua
 
 > description: Verification view detecting relations flagged as ambiguous where the float reference matched multiple targets.
-
-> traceability: [CSC-020](@)
-
-##### CSU: View Materialization Failure @CSU-104
-
-> file_path: models/default/verification_views/sd_501_view_materialization_failure.lua
-
-> language: Lua
-
-> description: Verification view detecting views whose materialization failed, leaving both resolved_ast and resolved_data as NULL.
 
 > traceability: [CSC-020](@)
 
@@ -1507,7 +1487,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > path: models/sw_docs/
 
-> description: Domain model for software documentation providing traceable object types, domain-specific verification views, specification types, relation types, and views.
+> description: Domain model for software documentation providing traceable object types, domain-specific analyze queries, specification types, relation types, and views.
 
 ##### CSU: HTML5 Postprocessor @CSU-125
 
@@ -1519,19 +1499,19 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > traceability: [CSC-025](@)
 
-##### SW Docs Verification Views Package
+##### SW Docs Analyze Queries Package
 
-#### CSC: SW Docs Verification Views @CSC-026
+#### CSC: SW Docs Analyze Queries @CSC-026
 
 > component_type: Package
 
-> path: models/sw_docs/verification_views/
+> path: models/sw_docs/analyze_queries/
 
-> description: Domain-specific verification view queries for software documentation traceability and naming convention enforcement.
+> description: Domain-specific analyze query queries for software documentation traceability and naming convention enforcement.
 
 ##### CSU: VC Missing HLR Traceability @CSU-126
 
-> file_path: models/sw_docs/verification_views/sd_601_vc_missing_hlr_traceability.lua
+> file_path: models/sw_docs/analyze_queries/sd_601_vc_missing_hlr_traceability.lua
 
 > language: Lua
 
@@ -1541,7 +1521,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: TR Missing VC Traceability @CSU-127
 
-> file_path: models/sw_docs/verification_views/sd_602_tr_missing_vc_traceability.lua
+> file_path: models/sw_docs/analyze_queries/sd_602_tr_missing_vc_traceability.lua
 
 > language: Lua
 
@@ -1551,7 +1531,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: HLR Missing VC Coverage @CSU-128
 
-> file_path: models/sw_docs/verification_views/sd_603_hlr_missing_vc_coverage.lua
+> file_path: models/sw_docs/analyze_queries/sd_603_hlr_missing_vc_coverage.lua
 
 > language: Lua
 
@@ -1561,7 +1541,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: FD Missing CSC Traceability @CSU-131
 
-> file_path: models/sw_docs/verification_views/sd_606_fd_missing_csc_traceability.lua
+> file_path: models/sw_docs/analyze_queries/sd_606_fd_missing_csc_traceability.lua
 
 > language: Lua
 
@@ -1571,7 +1551,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: FD Missing CSU Traceability @CSU-132
 
-> file_path: models/sw_docs/verification_views/sd_607_fd_missing_csu_traceability.lua
+> file_path: models/sw_docs/analyze_queries/sd_607_fd_missing_csu_traceability.lua
 
 > language: Lua
 
@@ -1581,7 +1561,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: CSC Missing FD Allocation @CSU-163
 
-> file_path: models/sw_docs/verification_views/csc_missing_fd_allocation.lua
+> file_path: models/sw_docs/analyze_queries/csc_missing_fd_allocation.lua
 
 > language: Lua
 
@@ -1591,7 +1571,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 ##### CSU: CSU Missing FD Allocation @CSU-164
 
-> file_path: models/sw_docs/verification_views/csu_missing_fd_allocation.lua
+> file_path: models/sw_docs/analyze_queries/csu_missing_fd_allocation.lua
 
 > language: Lua
 

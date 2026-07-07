@@ -2,7 +2,7 @@
 ---Parses document headers and registers the specification (L1 header).
 ---Stores parsed headers in ctx for spec_objects handler.
 ---
----PID auto-generation has been moved to the ANALYZE phase (pid_generator.lua).
+---PID auto-generation has been moved to the RESOLVE phase (pid_generator.lua).
 ---This handler only extracts explicit @PID values from headers.
 ---
 ---@module specifications
@@ -462,8 +462,8 @@ local function extract_headers_from_context(ctx, data, diagnostics)
         end
     end
 
-    -- NOTE: PID auto-generation has been moved to ANALYZE phase (pid_generator.lua)
-    -- Objects without explicit @PID will have pid = NULL until ANALYZE runs.
+    -- NOTE: PID auto-generation has been moved to RESOLVE phase (pid_generator.lua)
+    -- Objects without explicit @PID will have pid = NULL until RESOLVE runs.
 
     -- Store in context for downstream handlers
     ctx.parsed_headers = parsed_headers

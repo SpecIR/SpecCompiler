@@ -345,7 +345,7 @@ function M.on_initialize(data, contexts, diagnostics)
             data:execute(Queries.content.delete_floats_by_spec, { spec_id = spec_id })
         end
 
-        -- Insert all floats (duplicates detected by view_float_duplicate_label verification_view in VERIFY)
+        -- Insert all floats (duplicates detected by view_float_duplicate_label analyze_query in ANALYZE)
         for _, float in ipairs(all_floats) do
             -- Compute anchor after all objects are inserted
             float.anchor = get_float_anchor(float, data)

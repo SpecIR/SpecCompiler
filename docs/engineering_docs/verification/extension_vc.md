@@ -247,7 +247,7 @@ Verify a plugin returns one `{kind, schema, hooks}` descriptor and that role/hoo
 
 ### VC: Verification Descriptor @VC-EXT-012
 
-Verify a verification view is a `kind="verification"` descriptor forwarded to the host's ordered policy_key registry with override and disabled semantics.
+Verify a analyze query is a `kind="verification"` descriptor forwarded to the host's ordered policy_key registry with override and disabled semantics.
 
 > objective: Confirm `{schema = {policy_key, view, sql, disabled}, hooks = {message}}` descriptors feed the ordered registry, that a later model overrides an earlier policy_key in place, and that `disabled=true` removes it.
 

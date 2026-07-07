@@ -1,8 +1,9 @@
 -- Test oracle for VC-VERIFY-004: View Syntax Compatibility
--- Verifies unsupported/legacy view syntax does not emit unexpected
--- view-related verification_view keys.
+-- Verifies unsupported/legacy view syntax does not emit view-processing
+-- diagnostics: unregistered prefixes must be left as literal code, and the
+-- valid views (toc/lof/lot/sigla_list) must render without errors.
 --
--- In expect_errors mode, this oracle validates diagnostics emitted by VERIFY.
+-- In expect_errors mode, this oracle validates diagnostics emitted by ANALYZE.
 
 return function(actual_doc, helpers)
     -- In expect_errors mode, actual_doc is nil and we check diagnostics
@@ -28,10 +29,11 @@ return function(actual_doc, helpers)
             end
         end
 
-        -- Verify no explicit view verification_view failures were emitted
+        -- Verify no view-processing failures were emitted: neither the
+        -- unregistered syntax nor the valid views may raise view diagnostics.
         for code, _ in pairs(detected_codes) do
-            if code == "view_materialization_failure" then
-                err(string.format("Unexpected %s detected", code))
+            if code:match("^view_") then
+                err(string.format("Unexpected view diagnostic %s detected", code))
             end
         end
 

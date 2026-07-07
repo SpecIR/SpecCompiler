@@ -12,7 +12,7 @@ return {
             { name = "kind", type = "STRING" },        -- function, register, variable, etc.
             { name = "source", type = "STRING" },      -- Source file and line location
             { name = "complexity", type = "INT" },     -- Cyclomatic complexity (for functions)
-            { name = "calls", type = "STRING" },       -- Comma-separated list of called functions
+            { name = "calls", type = "XHTML" },       -- Links to called symbols
         }
     },
 }

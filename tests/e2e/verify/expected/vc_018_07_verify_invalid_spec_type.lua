@@ -1,6 +1,6 @@
 -- Oracle: Unknown specification type fallback behavior.
 -- UNKNOWN_SPEC triggers exactly 1 WARN diagnostic from the parser fallback.
--- The fallback to SPEC means the spec_invalid_type verification_view should NOT fire.
+-- The fallback to SPEC means the spec_invalid_type analyze_query should NOT fire.
 
 return function(_, helpers)
     if not helpers.expect_errors then
@@ -40,10 +40,10 @@ return function(_, helpers)
             detected_codes["WARN"])
     end
 
-    -- Fallback to SPEC should prevent the spec_invalid_type verification_view from firing
+    -- Fallback to SPEC should prevent the spec_invalid_type analyze_query from firing
     if detected_codes["spec_invalid_type"] then
         return false, string.format(
-            "Unexpected spec_invalid_type verification_view fired (%d times) -- fallback should have prevented this",
+            "Unexpected spec_invalid_type analyze_query fired (%d times) -- fallback should have prevented this",
             detected_codes["spec_invalid_type"])
     end
 

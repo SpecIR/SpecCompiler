@@ -15,6 +15,7 @@ return {
             { name = "language", type = "STRING" },
             { name = "description", type = "XHTML" },
             { name = "traceability", type = "XHTML" },
+            { name = "implements", type = "XHTML" },
         }
     },
 }

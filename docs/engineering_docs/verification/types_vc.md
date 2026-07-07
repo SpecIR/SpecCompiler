@@ -84,29 +84,32 @@ Verify spec_relations table stores traceability links.
 > - Each link creates one relation record
 > - source_ref points to containing object
 > - target_text contains original link text
-> - target_ref populated during [dic:analyze-phase](#) phase
+> - target_ref populated during [dic:resolve-phase](#) phase
 
 > traceability: [HLR-TYPE-005](@), [LLR-064](@), [LLR-065](@)
 
 
 ### VC: Spec Views Container @VC-016
 
-Verify spec_views table stores generated content.
+Verify spec_views table stores view definitions and views render from live data.
 
-> objective: Confirm view code blocks create spec_view records
+> objective: Confirm view code blocks create spec_view records and render at EMIT
 
 > verification_method: Test
 
 > approach:
 > - Process document with ```toc and ```lof code blocks
 > - Query spec_views table
-> - Verify view_type_ref, resolved_ast fields
+> - Verify view_type_ref, raw_ast fields
+> - Verify the emitted output contains the rendered view content
 
 > pass_criteria:
 > - Each view code block creates one record
 > - view_type_ref matches view type
-> - resolved_ast populated during [dic:transform-phase](#) phase
-> - resolved_data contains structured view data
+> - raw_ast preserves the view definition content
+> - View content is rendered live at EMIT from current database state
+>   (resolved_ast is populated only by view types that pre-render during
+>   [dic:transform-phase](#), e.g. abbreviations)
 
 > traceability: [HLR-TYPE-004](@), [LLR-062](@), [LLR-063](@)
 
@@ -135,7 +138,7 @@ Verify spec_attribute_values table stores object properties.
 
 ### VC: Type Validation @VC-018
 
-Verify verification views detect data integrity violations.
+Verify analyze queries detect data integrity violations.
 
 > objective: Confirm validation catches invalid data
 
@@ -145,7 +148,7 @@ Verify verification views detect data integrity violations.
 > - Create document with invalid enum value (`invalid_enum` / `invalid_cast`)
 > - Create document with missing required attribute (`missing_required`)
 > - Create document with dangling relation (`dangling_relation`)
-> - Run VERIFY phase, check diagnostics
+> - Run ANALYZE phase, check diagnostics
 
 > pass_criteria:
 > - `invalid_enum` or `invalid_cast` violation reported for invalid enum input

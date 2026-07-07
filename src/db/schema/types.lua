@@ -17,7 +17,7 @@ M.SQL = [[
 --   1. They are fully repopulated from model definitions every run
 --   2. Schema changes (added/removed columns) must take effect immediately
 --   3. No user data is stored here — only model-defined metamodel entries
--- Build/cache tables (build_graph, source_files, output_cache) are NOT dropped.
+-- Build/cache tables (build_graph, output_cache) are NOT dropped.
 --------------------------------------------------------------------------------
 
 DROP TABLE IF EXISTS implicit_spec_type_aliases;
@@ -183,10 +183,6 @@ CREATE TABLE IF NOT EXISTS spec_view_types (
   -- Documentation explaining this view type's purpose
   description TEXT,
 
-  -- Float counter group to list. Used for LOF/LOT.
-  -- E.g., 'FIGURE' for List of Figures, 'TABLE' for List of Tables
-  counter_group TEXT,
-
   -- Comma-wrapped aliases for syntax recognition (e.g., ",sigla,acronym,")
   -- Used to resolve shorthand syntax in code blocks
   aliases TEXT,
@@ -194,14 +190,6 @@ CREATE TABLE IF NOT EXISTS spec_view_types (
   -- Prefix for inline code syntax (e.g., "abbrev", "toc", "math")
   -- Matches syntax like `abbrev:NASA` or `toc:`
   inline_prefix TEXT,
-
-  -- Materialization strategy. Determines how view content is generated.
-  -- Values: 'toc', 'lof', 'abbrev_list', 'custom'
-  materializer_type TEXT,
-
-  -- For subtyped views (e.g., ABBREV has subtypes SIGLA, ABBREVIATION)
-  -- Points to a parent view type
-  view_subtype_ref TEXT,
 
   -- Boolean (0/1): Does this view type need external rendering?
   -- 1 = Requires external tool
@@ -237,7 +225,7 @@ CREATE TABLE IF NOT EXISTS datatype_definitions (
 -- 6. ATTRIBUTE DEFINITIONS
 -- Defines which attributes each object type can have (EAV schema).
 -- Includes cardinality and bounds constraints.
--- Validated by verification views (missing_required, cardinality_over, bounds).
+-- Validated by analyze queries (missing_required, cardinality_over, bounds).
 --------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS spec_attribute_types (
   -- Unique attribute definition ID
@@ -249,7 +237,7 @@ CREATE TABLE IF NOT EXISTS spec_attribute_types (
   owner_type_ref TEXT NOT NULL,
 
   -- Attribute name as it appears in markdown (e.g., "status", "priority")
-  -- Case-sensitive. Used in queries and verification views.
+  -- Case-sensitive. Used in queries and analyze queries.
   long_name TEXT NOT NULL,
 
   -- Data type for this attribute
@@ -257,19 +245,19 @@ CREATE TABLE IF NOT EXISTS spec_attribute_types (
   datatype_ref TEXT NOT NULL,
 
   -- Minimum occurrences. 0 = optional, 1+ = required.
-  -- Validated by verification view_object_missing_required
+  -- Validated by analyze query view_object_missing_required
   min_occurs INTEGER DEFAULT 0,
 
   -- Maximum occurrences. 1 = single value, >1 = multi-value attribute.
-  -- Validated by verification view_object_cardinality_over
+  -- Validated by analyze query view_object_cardinality_over
   max_occurs INTEGER DEFAULT 1,
 
   -- For INTEGER/REAL: minimum allowed value (inclusive)
-  -- Validated by verification view_object_bounds_violation
+  -- Validated by analyze query view_object_bounds_violation
   min_value REAL,
 
   -- For INTEGER/REAL: maximum allowed value (inclusive)
-  -- Validated by verification view_object_bounds_violation
+  -- Validated by analyze query view_object_bounds_violation
   max_value REAL,
 
   FOREIGN KEY (datatype_ref) REFERENCES datatype_definitions(identifier),
@@ -370,14 +358,14 @@ CREATE TABLE IF NOT EXISTS spec_specification_types (
 
 --------------------------------------------------------------------------------
 -- INDEXES FOR VERIFICATION VIEW PERFORMANCE
--- These indexes accelerate the VERIFY phase verification views which check data
+-- These indexes accelerate the ANALYZE phase analyze queries which check data
 -- integrity via complex JOINs on type reference columns.
 --------------------------------------------------------------------------------
 
--- spec_attribute_types index for bounds and cardinality verification views
+-- spec_attribute_types index for bounds and cardinality analyze queries
 CREATE INDEX IF NOT EXISTS idx_attr_def_owner_type ON spec_attribute_types(owner_type_ref);
 
--- enum_values index for invalid enum verification view
+-- enum_values index for invalid enum analyze query
 CREATE INDEX IF NOT EXISTS idx_enum_values_datatype ON enum_values(datatype_ref);
 ]]
 

@@ -1,5 +1,5 @@
 -- Test oracle for VC-REL-010: Relation type inference.
--- Validates that the relation_analyzer correctly infers relation types
+-- Validates that the relation_resolver correctly infers relation types
 -- based on link selector, resolved target type, and specificity scoring.
 
 return function(actual_doc, helpers)

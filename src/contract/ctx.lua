@@ -5,10 +5,15 @@
 ---argument, with a polymorphic `.subject` (the thing being acted on) and a
 ---`.capability` (which hook this is). "Frozen" here means only that top-level
 ---keys cannot be rebound -- the nested subject/data/config tables it points at
----remain mutable. There are TWO context flavors, one per phase, selected by the
----hook NAME -- the host validates the mapping (registry ALLOWED_HOOKS):
+---remain mutable. There are TWO context flavors, selected by the hook NAME --
+---the host validates the mapping (registry ALLOWED_HOOKS). The flavor decides
+---WHAT the hook receives and owes, never WHEN it runs: execution time belongs
+---to the phase handler that dispatches the capability (objects/specifications
+---render during TRANSFORM and are persisted to the IR; floats/views render
+---during EMIT; relation links rewrite during TRANSFORM; analyze messages fire
+---during ANALYZE; view build_block is dispatched during EMIT assembly).
 ---
----  RENDER ctx -- built during the EMIT walk (a Pandoc element becoming output).
+---  RENDER ctx -- for hooks that produce presentation output.
 ---    Invariant core (all asserted non-nil): data, pandoc, log, diagnostics,
 ---    format, spec_id, model, config; plus `host` (the registry, for cross-hook
 ---    dispatch). Render-tier hooks: object/specification/float/view render +
@@ -16,8 +21,8 @@
 ---    e.g. { object, attributes, specification, element, float, resolved, target,
 ---    view_id, preset, row } depending on kind.
 ---
----  DATA ctx -- built during the data/lifecycle phases (TRANSFORM/ANALYZE/
----    external-render); no Pandoc element, no chosen format. Invariant core:
+---  DATA ctx -- for hooks that produce data, not presentation; no Pandoc
+---    element, no chosen format. Invariant core:
 ---    data, spec_id, log (pandoc/format absent; model/config/diagnostics/host ride
 ---    along when available). Data-tier hooks, their subject, and their ONE return:
 ---      view  dataset(dctx)       -> { source | data | links }   subject.params
@@ -42,7 +47,7 @@ M.INVARIANT_CORE = {
 }
 
 -- Invariant-core fields for a DATA ctx (built during the data/lifecycle phases
--- -- TRANSFORM/ANALYZE/external-render -- where there is no Pandoc element and no
+-- -- TRANSFORM/RESOLVE/external-render -- where there is no Pandoc element and no
 -- single output format yet). pandoc/format/diagnostics/model/config ride along
 -- when the caller has them but are NOT required, so a data hook never depends on
 -- render-only state.

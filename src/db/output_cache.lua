@@ -1,9 +1,14 @@
--- src/core/output_cache.lua
--- Output cache for skipping regeneration when P-IR hasn't changed
+-- src/db/output_cache.lua
+-- Output cache for skipping Pandoc rendering when its input hasn't changed.
+--
+-- The cache key is the hash of the exact serialized document fed to the
+-- Pandoc CLI (assembled from the DB, views rendered, format filter applied).
+-- Anything that changes the rendered output — own content, cross-document
+-- view data, template filters — changes this hash by construction, so no
+-- dependency modeling is needed.
 
 local M = {}
 
-local hash_utils = require('infra.hash_utils')
 local task_runner = require('infra.process.task_runner')
 local Queries = require('db.queries')
 
@@ -19,8 +24,9 @@ end
 ---@param spec_id string Specification ID
 ---@param output_path string Output file path
 ---@param dependencies string[]|nil Extra files that affect this output
+---@param input_hash string Hash of the serialized document to be rendered
 ---@return boolean is_current True if output is current and can be skipped
-function M:is_output_current(spec_id, output_path, dependencies)
+function M:is_output_current(spec_id, output_path, dependencies, input_hash)
     -- Check if output file exists
     if not task_runner.file_exists(output_path) then
         if self.log then
@@ -40,7 +46,6 @@ function M:is_output_current(spec_id, output_path, dependencies)
         end
     end
 
-    -- Get cached P-IR hash for this spec and output path
     local cached = self.data:query_one(Queries.build.get_output_cache, {
         spec = spec_id, path = output_path
     })
@@ -52,18 +57,15 @@ function M:is_output_current(spec_id, output_path, dependencies)
         return false
     end
 
-    -- Compute current P-IR hash
-    local current_hash = hash_utils.pir_hash(self.data, spec_id)
-
-    if cached.pir_hash == current_hash then
+    if cached.pir_hash == input_hash then
         if self.log then
-            self.log.info("Output cache hit: skipping %s (P-IR unchanged)", output_path)
+            self.log.info("Output cache hit: skipping %s (render input unchanged)", output_path)
         end
         return true
     end
 
     if self.log then
-        self.log.debug("Output cache miss: P-IR changed for %s", output_path)
+        self.log.debug("Output cache miss: render input changed for %s", output_path)
     end
     return false
 end
@@ -71,15 +73,14 @@ end
 ---Update cache after generating output
 ---@param spec_id string Specification ID
 ---@param output_path string Output file path
-function M:update_cache(spec_id, output_path)
-    local pir_hash = hash_utils.pir_hash(self.data, spec_id)
-
+---@param input_hash string Hash of the serialized document that was rendered
+function M:update_cache(spec_id, output_path, input_hash)
     self.data:execute(Queries.build.update_output_cache, {
-        spec = spec_id, path = output_path, hash = pir_hash
+        spec = spec_id, path = output_path, hash = input_hash
     })
 
     if self.log then
-        self.log.debug("Output cache updated for %s (P-IR: %s)", output_path, pir_hash:sub(1, 8))
+        self.log.debug("Output cache updated for %s (input: %s)", output_path, input_hash:sub(1, 8))
     end
 end
 

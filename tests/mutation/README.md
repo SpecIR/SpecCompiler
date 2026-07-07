@@ -10,7 +10,7 @@ Measures test suite effectiveness by injecting faults and checking if tests dete
 ./tests/mutation/mutate.sh --sql
 
 # Lua source mutations on a specific file (~2-10 min depending on file size)
-./tests/mutation/mutate.sh --lua src/pipeline/verify/verify_handler.lua
+./tests/mutation/mutate.sh --lua src/pipeline/analyze/analyze_handler.lua
 
 # Verbose: show killed mutants too (not just survivors)
 ./tests/mutation/mutate.sh --sql --verbose

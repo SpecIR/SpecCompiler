@@ -45,7 +45,8 @@ The system shall store spec object attributes using Entity-Attribute-Value patte
 
 The system shall maintain a build cache for document hash tracking.
 
-> description: Source file hashes stored in source_files table (path, sha1).
+> description: Source file hashes stored as build_graph nodes (root_path,
+> node_path, node_sha1), where the root document is recorded as its own node.
 > Build cache module provides is_document_dirty() to check if document content
 > has changed since last build. Hash comparison enables change detection.
 
@@ -99,9 +100,9 @@ The system shall generate per-object-type SQL views that pivot the EAV attribute
 The system shall support incremental rebuilds via build graph tracking.
 
 > description: Build graph stored in build_graph table (root_path, node_path,
-> node_sha1). Tracks include file dependencies for each root document.
-> is_document_dirty_with_includes() checks root document and all includes.
-> update_build_graph() refreshes dependency tree after successful build.
+> node_sha1). Records the root document and its include file dependencies as
+> nodes. is_document_dirty() checks the root document and all includes in one
+> node walk. update_build_graph() refreshes the file set after successful build.
 
 > rationale: Specification documents often include sub-files. Incremental builds
 > must detect changes in any included file to trigger rebuild of parent document.

@@ -1,5 +1,5 @@
 # E2E Test Suite: Pipeline Contracts
-# Verifies: VC-002, VC-006, VC-007, VC-008
+# Verifies: VC-002, VC-006, VC-007, VC-008, VC-PIPE-012, VC-PIPE-013
 
 project:
   code: TEST_PIPELINE
@@ -12,3 +12,6 @@ output_format: json
 # - vc_pipeline_006_context_propagation.md  -> VC-006 (Context Propagation)
 # - vc_pipeline_007_incremental_cache.md    -> VC-007 (Incremental build + output cache behavior)
 # - vc_pipeline_008_incremental_multi_emit.md -> VC-008 (Multi-doc EMIT completeness)
+# - vc_pipe_012_01_prereq_not_found.md -> VC-PIPE-012 (Prerequisite validation)
+# - vc_pipe_013_01_stale_relation_rebind.md -> VC-PIPE-013 (Relations must not survive rebuild of their target spec)
+# - vc_pipe_014_01_stale_view_cross_doc.md -> VC-PIPE-014 (Cross-doc view data must invalidate emit cache)

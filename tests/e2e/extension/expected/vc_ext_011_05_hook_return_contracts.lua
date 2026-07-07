@@ -61,26 +61,39 @@ return function(actual_doc, helpers)  -- luacheck: ignore actual_doc helpers
         err("wrong-return error must name kind/id/hook: " .. tostring(bad_err))
     end
 
-    -- A "string" hook returning a table must fail loudly.
+    -- render_link is a "display" hook: a string OR a display table is
+    -- accepted; anything else (e.g. a number) must fail loudly.
+    host:register{
+        kind = "relation",
+        schema = { id = "RC_DISPLAY_LINK", extends = "PID_REF" },
+        hooks = { render_link = function() return { text = "Seção 3", suppress_spec_prefix = true } end },
+    }
+    local ok_disp, disp = pcall(host:get_hook("relation", "RC_DISPLAY_LINK", "render_link"), {})
+    if not ok_disp then
+        err("render_link returning a display table must be accepted: " .. tostring(disp))
+    elseif type(disp) ~= "table" or disp.text ~= "Seção 3" then
+        err("render_link display table must pass through unchanged")
+    end
+
     host:register{
         kind = "relation",
         schema = { id = "RC_BAD_LINK", extends = "PID_REF" },
-        hooks = { render_link = function() return { "not", "a", "string" } end },
+        hooks = { render_link = function() return 42 end },
     }
     local ok_link, link_err = pcall(host:get_hook("relation", "RC_BAD_LINK", "render_link"), {})
     if ok_link then
-        err("render_link returning a table must error")
+        err("render_link returning a number must error")
     elseif not tostring(link_err):find("RC_BAD_LINK", 1, true) then
         err("render_link error must name the type: " .. tostring(link_err))
     end
 
     -- verification `message` is REQUIRED: returning nil must error.
     host:register{
-        kind = "verification",
+        kind = "analyze",
         schema = { id = "rc_check", view = "view_rc_check", policy_key = "rc_check", sql = "SELECT 1" },
         hooks = { message = function() return nil end },
     }
-    local ok_msg, msg_err = pcall(host:get_hook("verification", "rc_check", "message"), {})
+    local ok_msg, msg_err = pcall(host:get_hook("analyze", "rc_check", "message"), {})
     if ok_msg then
         err("message returning nil must error (required return)")
     elseif not tostring(msg_err):find("must return a string", 1, true) then

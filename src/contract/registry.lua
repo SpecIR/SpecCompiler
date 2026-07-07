@@ -212,9 +212,6 @@ local function insert_view(data, schema)
         description = schema.description or "",
         aliases = aliases_str,
         inline_prefix = schema.inline_prefix,
-        materializer_type = schema.materializer_type,
-        counter_group = schema.counter_group,
-        view_subtype_ref = schema.view_subtype_ref,
         needs_external_render = schema.needs_external_render and 1 or 0
     })
     register_attributes(data, schema)
@@ -248,7 +245,7 @@ local INSERT_FN = {
     view          = insert_view,
     relation      = insert_relation,
     specification = insert_specification,
-    verification  = false,
+    analyze       = false,
 }
 
 ---Propagate inherited attributes through the object `extends` chain.
@@ -315,18 +312,16 @@ end
 
 local VALID_KINDS = {
     object = true, float = true, view = true, relation = true,
-    specification = true, verification = true,
+    specification = true, analyze = true,
 }
 
 -- Per-kind hook contract. Each entry maps a hook NAME to:
---   tier     "render" -- runs during the EMIT walk; sole arg is the frozen
---                        render ctx (has pandoc/format; ctx.subject is the
---                        Pandoc element).
---            "data"   -- runs in a data/lifecycle phase (TRANSFORM/ANALYZE/
---                        external-render); sole arg is the frozen DATA ctx
---                        (no pandoc/format; dctx.subject carries the payload).
+--   tier     selects the context shape, not the execution phase. Render-tier
+--            hooks receive a frozen render ctx (Pandoc/format available when
+--            the caller has them); data-tier hooks receive a data ctx.
 --   returns  the TYPE the hook must return: "ast" (a Pandoc element or an
---            array of them -- table or userdata) or "string". nil is always
+--            array of them -- table or userdata), "string", or "display"
+--            (a string or { text = "...", ... }). nil is always
 --            an accepted return (meaning "nothing produced / fall back")
 --            unless `required` is set. Checked at dispatch time: a wrong-typed
 --            return is a loud error naming kind/id/hook instead of a confusing
@@ -342,10 +337,10 @@ local ALLOWED_HOOKS = {
                       render_block = { tier = "render", returns = "ast" },   -- one block
                       dataset      = { tier = "data", returns = "ast" },     -- dataset table
                       build_block  = { tier = "data", returns = "ast" } },   -- one block
-    relation      = { render_link = { tier = "render", returns = "string" },
+    relation      = { render_link = { tier = "render", returns = "display" },
                       resolve     = { tier = "data", returns = "ast" } },    -- {target, ambiguous}
     specification = { render = { tier = "render", returns = "ast" } },
-    verification  = { message = { tier = "render", returns = "string", required = true } },
+    analyze       = { message = { tier = "render", returns = "string", required = true } },
 }
 
 ---Dispatch-time postcondition for a hook's first return value, per the
@@ -363,6 +358,11 @@ local function check_hook_return(kind, id, hookname, contract, ...)
     if contract.returns == "string" then
         if t ~= "string" then
             error(("hook %s/%s.%s must return a string, got %s")
+                :format(kind, id, hookname, t), 3)
+        end
+    elseif contract.returns == "display" then
+        if t ~= "string" and t ~= "table" then
+            error(("hook %s/%s.%s must return a string/display table, got %s")
                 :format(kind, id, hookname, t), 3)
         end
     elseif contract.returns == "ast" then
@@ -401,7 +401,7 @@ end
 
 ---A plugin module returns its descriptor table directly:
 ---`{ kind, schema, hooks, [phase_handler] }`. A module that is not a descriptor
----(e.g. a shared data table such as verification_views/sql.lua) yields nil and
+---(e.g. a shared data table such as analyze_queries/sql.lua) yields nil and
 ---is skipped by the loader.
 ---@param module table the required plugin module
 ---@return table|nil descriptor
@@ -436,8 +436,8 @@ function M.new(opts)
         _descriptors = {}, -- _descriptors[kind][id] = descriptor
         -- Verification-view registry (ordered + by policy_key) with override/
         -- disabled semantics (HLR-EXT-012).
-        _verification_views = {},   -- ordered array of {view, policy_key, sql, message, disabled}
-        _verification_by_key = {},  -- policy_key -> entry (override/dedup)
+        _analyze_queries = {},   -- ordered array of {view, policy_key, sql, message, disabled}
+        _analyze_query_by_key = {},  -- policy_key -> entry (override/dedup)
         -- Inline-view prefix -> view id, built at registration from a view's
         -- inline_prefix + aliases.
         _view_prefixes = {},        -- lowercased prefix -> view id
@@ -519,7 +519,7 @@ function Host:register(descriptor)
     -- c. eager hook index -- the one index every consumer reads via get_hook /
     -- get_hook_inherited. Every declared hook is indexed uniformly (including a
     -- relation's `resolve`, which is ALSO wired to the resolver registry in step d
-    -- for its ANALYZE-phase dispatch -- the index keeps get_hook uniform).
+    -- for its RESOLVE-phase dispatch -- the index keeps get_hook uniform).
     self._caps[kind] = self._caps[kind] or {}
     self._caps[kind][id] = self._caps[kind][id] or {}
     for hookname, fn in pairs(hooks) do
@@ -550,8 +550,8 @@ function Host:register(descriptor)
 
     -- e. verification descriptors feed the ordered policy_key registry
     -- (override + disabled semantics preserved).
-    if kind == "verification" then
-        self:_register_verification(schema, hooks.message)
+    if kind == "analyze" then
+        self:_register_analyze_query(schema, hooks.message)
     end
 
     -- f. a view's inline_prefix + aliases populate the prefix -> id map the
@@ -574,25 +574,25 @@ function Host:register(descriptor)
     return self
 end
 
----Register a verification view into the ordered policy_key registry with
+---Register a analyze query into the ordered policy_key registry with
 ---override/disabled semantics: a `disabled` entry removes any existing entry for
 ---its policy_key; otherwise a repeat policy_key replaces in place (model
 ---layering) and a new one appends.
 ---@param schema table { policy_key, view, sql, disabled }
 ---@param message_fn function|nil row -> message
-function Host:_register_verification(schema, message_fn)
+function Host:_register_analyze_query(schema, message_fn)
     local policy_key = schema.policy_key
     if not policy_key then return end
 
     if schema.disabled then
-        if self._verification_by_key[policy_key] then
-            for i, existing in ipairs(self._verification_views) do
+        if self._analyze_query_by_key[policy_key] then
+            for i, existing in ipairs(self._analyze_queries) do
                 if existing.policy_key == policy_key then
-                    table.remove(self._verification_views, i)
+                    table.remove(self._analyze_queries, i)
                     break
                 end
             end
-            self._verification_by_key[policy_key] = nil
+            self._analyze_query_by_key[policy_key] = nil
         end
         return
     end
@@ -605,30 +605,30 @@ function Host:_register_verification(schema, message_fn)
         disabled = schema.disabled,
     }
 
-    if self._verification_by_key[policy_key] then
-        for i, existing in ipairs(self._verification_views) do
+    if self._analyze_query_by_key[policy_key] then
+        for i, existing in ipairs(self._analyze_queries) do
             if existing.policy_key == policy_key then
-                self._verification_views[i] = entry
+                self._analyze_queries[i] = entry
                 break
             end
         end
     else
-        table.insert(self._verification_views, entry)
+        table.insert(self._analyze_queries, entry)
     end
-    self._verification_by_key[policy_key] = entry
+    self._analyze_query_by_key[policy_key] = entry
 end
 
----Ordered verification views (read by verify_handler).
+---Ordered analyze queries (read by analyze_handler).
 ---@return table[] entries
-function Host:get_verification_views()
-    return self._verification_views
+function Host:get_analyze_queries()
+    return self._analyze_queries
 end
 
 ---Create all verification SQL views in the database (CREATE VIEW IF NOT EXISTS,
 ---so idempotent).
 ---@param data DataManager
-function Host:create_verification_views(data)
-    for _, entry in ipairs(self._verification_views) do
+function Host:create_analyze_queries(data)
+    for _, entry in ipairs(self._analyze_queries) do
         if entry.sql then
             data.db:exec_sql(entry.sql)
         end
@@ -668,7 +668,7 @@ local function manifest_requires(model_name)
 end
 
 ---Load a model: its manifest-declared requirements (recursively), then its
----type categories and verification views. Idempotent per model name, so a
+---type categories and analyze queries. Idempotent per model name, so a
 ---model required by several others (or required and also set as template)
 ---loads once. A missing required model is a loud error.
 ---@param model_name string
@@ -698,7 +698,7 @@ function Host:load_model(model_name)
         package.path = package.path .. ";" .. extra
     end
     self:_load_types(model_name)
-    self:_load_verification_views(model_name)
+    self:_load_analyze_queries(model_name)
     return self
 end
 
@@ -784,14 +784,14 @@ function Host:_load_types(model_name)
     return self
 end
 
----Walk a model's verification_views directory and register each verification
+---Walk a model's analyze_queries directory and register each verification
 ---descriptor through the same as_descriptor/register path as every other kind.
 ---sql.lua returns a plain SQL-string table (no kind/schema), so as_descriptor
 ---returns nil for it and it is skipped.
 ---@param model_name string
 ---@return table host
-function Host:_load_verification_views(model_name)
-    local vv_path = model_dir(model_name, "verification_views")
+function Host:_load_analyze_queries(model_name)
+    local vv_path = model_dir(model_name, "analyze_queries")
     if not vv_path then return self end
 
     local entries = fs.scandir(vv_path) or {}
@@ -804,11 +804,11 @@ function Host:_load_verification_views(model_name)
     table.sort(names)  -- deterministic load order
 
     for _, n in ipairs(names) do
-        local req = "models." .. model_name .. ".verification_views." .. n
+        local req = "models." .. model_name .. ".analyze_queries." .. n
         local ok, module = pcall(require, req)
         -- A require failure is a hard error, not a silent skip.
         if not ok then
-            error("Failed to load verification view module: " .. req .. ": " .. tostring(module))
+            error("Failed to load analyze query module: " .. req .. ": " .. tostring(module))
         end
         if type(module) == "table" then
             local descriptor = as_descriptor(module)
@@ -845,7 +845,7 @@ end
 ---@return table host
 function Host:finalize()
     propagate_inherited_attributes(self.data)
-    self:create_verification_views(self.data)
+    self:create_analyze_queries(self.data)
     self:_assert_required_hooks()
     return self
 end

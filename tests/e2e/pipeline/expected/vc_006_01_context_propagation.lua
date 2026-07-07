@@ -56,9 +56,9 @@ return function(_, _)
         },
         {
             skip_phases = {
-                pipeline_mod.PHASES.ANALYZE,
+                pipeline_mod.PHASES.RESOLVE,
                 pipeline_mod.PHASES.TRANSFORM,
-                pipeline_mod.PHASES.VERIFY,
+                pipeline_mod.PHASES.ANALYZE,
                 pipeline_mod.PHASES.EMIT
             }
         }
@@ -133,9 +133,9 @@ return function(_, _)
         {},
         {
             skip_phases = {
-                pipeline_mod.PHASES.ANALYZE,
+                pipeline_mod.PHASES.RESOLVE,
                 pipeline_mod.PHASES.TRANSFORM,
-                pipeline_mod.PHASES.VERIFY,
+                pipeline_mod.PHASES.ANALYZE,
                 pipeline_mod.PHASES.EMIT
             }
         }
@@ -175,9 +175,9 @@ return function(_, _)
         {
             cached_spec_ids = {"spec_a", "spec_b"},
             skip_phases = {
-                pipeline_mod.PHASES.ANALYZE,
+                pipeline_mod.PHASES.RESOLVE,
                 pipeline_mod.PHASES.TRANSFORM,
-                pipeline_mod.PHASES.VERIFY,
+                pipeline_mod.PHASES.ANALYZE,
             }
         }
     )

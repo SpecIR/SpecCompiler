@@ -7,16 +7,15 @@
 **Allocation:** Realized by [CSC-012](@) (Transform Handlers) and [CSC-009](@) (Emit Handlers) through [CSU-060](@) (External Render Handler) and [CSU-037](@) (Emitter Orchestrator). Output infrastructure is provided by [CSC-004](@) (Infrastructure), with format-specific utilities in [CSC-013](@) (Format Utilities), DOCX generation in [CSC-014](@) (DOCX Generation), I/O operations in [CSC-015](@) (I/O Utilities), and external process management in [CSC-016](@) (Process Management).
 
 The multi-format publication function encompasses the TRANSFORM and EMIT pipeline phases,
-covering content rendering, view materialization, external subprocess rendering,
+covering content rendering, external subprocess rendering,
 document assembly from the [dic:intermediate-representation](#) database, [dic:float](#) numbering and resolution, and
-parallel output generation via Pandoc.
+parallel output generation via Pandoc. Views (table of contents, list of
+figures/tables, abbreviation lists, matrices) are rendered live at EMIT time by
+their view-type render hooks querying the database, so their content always
+reflects current database state — a requirement of the output cache, which keys
+on the serialized render input.
 
-**TRANSFORM Phase**: Prepares content for output through four handler stages:
-
-- [CSU-064](@): Pre-computes view data (table of contents, list of figures/tables,
-  abbreviation lists) and stores as JSON in `spec_views.resolved_data`. Dispatches by
-  view type: `toc` queries spec_objects ordered by file_seq, `lof`/`lot` queries floats
-  by counter_group, `abbrev_list` queries view content.
+**TRANSFORM Phase**: Prepares content for output through the handler stages:
 
 - [CSU-061](@): Resolves float content that does not require external rendering
   (e.g., CSV parsing, text processing) and updates `spec_floats.resolved_ast`.
@@ -86,8 +85,7 @@ DOCX output styling.
 The output subsystem spans the TRANSFORM and EMIT pipeline phases, realized through
 handler packages and infrastructure components.
 
-[csc:transform-handlers](#) (Transform Handlers) prepares content for output. [csu:view-materializer](#) (View
-Materializer) pre-computes view data as JSON. [csu:float-transformer](#) (Float Transformer) resolves float
+[csc:transform-handlers](#) (Transform Handlers) prepares content for output. [csu:float-transformer](#) (Float Transformer) resolves float
 content not requiring external tools. [csu:external-render-handler](#) (External Render Handler) coordinates
 parallel subprocess rendering via luv. [csu:object-render-handler](#) (Object Render Handler) invokes type-specific
 header/body renderers. [csu:specification-render-handler](#) (Specification Render Handler) renders document title

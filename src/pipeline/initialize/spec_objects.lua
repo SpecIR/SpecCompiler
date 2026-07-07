@@ -104,7 +104,7 @@ function M.on_initialize(data, contexts, diagnostics)
         end
 
         -- Insert all objects in single transaction
-        -- Duplicate PID detection is handled by view_object_duplicate_pid verification_view in VERIFY phase.
+        -- Duplicate PID detection is handled by view_object_duplicate_pid analyze_query in ANALYZE phase.
         for _, obj in ipairs(all_objects) do
             data:execute(Queries.content.insert_object, obj)
         end

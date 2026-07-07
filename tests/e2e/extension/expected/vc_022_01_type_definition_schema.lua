@@ -36,7 +36,7 @@ return function(_, _)
                 return { kind = "float", schema = { id = "VC022_FLOAT" } }
             ]],
             ["views/minimal_view.lua"] = [[
-                return { kind = "view", schema = { id = "VC022_VIEW", materializer_type = "inline" } }
+                return { kind = "view", schema = { id = "VC022_VIEW", inline_prefix = "vc022view" } }
             ]],
             ["relations/minimal_relation.lua"] = [[
                 return { kind = "relation", schema = { id = "VC022_REL", source_type_ref = "HLR", target_type_ref = "HLR" } }

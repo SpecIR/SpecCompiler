@@ -26,14 +26,14 @@ document files (with [dic:build-cache](#) checks), and delegates to the pipeline
 
 1. **[dic:initialize-phase](#)** — Parse Pandoc [dic:abstract-syntax-tree](#) into [dic:intermediate-representation](#) database tables (specifications,
    spec_objects, attributes, spec_floats, spec_views, spec_relations)
-2. **[dic:analyze-phase](#)** — Resolve cross-references and infer relation types
+2. **[dic:resolve-phase](#)** — Resolve cross-references and infer relation types
 3. **[dic:transform-phase](#)** — Render content, materialize views, execute external renderers
-4. **[dic:verify-phase](#)** — Run verification views and collect diagnostics
+4. **[dic:analyze-phase](#)** — Run analyze queries and collect diagnostics
 5. **[dic:emit-phase](#)** — Assemble documents and generate output files
 
 All phases use the same dispatch model: for each handler in sorted order, the Pipeline Orchestrator [CSU-006](@) calls the handler's `on_{phase}(data, contexts, diagnostics)` hook once with the full set of contexts. Handlers are responsible for iterating over contexts internally. Each handler invocation is bracketed by `uv.hrtime()` calls at nanosecond precision to record its duration, and the orchestrator also records the aggregate duration of each phase, providing two-level performance visibility (handler-level and phase-level).
 
-**Phase Abort**: After VERIFY, the Pipeline Orchestrator [CSU-006](@) inspects the diagnostics collector for any error-level entries. If errors exist, the pipeline aborts before EMIT — only output generation is skipped, since TRANSFORM has already completed. This design allows verification views to validate transform results before committing to output.
+**Phase Abort**: After ANALYZE, the Pipeline Orchestrator [CSU-006](@) inspects the diagnostics collector for any error-level entries. If errors exist, the pipeline aborts before EMIT — only output generation is skipped, since TRANSFORM has already completed. This design allows analyze queries to validate transform results before committing to output.
 
 **Context Propagation**: Each document file produces a context containing the parsed AST,
 file path, specification ID, and walker state. Contexts are passed through all phases,
@@ -78,7 +78,7 @@ float detection and extraction. [csu:attribute-paragraph-utilities](#) (Attribut
 blocks from definition-list paragraphs. [csu:include-handler](#) (Include Handler) and [csu:include-utilities](#)
 (Include Utilities) manage file inclusion and path resolution. [csu:render-utilities](#) (Render Utilities)
 and [csu:math-render-utilities](#) (Math Render Utilities) provide AST-to-output conversion helpers. [csu:view-utilities](#)
-(View Utilities) supports view parsing and materialization. [csu:source-position-compatibility](#) (Source Position
+(View Utilities) supports view parsing and rendering. [csu:source-position-compatibility](#) (Source Position
 Compatibility) normalizes Pandoc source position data across API versions.
 
 ```puml:fd-001-pipeline{caption="Pipeline Execution Orchestration"}
@@ -111,7 +111,7 @@ INIT -> DB: INSERT spec_relations
 P -> INIT: spec_views.on_initialize()
 INIT -> DB: INSERT spec_views
 
-== ANALYZE ==
+== RESOLVE ==
 P -> P: topological_sort("analyze")
 P -> ANLZ: pid_generator.on_analyze()
 ANLZ -> DB: UPDATE spec_objects SET pid
@@ -120,8 +120,6 @@ ANLZ -> DB: UPDATE spec_relations\n(resolve targets, infer types)
 
 == TRANSFORM ==
 P -> P: topological_sort("transform")
-P -> XFRM: view_materializer.on_transform()
-XFRM -> DB: UPDATE spec_views.resolved_data
 P -> XFRM: spec_floats.on_transform()
 XFRM -> DB: UPDATE spec_floats.resolved_ast
 P -> XFRM: external_render_handler.on_transform()
@@ -135,9 +133,9 @@ XFRM -> DB: UPDATE spec_objects.ast
 P -> XFRM: relation_link_rewriter.on_transform()
 XFRM -> DB: UPDATE spec_objects.ast\n(rewrite links)
 
-== VERIFY ==
+== ANALYZE ==
 P -> P: topological_sort("verify")
-P -> DB: SELECT * FROM verification views
+P -> DB: SELECT * FROM analyze queries
 DB --> P: violation rows
 
 alt errors exist
@@ -216,7 +214,7 @@ the document list is empty, with `doc=nil` and a derived `spec_id`.
 #### LLR: Phase Execution Order @LLR-020
 
 Given registered [dic:handler](#)s, [csu:pipeline-orchestrator](#) shall execute phases in fixed order:
-[dic:initialize-phase](#) → [dic:analyze-phase](#) → [dic:transform-phase](#) → [dic:verify-phase](#) → [dic:emit-phase](#).
+[dic:initialize-phase](#) → [dic:resolve-phase](#) → [dic:transform-phase](#) → [dic:analyze-phase](#) → [dic:emit-phase](#).
 
 > verification_method: Test
 
@@ -233,7 +231,7 @@ those declaring an `on_{phase}` hook for that phase.
 
 #### LLR: No EMIT After Abort @LLR-022
 
-When `diagnostics:has_errors()` returns true after [dic:verify-phase](#), [csu:pipeline-orchestrator](#)
+When `diagnostics:has_errors()` returns true after [dic:analyze-phase](#), [csu:pipeline-orchestrator](#)
 shall not execute [dic:emit-phase](#) phase handlers.
 
 > verification_method: Test
@@ -482,7 +480,7 @@ Selected SQLite as the persistence engine for the Specification Intermediate Rep
 >
 > - Zero-configuration embedded database requiring no server process
 > - Single-file database portable across platforms (specir.db)
-> - SQL-based query interface enabling declarative verification views and resolution logic
+> - SQL-based query interface enabling declarative analyze queries and resolution logic
 > - ACID transactions for reliable incremental builds with cache coherency
 > - Built-in FTS5 for full-text search in the web application output
 > - Mature Lua binding (lsqlite3) available in the Pandoc ecosystem
@@ -505,16 +503,16 @@ Selected Entity-Attribute-Value storage for dynamic object and float attributes.
 
 ### DD: Five-Phase Pipeline Architecture @DD-CORE-003
 
-Selected a five-phase sequential pipeline (INITIALIZE, ANALYZE, TRANSFORM, VERIFY, EMIT) for document processing.
+Selected a five-phase sequential pipeline (INITIALIZE, RESOLVE, TRANSFORM, ANALYZE, EMIT) for document processing.
 
 > rationale: Five phases separate concerns and enable verification before output:
 >
 > - INITIALIZE parses AST into normalized relational IR before any resolution
-> - ANALYZE resolves cross-references and infers types on the complete IR, not partial state
-> - TRANSFORM renders content and materializes views with all references resolved
-> - VERIFY runs verification views after TRANSFORM so it can check transform results (e.g., float render failures, view materialization)
+> - RESOLVE resolves cross-references and infers types on the complete IR, not partial state
+> - TRANSFORM renders content with all references resolved (views render live at EMIT)
+> - ANALYZE runs analyze queries after TRANSFORM so it can check transform results (e.g., float render failures)
 > - EMIT generates output only after verification passes, preventing invalid documents
-> - VERIFY-before-EMIT enables abort on error without wasting output generation time
+> - ANALYZE-before-EMIT enables abort on error without wasting output generation time
 > - Phase ordering is fixed; handler ordering within each phase is controlled by topological sort
 
 ---

@@ -13,7 +13,7 @@ Do not manually maintain matrix rows in this document.
 
 `traceability_matrix:`
 
-### Deterministic Enforcement in VERIFY
+### Deterministic Enforcement in ANALYZE
 
 - `traceability_vc_to_hlr`: VC must trace to at least one HLR.
 - `traceability_tr_to_vc`: TR must trace to at least one VC.

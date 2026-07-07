@@ -34,7 +34,7 @@ A **typed relational intermediate representation** for specifications, stored in
 >
 > **Specification:** See the SpecIR Schema Specification (`docs/specir/`) for the formal definition.
 
-### DIC: ANALYZE Phase @TERM-20
+### DIC: RESOLVE Phase @TERM-20
 
 The **second phase** in the pipeline that resolves references and infers types.
 
@@ -112,7 +112,7 @@ The **final phase** in the pipeline that assembles and outputs documents.
 >
 > **Purpose:** Assembles transformed content and writes final output documents.
 >
-> **Position:** Final phase after VERIFY.
+> **Position:** Final phase after ANALYZE.
 
 ### DIC: Float @TERM-04
 
@@ -179,11 +179,11 @@ A **distinct stage** in document processing with specific responsibilities.
 >
 > **Purpose:** Separates document processing into well-defined sequential stages.
 >
-> **Phases:** INITIALIZE, ANALYZE, TRANSFORM, VERIFY, EMIT.
+> **Phases:** INITIALIZE, RESOLVE, TRANSFORM, ANALYZE, EMIT.
 
 ### DIC: Pipeline @TERM-15
 
-The **5-phase processing system** (INITIALIZE -> ANALYZE -> TRANSFORM -> VERIFY -> EMIT).
+The **5-phase processing system** (INITIALIZE -> RESOLVE -> TRANSFORM -> ANALYZE -> EMIT).
 
 > description:
 >
@@ -219,7 +219,7 @@ The **third phase** in the pipeline that materializes views and rewrites content
 >
 > **Purpose:** Materializes database views into content and applies content transformations.
 >
-> **Position:** Third phase after ANALYZE, before VERIFY.
+> **Position:** Third phase after RESOLVE, before ANALYZE.
 
 ### DIC: Type Alias @TERM-27
 
@@ -251,13 +251,13 @@ The **host engine** (`src/contract/registry.lua`) that overlays models and regis
 >
 > **Tables:** spec_object_types, spec_float_types, spec_attribute_types, etc.
 
-### DIC: VERIFY Phase @TERM-21
+### DIC: ANALYZE Phase @TERM-21
 
-The **fourth phase** in the pipeline that validates content via verification views.
+The **fourth phase** in the pipeline that validates content via analyze queries.
 
 > description:
 >
-> **Purpose:** Validates document content using verification views and constraint checking.
+> **Purpose:** Validates document content using analyze queries and constraint checking.
 >
 > **Position:** Fourth phase after TRANSFORM, before EMIT.
 
@@ -349,11 +349,11 @@ A **unique identifier** assigned to spec objects for cross-referencing (e.g., `@
 >
 > **Auto-generation:** PIDs can be auto-generated from type prefix and sequence number.
 
-### DIC: Verification View @TERM-VERIFICATIONVIEW
+### DIC: Analyze Query @TERM-VERIFICATIONVIEW
 
-A **SQL query** that validates data integrity constraints during the VERIFY phase.
+A **SQL query** that validates data integrity constraints during the ANALYZE phase.
 
-> term: Verification View
+> term: Analyze Query
 
 > acronym: -
 
@@ -363,7 +363,7 @@ A **SQL query** that validates data integrity constraints during the VERIFY phas
 >
 > **Purpose:** Defines validation rules as SQL queries that detect specification errors.
 >
-> **Execution:** Run during the VERIFY phase; violations are reported as diagnostics.
+> **Execution:** Run during the ANALYZE phase; violations are reported as diagnostics.
 >
 > **Examples:** Missing required attributes, unresolved relations, cardinality violations.
 
@@ -525,7 +525,7 @@ A **text format** where each line is a valid JSON object, used for structured lo
 
 ### DIC: Validation Policy @TERM-VALIDATIONPOLICY
 
-A **configuration mapping** from verification view `policy_key` to severity level, controlling which violations are reported and at what severity.
+A **configuration mapping** from analyze query `policy_key` to severity level, controlling which violations are reported and at what severity.
 
 > term: Validation Policy
 
@@ -533,7 +533,7 @@ A **configuration mapping** from verification view `policy_key` to severity leve
 
 > description:
 >
-> **Purpose:** Allows projects to control validation strictness by mapping each verification view to a severity level.
+> **Purpose:** Allows projects to control validation strictness by mapping each analyze query to a severity level.
 >
 > **Severity levels:** `error` (blocks output generation), `warn` (reported but build continues), `ignore` (suppressed).
 >
@@ -553,7 +553,7 @@ A **structured error or warning record** emitted by [TERM-16](@)s during [TERM-1
 >
 > **Purpose:** Provides machine-parseable and human-readable feedback on specification errors and warnings throughout all pipeline phases.
 >
-> **Fields:** Each record contains `file` (source path), `line` (source line number), `code` (stable diagnostic key, usually the verification view `policy_key`, e.g., `dangling_relation`), and `msg` (human-readable description).
+> **Fields:** Each record contains `file` (source path), `line` (source line number), `code` (stable diagnostic key, usually the analyze query `policy_key`, e.g., `dangling_relation`), and `msg` (human-readable description).
 >
 > **Severity:** Errors trigger abort after [TERM-21](@) phase; warnings are reported but do not block output generation.
 
@@ -567,11 +567,11 @@ A **dependency tracking structure** recording include file hierarchies for incre
 
 > description:
 >
-> **Purpose:** Tracks which files are included by each root document, enabling change detection across include hierarchies.
+> **Purpose:** Records the full file set of each document build — the root document itself and every included file — enabling change detection across include hierarchies with a single node walk.
 >
-> **Storage:** Stored in the `build_graph` table with columns `root_path` (the including document), `node_path` (the included file), and `node_sha1` (content hash at build time).
+> **Storage:** Stored in the `build_graph` table with columns `root_path` (the document being built), `node_path` (a file that build read: the root itself or an include), and `node_sha1` (content hash at build time).
 >
-> **Usage:** Queried by [TERM-30](@) `is_document_dirty_with_includes()` to determine if any included file has changed since the last successful build.
+> **Usage:** Queried by [TERM-30](@) `is_document_dirty()` to determine if the root or any included file has changed since the last successful build.
 
 ### DIC: Placeholder Block @TERM-PLACEHOLDERBLOCK
 

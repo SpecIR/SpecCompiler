@@ -350,11 +350,9 @@ function M.format_table_node(tbl, config)
         xml.replace_child(tblPr, "w:tblBorders", create_borders(config.borders))
     end
 
-    -- Add cell margins if configured and not already present
+    -- Apply configured cell margins, overriding any Pandoc-provided defaults.
     if config.cell_margins then
-        if not xml.find_child(tblPr, "w:tblCellMar") then
-            xml.add_child(tblPr, create_cell_margins(config.cell_margins))
-        end
+        xml.replace_child(tblPr, "w:tblCellMar", create_cell_margins(config.cell_margins))
     end
 
     -- Apply paragraph formatting

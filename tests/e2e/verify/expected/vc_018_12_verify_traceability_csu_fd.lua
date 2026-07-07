@@ -1,4 +1,4 @@
--- Oracle: CSU/FD traceability verification_view coverage.
+-- Oracle: CSU/FD traceability analyze_query coverage.
 -- CSU-ORPHAN has no inbound FD relation -> traceability_csu_to_fd
 -- FD-ORPHAN has no outbound CSU relation -> traceability_fd_to_csu
 -- CSU-LINKED + FD-LINKED are properly linked (control).

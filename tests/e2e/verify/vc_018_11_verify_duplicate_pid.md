@@ -20,6 +20,6 @@ Expected error: **object_duplicate_pid** (view_object_duplicate_pid)
 
 ## HLR: Control Unique PID @HLR-UNIQUE
 
-This requirement has a unique PID and should not trigger the verification_view.
+This requirement has a unique PID and should not trigger the analyze_query.
 
 > priority: Low

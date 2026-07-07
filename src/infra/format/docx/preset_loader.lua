@@ -103,6 +103,52 @@ function M.deep_merge(base, override)
     return result
 end
 
+---Resolve the file paths of a preset and every base it extends, top-first.
+---Used by the reference cache so that editing an extended base preset also
+---invalidates reference.docx.
+---@param speccompiler_home string The SPECCOMPILER_HOME directory
+---@param template string The template name
+---@param preset string The preset name
+---@param visited table|nil Visited presets to detect cycles
+---@return string[]|nil paths Ordered preset paths (top preset first)
+---@return string|nil error Error message if resolution failed
+function M.resolve_chain_paths(speccompiler_home, template, preset, visited)
+    visited = visited or {}
+    local key = template .. "/" .. preset
+    if visited[key] then
+        return nil, "Circular preset dependency detected: " .. key
+    end
+    visited[key] = true
+
+    local path = M.resolve_path(speccompiler_home, template, preset)
+    if not path then
+        return nil, string.format("Preset not found: %s/%s", template, preset)
+    end
+
+    local paths = { path }
+
+    local preset_tbl, err = M.load_from_file(path)
+    if not preset_tbl then
+        return nil, err
+    end
+
+    if preset_tbl.extends then
+        local base_template = preset_tbl.extends.template or template
+        local base_preset = preset_tbl.extends.preset
+        local base_paths, base_err = M.resolve_chain_paths(
+            speccompiler_home, base_template, base_preset, visited
+        )
+        if not base_paths then
+            return nil, base_err
+        end
+        for _, base_path in ipairs(base_paths) do
+            paths[#paths + 1] = base_path
+        end
+    end
+
+    return paths, nil
+end
+
 ---Load and merge a preset chain.
 ---If a preset has an "extends" field, load and merge the base preset first.
 ---@param speccompiler_home string The SPECCOMPILER_HOME directory

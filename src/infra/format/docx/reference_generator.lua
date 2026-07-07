@@ -159,6 +159,21 @@ function M.update_styles_language(styles_xml, language)
     return before .. doc_defaults .. after
 end
 
+---Top-align header cells in table styles.
+---Pandoc's default "Table" style bottom-aligns first-row cells via a
+---firstRow tblStylePr (vAlign=bottom), which makes short headers sink below
+---multi-line ones. Flip it to top to match the abntex/LaTeX header row.
+---@param styles_xml string The styles.xml content
+---@return string updated_xml The updated styles.xml content
+function M.fix_table_header_valign(styles_xml)
+    return (styles_xml:gsub(
+        '<w:tblStylePr w:type="firstRow">.-</w:tblStylePr>',
+        function(block)
+            return (block:gsub('<w:vAlign w:val="bottom"%s*/>', '<w:vAlign w:val="top"/>'))
+        end
+    ))
+end
+
 ---Update settings.xml with document language.
 ---@param settings_xml string The original settings.xml content
 ---@param language string The language code (e.g., "pt-BR")
@@ -266,6 +281,10 @@ function M.generate(options)
     -- Merge custom styles
     local merged_styles = M.merge_styles(styles_xml, preset)
     log("  Merged custom styles into styles.xml")
+
+    -- Top-align table header cells (Pandoc's default Table style bottom-aligns them)
+    merged_styles = M.fix_table_header_valign(merged_styles)
+    log("  Top-aligned table header cells in table styles")
 
     -- Update default proofing language in docDefaults
     if language then

@@ -134,6 +134,33 @@ M.null_dangling_float_targets = [[
       AND NOT EXISTS (SELECT 1 FROM spec_floats WHERE id = spec_relations.target_float_id)
 ]]
 
+-- Unresolve other specs' relations that target objects of a rebuilt spec.
+-- Rebuilding deletes and re-inserts the spec's objects, and SQLite reuses the
+-- freed rowids, so a cached doc's target_object_id can silently rebind to a
+-- DIFFERENT object (the id exists, so the dangling cleanup above misses it).
+-- Only rows with target_text are touched — they can be re-resolved by label.
+-- The rebuilt spec's own relations are excluded: they were just re-created.
+M.unresolve_inbound_object_relations = [[
+    UPDATE spec_relations SET target_object_id = NULL, type_ref = NULL
+    WHERE specification_ref <> :spec_id
+      AND target_object_id IS NOT NULL
+      AND target_text IS NOT NULL
+      AND EXISTS (SELECT 1 FROM spec_objects o
+                  WHERE o.id = spec_relations.target_object_id
+                    AND o.specification_ref = :spec_id)
+]]
+
+-- Float variant of unresolve_inbound_object_relations.
+M.unresolve_inbound_float_relations = [[
+    UPDATE spec_relations SET target_float_id = NULL, type_ref = NULL
+    WHERE specification_ref <> :spec_id
+      AND target_float_id IS NOT NULL
+      AND target_text IS NOT NULL
+      AND EXISTS (SELECT 1 FROM spec_floats f
+                  WHERE f.id = spec_relations.target_float_id
+                    AND f.specification_ref = :spec_id)
+]]
+
 -- Find specs with unresolved relations (for re-analysis after stale cleanup).
 -- No selector filter — any relation needing analysis is included.
 M.specs_with_unresolved_relations = [[
@@ -151,7 +178,7 @@ M.specs_with_unresolved_relations = [[
 
 -- Get unresolved relations eligible for type-driven analysis.
 -- No selector filter — any untyped relation with target_text is eligible.
--- The relation_analyzer determines resolution strategy from candidate types.
+-- The relation_resolver determines resolution strategy from candidate types.
 M.unresolved_relations_for_analysis = [[
     SELECT r.id, r.source_object_id, r.target_text, r.from_file,
            r.link_line, r.link_selector, r.source_attribute,
@@ -250,7 +277,7 @@ M.select_attributes_with_ast_by_spec = [[
 ]]
 
 -- ============================================================================
--- RELATION TYPE INFERENCE (used by relation_analyzer)
+-- RELATION TYPE INFERENCE (used by relation_resolver)
 -- ============================================================================
 
 -- Update relation with inferred type

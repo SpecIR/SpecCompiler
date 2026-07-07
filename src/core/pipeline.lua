@@ -9,8 +9,8 @@ local uv = require("luv")
 
 M.PHASES = {
     INITIALIZE = "initialize",
+    RESOLVE    = "resolve",
     ANALYZE    = "analyze",
-    VERIFY     = "verify",
     TRANSFORM  = "transform",
     EMIT       = "emit"
 }
@@ -315,22 +315,22 @@ function M:execute(docs, opts)
     if not skip_phases[M.PHASES.INITIALIZE] then
         self:run_phase(M.PHASES.INITIALIZE, contexts)
     end
-    if not skip_phases[M.PHASES.ANALYZE] then
-        self:run_phase(M.PHASES.ANALYZE, contexts)
+    if not skip_phases[M.PHASES.RESOLVE] then
+        self:run_phase(M.PHASES.RESOLVE, contexts)
     end
     if not skip_phases[M.PHASES.TRANSFORM] then
         self:run_phase(M.PHASES.TRANSFORM, contexts)
     end
-    if not skip_phases[M.PHASES.VERIFY] then
-        self:run_phase(M.PHASES.VERIFY, emit_contexts)
+    if not skip_phases[M.PHASES.ANALYZE] then
+        self:run_phase(M.PHASES.ANALYZE, emit_contexts)
     end
 
-    -- Abort if verification found errors
-    -- VERIFY runs after TRANSFORM so verification views can check transform results
+    -- Abort if analysis found errors
+    -- ANALYZE runs after TRANSFORM so analyze queries can check transform results
     -- (e.g., float render failure, view materialization failure)
     if self.diagnostics and self.diagnostics:has_errors() then
         if self.log then
-            self.log.error("Pipeline aborted: verification found %d error(s)", #self.diagnostics.errors)
+            self.log.error("Pipeline aborted: analysis found %d error(s)", #self.diagnostics.errors)
         end
         return  -- Don't continue to EMIT phase
     end

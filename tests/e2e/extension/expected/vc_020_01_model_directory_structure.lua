@@ -18,7 +18,7 @@ return function(_, _)
                 return { kind = "float", schema = { id = "VC020_FLOAT", long_name = "VC020 Float", counter_group = "vc020_counter" } }
             ]],
             ["views/view_vc020.lua"] = [[
-                return { kind = "view", schema = { id = "VC020_VIEW", long_name = "VC020 View", materializer_type = "inline" } }
+                return { kind = "view", schema = { id = "VC020_VIEW", long_name = "VC020 View", inline_prefix = "vc020view" } }
             ]],
             ["relations/relation_vc020.lua"] = [[
                 return {
@@ -63,8 +63,8 @@ return function(_, _)
         if identifiers["VC020_FLOAT"].counter_group ~= "vc020_counter" then
             error("Float counter_group mismatch for VC020_FLOAT")
         end
-        if identifiers["VC020_VIEW"].materializer_type ~= "inline" then
-            error("View materializer_type mismatch for VC020_VIEW")
+        if identifiers["VC020_VIEW"].inline_prefix ~= "vc020view" then
+            error("View inline_prefix mismatch for VC020_VIEW")
         end
         if identifiers["VC020_REL"].source_type_ref ~= "HLR" then
             error("Relation source_type_ref mismatch for VC020_REL")

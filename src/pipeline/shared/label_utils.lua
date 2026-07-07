@@ -5,16 +5,42 @@
 ---@module label_utils
 local M = {}
 
+-- UTF-8 → ASCII transliteration for Latin accented letters (both cases map
+-- to lowercase, since slugs are lowercase). Sequences not in this table are
+-- stripped, matching the previous byte-strip behavior for non-Latin scripts.
+local TRANSLIT = {
+    ["à"]="a", ["á"]="a", ["â"]="a", ["ã"]="a", ["ä"]="a", ["å"]="a",
+    ["À"]="a", ["Á"]="a", ["Â"]="a", ["Ã"]="a", ["Ä"]="a", ["Å"]="a",
+    ["ç"]="c", ["Ç"]="c",
+    ["è"]="e", ["é"]="e", ["ê"]="e", ["ë"]="e",
+    ["È"]="e", ["É"]="e", ["Ê"]="e", ["Ë"]="e",
+    ["ì"]="i", ["í"]="i", ["î"]="i", ["ï"]="i",
+    ["Ì"]="i", ["Í"]="i", ["Î"]="i", ["Ï"]="i",
+    ["ñ"]="n", ["Ñ"]="n",
+    ["ò"]="o", ["ó"]="o", ["ô"]="o", ["õ"]="o", ["ö"]="o", ["ø"]="o",
+    ["Ò"]="o", ["Ó"]="o", ["Ô"]="o", ["Õ"]="o", ["Ö"]="o", ["Ø"]="o",
+    ["ù"]="u", ["ú"]="u", ["û"]="u", ["ü"]="u",
+    ["Ù"]="u", ["Ú"]="u", ["Û"]="u", ["Ü"]="u",
+    ["ý"]="y", ["ÿ"]="y", ["Ý"]="y",
+    ["ß"]="ss", ["æ"]="ae", ["Æ"]="ae", ["œ"]="oe", ["Œ"]="oe",
+    ["ð"]="d", ["Ð"]="d", ["þ"]="th", ["Þ"]="th",
+}
+
 ---Slugify text into a URL/anchor-safe format.
----Lowercases, replaces non-alphanumeric characters with hyphens,
----collapses consecutive hyphens, trims leading/trailing hyphens.
+---Transliterates Latin accented letters to ASCII (ç→c, á→a), lowercases,
+---replaces non-alphanumeric characters with hyphens, collapses consecutive
+---hyphens, trims leading/trailing hyphens.
 ---@param text string The text to slugify
 ---@return string slug The slugified text
 function M.slugify(text)
     if not text or text == "" then
         return ""
     end
-    local slug = text:lower()
+    -- Transliterate or strip each multi-byte UTF-8 sequence in one pass
+    local slug = text:gsub("[\xC2-\xF4][\x80-\xBF]*", function(seq)
+        return TRANSLIT[seq] or ""
+    end)
+    slug = slug:lower()
     slug = slug:gsub("[^%w%s%-]", "") -- remove non-alphanumeric except spaces and hyphens
     slug = slug:gsub("%s+", "-")       -- spaces to hyphens
     slug = slug:gsub("%-+", "-")       -- collapse consecutive hyphens

@@ -211,10 +211,13 @@ end
 ---@param template_name string Template name (e.g., "abnt")
 ---@param log table Logger instance
 ---@param config table|nil Optional style configuration passed to template
+---@param pp table|nil Hook provider module; template postprocessors that call
+---postprocess() themselves pass their own module here instead of being
+---re-required by template name
 ---@return boolean Success status
-function M.postprocess(docx_path, template_name, log, config)
-    -- Load template-specific post-processor (may be nil)
-    local pp = M.load_template_postprocessor(template_name, log)
+function M.postprocess(docx_path, template_name, log, config, pp)
+    -- Load template-specific post-processor unless the caller provided one
+    pp = pp or M.load_template_postprocessor(template_name, log)
 
     -- Get absolute path for the DOCX file
     local abs_docx_path = get_absolute_path(docx_path)
@@ -515,15 +518,15 @@ local function remove_duplicate_custom_styles(content, log)
 
     local seen = {}
     local to_remove = {}
-    for _, kid in ipairs(styles_root.kids or {}) do
-        if kid.name == "w:style" then
-            local style_id = xml.get_attr(kid, "w:styleId")
-            if style_id then
-                if seen[style_id] then
-                    to_remove[#to_remove + 1] = kid
-                else
-                    seen[style_id] = true
-                end
+    -- find_children is namespace-aware; kid.name alone holds the local name
+    -- ("style"), so comparing it against "w:style" would match nothing
+    for _, kid in ipairs(xml.find_children(styles_root, "w:style")) do
+        local style_id = xml.get_attr(kid, "w:styleId")
+        if style_id then
+            if seen[style_id] then
+                to_remove[#to_remove + 1] = kid
+            else
+                seen[style_id] = true
             end
         end
     end
@@ -551,13 +554,13 @@ local function fix_code_styles(content, log)
         styles_root = xml.find_child(doc.root, "w:styles") or doc.root
     end
 
-    -- Check which styles already exist
+    -- Check which styles already exist (namespace-aware lookup; kid.name alone
+    -- holds the local name, so a "w:style" comparison would match nothing and
+    -- cause duplicate injection)
     local existing = {}
-    for _, kid in ipairs(styles_root.kids or {}) do
-        if kid.name == "w:style" then
-            local sid = xml.get_attr(kid, "w:styleId")
-            if sid then existing[sid] = true end
-        end
+    for _, kid in ipairs(xml.find_children(styles_root, "w:style")) do
+        local sid = xml.get_attr(kid, "w:styleId")
+        if sid then existing[sid] = true end
     end
 
     local added = 0

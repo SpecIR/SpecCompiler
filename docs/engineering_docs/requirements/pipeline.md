@@ -5,21 +5,21 @@
 Five-phase document processing lifecycle with [dic:handler](#) orchestration and [dic:topological-sort](#) ordering.
 
 > description: Groups requirements for the core [dic:pipeline](#) that drives document processing
-> through [dic:initialize-phase](#), [dic:analyze-phase](#), [dic:transform-phase](#), [dic:verify-phase](#), [dic:emit-phase](#) phases with declarative handler dependencies.
+> through [dic:initialize-phase](#), [dic:resolve-phase](#), [dic:transform-phase](#), [dic:analyze-phase](#), [dic:emit-phase](#) phases with declarative handler dependencies.
 
 > rationale: A structured processing pipeline enables separation of concerns, validation
 > gates, and deterministic handler ordering.
 
 #### HLR: Five-Phase Lifecycle @HLR-PIPE-001
 
-The pipeline shall execute handlers in a five-phase lifecycle: INITIALIZE, ANALYZE, TRANSFORM, VERIFY, EMIT.
+The pipeline shall execute handlers in a five-phase lifecycle: INITIALIZE, RESOLVE, TRANSFORM, ANALYZE, EMIT.
 
 > description: Each phase serves a distinct purpose in document processing:
 >
 > 1. **INITIALIZE**: Parse document AST and populate database with specifications, spec_objects, floats, relations, views, and attributes
-> 2. **ANALYZE**: Resolve relations between objects (link target resolution, type inference)
+> 2. **RESOLVE**: Resolve relations between objects (link target resolution, type inference)
 > 3. **TRANSFORM**: Pre-compute views, render external content (PlantUML, charts), prepare for output
-> 4. **VERIFY**: Run verification views to validate data integrity, type constraints, cardinality rules
+> 4. **ANALYZE**: Run analyze queries to validate data integrity, type constraints, cardinality rules
 > 5. **EMIT**: Assemble final documents and write to output formats (docx, html5, markdown, json)
 
 > rationale: Separation of concerns enables validation between phases, allows early abort on errors, and supports format-agnostic processing until the final output stage.
@@ -60,13 +60,13 @@ The pipeline shall order handlers within each phase using topological sort with 
 > status: Approved
 
 
-#### HLR: Phase Abort on VERIFY Errors @HLR-PIPE-004
+#### HLR: Phase Abort on ANALYZE Errors @HLR-PIPE-004
 
-The pipeline shall abort execution after VERIFY phase if any errors are recorded.
+The pipeline shall abort execution after ANALYZE phase if any errors are recorded.
 
-> description: After running VERIFY phase, the pipeline checks `diagnostics:has_errors()`. If true, execution halts before EMIT phase, with TRANSFORM already completed. Error message is logged with error count. This prevents generating invalid output from documents with specification violations.
+> description: After running ANALYZE phase, the pipeline checks `diagnostics:has_errors()`. If true, execution halts before EMIT phase, with TRANSFORM already completed. Error message is logged with error count. This prevents generating invalid output from documents with specification violations.
 
-> rationale: Early abort on verification failures saves computation and prevents distribution of invalid specification documents. Errors in VERIFY indicate data integrity issues that would produce incorrect outputs.
+> rationale: Early abort on verification failures saves computation and prevents distribution of invalid specification documents. Errors in ANALYZE indicate data integrity issues that would produce incorrect outputs.
 
 > status: Approved
 
@@ -102,7 +102,7 @@ The pipeline shall create and propagate context objects containing document meta
 > - `bibliography`, `csl`: Citation configuration
 > - `project_root`: Root directory for resolving relative paths
 >
-> Context flows through all phases, enriched by handlers (e.g., verification results in VERIFY phase).
+> Context flows through all phases, enriched by handlers (e.g., verification results in ANALYZE phase).
 
 > rationale: Unified context object provides handlers with consistent access to document metadata and build configuration without global state, enabling testable and isolated handler implementations.
 
@@ -150,9 +150,9 @@ When a document contains `.include` code blocks, the system shall expand them by
 
 #### HLR: PID Auto-Generation @HLR-PIPE-009
 
-When a spec object does not have an explicit `@PID`, the system shall auto-generate a [dic:project-identifier](#) during the [dic:analyze-phase](#) phase based on the object's type definition.
+When a spec object does not have an explicit `@PID`, the system shall auto-generate a [dic:project-identifier](#) during the [dic:resolve-phase](#) phase based on the object's type definition.
 
-> description: The PID generator runs in the ANALYZE phase before relation resolution:
+> description: The PID generator runs in the RESOLVE phase before relation resolution:
 >
 > 1. **Non-[dic:composite-object-type](#) objects**: PIDs are generated using the type's `pid_prefix` and `pid_format` (e.g., `HLR-%03d` produces "HLR-001"), starting from the next available sequence number
 > 2. **[dic:composite-object-type](#) objects**: Hierarchical PIDs are qualified by the specification PID (e.g., "SRS-sec1.2.3")
@@ -166,7 +166,7 @@ When a spec object does not have an explicit `@PID`, the system shall auto-gener
 
 #### HLR: Relation Type Inference @HLR-PIPE-010
 
-The system shall infer relation types during the [dic:analyze-phase](#) phase using constraint-based matching with [dic:specificity-scoring](#) scoring.
+The system shall infer relation types during the [dic:resolve-phase](#) phase using constraint-based matching with [dic:specificity-scoring](#) scoring.
 
 > description: For each unresolved relation, the relation analyzer:
 >
@@ -199,7 +199,7 @@ A [dic:spec-object](#)'s scope shall be closed either automatically by the next 
 
 > description: When the INITIALIZE phase delimits each header's section, the scope (the `end_line` that governs which trailing content and floats the object contains) ends at the first `----` thematic break inside the section, if present, rather than only at the next header. The thematic break is consumed — it is removed from the rendered body and produces no horizontal rule. Content between the marker and the next header keeps its document position but is contained by the parent section. This gives authors an explicit way to close a section without introducing a heading, replacing the anti-pattern of an empty `##` used as a "section reset".
 >
-> An empty heading (a header whose title is blank) is rejected: it would otherwise render as an empty numbered heading and corrupt downstream numbering. The `object_broken_hierarchy` verification view reports it as an error and directs the author to use `----` instead.
+> An empty heading (a header whose title is blank) is rejected: it would otherwise render as an empty numbered heading and corrupt downstream numbering. The `object_broken_hierarchy` analyze query reports it as an error and directs the author to use `----` instead.
 
 > rationale: Section scope previously closed only at the next header, so authors who wanted trailing content to belong to a parent section resorted to an empty heading, which renders as a blank numbered chapter and shifts all subsequent numbering. A consumed thematic break expresses the intent precisely with no rendering artifact, and rejecting empty headings removes the failure mode entirely.
 

@@ -4,7 +4,7 @@
 ---
 ---@module attributes
 local logger = require("infra.logger")
-local AttributeCaster = require('pipeline.analyze.attribute_caster')
+local AttributeCaster = require('pipeline.resolve.attribute_caster')
 local attribute_para = require("pipeline.shared.attribute_para_utils")
 local hash_utils = require("infra.hash_utils")
 local cache_utils = require("pipeline.shared.cache_utils")

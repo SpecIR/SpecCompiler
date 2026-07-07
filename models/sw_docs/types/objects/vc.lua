@@ -10,11 +10,13 @@ return {
         pid_prefix = "VC",
         pid_format = "%s-%03d",
         attributes = {
-            { name = "objective", type = "XHTML", min_occurs = 1 },
+            { name = "objective", type = "XHTML" },
             { name = "verification_method", type = "ENUM", values = { "Test", "Analysis", "Inspection", "Demonstration" }, min_occurs = 1 },
             { name = "approach", type = "XHTML" },
+            { name = "input", type = "XHTML" },
+            { name = "procedure", type = "XHTML" },
             { name = "preconditions", type = "XHTML" },
-            { name = "expected_results", type = "XHTML" },
+            { name = "expected", type = "XHTML" },
             { name = "pass_criteria", type = "XHTML" },
             { name = "status", type = "ENUM", values = { "Draft", "Approved", "Passed", "Failed" } },
             { name = "traceability", type = "XHTML" },
@@ -23,8 +25,10 @@ return {
         attr_order = {
             "objective",
             "verification_method",
+            "input",
+            "procedure",
             "preconditions",
-            "expected_results",
+            "expected",
             "pass_criteria",
             "status"
         },

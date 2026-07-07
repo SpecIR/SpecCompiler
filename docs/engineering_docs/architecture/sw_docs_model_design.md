@@ -2,7 +2,7 @@
 
 ### FD: Software Documentation Domain Model @FD-007
 
-**Allocation:** Realized by [CSC-025](@) (SW Docs Model), with domain verification views in [CSC-026](@) (SW Docs Verification Views), object types in [CSC-027](@) (SW Docs Object Types), relation types in [CSC-028](@) (SW Docs Relation Types), specification types in [CSC-029](@) (SW Docs Specification Types), and view types in [CSC-030](@) (SW Docs View Types).
+**Allocation:** Realized by [CSC-025](@) (SW Docs Model), with domain analyze queries in [CSC-026](@) (SW Docs Analyze Queries), object types in [CSC-027](@) (SW Docs Object Types), relation types in [CSC-028](@) (SW Docs Relation Types), specification types in [CSC-029](@) (SW Docs Specification Types), and view types in [CSC-030](@) (SW Docs View Types).
 
 The software documentation domain model extends the default model with traceable object
 types, domain-specific relation semantics, specification document types, and verification
@@ -30,7 +30,7 @@ Report). Each type declares version, status, and date attributes.
 matrices (TRACEABILITY_MATRIX, TEST_EXECUTION_MATRIX, TEST_RESULTS_MATRIX) and coverage
 summaries (COVERAGE_SUMMARY, REQUIREMENTS_SUMMARY).
 
-**Verification Views**: [CSC-026](@) provides domain-specific verification view queries that enforce
+**Analyze Queries**: [CSC-026](@) provides domain-specific analyze query queries that enforce
 traceability constraints: VC must trace to HLR, TR must trace to VC, every HLR must be
 covered by at least one VC, every FD must trace to at least one CSC and CSU, and every
 CSC and CSU must have at least one FD allocated. [CSC-025](@) provides the HTML5
@@ -40,7 +40,7 @@ and SQLite-WASM full-text search.
 **Component Interaction**
 
 The software documentation domain model is realized through six packages that extend the
-default model with traceable types, domain relations, document types, verification views,
+default model with traceable types, domain relations, document types, analyze queries,
 and verification constraints.
 
 [csc:sw-docs-object-types](#) (SW Docs Object Types) defines the domain object taxonomy. [csu:traceable-base-object-type](#)
@@ -74,7 +74,7 @@ Results Reports. Each type declares version, status, and date attributes.
 Summary) computes requirement coverage statistics. [csu:requirements-summary-view](#) (Requirements Summary)
 generates requirement status dashboards.
 
-[csc:sw-docs-verification-views](#) (SW Docs Verification Views) provides domain-specific traceability verification rules.
+[csc:sw-docs-verification-views](#) (SW Docs Analyze Queries) provides domain-specific traceability verification rules.
 [csu:vc-missing-hlr-traceability](#) (VC Missing HLR Traceability) ensures every verification case traces to at least
 one HLR. [csu:tr-missing-vc-traceability](#) (TR Missing VC Traceability) ensures every test result traces to a
 verification case. [csu:hlr-missing-vc-coverage](#) (HLR Missing VC Coverage) ensures every HLR is covered by at
@@ -96,7 +96,7 @@ participant "CSU Build Engine" as E
 participant "CSU Type Loader" as TL
 participant "CSC-017 Default\nModel" as DEF
 participant "CSC-025 SW Docs\nModel" as SW
-participant "CSU Verification View Loader" as PL
+participant "CSU Analyze Query Loader" as PL
 participant "CSU Data Manager" as DB
 
 == Default Model Loading ==
@@ -140,20 +140,20 @@ note right: TRACEABLE.status propagated\nto HLR, LLR, FD, CSC, CSU, etc.
 TL --> E: sw_docs types registered
 deactivate TL
 
-== Domain Verification View Loading ==
+== Domain Analyze Query Loading ==
 E -> PL: load_model("default")
-PL -> DB: create default verification views
+PL -> DB: create default analyze queries
 
 E -> PL: load_model("sw_docs")
-PL -> SW: scan verification_views/
+PL -> SW: scan analyze_queries/
 SW --> PL: fd_missing_csc, fd_missing_csu,\ncsc_missing_fd, csu_missing_fd,\nhlr_missing_vc, vc_missing_hlr,\ntr_missing_vc
-loop for each domain verification view
-    PL -> DB: CREATE VIEW {verification_view.view}
+loop for each domain analyze query
+    PL -> DB: CREATE VIEW {analyze_query.view}
     note right: Domain-specific\ntraceability constraints
 end
 
-== VERIFY Executes All Verification views ==
-E -> DB: SELECT * FROM default verification views\n+ sw_docs verification views
+== ANALYZE Executes All Verification views ==
+E -> DB: SELECT * FROM default analyze queries\n+ sw_docs analyze queries
 DB --> E: violation rows
 @enduml
 ```

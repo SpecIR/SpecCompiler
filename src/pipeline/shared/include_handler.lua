@@ -99,19 +99,4 @@ function M.expand_includes(doc, base_dir, root_path, processed, log, depth)
     return doc, includes
 end
 
-local Queries = require("db.queries")
-
----Track include in build graph
----@param data DataManager
----@param root_path string Root document path
----@param node_path string Included file path
----@param node_sha1 string SHA1 of included file
-function M.track_include(data, root_path, node_path, node_sha1)
-    data:execute(Queries.build.upsert_build_graph_node, {
-        root = root_path,
-        node = node_path,
-        sha1 = node_sha1
-    })
-end
-
 return M

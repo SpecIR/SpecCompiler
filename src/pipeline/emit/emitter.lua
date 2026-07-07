@@ -17,6 +17,7 @@ local Assembler = require("pipeline.emit.assembler")
 local OutputCache = require("db.output_cache")
 local pandoc_cli = require("infra.process.pandoc_cli")
 local task_runner = require("infra.process.task_runner")
+local hash_utils = require("infra.hash_utils")
 
 -- Helper modules (extracted from this file)
 local float_resolver = require("pipeline.emit.float_resolver")
@@ -60,6 +61,11 @@ end
 local function collect_documents(data, contexts, log, diagnostics)
     local documents = {}
 
+    -- Preset and float resolution are context-invariant: hoisted out of the
+    -- per-document loop (floats resolve globally, preset comes from base ctx).
+    local preset = contexts[1] and load_docx_preset(contexts[1], log) or nil
+    local float_results = float_resolver.resolve_floats(data, log)
+
     for _, c in ipairs(contexts) do
         local output_dir = c.build_dir or "build"
         local spec_id = c.spec_id or "default"
@@ -75,9 +81,6 @@ local function collect_documents(data, contexts, log, diagnostics)
             log.warn("No document available for %s", spec_id)
             goto continue_context
         end
-
-        local preset = load_docx_preset(c, log)
-        local float_results = float_resolver.resolve_floats(data, log)
 
         local transformed_doc = emit_float.transform_floats_in_doc(doc, float_results, data, spec_id, log, preset, c, diagnostics)
         transformed_doc = emit_view.transform_views_in_doc(transformed_doc, data, spec_id, log, c, diagnostics)
@@ -170,18 +173,6 @@ end
 local function prepare_output_task(d, output, json_dir, output_cache, log)
     local output_path = output.path:gsub("{spec_id}", d.spec_id)
 
-    if output_cache:is_output_current(d.spec_id, output_path, collect_output_dependencies(d)) then
-        log.info("Skipped %s: %s (unchanged)", output.format, output_path)
-        return nil
-    end
-
-    local output_dir = output_path:match("^(.+)/[^/]+$")
-    if output_dir then
-        task_runner.ensure_dir(output_dir)
-    end
-
-    local format_config = build_format_config(d, output, log)
-
     local work_doc = d.doc
     local filter = Writer.load_filter(d.config.template, output.format)
     if filter and filter.apply then
@@ -202,6 +193,28 @@ local function prepare_output_task(d, output, json_dir, output_cache, log)
         log.error("Failed to serialize %s document %s to JSON: %s", output.format, d.spec_id, tostring(filter_doc_json))
         return nil
     end
+
+    -- Cache key = hash of the exact pandoc input just serialized. Whatever
+    -- changed the rendered document (cross-doc view data, template filter
+    -- edits, own content) is captured here by construction.
+    local input_hash = hash_utils.sha1(filter_doc_json)
+
+    local deps = collect_output_dependencies(d)
+    if output.format == "docx" and d.reference_doc then
+        deps[#deps + 1] = d.reference_doc
+    end
+
+    if output_cache:is_output_current(d.spec_id, output_path, deps, input_hash) then
+        log.info("Skipped %s: %s (unchanged)", output.format, output_path)
+        return nil
+    end
+
+    local output_dir = output_path:match("^(.+)/[^/]+$")
+    if output_dir then
+        task_runner.ensure_dir(output_dir)
+    end
+
+    local format_config = build_format_config(d, output, log)
 
     -- The task always references format_json_path (matching prior behavior even
     -- when the write fails — pandoc then reports the missing input itself);
@@ -234,7 +247,8 @@ local function prepare_output_task(d, output, json_dir, output_cache, log)
     return task, {
         spec_id = d.spec_id,
         format = output.format,
-        output_path = output_path
+        output_path = output_path,
+        input_hash = input_hash
     }, saved_json_path
 end
 
@@ -304,7 +318,7 @@ local function process_emit_results(results, task_metadata, output_cache, diagno
         local success = result.result.exit_code == 0
 
         if success then
-            output_cache:update_cache(meta.spec_id, meta.output_path)
+            output_cache:update_cache(meta.spec_id, meta.output_path, meta.input_hash)
             log.info("Generated %s: %s", meta.format, meta.output_path)
 
             local fmt = meta.format
