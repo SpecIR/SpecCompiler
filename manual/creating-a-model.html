@@ -166,6 +166,71 @@ margin: 0 0.8em 0.2em -1.6em;
 vertical-align: middle;
 }
 .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 </head>
 <body>
@@ -267,30 +332,30 @@ only what you need:</p>
 </div>
 <a id="listing-src-model-quickstart" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> The descriptor a type module returns, annotated</figcaption>
-<pre><code>-- File: models/&lt;your-model&gt;/types/&lt;category&gt;/&lt;type-name&gt;.lua
--- The module returns ONE descriptor table; the host reads only this table.
-return {
-    -- kind: object | float | view | relation | specification | verification.
-    -- It must match the category directory the file lives in.
-    kind = &quot;object&quot;,
-
-    -- schema: your DATA. schema.id is authoritative (NOT the filename).
-    -- These fields become columns in the SpecIR database.
-    schema = {
-        id = &quot;...&quot;,            -- required, uppercase convention, globally unique
-        -- extends = &quot;...&quot;,    -- inherit attributes + hooks from a base type
-        -- attributes = { ... },
-    },
-
-    -- hooks (OPTIONAL): your BEHAVIOUR, and the ONLY place behaviour may live.
-    -- The host classifies each hook by NAME, infers the role from the hooks
-    -- present, and rejects a function placed on any other top-level key. A
-    -- pure-data type (most objects/floats) omits this key entirely and
-    -- inherits the host default.
-    -- hooks = {
-    --     render = function(ctx) ... end,   -- one hook whose name fits the intent
-    -- },
-}</code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- File: models/&lt;your-model&gt;/types/&lt;category&gt;/&lt;type-name&gt;.lua</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- The module returns ONE descriptor table; the host reads only this table.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- kind: object | float | view | relation | specification | verification.</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- It must match the category directory the file lives in.</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">kind</span> <span class="op">=</span> <span class="st">&quot;object&quot;</span><span class="op">,</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- schema: your DATA. schema.id is authoritative (NOT the filename).</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- These fields become columns in the SpecIR database.</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;...&quot;</span><span class="op">,</span>            <span class="co">-- required, uppercase convention, globally unique</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- extends = &quot;...&quot;,    -- inherit attributes + hooks from a base type</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- attributes = { ... },</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- hooks (OPTIONAL): your BEHAVIOUR, and the ONLY place behaviour may live.</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- The host classifies each hook by NAME, infers the role from the hooks</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- present, and rejects a function placed on any other top-level key. A</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- pure-data type (most objects/floats) omits this key entirely and</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- inherits the host default.</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- hooks = {</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">--     render = function(ctx) ... end,   -- one hook whose name fits the intent</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- },</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div data-pos="50:1-51:1">
 <p>Set <code data-pos="50:5-50:29">template: &lt;your-model&gt;</code>
 in <code data-pos="50:33-50:47">project.yaml</code> (see <a href="#project-integration" data-pos="50:53-50:96">Project
@@ -321,21 +386,21 @@ first-class, traceable objects:</p>
           decision.lua    -- the whole model</code></pre>
 <a id="listing-src-model-adr-descriptor" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> models/adr/types/objects/decision.lua — the complete model</figcaption>
-<pre><code>return {
-    kind = &quot;object&quot;,
-    schema = {
-        id = &quot;DECISION&quot;,
-        long_name = &quot;Architecture Decision&quot;,
-        extends = &quot;SECTION&quot;,
-        pid_prefix = &quot;ADR&quot;,
-        pid_format = &quot;%s-%03d&quot;,
-        attributes = {
-            { name = &quot;status&quot;, type = &quot;ENUM&quot;,
-              values = { &quot;Proposed&quot;, &quot;Accepted&quot;, &quot;Superseded&quot; } },
-            { name = &quot;consequences&quot;, type = &quot;XHTML&quot; },
-        },
-    },
-}</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">kind</span> <span class="op">=</span> <span class="st">&quot;object&quot;</span><span class="op">,</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;DECISION&quot;</span><span class="op">,</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">long_name</span> <span class="op">=</span> <span class="st">&quot;Architecture Decision&quot;</span><span class="op">,</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">extends</span> <span class="op">=</span> <span class="st">&quot;SECTION&quot;</span><span class="op">,</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">pid_prefix</span> <span class="op">=</span> <span class="st">&quot;ADR&quot;</span><span class="op">,</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">pid_format</span> <span class="op">=</span> <span class="st">&quot;%s-%03d&quot;</span><span class="op">,</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">attributes</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;status&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;ENUM&quot;</span><span class="op">,</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>              <span class="va">values</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;Proposed&quot;</span><span class="op">,</span> <span class="st">&quot;Accepted&quot;</span><span class="op">,</span> <span class="st">&quot;Superseded&quot;</span> <span class="op">}</span> <span class="op">},</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;consequences&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;XHTML&quot;</span> <span class="op">},</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="op">},</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div data-pos="87:1-88:1">
 <p>No <code data-pos="87:4-87:11">hooks</code> key: rendering, PID
 assignment, labels, and cross-reference resolution are all inherited.
@@ -344,23 +409,23 @@ any other typed object:</p>
 </div>
 <a id="listing-src-model-adr-usage" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> decisions.md</figcaption>
-<pre><code># Architecture Decisions @SPEC-ADR-001
-
-## DECISION: Use SQLite for the IR @ADR-001
-
-&gt; status: Accepted
-
-&gt; consequences: Single-file build artifact; traceability is SQL-queryable.
-
-We store the intermediate representation in a SQLite database rather than
-in-memory tables, so verification views can run plain SQL.
-
-## DECISION: Run on stock pandoc
-
-&gt; status: Proposed
-
-No custom pandoc build; ship Lua + C extensions that load into the system
-pandoc.</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Architecture Decisions @SPEC-ADR-001</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## DECISION: Use SQLite for the IR @ADR-001</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; status: Accepted</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; consequences: Single-file build artifact; traceability is SQL-queryable.</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>We store the intermediate representation in a SQLite database rather than</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>in-memory tables, so verification views can run plain SQL.</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## DECISION: Run on stock pandoc</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; status: Proposed</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>No custom pandoc build; ship Lua + C extensions that load into the system</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>pandoc.</span></code></pre></div>
 <div data-pos="109:1-110:1">
 <p><code data-pos="109:1-109:14">specc build</code> registers <code data-pos="109:25-109:35">DECISION</code>, gives the second decision the
 auto-generated PID <code data-pos="109:86-109:95">ADR-002</code> (from
@@ -418,9 +483,9 @@ everything else is optional.</p>
 </div>
 <a id="listing-src-model-manifest" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> model.yaml — declaring a model dependency</figcaption>
-<pre><code>name: mymodel
-description: My domain model
-requires: [base_model]   # loaded before this model; missing = loud load error</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> mymodel</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">description</span><span class="kw">:</span><span class="at"> My domain model</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">requires</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at">base_model</span><span class="kw">]</span><span class="co">   # loaded before this model; missing = loud load error</span></span></code></pre></div>
 <div data-pos="147:1-148:1">
 <p>When the engine loads a model it first loads every model in <code data-pos="147:61-147:71">requires</code> (recursively, each at most
 once), erroring loudly if a required model is absent. A model can also
@@ -727,56 +792,56 @@ The render hook reads its element and attributes from <code data-pos="296:123-29
 </div>
 <a id="listing-src-model-template-object" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> types/objects/hlr.lua</figcaption>
-<pre><code>local render_utils = require(&quot;pipeline.shared.render_utils&quot;)
-
-return {
-    kind = &quot;object&quot;,
-    schema = {
-        id = &quot;HLR&quot;,
-        long_name = &quot;High-Level Requirement&quot;,
-        description = &quot;A top-level system requirement&quot;,
-        extends = &quot;TRACEABLE&quot;,       -- inherit the standard traceable card
-        pid_prefix = &quot;HLR&quot;,
-        pid_format = &quot;%s-%03d&quot;,
-        attributes = {
-            { name = &quot;priority&quot;, type = &quot;ENUM&quot;,
-              values = { &quot;High&quot;, &quot;Medium&quot;, &quot;Low&quot; },
-              min_occurs = 1, max_occurs = 1 },
-            { name = &quot;rationale&quot;, type = &quot;XHTML&quot; },
-        },
-    },
-    hooks = {
-        -- EMIT: ctx.subject carries { object, attributes, element, ... } already
-        -- resolved by the pipeline, so no DB query is needed for our own item.
-        render = function(ctx)
-            local obj   = ctx.subject.object
-            local attrs = ctx.subject.attributes or {}
-            local priority = (attrs.priority or {}).value or &quot;?&quot;
-
-            local blocks = {}
-            local level = math.max((ctx.subject.header_level or 2) - 1, 1)
-            local hdr = ctx.pandoc.Header(level,
-                { ctx.pandoc.Str(obj.pid .. &quot;: &quot; .. (obj.title_text or &quot;&quot;)) })
-            render_utils.add_header_blocks(blocks, hdr)
-            table.insert(blocks, ctx.pandoc.Para({
-                ctx.pandoc.Strong({ ctx.pandoc.Str(&quot;Priority: &quot;) }),
-                ctx.pandoc.Str(priority),
-            }))
-            return blocks
-        end,
-    },
-}</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">render_utils</span> <span class="op">=</span> <span class="fu">require</span><span class="op">(</span><span class="st">&quot;pipeline.shared.render_utils&quot;</span><span class="op">)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">kind</span> <span class="op">=</span> <span class="st">&quot;object&quot;</span><span class="op">,</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;HLR&quot;</span><span class="op">,</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">long_name</span> <span class="op">=</span> <span class="st">&quot;High-Level Requirement&quot;</span><span class="op">,</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">description</span> <span class="op">=</span> <span class="st">&quot;A top-level system requirement&quot;</span><span class="op">,</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">extends</span> <span class="op">=</span> <span class="st">&quot;TRACEABLE&quot;</span><span class="op">,</span>       <span class="co">-- inherit the standard traceable card</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">pid_prefix</span> <span class="op">=</span> <span class="st">&quot;HLR&quot;</span><span class="op">,</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">pid_format</span> <span class="op">=</span> <span class="st">&quot;%s-%03d&quot;</span><span class="op">,</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">attributes</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;priority&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;ENUM&quot;</span><span class="op">,</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>              <span class="va">values</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;High&quot;</span><span class="op">,</span> <span class="st">&quot;Medium&quot;</span><span class="op">,</span> <span class="st">&quot;Low&quot;</span> <span class="op">},</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>              <span class="va">min_occurs</span> <span class="op">=</span> <span class="dv">1</span><span class="op">,</span> <span class="va">max_occurs</span> <span class="op">=</span> <span class="dv">1</span> <span class="op">},</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;rationale&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;XHTML&quot;</span> <span class="op">},</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        <span class="op">},</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="va">hooks</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- EMIT: ctx.subject carries { object, attributes, element, ... } already</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- resolved by the pipeline, so no DB query is needed for our own item.</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">render</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">ctx</span><span class="op">)</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">obj</span>   <span class="op">=</span> <span class="va">ctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">object</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">attrs</span> <span class="op">=</span> <span class="va">ctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">attributes</span> <span class="kw">or</span> <span class="op">{}</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">priority</span> <span class="op">=</span> <span class="op">(</span><span class="va">attrs</span><span class="op">.</span><span class="va">priority</span> <span class="kw">or</span> <span class="op">{}).</span><span class="va">value</span> <span class="kw">or</span> <span class="st">&quot;?&quot;</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">blocks</span> <span class="op">=</span> <span class="op">{}</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">level</span> <span class="op">=</span> <span class="fu">math.max</span><span class="op">((</span><span class="va">ctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">header_level</span> <span class="kw">or</span> <span class="dv">2</span><span class="op">)</span> <span class="op">-</span> <span class="dv">1</span><span class="op">,</span> <span class="dv">1</span><span class="op">)</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">hdr</span> <span class="op">=</span> <span class="va">ctx</span><span class="op">.</span><span class="va">pandoc</span><span class="op">.</span>Header<span class="op">(</span><span class="va">level</span><span class="op">,</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>                <span class="op">{</span> <span class="va">ctx</span><span class="op">.</span><span class="va">pandoc</span><span class="op">.</span>Str<span class="op">(</span><span class="va">obj</span><span class="op">.</span><span class="va">pid</span> <span class="op">..</span> <span class="st">&quot;: &quot;</span> <span class="op">..</span> <span class="op">(</span><span class="va">obj</span><span class="op">.</span><span class="va">title_text</span> <span class="kw">or</span> <span class="st">&quot;&quot;</span><span class="op">))</span> <span class="op">})</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>            <span class="va">render_utils</span><span class="op">.</span>add_header_blocks<span class="op">(</span><span class="va">blocks</span><span class="op">,</span> <span class="va">hdr</span><span class="op">)</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>            <span class="fu">table.insert</span><span class="op">(</span><span class="va">blocks</span><span class="op">,</span> <span class="va">ctx</span><span class="op">.</span><span class="va">pandoc</span><span class="op">.</span>Para<span class="op">({</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>                <span class="va">ctx</span><span class="op">.</span><span class="va">pandoc</span><span class="op">.</span>Strong<span class="op">({</span> <span class="va">ctx</span><span class="op">.</span><span class="va">pandoc</span><span class="op">.</span>Str<span class="op">(</span><span class="st">&quot;Priority: &quot;</span><span class="op">)</span> <span class="op">}),</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>                <span class="va">ctx</span><span class="op">.</span><span class="va">pandoc</span><span class="op">.</span>Str<span class="op">(</span><span class="va">priority</span><span class="op">),</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>            <span class="op">}))</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">blocks</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div data-pos="340:1-341:1">
 <p>Usage:</p>
 </div>
 <a id="listing-src-model-template-object-usage" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Authoring an HLR in Markdown</figcaption>
-<pre><code>## HLR: User Authentication @HLR-001
-
-&gt; priority: High
-&gt; rationale: Required by security policy section 4.2
-
-The system shall authenticate users via username and password.</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">## HLR: User Authentication @HLR-001</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; priority: High</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; rationale: Required by security policy section 4.2</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>The system shall authenticate users via username and password.</span></code></pre></div>
 <div data-pos="351:1-352:1">
 <p>Most object types don’t need a <code data-pos="351:32-351:40">render</code> hook at all — omit <code data-pos="351:60-351:67">hooks</code> and the host emits the standard
 PID-header / attributes / body card. Add a <code data-pos="351:143-351:151">render</code> hook only when the default
@@ -790,17 +855,17 @@ resolver, and default link display:</p>
 </div>
 <a id="listing-src-model-template-relation-simple" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> types/relations/traces_to.lua</figcaption>
-<pre><code>return {
-    kind = &quot;relation&quot;,
-    schema = {
-        id = &quot;TRACES_TO&quot;,
-        extends = &quot;PID_REF&quot;,
-        long_name = &quot;Traces To&quot;,
-        description = &quot;Traceability link from one object to another&quot;,
-        source_type_ref = &quot;LLR&quot;,
-        target_type_ref = &quot;HLR&quot;,
-    },
-}</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">kind</span> <span class="op">=</span> <span class="st">&quot;relation&quot;</span><span class="op">,</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;TRACES_TO&quot;</span><span class="op">,</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">extends</span> <span class="op">=</span> <span class="st">&quot;PID_REF&quot;</span><span class="op">,</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">long_name</span> <span class="op">=</span> <span class="st">&quot;Traces To&quot;</span><span class="op">,</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">description</span> <span class="op">=</span> <span class="st">&quot;Traceability link from one object to another&quot;</span><span class="op">,</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">source_type_ref</span> <span class="op">=</span> <span class="st">&quot;LLR&quot;</span><span class="op">,</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">target_type_ref</span> <span class="op">=</span> <span class="st">&quot;HLR&quot;</span><span class="op">,</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div data-pos="371:1-372:1">
 <p>That’s complete. The link <code data-pos="371:27-371:41">[HLR-001](@)</code> written inside an LLR will
 resolve as <code data-pos="371:80-371:91">TRACES_TO</code>.</p>
@@ -814,17 +879,17 @@ back to the base type):</p>
 </div>
 <a id="listing-src-model-template-relation-display" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Custom display text via a render_link hook</figcaption>
-<pre><code>hooks = {
-    -- Render section refs as &quot;&lt;hierarchical-number&gt; &lt;title&gt;&quot;, e.g. &quot;3.4 Introduction&quot;.
-    render_link = function(ctx)
-        local target = ctx.subject.target
-        local title  = target.title or &quot;&quot;
-        local number = target.pid and target.pid:match(&quot;sec([%d%.]+)$&quot;)
-        if number and title ~= &quot;&quot; then return number .. &quot; &quot; .. title end
-        if title ~= &quot;&quot; then return title end
-        return target.pid
-    end,
-}</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="va">hooks</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Render section refs as &quot;&lt;hierarchical-number&gt; &lt;title&gt;&quot;, e.g. &quot;3.4 Introduction&quot;.</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">render_link</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">ctx</span><span class="op">)</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">local</span> <span class="va">target</span> <span class="op">=</span> <span class="va">ctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">target</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">local</span> <span class="va">title</span>  <span class="op">=</span> <span class="va">target</span><span class="op">.</span><span class="va">title</span> <span class="kw">or</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">local</span> <span class="va">number</span> <span class="op">=</span> <span class="va">target</span><span class="op">.</span><span class="va">pid</span> <span class="kw">and</span> <span class="va">target</span><span class="op">.</span><span class="va">pid</span><span class="op">:</span><span class="fu">match</span><span class="op">(</span><span class="st">&quot;sec([%d%.]+)$&quot;</span><span class="op">)</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">number</span> <span class="kw">and</span> <span class="va">title</span> <span class="op">~=</span> <span class="st">&quot;&quot;</span> <span class="cf">then</span> <span class="cf">return</span> <span class="va">number</span> <span class="op">..</span> <span class="st">&quot; &quot;</span> <span class="op">..</span> <span class="va">title</span> <span class="cf">end</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">title</span> <span class="op">~=</span> <span class="st">&quot;&quot;</span> <span class="cf">then</span> <span class="cf">return</span> <span class="va">title</span> <span class="cf">end</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">target</span><span class="op">.</span><span class="va">pid</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div data-pos="389:1-390:1">
 <p><code data-pos="389:1-389:21">ctx.subject.target</code> is
 pre-resolved. Object targets carry <code data-pos="389:60-389:103">{ kind = &quot;object&quot;, pid, title, type_ref }</code>;
@@ -854,25 +919,25 @@ syntax to your hook.</p>
 </div>
 <a id="listing-src-model-template-view" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> types/views/symbol.lua</figcaption>
-<pre><code>return {
-    kind = &quot;view&quot;,
-    schema = {
-        id = &quot;SYMBOL&quot;,
-        long_name = &quot;Symbol&quot;,
-        description = &quot;Engineering symbol with inline formatting&quot;,
-        aliases = { &quot;sym&quot; },
-        inline_prefix = &quot;symbol&quot;,
-    },
-    hooks = {
-        -- EMIT: ctx.subject.element is the Pandoc Code element.
-        render = function(ctx)
-            local text = ctx.subject.element.text or &quot;&quot;
-            local content = text:match(&quot;^symbol:%s*(.+)$&quot;) or text:match(&quot;^sym:%s*(.+)$&quot;)
-            if not content then return nil end
-            return { ctx.pandoc.Emph({ ctx.pandoc.Str(content) }) }
-        end,
-    },
-}</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">kind</span> <span class="op">=</span> <span class="st">&quot;view&quot;</span><span class="op">,</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;SYMBOL&quot;</span><span class="op">,</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">long_name</span> <span class="op">=</span> <span class="st">&quot;Symbol&quot;</span><span class="op">,</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">description</span> <span class="op">=</span> <span class="st">&quot;Engineering symbol with inline formatting&quot;</span><span class="op">,</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">aliases</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;sym&quot;</span> <span class="op">},</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">inline_prefix</span> <span class="op">=</span> <span class="st">&quot;symbol&quot;</span><span class="op">,</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">hooks</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- EMIT: ctx.subject.element is the Pandoc Code element.</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">render</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">ctx</span><span class="op">)</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">text</span> <span class="op">=</span> <span class="va">ctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">element</span><span class="op">.</span><span class="va">text</span> <span class="kw">or</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">content</span> <span class="op">=</span> <span class="va">text</span><span class="op">:</span><span class="fu">match</span><span class="op">(</span><span class="st">&quot;^symbol:%s*(.+)$&quot;</span><span class="op">)</span> <span class="kw">or</span> <span class="va">text</span><span class="op">:</span><span class="fu">match</span><span class="op">(</span><span class="st">&quot;^sym:%s*(.+)$&quot;</span><span class="op">)</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> <span class="va">content</span> <span class="cf">then</span> <span class="cf">return</span> <span class="kw">nil</span> <span class="cf">end</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="op">{</span> <span class="va">ctx</span><span class="op">.</span><span class="va">pandoc</span><span class="op">.</span>Emph<span class="op">({</span> <span class="va">ctx</span><span class="op">.</span><span class="va">pandoc</span><span class="op">.</span>Str<span class="op">(</span><span class="va">content</span><span class="op">)</span> <span class="op">})</span> <span class="op">}</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div data-pos="419:1-420:1">
 <p>Usage: <code data-pos="419:8-419:33">The force is defined as</code>
 <code data-pos="419:34-419:56">`symbol: F = ma`</code>.</p>
@@ -886,48 +951,48 @@ it. (The host enforces this: a view that extends <code data-pos="421:381-421:393
 </div>
 <a id="listing-src-model-template-view-block" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> A generated table view via build_block (types/views/traceability_matrix.lua)</figcaption>
-<pre><code>return {
-    kind = &quot;view&quot;,
-    schema = {
-        id = &quot;TRACEABILITY_MATRIX&quot;,
-        extends = &quot;TABLE_VIEW&quot;,          -- inherits the shared render_block
-        long_name = &quot;Traceability Matrix&quot;,
-        description = &quot;HLR to VC traceability with test results&quot;,
-        inline_prefix = &quot;traceability_matrix&quot;,
-    },
-    hooks = {
-        -- DATA: build the generated table. dctx.data is the SpecIR database;
-        -- dctx.subject.params holds any view parameters.
-        build_block = function(dctx)
-            local rows = dctx.data:query_all([[
-                SELECT hlr.pid AS hlr_pid, vc.pid AS vc_pid
-                FROM spec_relations r
-                JOIN spec_objects vc  ON r.source_object_id = vc.id
-                JOIN spec_objects hlr ON r.target_object_id = hlr.id
-                WHERE vc.type_ref = &#39;VC&#39; AND hlr.type_ref = &#39;HLR&#39;
-                  AND vc.specification_ref = :spec_id
-                ORDER BY hlr.pid, vc.pid
-            ]], { spec_id = dctx.spec_id })
-            if not rows or #rows == 0 then
-                return pandoc.Para({ pandoc.Str(&quot;No HLR-VC traceability found.&quot;) })
-            end
-            local header = {
-                { pandoc.Plain({ pandoc.Strong({ pandoc.Str(&quot;HLR&quot;) }) }) },
-                { pandoc.Plain({ pandoc.Strong({ pandoc.Str(&quot;VC&quot;)  }) }) },
-            }
-            local body = {}
-            for _, row in ipairs(rows) do
-                table.insert(body, {
-                    { pandoc.Plain({ pandoc.Str(row.hlr_pid or &quot;&quot;) }) },
-                    { pandoc.Plain({ pandoc.Str(row.vc_pid  or &quot;&quot;) }) },
-                })
-            end
-            local tbl = pandoc.SimpleTable({}, { pandoc.AlignLeft, pandoc.AlignLeft },
-                { 0, 0 }, header, body)
-            return pandoc.utils.from_simple_table(tbl)
-        end,
-    },
-}</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">kind</span> <span class="op">=</span> <span class="st">&quot;view&quot;</span><span class="op">,</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;TRACEABILITY_MATRIX&quot;</span><span class="op">,</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">extends</span> <span class="op">=</span> <span class="st">&quot;TABLE_VIEW&quot;</span><span class="op">,</span>          <span class="co">-- inherits the shared render_block</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">long_name</span> <span class="op">=</span> <span class="st">&quot;Traceability Matrix&quot;</span><span class="op">,</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">description</span> <span class="op">=</span> <span class="st">&quot;HLR to VC traceability with test results&quot;</span><span class="op">,</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">inline_prefix</span> <span class="op">=</span> <span class="st">&quot;traceability_matrix&quot;</span><span class="op">,</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">hooks</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- DATA: build the generated table. dctx.data is the SpecIR database;</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- dctx.subject.params holds any view parameters.</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">build_block</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">dctx</span><span class="op">)</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">rows</span> <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">data</span><span class="op">:</span>query_all<span class="op">(</span><span class="vs">[[</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="vs">                SELECT hlr.pid AS hlr_pid, vc.pid AS vc_pid</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="vs">                FROM spec_relations r</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="vs">                JOIN spec_objects vc  ON r.source_object_id = vc.id</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="vs">                JOIN spec_objects hlr ON r.target_object_id = hlr.id</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="vs">                WHERE vc.type_ref = &#39;VC&#39; AND hlr.type_ref = &#39;HLR&#39;</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="vs">                  AND vc.specification_ref = :spec_id</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="vs">                ORDER BY hlr.pid, vc.pid</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="vs">            ]]</span><span class="op">,</span> <span class="op">{</span> <span class="va">spec_id</span> <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">spec_id</span> <span class="op">})</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> <span class="va">rows</span> <span class="kw">or</span> <span class="op">#</span><span class="va">rows</span> <span class="op">==</span> <span class="dv">0</span> <span class="cf">then</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span>Para<span class="op">({</span> <span class="va">pandoc</span><span class="op">.</span>Str<span class="op">(</span><span class="st">&quot;No HLR-VC traceability found.&quot;</span><span class="op">)</span> <span class="op">})</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">header</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>                <span class="op">{</span> <span class="va">pandoc</span><span class="op">.</span>Plain<span class="op">({</span> <span class="va">pandoc</span><span class="op">.</span>Strong<span class="op">({</span> <span class="va">pandoc</span><span class="op">.</span>Str<span class="op">(</span><span class="st">&quot;HLR&quot;</span><span class="op">)</span> <span class="op">})</span> <span class="op">})</span> <span class="op">},</span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>                <span class="op">{</span> <span class="va">pandoc</span><span class="op">.</span>Plain<span class="op">({</span> <span class="va">pandoc</span><span class="op">.</span>Strong<span class="op">({</span> <span class="va">pandoc</span><span class="op">.</span>Str<span class="op">(</span><span class="st">&quot;VC&quot;</span><span class="op">)</span>  <span class="op">})</span> <span class="op">})</span> <span class="op">},</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">body</span> <span class="op">=</span> <span class="op">{}</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> <span class="cn">_</span><span class="op">,</span> <span class="va">row</span> <span class="kw">in</span> <span class="fu">ipairs</span><span class="op">(</span><span class="va">rows</span><span class="op">)</span> <span class="cf">do</span></span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>                <span class="fu">table.insert</span><span class="op">(</span><span class="va">body</span><span class="op">,</span> <span class="op">{</span></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>                    <span class="op">{</span> <span class="va">pandoc</span><span class="op">.</span>Plain<span class="op">({</span> <span class="va">pandoc</span><span class="op">.</span>Str<span class="op">(</span><span class="va">row</span><span class="op">.</span><span class="va">hlr_pid</span> <span class="kw">or</span> <span class="st">&quot;&quot;</span><span class="op">)</span> <span class="op">})</span> <span class="op">},</span></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>                    <span class="op">{</span> <span class="va">pandoc</span><span class="op">.</span>Plain<span class="op">({</span> <span class="va">pandoc</span><span class="op">.</span>Str<span class="op">(</span><span class="va">row</span><span class="op">.</span><span class="va">vc_pid</span>  <span class="kw">or</span> <span class="st">&quot;&quot;</span><span class="op">)</span> <span class="op">})</span> <span class="op">},</span></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>                <span class="op">})</span></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">tbl</span> <span class="op">=</span> <span class="va">pandoc</span><span class="op">.</span>SimpleTable<span class="op">({},</span> <span class="op">{</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">AlignLeft</span><span class="op">,</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">AlignLeft</span> <span class="op">},</span></span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>                <span class="op">{</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span> <span class="op">},</span> <span class="va">header</span><span class="op">,</span> <span class="va">body</span><span class="op">)</span></span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>from_simple_table<span class="op">(</span><span class="va">tbl</span><span class="op">)</span></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div data-pos="468:1-469:1">
 <p>A view that feeds a chart (rather than emitting its own block)
 declares a <code data-pos="468:75-468:84">dataset</code> data hook
@@ -943,24 +1008,24 @@ type</h2>
 </div>
 <a id="listing-src-model-template-float" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> types/floats/sequence_diagram.lua</figcaption>
-<pre><code>return {
-    kind = &quot;float&quot;,
-    schema = {
-        id = &quot;SEQUENCE&quot;,
-        long_name = &quot;Sequence Diagram&quot;,
-        caption_format = &quot;Figure&quot;,
-        counter_group = &quot;FIGURE&quot;,      -- shares numbering with FIGURE, PLANTUML, CHART
-        aliases = { &quot;seq&quot;, &quot;sequence&quot; },
-    },
-}</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">kind</span> <span class="op">=</span> <span class="st">&quot;float&quot;</span><span class="op">,</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;SEQUENCE&quot;</span><span class="op">,</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">long_name</span> <span class="op">=</span> <span class="st">&quot;Sequence Diagram&quot;</span><span class="op">,</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">caption_format</span> <span class="op">=</span> <span class="st">&quot;Figure&quot;</span><span class="op">,</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">counter_group</span> <span class="op">=</span> <span class="st">&quot;FIGURE&quot;</span><span class="op">,</span>      <span class="co">-- shares numbering with FIGURE, PLANTUML, CHART</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">aliases</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;seq&quot;</span><span class="op">,</span> <span class="st">&quot;sequence&quot;</span> <span class="op">},</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div data-pos="487:1-488:1">
 <p>Usage:</p>
 </div>
 <a id="listing-src-model-template-float-usage" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Authoring a float</figcaption>
-<pre><code>```seq:auth-flow{caption=&quot;User authentication flow&quot;}
-sequence diagram content here
-```</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="in">```seq:auth-flow{caption=&quot;User authentication flow&quot;}</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="in">sequence diagram content here</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
 <div data-pos="495:1-496:1">
 <p>A float that resolves its own content <strong>internally</strong> (no
 external tool) declares a single <code data-pos="495:91-495:102">transform</code> data hook. It reads <code data-pos="495:123-495:148">ctx.subject.raw_content</code> and <code data-pos="495:153-495:172">ctx.subject.float</code> and returns the
@@ -977,20 +1042,20 @@ STD, …). They are pure-data — no <code data-pos="499:101-499:108">hooks</cod
 </div>
 <a id="listing-src-model-template-spec" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> types/specifications/srs.lua</figcaption>
-<pre><code>return {
-    kind = &quot;specification&quot;,
-    schema = {
-        id = &quot;SRS&quot;,
-        long_name = &quot;Software Requirements Specification&quot;,
-        description = &quot;MIL-STD-498 SRS document&quot;,
-        is_default = false,
-        implicit_aliases = { &quot;Software Requirements Specification&quot;, &quot;SRS&quot; },
-        attributes = {
-            { name = &quot;version&quot;, type = &quot;STRING&quot; },
-            { name = &quot;date&quot;,    type = &quot;STRING&quot; },
-        },
-    },
-}</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">kind</span> <span class="op">=</span> <span class="st">&quot;specification&quot;</span><span class="op">,</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;SRS&quot;</span><span class="op">,</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">long_name</span> <span class="op">=</span> <span class="st">&quot;Software Requirements Specification&quot;</span><span class="op">,</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">description</span> <span class="op">=</span> <span class="st">&quot;MIL-STD-498 SRS document&quot;</span><span class="op">,</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">is_default</span> <span class="op">=</span> <span class="kw">false</span><span class="op">,</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">implicit_aliases</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;Software Requirements Specification&quot;</span><span class="op">,</span> <span class="st">&quot;SRS&quot;</span> <span class="op">},</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">attributes</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;version&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;STRING&quot;</span> <span class="op">},</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>            <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;date&quot;</span><span class="op">,</span>    <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;STRING&quot;</span> <span class="op">},</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">},</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div data-pos="518:1-519:1">
 <p>Usage: <code data-pos="518:8-518:56"># srs: My Project Requirements @SRS-MYPROJ-001</code>
 at the top of a <code data-pos="518:73-518:78">.md</code> file.</p>
@@ -1412,35 +1477,35 @@ particular convention, but matching the <code data-pos="766:181-766:193">policy_
 </div>
 <a id="listing-src-model-verification-view" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> models/mymodel/verification_views/vc_missing_hlr.lua</figcaption>
-<pre><code>return {
-    kind = &quot;verification&quot;,
-    schema = {
-        id = &quot;vc_missing_hlr&quot;,
-        view = &quot;view_traceability_vc_missing_hlr&quot;,
-        policy_key = &quot;traceability_vc_to_hlr&quot;,
-        sql = [[
-CREATE VIEW IF NOT EXISTS view_traceability_vc_missing_hlr AS
-SELECT vc.identifier AS object_id, vc.pid AS object_pid,
-       vc.title_text AS object_title, vc.from_file, vc.start_line
-FROM spec_objects vc
-WHERE vc.type_ref = &#39;VC&#39;
-  AND NOT EXISTS (
-      SELECT 1 FROM spec_relations r
-      JOIN spec_objects target ON target.identifier = r.target_ref
-      WHERE r.source_ref = vc.identifier AND target.type_ref = &#39;HLR&#39;
-  );
-]],
-    },
-    hooks = {
-        -- VERIFY: one call per row the SQL view returns. ctx.subject.row is the row.
-        message = function(ctx)
-            local row = ctx.subject.row
-            local label = row.object_pid or row.object_title or row.object_id
-            return string.format(
-                &quot;Verification case &#39;%s&#39; has no traceability link to an HLR&quot;, label)
-        end,
-    },
-}</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">kind</span> <span class="op">=</span> <span class="st">&quot;verification&quot;</span><span class="op">,</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;vc_missing_hlr&quot;</span><span class="op">,</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">view</span> <span class="op">=</span> <span class="st">&quot;view_traceability_vc_missing_hlr&quot;</span><span class="op">,</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">policy_key</span> <span class="op">=</span> <span class="st">&quot;traceability_vc_to_hlr&quot;</span><span class="op">,</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">sql</span> <span class="op">=</span> <span class="vs">[[</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="vs">CREATE VIEW IF NOT EXISTS view_traceability_vc_missing_hlr AS</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="vs">SELECT vc.identifier AS object_id, vc.pid AS object_pid,</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="vs">       vc.title_text AS object_title, vc.from_file, vc.start_line</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="vs">FROM spec_objects vc</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="vs">WHERE vc.type_ref = &#39;VC&#39;</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="vs">  AND NOT EXISTS (</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="vs">      SELECT 1 FROM spec_relations r</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="vs">      JOIN spec_objects target ON target.identifier = r.target_ref</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="vs">      WHERE r.source_ref = vc.identifier AND target.type_ref = &#39;HLR&#39;</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="vs">  );</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="vs">]]</span><span class="op">,</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="va">hooks</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- VERIFY: one call per row the SQL view returns. ctx.subject.row is the row.</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">message</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">ctx</span><span class="op">)</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">row</span> <span class="op">=</span> <span class="va">ctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">row</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">label</span> <span class="op">=</span> <span class="va">row</span><span class="op">.</span><span class="va">object_pid</span> <span class="kw">or</span> <span class="va">row</span><span class="op">.</span><span class="va">object_title</span> <span class="kw">or</span> <span class="va">row</span><span class="op">.</span><span class="va">object_id</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="fu">string.format</span><span class="op">(</span></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;Verification case &#39;%s&#39; has no traceability link to an HLR&quot;</span><span class="op">,</span> <span class="va">label</span><span class="op">)</span></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div data-pos="800:1-801:1">
 <p><code data-pos="800:1-800:13">policy_key</code> is the handle authors
 use to tune severity. Repeating a <code data-pos="800:70-800:82">policy_key</code> in an overlay replaces the
@@ -1449,8 +1514,8 @@ layering). Suppress a verification view in <code data-pos="800:251-800:265">proj
 </div>
 <a id="listing-src-model-suppress-verification-view" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Suppressing a verification view</figcaption>
-<pre><code>validation:
-  traceability_vc_to_hlr: ignore</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validation</span><span class="kw">:</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">traceability_vc_to_hlr</span><span class="kw">:</span><span class="at"> ignore</span></span></code></pre></div>
 <h1 data-number="12" data-pos="807:1-808:1" id="external-renderers"><span class="header-section-number">12</span>
 External renderers</h1>
 <div data-pos="809:1-810:1">
@@ -1471,57 +1536,57 @@ external pair is also rejected.)</p>
 </div>
 <a id="listing-src-model-external-render" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> types/floats/plantuml.lua — an external-render float</figcaption>
-<pre><code>local float_base  = require(&quot;pipeline.shared.float_base&quot;)
-local task_runner = require(&quot;infra.process.task_runner&quot;)
-
-return {
-    kind = &quot;float&quot;,
-    schema = {
-        id = &quot;PLANTUML&quot;,
-        long_name = &quot;PlantUML Diagram&quot;,
-        caption_format = &quot;Figure&quot;,
-        counter_group = &quot;FIGURE&quot;,
-        aliases = { &quot;puml&quot;, &quot;plantuml&quot; },
-        needs_external_render = true,
-    },
-    hooks = {
-        -- DATA: build the spawn task. dctx.subject carries { float, build_dir };
-        -- dctx.log is the logger. Return the task descriptor, or nil to skip.
-        prepare_task = function(dctx)
-            local float     = dctx.subject.float
-            local build_dir = dctx.subject.build_dir
-            local content   = float.raw_content or &quot;&quot;
-            local hash      = pandoc.sha1(content)
-            local diagrams  = build_dir .. &quot;/diagrams&quot;
-            local puml_file = diagrams .. &quot;/&quot; .. hash .. &quot;.puml&quot;
-            local png_file  = diagrams .. &quot;/&quot; .. hash .. &quot;.png&quot;
-
-            task_runner.ensure_dir(diagrams)
-            task_runner.write_file(puml_file, content)
-
-            return {
-                cmd = &quot;plantuml&quot;,
-                args = { &quot;-tpng&quot;, puml_file },
-                opts = { timeout = 30000 },
-                output_path = png_file,   -- cache key: skipped when the file exists
-                context = { float = float, relative_path = &quot;diagrams/&quot; .. hash .. &quot;.png&quot; },
-            }
-        end,
-
-        -- DATA: write the resolved AST. dctx.subject carries
-        -- { task, success, stdout, stderr }; dctx.data is the SpecIR database.
-        handle_result = function(dctx)
-            local task = dctx.subject.task
-            local ctx  = task.context
-            if not dctx.subject.success then
-                dctx.log.warn(&quot;PlantUML failed: %s&quot;, dctx.subject.stderr)
-                return
-            end
-            local json = string.format(&#39;{&quot;png_paths&quot;:[&quot;%s&quot;]}&#39;, ctx.relative_path)
-            float_base.update_resolved_ast(dctx.data, ctx.float.id, json)
-        end,
-    },
-}</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">float_base</span>  <span class="op">=</span> <span class="fu">require</span><span class="op">(</span><span class="st">&quot;pipeline.shared.float_base&quot;</span><span class="op">)</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="va">task_runner</span> <span class="op">=</span> <span class="fu">require</span><span class="op">(</span><span class="st">&quot;infra.process.task_runner&quot;</span><span class="op">)</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">kind</span> <span class="op">=</span> <span class="st">&quot;float&quot;</span><span class="op">,</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;PLANTUML&quot;</span><span class="op">,</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">long_name</span> <span class="op">=</span> <span class="st">&quot;PlantUML Diagram&quot;</span><span class="op">,</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">caption_format</span> <span class="op">=</span> <span class="st">&quot;Figure&quot;</span><span class="op">,</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">counter_group</span> <span class="op">=</span> <span class="st">&quot;FIGURE&quot;</span><span class="op">,</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">aliases</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;puml&quot;</span><span class="op">,</span> <span class="st">&quot;plantuml&quot;</span> <span class="op">},</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">needs_external_render</span> <span class="op">=</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">hooks</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- DATA: build the spawn task. dctx.subject carries { float, build_dir };</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- dctx.log is the logger. Return the task descriptor, or nil to skip.</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">prepare_task</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">dctx</span><span class="op">)</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">float</span>     <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">float</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">build_dir</span> <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">build_dir</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">content</span>   <span class="op">=</span> <span class="va">float</span><span class="op">.</span><span class="va">raw_content</span> <span class="kw">or</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">hash</span>      <span class="op">=</span> <span class="va">pandoc</span><span class="op">.</span>sha1<span class="op">(</span><span class="va">content</span><span class="op">)</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">diagrams</span>  <span class="op">=</span> <span class="va">build_dir</span> <span class="op">..</span> <span class="st">&quot;/diagrams&quot;</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">puml_file</span> <span class="op">=</span> <span class="va">diagrams</span> <span class="op">..</span> <span class="st">&quot;/&quot;</span> <span class="op">..</span> <span class="va">hash</span> <span class="op">..</span> <span class="st">&quot;.puml&quot;</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">png_file</span>  <span class="op">=</span> <span class="va">diagrams</span> <span class="op">..</span> <span class="st">&quot;/&quot;</span> <span class="op">..</span> <span class="va">hash</span> <span class="op">..</span> <span class="st">&quot;.png&quot;</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>            <span class="va">task_runner</span><span class="op">.</span>ensure_dir<span class="op">(</span><span class="va">diagrams</span><span class="op">)</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>            <span class="va">task_runner</span><span class="op">.</span>write_file<span class="op">(</span><span class="va">puml_file</span><span class="op">,</span> <span class="va">content</span><span class="op">)</span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>                <span class="va">cmd</span> <span class="op">=</span> <span class="st">&quot;plantuml&quot;</span><span class="op">,</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>                <span class="va">args</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;-tpng&quot;</span><span class="op">,</span> <span class="va">puml_file</span> <span class="op">},</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>                <span class="va">opts</span> <span class="op">=</span> <span class="op">{</span> <span class="va">timeout</span> <span class="op">=</span> <span class="dv">30000</span> <span class="op">},</span></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>                <span class="va">output_path</span> <span class="op">=</span> <span class="va">png_file</span><span class="op">,</span>   <span class="co">-- cache key: skipped when the file exists</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>                <span class="va">context</span> <span class="op">=</span> <span class="op">{</span> <span class="va">float</span> <span class="op">=</span> <span class="va">float</span><span class="op">,</span> <span class="va">relative_path</span> <span class="op">=</span> <span class="st">&quot;diagrams/&quot;</span> <span class="op">..</span> <span class="va">hash</span> <span class="op">..</span> <span class="st">&quot;.png&quot;</span> <span class="op">},</span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- DATA: write the resolved AST. dctx.subject carries</span></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- { task, success, stdout, stderr }; dctx.data is the SpecIR database.</span></span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>        <span class="va">handle_result</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">dctx</span><span class="op">)</span></span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">task</span> <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">task</span></span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">ctx</span>  <span class="op">=</span> <span class="va">task</span><span class="op">.</span><span class="va">context</span></span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">success</span> <span class="cf">then</span></span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>                <span class="va">dctx</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>warn<span class="op">(</span><span class="st">&quot;PlantUML failed: %s&quot;</span><span class="op">,</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">stderr</span><span class="op">)</span></span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span></span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">json</span> <span class="op">=</span> <span class="fu">string.format</span><span class="op">(</span><span class="st">&#39;{&quot;png_paths&quot;:[&quot;%s&quot;]}&#39;</span><span class="op">,</span> <span class="va">ctx</span><span class="op">.</span><span class="va">relative_path</span><span class="op">)</span></span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>            <span class="va">float_base</span><span class="op">.</span>update_resolved_ast<span class="op">(</span><span class="va">dctx</span><span class="op">.</span><span class="va">data</span><span class="op">,</span> <span class="va">ctx</span><span class="op">.</span><span class="va">float</span><span class="op">.</span><span class="va">id</span><span class="op">,</span> <span class="va">json</span><span class="op">)</span></span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <a id="csv-tbl-model-task-descriptor" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Task descriptor returned by prepare_task</figcaption>
 <table>
@@ -1562,14 +1627,14 @@ rows) for view-typed items.</p>
 Project integration</h1>
 <a id="listing-src-model-project-yaml" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Using a custom model in project.yaml</figcaption>
-<pre><code>project:
-  code: MYPROJ
-  name: My Project
-
-template: mymodel   # Loads models/default/ then models/mymodel/
-
-doc_files:
-  - srs.md</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">project</span><span class="kw">:</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">code</span><span class="kw">:</span><span class="at"> MYPROJ</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> My Project</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">template</span><span class="kw">:</span><span class="at"> mymodel</span><span class="co">   # Loads models/default/ then models/mymodel/</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">doc_files</span><span class="kw">:</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> srs.md</span></span></code></pre></div>
 <h1 data-number="14" data-pos="896:1-897:1" id="troubleshooting"><span class="header-section-number">14</span> Troubleshooting</h1>
 <div data-pos="898:1-899:1">
 <p><strong>My type doesn’t load.</strong> Check that the file is under

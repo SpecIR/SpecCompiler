@@ -178,7 +178,7 @@ vertical-align: middle;
 <li><a href="#SVC-001-sec5" id="toc-SVC-001-sec5"><span class="toc-section-number">5</span> Traceability Matrix</a>
 <ul>
 <li><a href="#SVC-001-sec5.1" id="toc-SVC-001-sec5.1"><span class="toc-section-number">5.1</span> Deterministic Enforcement in
-VERIFY</a></li>
+ANALYZE</a></li>
 </ul></li>
 <li><a href="#SVC-001-sec6" id="toc-SVC-001-sec6"><span class="toc-section-number">6</span> Pipeline Verification Cases</a></li>
 <li><a href="#SVC-001-sec7" id="toc-SVC-001-sec7"><span class="toc-section-number">7</span> Storage Verification Cases</a></li>
@@ -452,6 +452,11 @@ document.</p>
 <td style="text-align: center;">Test</td>
 </tr>
 <tr>
+<td style="text-align: left;"><a href="#VC-INT-016">VC-INT-016</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-002">HLR-TYPE-002</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
 <td style="text-align: left;"><a href="#VC-OUT-001">VC-OUT-001</a></td>
 <td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a></td>
 <td style="text-align: center;">Test</td>
@@ -469,6 +474,21 @@ document.</p>
 <tr>
 <td style="text-align: left;"><a href="#VC-OUT-007">VC-OUT-007</a></td>
 <td style="text-align: left;"><a href="srs.html#HLR-OUT-007">HLR-OUT-007</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-OUT-008">VC-OUT-008</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a>, <a href="srs.html#HLR-PIPE-008">HLR-PIPE-008</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-OUT-009">VC-OUT-009</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a>, <a href="srs.html#HLR-PIPE-012">HLR-PIPE-012</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-OUT-010">VC-OUT-010</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a>, <a href="srs.html#HLR-OUT-004">HLR-OUT-004</a></td>
 <td style="text-align: center;">Test</td>
 </tr>
 <tr>
@@ -499,6 +519,16 @@ document.</p>
 <tr>
 <td style="text-align: left;"><a href="#VC-PIPE-012">VC-PIPE-012</a></td>
 <td style="text-align: left;"><a href="srs.html#HLR-PIPE-011">HLR-PIPE-011</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-PIPE-013">VC-PIPE-013</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-010">HLR-PIPE-010</a></td>
+<td style="text-align: center;">Test</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-PIPE-014">VC-PIPE-014</a></td>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a>, <a href="srs.html#HLR-OUT-004">HLR-OUT-004</a>, <a href="srs.html#HLR-STOR-004">HLR-STOR-004</a></td>
 <td style="text-align: center;">Test</td>
 </tr>
 </tbody>
@@ -1034,6 +1064,12 @@ Results Matrix</h1>
 <td style="text-align: center;"><strong>PASS</strong></td>
 </tr>
 <tr>
+<td style="text-align: left;"><a href="#VC-INT-016">VC-INT-016</a></td>
+<td style="text-align: left;">UTF-8 Label Slugification</td>
+<td style="text-align: left;"><a href="#TR-INT-016-01">TR-INT-016-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
 <td style="text-align: left;"><a href="#VC-OUT-001">VC-OUT-001</a></td>
 <td style="text-align: left;">Document Assembly</td>
 <td style="text-align: left;"><a href="#TR-OUT-001-01">TR-OUT-001-01</a></td>
@@ -1052,6 +1088,30 @@ Results Matrix</h1>
 <td style="text-align: center;"><strong>PASS</strong></td>
 </tr>
 <tr>
+<td style="text-align: left;"><a href="#VC-OUT-008">VC-OUT-008</a></td>
+<td style="text-align: left;">Heading Hierarchy Well-formedness</td>
+<td style="text-align: left;"><a href="#TR-OUT-008-01">TR-OUT-008-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-OUT-008">VC-OUT-008</a></td>
+<td style="text-align: left;">Heading Hierarchy Well-formedness</td>
+<td style="text-align: left;"><a href="#TR-OUT-008-02">TR-OUT-008-02</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-OUT-009">VC-OUT-009</a></td>
+<td style="text-align: left;">Section Scope Termination</td>
+<td style="text-align: left;"><a href="#TR-OUT-009-01">TR-OUT-009-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-OUT-010">VC-OUT-010</a></td>
+<td style="text-align: left;">Cross-Format Heading Consistency</td>
+<td style="text-align: left;"><a href="#TR-OUT-010-01">TR-OUT-010-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
 <td style="text-align: left;"><a href="#VC-PIPE-007">VC-PIPE-007</a></td>
 <td style="text-align: left;">Sourcepos Normalization</td>
 <td style="text-align: left;"><a href="#TR-PIPE-007-01">TR-PIPE-007-01</a></td>
@@ -1061,6 +1121,19 @@ Results Matrix</h1>
 <td style="text-align: left;"><a href="#VC-PIPE-012">VC-PIPE-012</a></td>
 <td style="text-align: left;">Prerequisite-Not-Found Diagnostic</td>
 <td style="text-align: left;"><a href="#TR-PIPE-012-01">TR-PIPE-012-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-PIPE-013">VC-PIPE-013</a></td>
+<td style="text-align: left;">Incremental Stale Relation Rebind</td>
+<td style="text-align: left;"><a href="#TR-PIPE-013-01">TR-PIPE-013-01</a></td>
+<td style="text-align: center;"><strong>PASS</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="#VC-PIPE-014">VC-PIPE-014</a></td>
+<td style="text-align: left;">Incremental Cross-Document View
+Freshness</td>
+<td style="text-align: left;"><a href="#TR-PIPE-014-01">TR-PIPE-014-01</a></td>
 <td style="text-align: center;"><strong>PASS</strong></td>
 </tr>
 </tbody>
@@ -1354,6 +1427,42 @@ Traceability Matrix</h1>
 <td style="text-align: center;"><strong>✓ Pass</strong></td>
 </tr>
 <tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a></td>
+<td style="text-align: left;">Document Assembly</td>
+<td style="text-align: left;"><a href="#VC-OUT-008">VC-OUT-008</a></td>
+<td style="text-align: left;">Heading Hierarchy Well-formedness</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a></td>
+<td style="text-align: left;">Document Assembly</td>
+<td style="text-align: left;"><a href="#VC-OUT-008">VC-OUT-008</a></td>
+<td style="text-align: left;">Heading Hierarchy Well-formedness</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a></td>
+<td style="text-align: left;">Document Assembly</td>
+<td style="text-align: left;"><a href="#VC-OUT-009">VC-OUT-009</a></td>
+<td style="text-align: left;">Section Scope Termination</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a></td>
+<td style="text-align: left;">Document Assembly</td>
+<td style="text-align: left;"><a href="#VC-OUT-010">VC-OUT-010</a></td>
+<td style="text-align: left;">Cross-Format Heading Consistency</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-001">HLR-OUT-001</a></td>
+<td style="text-align: left;">Document Assembly</td>
+<td style="text-align: left;"><a href="#VC-PIPE-014">VC-PIPE-014</a></td>
+<td style="text-align: left;">Incremental Cross-Document View
+Freshness</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
 <td style="text-align: left;"><a href="srs.html#HLR-OUT-002">HLR-OUT-002</a></td>
 <td style="text-align: left;">Float Resolution</td>
 <td style="text-align: left;"><a href="#VC-032">VC-032</a></td>
@@ -1379,6 +1488,21 @@ Traceability Matrix</h1>
 <td style="text-align: left;">Multi-Format Output</td>
 <td style="text-align: left;"><a href="#VC-028">VC-028</a></td>
 <td style="text-align: left;">Multi-Format Output</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-004">HLR-OUT-004</a></td>
+<td style="text-align: left;">Multi-Format Output</td>
+<td style="text-align: left;"><a href="#VC-OUT-010">VC-OUT-010</a></td>
+<td style="text-align: left;">Cross-Format Heading Consistency</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-OUT-004">HLR-OUT-004</a></td>
+<td style="text-align: left;">Multi-Format Output</td>
+<td style="text-align: left;"><a href="#VC-PIPE-014">VC-PIPE-014</a></td>
+<td style="text-align: left;">Incremental Cross-Document View
+Freshness</td>
 <td style="text-align: center;"><strong>✓ Pass</strong></td>
 </tr>
 <tr>
@@ -1455,7 +1579,7 @@ Algorithm</td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="srs.html#HLR-PIPE-004">HLR-PIPE-004</a></td>
-<td style="text-align: left;">Phase Abort on VERIFY Errors</td>
+<td style="text-align: left;">Phase Abort on ANALYZE Errors</td>
 <td style="text-align: left;"><a href="#VC-004">VC-004</a></td>
 <td style="text-align: left;">Phase Abort on Errors</td>
 <td style="text-align: center;">— Not Run</td>
@@ -1491,6 +1615,20 @@ Algorithm</td>
 <tr>
 <td style="text-align: left;"><a href="srs.html#HLR-PIPE-008">HLR-PIPE-008</a></td>
 <td style="text-align: left;">Include File Expansion</td>
+<td style="text-align: left;"><a href="#VC-OUT-008">VC-OUT-008</a></td>
+<td style="text-align: left;">Heading Hierarchy Well-formedness</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-008">HLR-PIPE-008</a></td>
+<td style="text-align: left;">Include File Expansion</td>
+<td style="text-align: left;"><a href="#VC-OUT-008">VC-OUT-008</a></td>
+<td style="text-align: left;">Heading Hierarchy Well-formedness</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-008">HLR-PIPE-008</a></td>
+<td style="text-align: left;">Include File Expansion</td>
 <td style="text-align: left;"><a href="#VC-PIPE-009">VC-PIPE-009</a></td>
 <td style="text-align: left;">Include File Expansion</td>
 <td style="text-align: center;">— Not Run</td>
@@ -1510,10 +1648,24 @@ Algorithm</td>
 <td style="text-align: center;">— Not Run</td>
 </tr>
 <tr>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-010">HLR-PIPE-010</a></td>
+<td style="text-align: left;">Relation Type Inference</td>
+<td style="text-align: left;"><a href="#VC-PIPE-013">VC-PIPE-013</a></td>
+<td style="text-align: left;">Incremental Stale Relation Rebind</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
 <td style="text-align: left;"><a href="srs.html#HLR-PIPE-011">HLR-PIPE-011</a></td>
 <td style="text-align: left;">Prerequisite-Not-Found Diagnostic</td>
 <td style="text-align: left;"><a href="#VC-PIPE-012">VC-PIPE-012</a></td>
 <td style="text-align: left;">Prerequisite-Not-Found Diagnostic</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-PIPE-012">HLR-PIPE-012</a></td>
+<td style="text-align: left;">Section Scope Termination</td>
+<td style="text-align: left;"><a href="#VC-OUT-009">VC-OUT-009</a></td>
+<td style="text-align: left;">Section Scope Termination</td>
 <td style="text-align: center;"><strong>✓ Pass</strong></td>
 </tr>
 <tr>
@@ -1552,6 +1704,14 @@ Algorithm</td>
 <td style="text-align: center;"><strong>✓ Pass</strong></td>
 </tr>
 <tr>
+<td style="text-align: left;"><a href="srs.html#HLR-STOR-004">HLR-STOR-004</a></td>
+<td style="text-align: left;">Output Cache</td>
+<td style="text-align: left;"><a href="#VC-PIPE-014">VC-PIPE-014</a></td>
+<td style="text-align: left;">Incremental Cross-Document View
+Freshness</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
 <td style="text-align: left;"><a href="srs.html#HLR-STOR-005">HLR-STOR-005</a></td>
 <td style="text-align: left;">Incremental Rebuild Support</td>
 <td style="text-align: left;"><a href="#VC-011">VC-011</a></td>
@@ -1584,6 +1744,13 @@ Algorithm</td>
 <td style="text-align: left;">Spec Objects Container</td>
 <td style="text-align: left;"><a href="#VC-013">VC-013</a></td>
 <td style="text-align: left;">Spec Objects Container</td>
+<td style="text-align: center;"><strong>✓ Pass</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="srs.html#HLR-TYPE-002">HLR-TYPE-002</a></td>
+<td style="text-align: left;">Spec Objects Container</td>
+<td style="text-align: left;"><a href="#VC-INT-016">VC-INT-016</a></td>
+<td style="text-align: left;">UTF-8 Label Slugification</td>
 <td style="text-align: center;"><strong>✓ Pass</strong></td>
 </tr>
 <tr>
@@ -1856,7 +2023,7 @@ Algorithm</td>
 </table>
 </div>
 <h2 data-number="5.1" data-pos="16:1-17:1" data-source-file="./verification/test_execution_matrix.md" id="SVC-001-sec5.1"><span class="header-section-number">5.1</span>
-Deterministic Enforcement in VERIFY</h2>
+Deterministic Enforcement in ANALYZE</h2>
 <div data-pos="18:1-25:1" data-source-file="./verification/test_execution_matrix.md">
 <ul>
 <li><div data-pos="18:3-19:1">
@@ -1894,8 +2061,8 @@ Five-Phase Lifecycle</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="5:1-6:1" data-source-file="./verification/pipeline_vc.md">
-<p>Verify that the <a href="srs.html#TERM-15" data-pos="5:17-5:34">srs:
-Pipeline</a> executes all five phases in correct order.</p>
+<p>Verify that the <a href="srs.html#TERM-15" data-pos="5:17-5:34">&lt;Pipeline&gt;</a> executes all five phases in
+correct order.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -1904,20 +2071,23 @@ Pipeline</a> executes all five phases in correct order.</p>
 <dd>
 Confirm
 
-<a href="srs.html#TERM-19" data-pos="7:22-7:47">srs: INITIALIZE
-Phase</a>
+<a href="srs.html#TERM-19" data-pos="7:22-7:47">&lt;INITIALIZE
+Phase&gt;</a>
 ,
 
-<a href="srs.html#TERM-20" data-pos="7:49-7:71">srs: ANALYZE Phase</a>
+<a href="srs.html#TERM-20" data-pos="7:49-7:71">&lt;RESOLVE
+Phase&gt;</a>
 ,
 
-<a href="srs.html#TERM-22" data-pos="7:73-7:97">srs: TRANSFORM Phase</a>
+<a href="srs.html#TERM-22" data-pos="7:73-7:97">&lt;TRANSFORM
+Phase&gt;</a>
 ,
 
-<a href="srs.html#TERM-21" data-pos="7:99-7:120">srs: VERIFY Phase</a>
+<a href="srs.html#TERM-21" data-pos="7:99-7:121">&lt;ANALYZE
+Phase&gt;</a>
 ,
 
-<a href="srs.html#TERM-23" data-pos="7:122-7:141">srs: EMIT Phase</a>
+<a href="srs.html#TERM-23" data-pos="7:123-7:142">&lt;EMIT Phase&gt;</a>
 
 execute
 
@@ -1934,8 +2104,8 @@ Test
 All 5 phases execute for every document
 </div></li>
 <li><div data-pos="18:5-19:1">
-Phase order is always INITIALIZE &lt; ANALYZE &lt; TRANSFORM &lt; VERIFY
-&lt; EMIT
+Phase order is always INITIALIZE &lt; RESOLVE &lt; TRANSFORM &lt;
+ANALYZE &lt; EMIT
 </div></li>
 </ul>
 </dd>
@@ -1977,8 +2147,8 @@ Handler Registration</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="25:1-26:1" data-source-file="./verification/pipeline_vc.md">
-<p>Verify that <a href="srs.html#TERM-16" data-pos="25:13-25:29">srs:
-Handler</a> are registered with required fields.</p>
+<p>Verify that <a href="srs.html#TERM-16" data-pos="25:13-25:29">&lt;Handler&gt;</a> are registered with required
+fields.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -1997,7 +2167,7 @@ name
 
 and
 
-<a href="srs.html#TERM-24" data-pos="27:62-27:84">srs: Prerequisites</a>
+<a href="srs.html#TERM-24" data-pos="27:62-27:84">&lt;Prerequisites&gt;</a>
 </dd>
 <dt><strong>VERIFICATION METHOD:</strong></dt>
 <dd>
@@ -2061,8 +2231,8 @@ Topological Ordering</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="47:1-48:1" data-source-file="./verification/pipeline_vc.md">
-<p>Verify <a href="srs.html#TERM-16" data-pos="47:8-47:24">srs:
-Handler</a> execute in dependency order.</p>
+<p>Verify <a href="srs.html#TERM-16" data-pos="47:8-47:24">&lt;Handler&gt;</a> execute in dependency
+order.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -2071,8 +2241,8 @@ Handler</a> execute in dependency order.</p>
 <dd>
 Confirm
 
-<a href="srs.html#TERM-25" data-pos="49:22-49:47">srs: Topological
-Sort</a>
+<a href="srs.html#TERM-25" data-pos="49:22-49:47">&lt;Topological
+Sort&gt;</a>
 
 produces
 
@@ -2155,10 +2325,10 @@ Test
 <dd>
 <ul>
 <li><div data-pos="80:5-81:1">
-diagnostics.has_errors() returns true after VERIFY
+diagnostics.has_errors() returns true after ANALYZE
 </div></li>
 <li><div data-pos="81:5-82:1">
-TRANSFORM phase has already completed before VERIFY
+TRANSFORM phase has already completed before ANALYZE
 </div></li>
 <li><div data-pos="82:5-83:1">
 EMIT phase handlers never called
@@ -2175,7 +2345,7 @@ Create document with validation errors (missing required attribute)
 Execute pipeline
 </div></li>
 <li><div data-pos="77:5-78:1">
-Verify EMIT handlers are not invoked after VERIFY errors are reported
+Verify EMIT handlers are not invoked after ANALYZE errors are reported
 </div></li>
 </ul>
 </dd>
@@ -2208,7 +2378,7 @@ Batch Dispatch Across All Phases</h2>
 <dt><strong>OBJECTIVE:</strong></dt>
 <dd>
 Confirm each handler hook receives the full contexts array for
-INITIALIZE, ANALYZE, TRANSFORM, VERIFY, and EMIT
+INITIALIZE, RESOLVE, TRANSFORM, ANALYZE, and EMIT
 </dd>
 <dt><strong>VERIFICATION METHOD:</strong></dt>
 <dd>
@@ -2427,9 +2597,9 @@ CommonSpec Input Parsing</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="156:1-157:1" data-source-file="./verification/pipeline_vc.md">
-<p>Verify that each <a href="srs.html#TERM-COMMONSPEC" data-pos="156:18-156:37">srs: CommonSpec</a> annotation type produces
-the correct <a href="srs.html#TERM-IR" data-pos="156:75-156:111">srs:
-Intermediate Representation</a> record.</p>
+<p>Verify that each <a href="srs.html#TERM-COMMONSPEC" data-pos="156:18-156:37">&lt;CommonSpec&gt;</a> annotation type produces
+the correct <a href="srs.html#TERM-IR" data-pos="156:75-156:111">&lt;Intermediate Representation&gt;</a>
+record.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -2620,8 +2790,9 @@ Test
 Auto-generated PIDs match the type’s <code data-pos="216:42-216:54">pid_prefix</code> and <code data-pos="216:59-216:71">pid_format</code> (e.g., “HLR-001”)
 </div></li>
 <li><div data-pos="217:5-218:1">
-<a href="srs.html#TERM-COMPOSITE" data-pos="217:5-217:35">srs: Composite
-Object Type</a> objects receive hierarchical PIDs (e.g., “SRS-sec1.2”)
+<a href="srs.html#TERM-COMPOSITE" data-pos="217:5-217:35">&lt;Composite
+Object Type&gt;</a> objects receive hierarchical PIDs (e.g.,
+“SRS-sec1.2”)
 </div></li>
 <li><div data-pos="218:5-219:1">
 Explicit <code data-pos="218:14-218:20">@PID</code> annotations are
@@ -2639,7 +2810,7 @@ No duplicate PIDs exist across all specifications
 Create a document with typed objects lacking <code data-pos="210:50-210:56">@PID</code> annotations
 </div></li>
 <li><div data-pos="211:5-212:1">
-Execute pipeline through ANALYZE phase
+Execute pipeline through RESOLVE phase
 </div></li>
 <li><div data-pos="212:5-213:1">
 Query <code data-pos="212:11-212:29">spec_objects.pid</code> values and
@@ -2678,8 +2849,7 @@ Relation Type Inference</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="226:1-227:1" data-source-file="./verification/pipeline_vc.md">
-<p>Verify that relations are resolved with correct type inference and <a href="srs.html#TERM-SPECIFICITY" data-pos="226:68-226:96">srs:
-Specificity Scoring</a> scoring.</p>
+<p>Verify that relations are resolved with correct type inference and <a href="srs.html#TERM-SPECIFICITY" data-pos="226:68-226:96">&lt;Specificity Scoring&gt;</a> scoring.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -2719,7 +2889,7 @@ Unresolved relations have <code data-pos="242:31-242:50">is_unresolved = 1</code
 Create documents with relations matching different specificity levels
 </div></li>
 <li><div data-pos="234:5-235:1">
-Execute pipeline through ANALYZE phase
+Execute pipeline through RESOLVE phase
 </div></li>
 <li><div data-pos="235:5-236:1">
 Query <code data-pos="235:11-235:27">spec_relations</code> for resolved
@@ -2815,6 +2985,151 @@ HLR-PIPE-011</a>
 </dl>
 </div>
 </div>
+<div class="spec-object">
+<section id="VC-PIPE-013" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">VC-PIPE-013:
+Incremental Stale Relation Rebind</h2>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="270:1-271:1" data-source-file="./verification/pipeline_vc.md">
+<p>Verify that incremental rebuilds remove stale relation bindings when
+a target specification changes.</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm relation resolution is recomputed from current database state
+instead of preserving stale target references across incremental builds.
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="282:5-283:1">
+The old target binding is removed
+</div></li>
+<li><div data-pos="283:5-284:1">
+The relation is either rebound to the current valid target or marked
+unresolved
+</div></li>
+<li><div data-pos="284:5-285:1">
+No stale <code data-pos="284:14-284:26">target_ref</code> survives the
+rebuild
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="277:5-278:1">
+Build a two-document project with a relation from one document to a
+target object in another document
+</div></li>
+<li><div data-pos="278:5-279:1">
+Modify the target document so the previous target is no longer valid
+</div></li>
+<li><div data-pos="279:5-280:1">
+Rebuild incrementally and query <code data-pos="279:37-279:53">spec_relations</code>
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-PIPE-010" data-pos="286:17-286:34">srs:
+HLR-PIPE-010</a>
+,
+
+<a href="sdd.html#LLR-043" data-pos="286:36-286:48">sdd: LLR-043</a>
+,
+
+<a href="sdd.html#LLR-044" data-pos="286:50-286:62">sdd: LLR-044</a>
+,
+
+<a href="sdd.html#LLR-045" data-pos="286:64-286:76">sdd: LLR-045</a>
+,
+
+<a href="sdd.html#LLR-046" data-pos="286:78-286:90">sdd: LLR-046</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-PIPE-014" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">VC-PIPE-014:
+Incremental Cross-Document View Freshness</h2>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="291:1-292:1" data-source-file="./verification/pipeline_vc.md">
+<p>Verify that cross-document view output is regenerated when source
+data in another document changes.</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm output cache validation uses the assembled render input,
+including live view data, so cross-document view changes cannot serve
+stale output.
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="303:5-304:1">
+The affected output is regenerated
+</div></li>
+<li><div data-pos="304:5-305:1">
+The rendered view reflects the updated cross-document data
+</div></li>
+<li><div data-pos="305:5-306:1">
+The output cache does not suppress emission when the assembled render
+input changes
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="298:5-299:1">
+Build a multi-document project containing a view whose rendered content
+depends on another document
+</div></li>
+<li><div data-pos="299:5-300:1">
+Modify the source document data used by the view
+</div></li>
+<li><div data-pos="300:5-301:1">
+Rebuild incrementally and compare the emitted output
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-OUT-001" data-pos="307:17-307:33">srs:
+HLR-OUT-001</a>
+,
+
+<a href="srs.html#HLR-OUT-004" data-pos="307:35-307:51">srs:
+HLR-OUT-004</a>
+,
+
+<a href="srs.html#HLR-STOR-004" data-pos="307:53-307:70">srs:
+HLR-STOR-004</a>
+,
+
+<a href="sdd.html#LLR-049" data-pos="307:72-307:84">sdd: LLR-049</a>
+</dd>
+</dl>
+</div>
+</div>
 <h1 data-number="7" data-pos="1:1-2:1" data-source-file="./verification/storage_vc.md" id="SVC-001-sec7"><span class="header-section-number">7</span> Storage Verification Cases</h1>
 <div class="spec-object">
 <section id="VC-007" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
@@ -2823,7 +3138,7 @@ SQLite Persistence</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="5:1-6:1" data-source-file="./verification/storage_vc.md">
-<p>Verify data persists correctly in <a href="srs.html#TERM-SQLITE" data-pos="5:35-5:59">srs: SQLite Database</a> database.</p>
+<p>Verify data persists correctly in <a href="srs.html#TERM-SQLITE" data-pos="5:35-5:59">&lt;SQLite Database&gt;</a> database.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -2896,7 +3211,7 @@ Attribute Model</h2>
 <dd>
 Confirm
 
-<a href="srs.html#TERM-EAV" data-pos="28:22-28:40">srs: EAV Model</a>
+<a href="srs.html#TERM-EAV" data-pos="28:22-28:40">&lt;EAV Model&gt;</a>
 
 pattern
 
@@ -2974,8 +3289,8 @@ Build Cache</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="50:1-51:1" data-source-file="./verification/storage_vc.md">
-<p>Verify <a href="srs.html#TERM-30" data-pos="50:8-50:28">srs: Build
-Cache</a> tracks document changes.</p>
+<p>Verify <a href="srs.html#TERM-30" data-pos="50:8-50:28">&lt;Build
+Cache&gt;</a> tracks document changes.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -3037,8 +3352,8 @@ Output Cache</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="71:1-72:1" data-source-file="./verification/storage_vc.md">
-<p>Verify <a href="srs.html#TERM-31" data-pos="71:8-71:29">srs: Output
-Cache</a> prevents redundant generation.</p>
+<p>Verify <a href="srs.html#TERM-31" data-pos="71:8-71:29">&lt;Output
+Cache&gt;</a> prevents redundant generation.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -3165,7 +3480,7 @@ Pivot Views</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="114:1-115:1" data-source-file="./verification/storage_vc.md">
-<p>Verify per-object-type SQL views pivot <a href="srs.html#TERM-EAV" data-pos="114:40-114:58">srs: EAV Model</a> attributes into typed
+<p>Verify per-object-type SQL views pivot <a href="srs.html#TERM-EAV" data-pos="114:40-114:58">&lt;EAV Model&gt;</a> attributes into typed
 columns.</p>
 </div>
 </div>
@@ -3405,7 +3720,7 @@ Each code block with type prefix creates one record
 label extracted from syntax (e.g., “fig:label”)
 </div></li>
 <li><div data-pos="63:5-64:1">
-number assigned during <a href="srs.html#TERM-23" data-pos="63:28-63:47">srs: EMIT Phase</a> phase
+number assigned during <a href="srs.html#TERM-23" data-pos="63:28-63:47">&lt;EMIT Phase&gt;</a> phase
 </div></li>
 <li><div data-pos="64:5-65:1">
 parent_object_ref links to containing object
@@ -3473,7 +3788,7 @@ source_ref points to containing object
 target_text contains original link text
 </div></li>
 <li><div data-pos="87:5-88:1">
-target_ref populated during <a href="srs.html#TERM-20" data-pos="87:33-87:55">srs: ANALYZE Phase</a> phase
+target_ref populated during <a href="srs.html#TERM-20" data-pos="87:33-87:55">&lt;RESOLVE Phase&gt;</a> phase
 </div></li>
 </ul>
 </dd>
@@ -3516,14 +3831,15 @@ Views Container</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="94:1-95:1" data-source-file="./verification/types_vc.md">
-<p>Verify spec_views table stores generated content.</p>
+<p>Verify spec_views table stores view definitions and views render from
+live data.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>OBJECTIVE:</strong></dt>
 <dd>
-Confirm view code blocks create spec_view records
+Confirm view code blocks create spec_view records and render at EMIT
 </dd>
 <dt><strong>VERIFICATION METHOD:</strong></dt>
 <dd>
@@ -3532,17 +3848,19 @@ Test
 <dt><strong>PASS CRITERIA:</strong></dt>
 <dd>
 <ul>
-<li><div data-pos="106:5-107:1">
+<li><div data-pos="107:5-108:1">
 Each view code block creates one record
 </div></li>
-<li><div data-pos="107:5-108:1">
+<li><div data-pos="108:5-109:1">
 view_type_ref matches view type
 </div></li>
-<li><div data-pos="108:5-109:1">
-resolved_ast populated during <a href="srs.html#TERM-22" data-pos="108:35-108:59">srs: TRANSFORM Phase</a> phase
-</div></li>
 <li><div data-pos="109:5-110:1">
-resolved_data contains structured view data
+raw_ast preserves the view definition content
+</div></li>
+<li><div data-pos="110:5-111:1;111:5-112:1;112:5-113:1">
+View content is rendered live at EMIT from current database state
+(resolved_ast is populated only by view types that pre-render during <a href="srs.html#TERM-22" data-pos="112:5-112:29">&lt;TRANSFORM
+Phase&gt;</a>, e.g. abbreviations)
 </div></li>
 </ul>
 </dd>
@@ -3557,20 +3875,23 @@ code blocks
 Query spec_views table
 </div></li>
 <li><div data-pos="103:5-104:1">
-Verify view_type_ref, resolved_ast fields
+Verify view_type_ref, raw_ast fields
+</div></li>
+<li><div data-pos="104:5-105:1">
+Verify the emitted output contains the rendered view content
 </div></li>
 </ul>
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="srs.html#HLR-TYPE-004" data-pos="111:17-111:34">srs:
+<a href="srs.html#HLR-TYPE-004" data-pos="114:17-114:34">srs:
 HLR-TYPE-004</a>
 ,
 
-<a href="sdd.html#LLR-062" data-pos="111:36-111:48">sdd: LLR-062</a>
+<a href="sdd.html#LLR-062" data-pos="114:36-114:48">sdd: LLR-062</a>
 ,
 
-<a href="sdd.html#LLR-063" data-pos="111:50-111:62">sdd: LLR-063</a>
+<a href="sdd.html#LLR-063" data-pos="114:50-114:62">sdd: LLR-063</a>
 </dd>
 </dl>
 </div>
@@ -3581,7 +3902,7 @@ HLR-TYPE-004</a>
 Attributes Container</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="116:1-117:1" data-source-file="./verification/types_vc.md">
+<div data-pos="119:1-120:1" data-source-file="./verification/types_vc.md">
 <p>Verify spec_attribute_values table stores object properties.</p>
 </div>
 </div>
@@ -3598,16 +3919,16 @@ Test
 <dt><strong>PASS CRITERIA:</strong></dt>
 <dd>
 <ul>
-<li><div data-pos="128:5-129:1">
+<li><div data-pos="131:5-132:1">
 Each attribute line creates one record
 </div></li>
-<li><div data-pos="129:5-130:1">
+<li><div data-pos="132:5-133:1">
 owner_ref links to parent object
 </div></li>
-<li><div data-pos="130:5-131:1">
+<li><div data-pos="133:5-134:1">
 datatype matches attribute definition
 </div></li>
-<li><div data-pos="131:5-132:1">
+<li><div data-pos="134:5-135:1">
 Value stored in correct typed column
 </div></li>
 </ul>
@@ -3615,27 +3936,27 @@ Value stored in correct typed column
 <dt><strong>APPROACH:</strong></dt>
 <dd>
 <ul>
-<li><div data-pos="123:5-124:1">
+<li><div data-pos="126:5-127:1">
 Process document with &gt; status: draft, &gt; priority: 1 attributes
 </div></li>
-<li><div data-pos="124:5-125:1">
+<li><div data-pos="127:5-128:1">
 Query spec_attribute_values table
 </div></li>
-<li><div data-pos="125:5-126:1">
+<li><div data-pos="128:5-129:1">
 Verify name, datatype, typed value columns
 </div></li>
 </ul>
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="srs.html#HLR-TYPE-006" data-pos="133:17-133:34">srs:
+<a href="srs.html#HLR-TYPE-006" data-pos="136:17-136:34">srs:
 HLR-TYPE-006</a>
 ,
 
-<a href="sdd.html#LLR-066" data-pos="133:36-133:48">sdd: LLR-066</a>
+<a href="sdd.html#LLR-066" data-pos="136:36-136:48">sdd: LLR-066</a>
 ,
 
-<a href="sdd.html#LLR-067" data-pos="133:50-133:62">sdd: LLR-067</a>
+<a href="sdd.html#LLR-067" data-pos="136:50-136:62">sdd: LLR-067</a>
 </dd>
 </dl>
 </div>
@@ -3646,8 +3967,8 @@ HLR-TYPE-006</a>
 Validation</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="138:1-139:1" data-source-file="./verification/types_vc.md">
-<p>Verify verification views detect data integrity violations.</p>
+<div data-pos="141:1-142:1" data-source-file="./verification/types_vc.md">
+<p>Verify analyze queries detect data integrity violations.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -3663,31 +3984,31 @@ Test
 <dt><strong>PASS CRITERIA:</strong></dt>
 <dd>
 <ul>
-<li><div data-pos="151:5-152:1">
-<code data-pos="151:5-151:19">invalid_enum</code> or <code data-pos="151:23-151:37">invalid_cast</code> violation reported for
+<li><div data-pos="154:5-155:1">
+<code data-pos="154:5-154:19">invalid_enum</code> or <code data-pos="154:23-154:37">invalid_cast</code> violation reported for
 invalid enum input
 </div></li>
-<li><div data-pos="152:5-153:1">
-<code data-pos="152:5-152:23">missing_required</code> violation reported
+<li><div data-pos="155:5-156:1">
+<code data-pos="155:5-155:23">missing_required</code> violation reported
 for missing required data
 </div></li>
-<li><div data-pos="153:5-154:1">
-<code data-pos="153:5-153:24">dangling_relation</code> violation
+<li><div data-pos="156:5-157:1">
+<code data-pos="156:5-156:24">dangling_relation</code> violation
 reported for dangling references
 </div></li>
-<li><div data-pos="154:5-155:1">
-<code data-pos="154:5-154:29">traceability_vc_to_hlr</code>, <code data-pos="154:31-154:54">traceability_tr_to_vc</code>, and <code data-pos="154:60-154:84">traceability_hlr_to_vc</code> are reported
+<li><div data-pos="157:5-158:1">
+<code data-pos="157:5-157:29">traceability_vc_to_hlr</code>, <code data-pos="157:31-157:54">traceability_tr_to_vc</code>, and <code data-pos="157:60-157:84">traceability_hlr_to_vc</code> are reported
 deterministically for broken HLR-VC-TR chains (sw_docs model)
 </div></li>
-<li><div data-pos="155:5-156:1">
-<code data-pos="155:5-155:29">traceability_fd_to_csc</code> violation is
+<li><div data-pos="158:5-159:1">
+<code data-pos="158:5-158:29">traceability_fd_to_csc</code> violation is
 reported when an FD has no traceability link to a CSC
 </div></li>
-<li><div data-pos="156:5-157:1">
-<code data-pos="156:5-156:29">traceability_fd_to_csu</code> violation is
+<li><div data-pos="159:5-160:1">
+<code data-pos="159:5-159:29">traceability_fd_to_csu</code> violation is
 reported when an FD has no traceability link to a CSU
 </div></li>
-<li><div data-pos="157:5-158:1">
+<li><div data-pos="160:5-161:1">
 Error messages include file path and line number
 </div></li>
 </ul>
@@ -3695,30 +4016,99 @@ Error messages include file path and line number
 <dt><strong>APPROACH:</strong></dt>
 <dd>
 <ul>
-<li><div data-pos="145:5-146:1">
-Create document with invalid enum value (<code data-pos="145:46-145:60">invalid_enum</code> / <code data-pos="145:63-145:77">invalid_cast</code>)
-</div></li>
-<li><div data-pos="146:5-147:1">
-Create document with missing required attribute (<code data-pos="146:54-146:72">missing_required</code>)
-</div></li>
-<li><div data-pos="147:5-148:1">
-Create document with dangling relation (<code data-pos="147:45-147:64">dangling_relation</code>)
-</div></li>
 <li><div data-pos="148:5-149:1">
-Run VERIFY phase, check diagnostics
+Create document with invalid enum value (<code data-pos="148:46-148:60">invalid_enum</code> / <code data-pos="148:63-148:77">invalid_cast</code>)
+</div></li>
+<li><div data-pos="149:5-150:1">
+Create document with missing required attribute (<code data-pos="149:54-149:72">missing_required</code>)
+</div></li>
+<li><div data-pos="150:5-151:1">
+Create document with dangling relation (<code data-pos="150:45-150:64">dangling_relation</code>)
+</div></li>
+<li><div data-pos="151:5-152:1">
+Run ANALYZE phase, check diagnostics
 </div></li>
 </ul>
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="srs.html#HLR-TYPE-007" data-pos="159:17-159:34">srs:
+<a href="srs.html#HLR-TYPE-007" data-pos="162:17-162:34">srs:
 HLR-TYPE-007</a>
 ,
 
-<a href="sdd.html#LLR-068" data-pos="159:36-159:48">sdd: LLR-068</a>
+<a href="sdd.html#LLR-068" data-pos="162:36-162:48">sdd: LLR-068</a>
 ,
 
-<a href="sdd.html#LLR-069" data-pos="159:50-159:62">sdd: LLR-069</a>
+<a href="sdd.html#LLR-069" data-pos="162:50-162:62">sdd: LLR-069</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-INT-016" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">VC-INT-016:
+UTF-8 Label Slugification</h2>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="167:1-168:1" data-source-file="./verification/types_vc.md">
+<p>Verify that generated object labels transliterate UTF-8 titles into
+stable ASCII slugs.</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm object label generation produces deterministic cross-reference
+labels for titles containing accents, punctuation, and non-ASCII
+characters.
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="179:5-180:1">
+Accented characters are transliterated consistently
+</div></li>
+<li><div data-pos="180:5-181:1">
+Punctuation and whitespace normalize to stable slug separators
+</div></li>
+<li><div data-pos="181:5-182:1">
+Generated labels remain usable as <code data-pos="181:39-181:44">(#)</code> cross-reference targets
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="174:5-175:1">
+Process a document with typed headings containing UTF-8 characters
+</div></li>
+<li><div data-pos="175:5-176:1">
+Execute the pipeline through initialization and resolution
+</div></li>
+<li><div data-pos="176:5-177:1">
+Query generated <code data-pos="176:21-176:41">spec_objects.label</code>
+values
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-TYPE-002" data-pos="183:17-183:34">srs:
+HLR-TYPE-002</a>
+,
+
+<a href="sdd.html#LLR-057" data-pos="183:36-183:48">sdd: LLR-057</a>
+,
+
+<a href="sdd.html#LLR-058" data-pos="183:50-183:62">sdd: LLR-058</a>
+,
+
+<a href="sdd.html#LLR-059" data-pos="183:64-183:76">sdd: LLR-059</a>
 </dd>
 </dl>
 </div>
@@ -3732,8 +4122,8 @@ Model Type Loading</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="5:1-6:1" data-source-file="./verification/extension_vc.md">
-<p>Verify <a href="srs.html#TERM-38" data-pos="5:8-5:28">srs: Type
-Loader</a> discovers and loads model types.</p>
+<p>Verify <a href="srs.html#TERM-38" data-pos="5:8-5:28">&lt;Type
+Loader&gt;</a> discovers and loads model types.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -3792,8 +4182,8 @@ Model Directory Structure</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="26:1-27:1" data-source-file="./verification/extension_vc.md">
-<p>Verify <a href="srs.html#TERM-38" data-pos="26:8-26:28">srs: Type
-Loader</a> recognizes all type categories.</p>
+<p>Verify <a href="srs.html#TERM-38" data-pos="26:8-26:28">&lt;Type
+Loader&gt;</a> recognizes all type categories.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -4138,9 +4528,9 @@ View Generator Loading</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="139:1-140:1" data-source-file="./verification/extension_vc.md">
-<p>Verify <a href="srs.html#TERM-35" data-pos="139:8-139:26">srs: Data
-View</a> generators are loaded from model directories and injected into
-chart rendering.</p>
+<p>Verify <a href="srs.html#TERM-35" data-pos="139:8-139:26">&lt;Data
+View&gt;</a> generators are loaded from model directories and injected
+into chart rendering.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -4477,7 +4867,7 @@ Verification Descriptor</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="250:1-251:1" data-source-file="./verification/extension_vc.md">
-<p>Verify a verification view is a <code data-pos="250:33-250:54">kind=&quot;verification&quot;</code> descriptor forwarded
+<p>Verify a analyze query is a <code data-pos="250:29-250:50">kind=&quot;verification&quot;</code> descriptor forwarded
 to the host’s ordered policy_key registry with override and disabled
 semantics.</p>
 </div>
@@ -4758,7 +5148,8 @@ Float Numbering</h2>
 <dd>
 Confirm
 
-<a href="srs.html#TERM-28" data-pos="54:22-54:44">srs: Counter Group</a>
+<a href="srs.html#TERM-28" data-pos="54:22-54:44">&lt;Counter
+Group&gt;</a>
 
 share
 
@@ -5232,9 +5623,9 @@ Full-Text Search Indexing</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="206:1-207:1" data-source-file="./verification/output_vc.md">
-<p>Verify that <a href="srs.html#TERM-FTS" data-pos="206:13-206:38">srs:
-Full-Text Search</a> virtual tables are populated with specification
-content during the <a href="srs.html#TERM-23" data-pos="206:106-206:125">srs: EMIT Phase</a> phase.</p>
+<p>Verify that <a href="srs.html#TERM-FTS" data-pos="206:13-206:38">&lt;Full-Text Search&gt;</a> virtual tables are
+populated with specification content during the <a href="srs.html#TERM-23" data-pos="206:106-206:125">&lt;EMIT
+Phase&gt;</a> phase.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -5303,6 +5694,231 @@ HLR-OUT-007</a>
 </dl>
 </div>
 </div>
+<div class="spec-object">
+<section id="VC-OUT-008" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">VC-OUT-008:
+Heading Hierarchy Well-formedness</h2>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="230:1-231:1" data-source-file="./verification/output_vc.md">
+<p>Verify that header levels assembled across cross-file includes form a
+well-formed tree, that the renderer maps them to the correct heading
+depth, and that structurally invalid hierarchies are rejected before
+emission.</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm that the <code data-pos="232:31-232:56">object_broken_hierarchy</code> analyze query
+rejects skipped heading levels and orphaned roots, that a heading’s
+level survives deep include nesting unchanged, and that the assembler
+maps valid levels to the correct DOCX Heading style (siblings share a
+style, children nest one deeper, ascending returns to the shallower
+style).
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="242:5-243:1">
+Include nesting never changes a heading’s level; level is governed only
+by the markdown <code data-pos="242:93-242:96">#</code>-count
+</div></li>
+<li><div data-pos="243:5-244:1">
+Valid hierarchy maps to <code data-pos="243:29-243:43">Heading1/2/3</code> so that siblings share a
+style, each child is exactly one level deeper, and an ascent returns to
+the shallower style
+</div></li>
+<li><div data-pos="244:5-245:1">
+A skipped level raises an <code data-pos="244:31-244:56">object_broken_hierarchy</code> error naming the
+skipped level
+</div></li>
+<li><div data-pos="245:5-246:1">
+An orphaned root raises an <code data-pos="245:32-245:57">object_broken_hierarchy</code> error, including
+when the parent chapter is one include deep
+</div></li>
+<li><div data-pos="246:5-247:1">
+The contiguous control raises no <code data-pos="246:38-246:63">object_broken_hierarchy</code> diagnostic
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="237:5-238:1">
+Build a five-file-deep include chain mixing descents, an ascent (level 4
+back to level 2), and sibling chapters; generate DOCX and assert the
+<code data-pos="237:147-237:157">w:pStyle</code> of each heading in
+document order
+</div></li>
+<li><div data-pos="238:5-239:1">
+Build fixtures with a skipped level (<code data-pos="238:42-238:46">##</code> then <code data-pos="238:52-238:58">####</code>) and with an orphaned root (a
+document opening at level 3 with a shallower level-2 heading later,
+including the case where the chapter is one include deeper than the
+section)
+</div></li>
+<li><div data-pos="239:5-240:1">
+Build a contiguous multi-level control with an ascent
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-OUT-001" data-pos="248:17-248:33">srs:
+HLR-OUT-001</a>
+,
+
+<a href="srs.html#HLR-PIPE-008" data-pos="248:35-248:52">srs:
+HLR-PIPE-008</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-OUT-009" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">VC-OUT-009:
+Section Scope Termination</h2>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="253:1-254:1" data-source-file="./verification/output_vc.md">
+<p>Verify that a <code data-pos="253:15-253:21">----</code> thematic
+break closes the current section’s scope, is consumed from output, and
+that empty headings are rejected.</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm that a <code data-pos="255:29-255:35">----</code> truncates the
+enclosing spec object’s <code data-pos="255:74-255:84">end_line</code>
+(so trailing content/floats are contained by the parent), that the
+marker produces no horizontal rule in the DOCX, that content after the
+marker keeps its document position, and that an empty heading is
+reported by <code data-pos="255:300-255:325">object_broken_hierarchy</code>.
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="265:5-266:1">
+The section’s <code data-pos="265:19-265:29">end_line</code> ends at the
+last block before the <code data-pos="265:64-265:70">----</code>, not at
+the next header
+</div></li>
+<li><div data-pos="266:5-267:1">
+The DOCX contains no horizontal-rule paragraph for the consumed marker
+</div></li>
+<li><div data-pos="267:5-268:1">
+Content following the <code data-pos="267:27-267:33">----</code> renders
+in its original position
+</div></li>
+<li><div data-pos="268:5-269:1">
+An empty heading raises <code data-pos="268:29-268:54">object_broken_hierarchy</code> and the message
+directs the author to use <code data-pos="268:97-268:103">----</code>
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="260:5-261:1">
+Build a section containing body, a <code data-pos="260:40-260:46">----</code>, and trailing content; query <code data-pos="260:76-260:99">spec_objects.end_line</code> and assert it
+truncates at the marker
+</div></li>
+<li><div data-pos="261:5-262:1">
+Generate DOCX and assert no horizontal-rule border is emitted and the
+trailing content is still present in document order
+</div></li>
+<li><div data-pos="262:5-263:1">
+Build a fixture with an empty <code data-pos="262:35-262:39">##</code>
+heading and assert an <code data-pos="262:62-262:87">object_broken_hierarchy</code> error is raised
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-PIPE-012" data-pos="270:17-270:34">srs:
+HLR-PIPE-012</a>
+,
+
+<a href="srs.html#HLR-OUT-001" data-pos="270:36-270:52">srs:
+HLR-OUT-001</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="VC-OUT-010" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">VC-OUT-010:
+Cross-Format Heading Consistency</h2>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="275:1-276:1" data-source-file="./verification/output_vc.md">
+<p>Verify that LaTeX and DOCX render the same heading at the same depth,
+since both are produced from one assembled IR.</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>OBJECTIVE:</strong></dt>
+<dd>
+Confirm that a heading maps to the same depth in every output format — a
+section is <code data-pos="277:98-277:108">\section</code> in LaTeX and
+Heading2 in DOCX, never one nesting level deeper in one format than the
+other.
+</dd>
+<dt><strong>VERIFICATION METHOD:</strong></dt>
+<dd>
+Test
+</dd>
+<dt><strong>PASS CRITERIA:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="287:5-288:1">
+The number of headings matches across formats
+</div></li>
+<li><div data-pos="288:5-289:1">
+Each heading’s depth is identical in LaTeX and DOCX
+</div></li>
+</ul>
+</dd>
+<dt><strong>APPROACH:</strong></dt>
+<dd>
+<ul>
+<li><div data-pos="282:5-283:1">
+Build one multi-level fixture (chapter / section / subsection) to both
+LaTeX and DOCX
+</div></li>
+<li><div data-pos="283:5-284:1">
+Extract the ordered (depth, title) sequence from each: LaTeX <code data-pos="283:66-283:76">\chapter</code>/<code data-pos="283:77-283:87">\section</code>/<code data-pos="283:88-283:101">\subsection</code> -&gt; 1/2/3; DOCX
+Heading1/2/3 -&gt; 1/2/3
+</div></li>
+<li><div data-pos="284:5-285:1">
+Assert the two sequences are identical
+</div></li>
+</ul>
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="srs.html#HLR-OUT-001" data-pos="290:17-290:33">srs:
+HLR-OUT-001</a>
+,
+
+<a href="srs.html#HLR-OUT-004" data-pos="290:35-290:51">srs:
+HLR-OUT-004</a>
+</dd>
+</dl>
+</div>
+</div>
 <h1 data-number="11" data-pos="1:1-2:1" data-source-file="./verification/audit_vc.md" id="SVC-001-sec11"><span class="header-section-number">11</span> Audit &amp; Integrity
 Verification Cases</h1>
 <div class="spec-object">
@@ -5320,8 +5936,8 @@ and skips unchanged documents.</p>
 <dl>
 <dt><strong>OBJECTIVE:</strong></dt>
 <dd>
-Confirm that the build engine computes SHA1 hashes, caches them in <code data-pos="7:81-7:95">source_files</code>, and correctly distinguishes
-dirty from clean documents
+Confirm that the build engine computes SHA1 hashes, caches them as <code data-pos="7:81-7:94">build_graph</code> nodes, and correctly
+distinguishes dirty from clean documents
 </dd>
 <dt><strong>VERIFICATION METHOD:</strong></dt>
 <dd>
@@ -5337,11 +5953,11 @@ Unchanged documents produce cache hits (no re-parsing)
 Modified documents produce cache misses (full reprocessing)
 </div></li>
 <li><div data-pos="20:5-21:1">
-Hash values in <code data-pos="20:20-20:34">source_files</code> table
+Hash values in <code data-pos="20:20-20:33">build_graph</code> nodes
 match actual file content SHA1
 </div></li>
 <li><div data-pos="21:5-22:1">
-Hashes are not updated when VERIFY phase produces errors
+Hashes are not updated when ANALYZE phase produces errors
 </div></li>
 </ul>
 </dd>
@@ -5359,8 +5975,8 @@ Modify one document; rebuild and verify only the modified document is
 reprocessed
 </div></li>
 <li><div data-pos="15:5-16:1">
-Verify <code data-pos="15:12-15:26">source_files</code> table contains
-updated hash after successful build
+Verify the <code data-pos="15:16-15:29">build_graph</code> root node
+contains the updated hash after successful build
 </div></li>
 </ul>
 </dd>
@@ -5693,7 +6309,7 @@ in the SVC.</p>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-76
+81
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -5701,7 +6317,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -5727,7 +6343,7 @@ tests/e2e/pipeline/vc_002_01_handler_registration.md
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-34
+36
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -5735,7 +6351,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -5761,7 +6377,7 @@ Sourcepos Compat</h2>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-43
+46
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -5769,7 +6385,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -5796,7 +6412,7 @@ Not Found</h2>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-40
+38
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -5804,7 +6420,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -5823,1267 +6439,79 @@ Diagnostic</a>
 </div>
 </div>
 <div class="spec-object">
+<section id="TR-PIPE-013-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-PIPE-013-01: Pipe 013 01 Stale
+Relation Rebind</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+201
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/pipeline/vc_pipe_013_01_stale_relation_rebind.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-PIPE-013" data-pos="61:17-61:33">Incremental Stale Relation
+Rebind</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-PIPE-014-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-PIPE-014-01: Pipe 014 01 Stale
+View Cross Doc</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+258
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/pipeline/vc_pipe_014_01_stale_view_cross_doc.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-PIPE-014" data-pos="75:17-75:33">Incremental Cross-Document
+View Freshness</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
 <section id="TR-007-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
 <h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-007-01:
 007 01 Db Persistence</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-101
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/database/vc_007_01_db_persistence.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-007" data-pos="61:17-61:28">SQLite Persistence</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-008-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-008-01:
-008 01 Cast Datatype Matrix</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-85
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/casting/vc_008_01_cast_datatype_matrix.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-008" data-pos="75:17-75:28">EAV Attribute Model</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-008-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-008-02:
-008 02 Cast Negative</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-78
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/casting_negative/vc_008_02_cast_negative.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-008" data-pos="89:17-89:28">EAV Attribute Model</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-009-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-009-01:
-009 01 Incremental Cache</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-309
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/pipeline/vc_009_01_incremental_cache.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-009" data-pos="103:17-103:28">Build Cache</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-010-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-010-01:
-010 01 Incremental Multi Emit</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-777
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/pipeline/vc_010_01_incremental_multi_emit.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-010" data-pos="117:17-117:28">Output Cache</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-033-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-033-01:
-033 01 Eav Views</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-168
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/pivot/vc_033_01_eav_views.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-033" data-pos="131:17-131:28">EAV Pivot Views</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-013-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-013-01:
-013 01 Document Walker</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-86
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/internals/vc_013_01_document_walker.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-013" data-pos="145:17-145:28">Spec Objects Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-013-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-013-02:
-013 02 Syntax Parsing</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-110
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/syntax/vc_013_02_syntax_parsing.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-013" data-pos="159:17-159:28">Spec Objects Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-014-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-01:
-014 01 Float Syntax</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-96
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/floats/vc_014_01_float_syntax.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-014" data-pos="173:17-173:28">Spec Floats Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-014-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-02:
-014 02 Float Tables</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-39
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/floats/vc_014_02_float_tables.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-014" data-pos="187:17-187:28">Spec Floats Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-014-03" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-03:
-014 03 Float Figures</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-44
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/floats/vc_014_03_float_figures.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-014" data-pos="201:17-201:28">Spec Floats Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-014-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-04:
-014 04 Float Base</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-40
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/internals/vc_014_04_float_base.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-014" data-pos="215:17-215:28">Spec Floats Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-014-05" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-05:
-014 05 Spec Floats</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-38
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/internals/vc_014_05_spec_floats.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-014" data-pos="229:17-229:28">Spec Floats Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-014-06" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-06:
-014 06 Float Utilities</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-54
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/internals/vc_014_06_float_utilities.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-014" data-pos="243:17-243:28">Spec Floats Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-014-07" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-07:
-014 07 Emit Float</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-43
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/internals/vc_014_07_emit_float.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-014" data-pos="257:17-257:28">Spec Floats Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-014-08" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-08:
-014 08 Logger Paths</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-34
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/internals/vc_014_08_logger_paths.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-014" data-pos="271:17-271:28">Spec Floats Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-015-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-01:
-015 01 Relation Resolver</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-50
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/internals/vc_015_01_relation_resolver.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-015" data-pos="285:17-285:28">Spec Relations Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-015-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-02:
-015 02 Relation Edges</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-54
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/internals/vc_015_02_relation_edges.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-015" data-pos="299:17-299:28">Spec Relations Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-015-03" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-03:
-015 03 Links</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-105
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/relations/vc_015_03_links.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-015" data-pos="313:17-313:28">Spec Relations Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-015-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-04:
-015 04 Xref</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-49
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/relations/vc_015_04_xref.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-015" data-pos="327:17-327:28">Spec Relations Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-015-05" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-05:
-015 05 Citations</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-44
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/relations/vc_015_05_citations.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-015" data-pos="341:17-341:28">Spec Relations Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-015-06" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-06:
-015 06 Scoped Resolution</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-46
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/relations/vc_015_06_scoped_resolution.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-015" data-pos="355:17-355:28">Spec Relations Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-015-07" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-07:
-015 07 Attribute Scope Prefixes</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-52
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/relations/vc_015_07_attribute_scope_prefixes.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-015" data-pos="369:17-369:28">Spec Relations Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-015-08" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-08:
-015 08 Scoped Label Resolution</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-56
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/relations/vc_015_08_scoped_label_resolution.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-015" data-pos="383:17-383:28">Spec Relations Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-015-09" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-09:
-015 09 Section Xrefs</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-45
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/relations/vc_015_09_section_xrefs.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-015" data-pos="397:17-397:28">Spec Relations Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-015-10" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-10:
-015 10 Type Inference</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-57
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/relations/vc_015_10_type_inference.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-015" data-pos="411:17-411:28">Spec Relations Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-016-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-016-01:
-016 01 View Materializer</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-39
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/internals/vc_016_01_view_materializer.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-016" data-pos="425:17-425:28">Spec Views Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-016-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-016-02:
-016 02 View Utils</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-58
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/internals/vc_016_02_view_utils.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-016" data-pos="439:17-439:28">Spec Views Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-016-03" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-016-03:
-016 03 Inline Views</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-94
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/views/vc_016_03_inline_views.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-016" data-pos="453:17-453:28">Spec Views Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-016-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-016-04:
-016 04 View Render Characterization</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-47
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/views/vc_016_04_view_render_characterization.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-016" data-pos="467:17-467:28">Spec Views Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-017-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-017-01:
-017 01 Attribute Caster</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-38
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/internals/vc_017_01_attribute_caster.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-017" data-pos="481:17-481:28">Spec Attributes Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-017-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-017-02:
-017 02 Attribute Para Utils</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-41
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/internals/vc_017_02_attribute_para_utils.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-017" data-pos="495:17-495:28">Spec Attributes Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-017-03" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-017-03:
-017 03 Attr Dedup</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-137
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/sw_docs_types/vc_017_03_attr_dedup.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-017" data-pos="509:17-509:28">Spec Attributes Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-017-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-017-04:
-017 04 Syntax Attributes</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-96
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/syntax/vc_017_04_syntax_attributes.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-017" data-pos="523:17-523:28">Spec Attributes Container</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-018-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-01:
-018 01 Db Validation</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-55
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/database/vc_018_01_db_validation.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-018" data-pos="537:17-537:28">Type Validation</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-018-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-02:
-018 02 Verify Object Attrs</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-158
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/verify/vc_018_02_verify_object_attrs.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-018" data-pos="551:17-551:28">Type Validation</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-018-03" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-03:
-018 03 Verify Floats</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-114
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/verify/vc_018_03_verify_floats.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-018" data-pos="565:17-565:28">Type Validation</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-018-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-04:
-018 04 Verify Relations</h2>
 </section>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
@@ -7097,7 +6525,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7105,393 +6533,19 @@ Pass
 </dd>
 <dt><strong>TEST FILE:</strong></dt>
 <dd>
-tests/e2e/verify/vc_018_04_verify_relations.md
+tests/e2e/database/vc_007_01_db_persistence.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-018" data-pos="579:17-579:28">Type Validation</a>
+<a href="#VC-007" data-pos="89:17-89:28">SQLite Persistence</a>
 </dd>
 </dl>
 </div>
 </div>
 <div class="spec-object">
-<section id="TR-018-05" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-05:
-018 05 Verify Views</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-72
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/verify/vc_018_05_verify_views.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-018" data-pos="593:17-593:28">Type Validation</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-018-07" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-07:
-018 07 Verify Invalid Spec Type</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-62
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/verify/vc_018_07_verify_invalid_spec_type.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-018" data-pos="607:17-607:28">Type Validation</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-018-09" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-09:
-018 09 Verify Inherited Enum</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-52
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/verify/vc_018_09_verify_inherited_enum.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-018" data-pos="621:17-621:28">Type Validation</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-018-10" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-10:
-018 10 Verify Cast Failures</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-58
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/verify/vc_018_10_verify_cast_failures.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-018" data-pos="635:17-635:28">Type Validation</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-018-11" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-11:
-018 11 Verify Duplicate Pid</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-60
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/verify/vc_018_11_verify_duplicate_pid.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-018" data-pos="649:17-649:28">Type Validation</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-018-12" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-12:
-018 12 Verify Traceability Csu Fd</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-63
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/verify/vc_018_12_verify_traceability_csu_fd.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-018" data-pos="663:17-663:28">Type Validation</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-018-13" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-13:
-018 13 Verify Cast Multitype</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-68
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/verify/vc_018_13_verify_cast_multitype.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-018" data-pos="677:17-677:28">Type Validation</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-018-14" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-14:
-018 14 Verify Float Last Section</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-90
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/verify/vc_018_14_verify_float_last_section.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-018" data-pos="691:17-691:28">Type Validation</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-019-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-019-01:
-019 01 Preset Load Chain</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-80
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/preset/vc_019_01_preset_load_chain.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-019" data-pos="705:17-705:28">Model Type Loading</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-019-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-019-02:
-019 02 Sf Type</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-89
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/sw_docs_types/vc_019_02_sf_type.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-019" data-pos="719:17-719:28">Model Type Loading</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-019-03" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-019-03:
-019 03 Nfr Type</h2>
-</section>
-<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
-<dl>
-<dt><strong>DURATION MS:</strong></dt>
-<dd>
-124
-</dd>
-<dt><strong>EXECUTED BY:</strong></dt>
-<dd>
-E2E Test Runner
-</dd>
-<dt><strong>EXECUTION DATE:</strong></dt>
-<dd>
-2026-06-15
-</dd>
-<dt><strong>RESULT:</strong></dt>
-<dd>
-Pass
-</dd>
-<dt><strong>TEST FILE:</strong></dt>
-<dd>
-tests/e2e/sw_docs_types/vc_019_03_nfr_type.md
-</dd>
-<dt><strong>TRACEABILITY:</strong></dt>
-<dd>
-<a href="#VC-019" data-pos="733:17-733:28">Model Type Loading</a>
-</dd>
-</dl>
-</div>
-</div>
-<div class="spec-object">
-<section id="TR-019-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-019-04:
-019 04 Realizes Relation</h2>
+<section id="TR-008-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-008-01:
+008 01 Cast Datatype Matrix</h2>
 </section>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
@@ -7505,7 +6559,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7513,25 +6567,25 @@ Pass
 </dd>
 <dt><strong>TEST FILE:</strong></dt>
 <dd>
-tests/e2e/sw_docs_types/vc_019_04_realizes_relation.md
+tests/e2e/casting/vc_008_01_cast_datatype_matrix.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-019" data-pos="747:17-747:28">Model Type Loading</a>
+<a href="#VC-008" data-pos="103:17-103:28">EAV Attribute Model</a>
 </dd>
 </dl>
 </div>
 </div>
 <div class="spec-object">
-<section id="TR-019-05" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-019-05:
-019 05 Xref Decomposition</h2>
+<section id="TR-008-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-008-02:
+008 02 Cast Negative</h2>
 </section>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-72
+85
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -7539,7 +6593,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7547,25 +6601,25 @@ Pass
 </dd>
 <dt><strong>TEST FILE:</strong></dt>
 <dd>
-tests/e2e/sw_docs_types/vc_019_05_xref_decomposition.md
+tests/e2e/casting_negative/vc_008_02_cast_negative.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-019" data-pos="761:17-761:28">Model Type Loading</a>
+<a href="#VC-008" data-pos="117:17-117:28">EAV Attribute Model</a>
 </dd>
 </dl>
 </div>
 </div>
 <div class="spec-object">
-<section id="TR-019-06" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-019-06:
-019 06 Xref Dic</h2>
+<section id="TR-009-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-009-01:
+009 01 Incremental Cache</h2>
 </section>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-78
+321
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -7573,7 +6627,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7581,19 +6635,1413 @@ Pass
 </dd>
 <dt><strong>TEST FILE:</strong></dt>
 <dd>
-tests/e2e/sw_docs_types/vc_019_06_xref_dic.md
+tests/e2e/pipeline/vc_009_01_incremental_cache.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-019" data-pos="775:17-775:28">Model Type Loading</a>
+<a href="#VC-009" data-pos="131:17-131:28">Build Cache</a>
 </dd>
 </dl>
 </div>
 </div>
 <div class="spec-object">
-<section id="TR-020-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-020-01:
-020 01 Model Directory Structure</h2>
+<section id="TR-010-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-010-01:
+010 01 Incremental Multi Emit</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+773
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/pipeline/vc_010_01_incremental_multi_emit.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-010" data-pos="145:17-145:28">Output Cache</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-033-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-033-01:
+033 01 Eav Views</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+176
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/pivot/vc_033_01_eav_views.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-033" data-pos="159:17-159:28">EAV Pivot Views</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-013-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-013-01:
+013 01 Document Walker</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+91
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_013_01_document_walker.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-013" data-pos="173:17-173:28">Spec Objects Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-013-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-013-02:
+013 02 Syntax Parsing</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+119
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/syntax/vc_013_02_syntax_parsing.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-013" data-pos="187:17-187:28">Spec Objects Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-014-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-01:
+014 01 Float Syntax</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+105
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/floats/vc_014_01_float_syntax.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-014" data-pos="201:17-201:28">Spec Floats Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-014-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-02:
+014 02 Float Tables</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+70
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/floats/vc_014_02_float_tables.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-014" data-pos="215:17-215:28">Spec Floats Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-014-03" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-03:
+014 03 Float Figures</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+41
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/floats/vc_014_03_float_figures.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-014" data-pos="229:17-229:28">Spec Floats Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-014-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-04:
+014 04 Float Base</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+46
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_014_04_float_base.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-014" data-pos="243:17-243:28">Spec Floats Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-014-05" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-05:
+014 05 Spec Floats</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+44
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_014_05_spec_floats.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-014" data-pos="257:17-257:28">Spec Floats Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-014-06" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-06:
+014 06 Float Utilities</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+63
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_014_06_float_utilities.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-014" data-pos="271:17-271:28">Spec Floats Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-014-07" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-07:
+014 07 Emit Float</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+50
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_014_07_emit_float.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-014" data-pos="285:17-285:28">Spec Floats Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-014-08" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-014-08:
+014 08 Logger Paths</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+37
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_014_08_logger_paths.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-014" data-pos="299:17-299:28">Spec Floats Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-01:
+015 01 Relation Resolver</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+52
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_015_01_relation_resolver.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="313:17-313:28">Spec Relations Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-02:
+015 02 Relation Edges</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+59
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_015_02_relation_edges.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="327:17-327:28">Spec Relations Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-03" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-03:
+015 03 Links</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+108
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_03_links.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="341:17-341:28">Spec Relations Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-04:
+015 04 Xref</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+55
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_04_xref.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="355:17-355:28">Spec Relations Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-05" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-05:
+015 05 Citations</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+47
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_05_citations.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="369:17-369:28">Spec Relations Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-06" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-06:
+015 06 Scoped Resolution</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+49
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_06_scoped_resolution.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="383:17-383:28">Spec Relations Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-07" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-07:
+015 07 Attribute Scope Prefixes</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+56
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_07_attribute_scope_prefixes.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="397:17-397:28">Spec Relations Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-08" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-08:
+015 08 Scoped Label Resolution</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+63
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_08_scoped_label_resolution.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="411:17-411:28">Spec Relations Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-09" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-09:
+015 09 Section Xrefs</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+49
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_09_section_xrefs.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="425:17-425:28">Spec Relations Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-015-10" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-015-10:
+015 10 Type Inference</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+81
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/relations/vc_015_10_type_inference.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-015" data-pos="439:17-439:28">Spec Relations Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-016-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-016-01:
+016 01 View Render</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+43
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_016_01_view_render.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-016" data-pos="453:17-453:28">Spec Views Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-016-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-016-02:
+016 02 View Utils</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+41
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_016_02_view_utils.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-016" data-pos="467:17-467:28">Spec Views Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-016-03" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-016-03:
+016 03 Inline Views</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+101
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/views/vc_016_03_inline_views.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-016" data-pos="481:17-481:28">Spec Views Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-016-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-016-04:
+016 04 View Render Characterization</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+48
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/views/vc_016_04_view_render_characterization.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-016" data-pos="495:17-495:28">Spec Views Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-017-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-017-01:
+017 01 Attribute Caster</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+43
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_017_01_attribute_caster.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-017" data-pos="509:17-509:28">Spec Attributes Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-017-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-017-02:
+017 02 Attribute Para Utils</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+48
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_017_02_attribute_para_utils.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-017" data-pos="523:17-523:28">Spec Attributes Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-017-03" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-017-03:
+017 03 Attr Dedup</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+148
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sw_docs_types/vc_017_03_attr_dedup.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-017" data-pos="537:17-537:28">Spec Attributes Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-017-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-017-04:
+017 04 Syntax Attributes</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+106
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/syntax/vc_017_04_syntax_attributes.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-017" data-pos="551:17-551:28">Spec Attributes Container</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-01:
+018 01 Db Validation</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+56
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/database/vc_018_01_db_validation.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="565:17-565:28">Type Validation</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-02:
+018 02 Verify Object Attrs</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+163
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_02_verify_object_attrs.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="579:17-579:28">Type Validation</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-03" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-03:
+018 03 Verify Floats</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+116
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_03_verify_floats.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="593:17-593:28">Type Validation</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-04:
+018 04 Verify Relations</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+104
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_04_verify_relations.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="607:17-607:28">Type Validation</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-05" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-05:
+018 05 Verify Views</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+77
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_05_verify_views.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="621:17-621:28">Type Validation</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-07" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-07:
+018 07 Verify Invalid Spec Type</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+48
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_07_verify_invalid_spec_type.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="635:17-635:28">Type Validation</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-09" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-09:
+018 09 Verify Inherited Enum</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+50
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_09_verify_inherited_enum.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="649:17-649:28">Type Validation</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-10" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-10:
+018 10 Verify Cast Failures</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+51
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_10_verify_cast_failures.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="663:17-663:28">Type Validation</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-11" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-11:
+018 11 Verify Duplicate Pid</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+59
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_11_verify_duplicate_pid.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="677:17-677:28">Type Validation</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-12" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-12:
+018 12 Verify Traceability Csu Fd</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+65
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_12_verify_traceability_csu_fd.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="691:17-691:28">Type Validation</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-13" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-13:
+018 13 Verify Cast Multitype</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+83
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_13_verify_cast_multitype.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="705:17-705:28">Type Validation</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-018-14" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-018-14:
+018 14 Verify Float Last Section</h2>
 </section>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
@@ -7607,7 +8055,245 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/verify/vc_018_14_verify_float_last_section.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-018" data-pos="719:17-719:28">Type Validation</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-019-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-019-01:
+019 01 Preset Load Chain</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+86
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/preset/vc_019_01_preset_load_chain.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-019" data-pos="733:17-733:28">Model Type Loading</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-019-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-019-02:
+019 02 Sf Type</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+95
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sw_docs_types/vc_019_02_sf_type.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-019" data-pos="747:17-747:28">Model Type Loading</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-019-03" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-019-03:
+019 03 Nfr Type</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+130
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sw_docs_types/vc_019_03_nfr_type.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-019" data-pos="761:17-761:28">Model Type Loading</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-019-04" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-019-04:
+019 04 Realizes Relation</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+94
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sw_docs_types/vc_019_04_realizes_relation.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-019" data-pos="775:17-775:28">Model Type Loading</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-019-05" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-019-05:
+019 05 Xref Decomposition</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+77
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sw_docs_types/vc_019_05_xref_decomposition.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-019" data-pos="789:17-789:28">Model Type Loading</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-019-06" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-019-06:
+019 06 Xref Dic</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+87
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/sw_docs_types/vc_019_06_xref_dic.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-019" data-pos="803:17-803:28">Model Type Loading</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-020-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-020-01:
+020 01 Model Directory Structure</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+84
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7619,7 +8305,7 @@ tests/e2e/extension/vc_020_01_model_directory_structure.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-020" data-pos="789:17-789:28">Model Directory Structure</a>
+<a href="#VC-020" data-pos="817:17-817:28">Model Directory Structure</a>
 </dd>
 </dl>
 </div>
@@ -7641,7 +8327,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7653,7 +8339,7 @@ tests/e2e/extension/vc_021_01_handler_registration_interface.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-021" data-pos="803:17-803:28">Handler Registration
+<a href="#VC-021" data-pos="831:17-831:28">Handler Registration
 Interface</a>
 </dd>
 </dl>
@@ -7676,7 +8362,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7688,7 +8374,7 @@ tests/e2e/extension/vc_022_01_type_definition_schema.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-022" data-pos="817:17-817:28">Type Definition Schema</a>
+<a href="#VC-022" data-pos="845:17-845:28">Type Definition Schema</a>
 </dd>
 </dl>
 </div>
@@ -7702,7 +8388,7 @@ tests/e2e/extension/vc_022_01_type_definition_schema.md
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-33
+36
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -7710,7 +8396,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7722,7 +8408,7 @@ tests/e2e/extension/vc_023_01_model_path_resolution.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-023" data-pos="831:17-831:28">Model Path Resolution</a>
+<a href="#VC-023" data-pos="859:17-859:28">Model Path Resolution</a>
 </dd>
 </dl>
 </div>
@@ -7736,7 +8422,7 @@ tests/e2e/extension/vc_023_01_model_path_resolution.md
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-61
+65
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -7744,7 +8430,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7756,7 +8442,7 @@ tests/e2e/floats/vc_024_01_plantuml.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-024" data-pos="845:17-845:28">External Renderer
+<a href="#VC-024" data-pos="873:17-873:28">External Renderer
 Registration</a>
 </dd>
 </dl>
@@ -7771,7 +8457,7 @@ Registration</a>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-56
+63
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -7779,7 +8465,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7791,7 +8477,7 @@ tests/e2e/views/vc_025_02_view_registration.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-025" data-pos="859:17-859:28">Data View Generator
+<a href="#VC-025" data-pos="887:17-887:28">Data View Generator
 Loading</a>
 </dd>
 </dl>
@@ -7806,7 +8492,7 @@ Loading</a>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-138
+150
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -7814,7 +8500,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7826,7 +8512,7 @@ tests/e2e/sw_docs-tests/vc_025_03_traceability_matrix.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-025" data-pos="873:17-873:28">Data View Generator
+<a href="#VC-025" data-pos="901:17-901:28">Data View Generator
 Loading</a>
 </dd>
 </dl>
@@ -7841,7 +8527,7 @@ Loading</a>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-78
+86
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -7849,7 +8535,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7861,7 +8547,7 @@ tests/e2e/sw_docs-tests/vc_025_04_test_results_matrix.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-025" data-pos="887:17-887:28">Data View Generator
+<a href="#VC-025" data-pos="915:17-915:28">Data View Generator
 Loading</a>
 </dd>
 </dl>
@@ -7876,7 +8562,7 @@ Loading</a>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-51
+55
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -7884,7 +8570,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7896,7 +8582,7 @@ tests/e2e/sw_docs-tests/vc_025_05_traceability_matrix_block_empty.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-025" data-pos="901:17-901:28">Data View Generator
+<a href="#VC-025" data-pos="929:17-929:28">Data View Generator
 Loading</a>
 </dd>
 </dl>
@@ -7911,7 +8597,7 @@ Loading</a>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-60
+63
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -7919,7 +8605,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7931,7 +8617,7 @@ tests/e2e/sw_docs-tests/vc_025_06_traceability_matrix_textblock_empty.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-025" data-pos="915:17-915:28">Data View Generator
+<a href="#VC-025" data-pos="943:17-943:28">Data View Generator
 Loading</a>
 </dd>
 </dl>
@@ -7946,7 +8632,7 @@ Loading</a>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-60
+61
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -7954,7 +8640,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -7966,7 +8652,7 @@ tests/e2e/sw_docs-tests/vc_025_07_test_results_matrix_block_empty.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-025" data-pos="929:17-929:28">Data View Generator
+<a href="#VC-025" data-pos="957:17-957:28">Data View Generator
 Loading</a>
 </dd>
 </dl>
@@ -7981,7 +8667,7 @@ Loading</a>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-56
+62
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -7989,7 +8675,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8001,7 +8687,7 @@ tests/e2e/sw_docs-tests/vc_025_08_test_results_matrix_textblock_empty.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-025" data-pos="943:17-943:28">Data View Generator
+<a href="#VC-025" data-pos="971:17-971:28">Data View Generator
 Loading</a>
 </dd>
 </dl>
@@ -8016,7 +8702,7 @@ Loading</a>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-62
+69
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8024,7 +8710,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8036,7 +8722,7 @@ tests/e2e/sw_docs-tests/vc_025_09_test_execution_matrix.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-025" data-pos="957:17-957:28">Data View Generator
+<a href="#VC-025" data-pos="985:17-985:28">Data View Generator
 Loading</a>
 </dd>
 </dl>
@@ -8051,7 +8737,7 @@ Ctx</h2>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-36
+39
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8059,7 +8745,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8071,7 +8757,7 @@ tests/e2e/internals/vc_ext_009_01_canonical_ctx.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-EXT-009" data-pos="971:17-971:32">Canonical Hook
+<a href="#VC-EXT-009" data-pos="999:17-999:32">Canonical Hook
 Context</a>
 </dd>
 </dl>
@@ -8086,7 +8772,7 @@ Registry</h2>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-35
+38
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8094,7 +8780,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8106,7 +8792,7 @@ tests/e2e/extension/vc_ext_011_01_host_registry.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-EXT-011" data-pos="985:17-985:32">Descriptor and Role
+<a href="#VC-EXT-011" data-pos="1013:17-1013:32">Descriptor and Role
 Inference</a>
 </dd>
 </dl>
@@ -8121,7 +8807,7 @@ Card Render</h2>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-42
+46
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8129,7 +8815,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8141,7 +8827,7 @@ tests/e2e/extension/vc_ext_011_02_inherited_card_render.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-EXT-011" data-pos="999:17-999:32">Descriptor and Role
+<a href="#VC-EXT-011" data-pos="1027:17-1027:32">Descriptor and Role
 Inference</a>
 </dd>
 </dl>
@@ -8156,7 +8842,7 @@ Render Index</h2>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-47
+49
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8164,7 +8850,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8176,7 +8862,7 @@ tests/e2e/extension/vc_ext_011_03_float_render_index.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-EXT-011" data-pos="1013:17-1013:32">Descriptor and Role
+<a href="#VC-EXT-011" data-pos="1041:17-1041:32">Descriptor and Role
 Inference</a>
 </dd>
 </dl>
@@ -8191,7 +8877,7 @@ Float Hooks</h2>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-50
+51
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8199,7 +8885,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8211,7 +8897,7 @@ tests/e2e/extension/vc_ext_011_04_external_float_hooks.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-EXT-011" data-pos="1027:17-1027:32">Descriptor and Role
+<a href="#VC-EXT-011" data-pos="1055:17-1055:32">Descriptor and Role
 Inference</a>
 </dd>
 </dl>
@@ -8226,7 +8912,7 @@ Return Contracts</h2>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-46
+50
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8234,7 +8920,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8246,7 +8932,7 @@ tests/e2e/extension/vc_ext_011_05_hook_return_contracts.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-EXT-011" data-pos="1041:17-1041:32">Descriptor and Role
+<a href="#VC-EXT-011" data-pos="1069:17-1069:32">Descriptor and Role
 Inference</a>
 </dd>
 </dl>
@@ -8261,7 +8947,7 @@ Verification Descriptor</h2>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-36
+40
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8269,7 +8955,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8281,7 +8967,7 @@ tests/e2e/extension/vc_ext_012_01_verification_descriptor.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-EXT-012" data-pos="1055:17-1055:32">Verification
+<a href="#VC-EXT-012" data-pos="1083:17-1083:32">Verification
 Descriptor</a>
 </dd>
 </dl>
@@ -8296,7 +8982,7 @@ Descriptor</a>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-53
+72
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8304,7 +8990,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8316,7 +9002,7 @@ tests/e2e/internals/vc_027_01_float_numbering.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-027" data-pos="1069:17-1069:28">Float Numbering</a>
+<a href="#VC-027" data-pos="1097:17-1097:28">Float Numbering</a>
 </dd>
 </dl>
 </div>
@@ -8330,7 +9016,7 @@ tests/e2e/internals/vc_027_01_float_numbering.md
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-104
+115
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8338,7 +9024,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8350,7 +9036,7 @@ tests/e2e/output/vc_028_01_output_formats.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-028" data-pos="1083:17-1083:28">Multi-Format Output</a>
+<a href="#VC-028" data-pos="1111:17-1111:28">Multi-Format Output</a>
 </dd>
 </dl>
 </div>
@@ -8364,7 +9050,7 @@ tests/e2e/output/vc_028_01_output_formats.md
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-47
+49
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8372,7 +9058,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8384,7 +9070,7 @@ tests/e2e/output/vc_028_02_bibliography.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-028" data-pos="1097:17-1097:28">Multi-Format Output</a>
+<a href="#VC-028" data-pos="1125:17-1125:28">Multi-Format Output</a>
 </dd>
 </dl>
 </div>
@@ -8398,7 +9084,7 @@ tests/e2e/output/vc_028_02_bibliography.md
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-221
+242
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8406,7 +9092,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8418,7 +9104,7 @@ tests/e2e/ooxml/vc_029_01_ooxml_schema_validation.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-029" data-pos="1111:17-1111:28">DOCX Generation</a>
+<a href="#VC-029" data-pos="1139:17-1139:28">DOCX Generation</a>
 </dd>
 </dl>
 </div>
@@ -8432,7 +9118,7 @@ tests/e2e/ooxml/vc_029_01_ooxml_schema_validation.md
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-146
+145
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8440,7 +9126,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8452,7 +9138,7 @@ tests/e2e/ooxml/vc_029_02_ooxml_validator_selftest.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-029" data-pos="1125:17-1125:28">DOCX Generation</a>
+<a href="#VC-029" data-pos="1153:17-1153:28">DOCX Generation</a>
 </dd>
 </dl>
 </div>
@@ -8466,7 +9152,7 @@ tests/e2e/ooxml/vc_029_02_ooxml_validator_selftest.md
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-129
+149
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8474,7 +9160,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8486,7 +9172,7 @@ tests/e2e/ooxml/vc_029_03_caption_seq_cache.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-029" data-pos="1139:17-1139:28">DOCX Generation</a>
+<a href="#VC-029" data-pos="1167:17-1167:28">DOCX Generation</a>
 </dd>
 </dl>
 </div>
@@ -8500,7 +9186,7 @@ tests/e2e/ooxml/vc_029_03_caption_seq_cache.md
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-35
+36
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8508,7 +9194,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8520,7 +9206,7 @@ tests/e2e/output/vc_030_01_html_options.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-030" data-pos="1153:17-1153:28">HTML5 Generation</a>
+<a href="#VC-030" data-pos="1181:17-1181:28">HTML5 Generation</a>
 </dd>
 </dl>
 </div>
@@ -8534,7 +9220,7 @@ tests/e2e/output/vc_030_01_html_options.md
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-87
+95
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8542,7 +9228,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8554,7 +9240,7 @@ tests/e2e/webapp/vc_030_02_web_generation.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-030" data-pos="1167:17-1167:28">HTML5 Generation</a>
+<a href="#VC-030" data-pos="1195:17-1195:28">HTML5 Generation</a>
 </dd>
 </dl>
 </div>
@@ -8568,7 +9254,7 @@ tests/e2e/webapp/vc_030_02_web_generation.md
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-50
+53
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8576,7 +9262,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8588,7 +9274,7 @@ tests/e2e/webapp/vc_030_03_web_search.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-030" data-pos="1181:17-1181:28">HTML5 Generation</a>
+<a href="#VC-030" data-pos="1209:17-1209:28">HTML5 Generation</a>
 </dd>
 </dl>
 </div>
@@ -8602,7 +9288,7 @@ tests/e2e/webapp/vc_030_03_web_search.md
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-62
+41
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8610,7 +9296,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8622,7 +9308,7 @@ tests/e2e/internals/vc_031_01_assembler.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-031" data-pos="1195:17-1195:28">Document Assembly</a>
+<a href="#VC-031" data-pos="1223:17-1223:28">Document Assembly</a>
 </dd>
 </dl>
 </div>
@@ -8636,7 +9322,7 @@ tests/e2e/internals/vc_031_01_assembler.md
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-77
+82
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8644,7 +9330,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8656,7 +9342,7 @@ tests/e2e/floats/vc_032_01_caption_structure.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-032" data-pos="1209:17-1209:28">Float Resolution</a>
+<a href="#VC-032" data-pos="1237:17-1237:28">Float Resolution</a>
 </dd>
 </dl>
 </div>
@@ -8670,7 +9356,7 @@ Order</h2>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-98
+96
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8678,7 +9364,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8690,7 +9376,7 @@ tests/e2e/assembly/vc_out_001_01_assembly_order.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-OUT-001" data-pos="1223:17-1223:32">Document Assembly</a>
+<a href="#VC-OUT-001" data-pos="1251:17-1251:32">Document Assembly</a>
 </dd>
 </dl>
 </div>
@@ -8704,7 +9390,7 @@ Utils</h2>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-42
+46
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8712,7 +9398,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8724,7 +9410,7 @@ tests/e2e/internals/vc_out_004_01_render_utils.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-OUT-004" data-pos="1237:17-1237:32">Render Decoration</a>
+<a href="#VC-OUT-004" data-pos="1265:17-1265:32">Render Decoration</a>
 </dd>
 </dl>
 </div>
@@ -8738,7 +9424,7 @@ Handler</h2>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-50
+55
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8746,7 +9432,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8758,8 +9444,183 @@ tests/e2e/internals/vc_out_005_01_render_handler.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-OUT-005" data-pos="1251:17-1251:32">Spec Object Render
+<a href="#VC-OUT-005" data-pos="1279:17-1279:32">Spec Object Render
 Handler</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-OUT-008-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-OUT-008-01: Out 008 01 Heading
+Hierarchy</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+129
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/assembly/vc_out_008_01_heading_hierarchy.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-OUT-008" data-pos="1293:17-1293:32">Heading Hierarchy
+Well-formedness</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-OUT-008-02" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-OUT-008-02: Out 008 02 Broken
+Hierarchy</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+177
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/assembly/vc_out_008_02_broken_hierarchy.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-OUT-008" data-pos="1307:17-1307:32">Heading Hierarchy
+Well-formedness</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-OUT-009-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-OUT-009-01: Out 009 01 Section
+Close</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+102
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/assembly/vc_out_009_01_section_close.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-OUT-009" data-pos="1321:17-1321:32">Section Scope
+Termination</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-OUT-010-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-OUT-010-01: Out 010 01 Cross
+Format Levels</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+160
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/assembly/vc_out_010_01_cross_format_levels.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-OUT-010" data-pos="1335:17-1335:32">Cross-Format Heading
+Consistency</a>
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="TR-INT-016-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TR-INT-016-01: Int 016 01 Label
+Slugify</h2>
+</section>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DURATION MS:</strong></dt>
+<dd>
+48
+</dd>
+<dt><strong>EXECUTED BY:</strong></dt>
+<dd>
+E2E Test Runner
+</dd>
+<dt><strong>EXECUTION DATE:</strong></dt>
+<dd>
+2026-07-07
+</dd>
+<dt><strong>RESULT:</strong></dt>
+<dd>
+Pass
+</dd>
+<dt><strong>TEST FILE:</strong></dt>
+<dd>
+tests/e2e/internals/vc_int_016_01_label_slugify.md
+</dd>
+<dt><strong>TRACEABILITY:</strong></dt>
+<dd>
+<a href="#VC-INT-016" data-pos="1349:17-1349:32">UTF-8 Label
+Slugification</a>
 </dd>
 </dl>
 </div>
@@ -8773,7 +9634,7 @@ Over Env</h2>
 <dl>
 <dt><strong>DURATION MS:</strong></dt>
 <dd>
-56
+42
 </dd>
 <dt><strong>EXECUTED BY:</strong></dt>
 <dd>
@@ -8781,7 +9642,7 @@ E2E Test Runner
 </dd>
 <dt><strong>EXECUTION DATE:</strong></dt>
 <dd>
-2026-06-15
+2026-07-07
 </dd>
 <dt><strong>RESULT:</strong></dt>
 <dd>
@@ -8793,7 +9654,7 @@ tests/e2e/internals/vc_cfg_001_01_manifest_over_env.md
 </dd>
 <dt><strong>TRACEABILITY:</strong></dt>
 <dd>
-<a href="#VC-CFG-001" data-pos="1265:17-1265:32">Manifest-Only
+<a href="#VC-CFG-001" data-pos="1363:17-1363:32">Manifest-Only
 Configuration</a>
 </dd>
 </dl>

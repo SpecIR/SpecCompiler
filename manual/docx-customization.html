@@ -166,6 +166,71 @@ margin: 0 0.8em 0.2em -1.6em;
 vertical-align: middle;
 }
 .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 </head>
 <body>
@@ -283,43 +348,43 @@ keys:</p>
 </div>
 <a id="listing-src-docx-preset-structure" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Preset table structure</figcaption>
-<pre><code>return {
-    name = &quot;My Preset&quot;,
-    description = &quot;Custom document styles&quot;,
-
-    -- Page configuration
-    page = {
-        size = &quot;A4&quot;,              -- &quot;Letter&quot; or &quot;A4&quot;
-        orientation = &quot;portrait&quot;, -- &quot;portrait&quot; or &quot;landscape&quot;
-        margins = {
-            top = &quot;2.5cm&quot;,
-            bottom = &quot;2.5cm&quot;,
-            left = &quot;3cm&quot;,
-            right = &quot;2cm&quot;,
-        },
-    },
-
-    -- Paragraph styles (array of style definitions)
-    paragraph_styles = { ... },
-
-    -- Table styles (array of table style definitions)
-    table_styles = { ... },
-
-    -- Caption formats per float type
-    captions = { ... },
-
-    -- Document settings
-    settings = {
-        default_tab_stop = 720,   -- In twips (720 = 0.5 inch)
-        language = &quot;en-US&quot;,
-    },
-
-    -- Optional: inherit from another preset
-    extends = {
-        template = &quot;default&quot;,     -- Base template
-        preset = &quot;base&quot;,          -- Base preset name
-    },
-}</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;My Preset&quot;</span><span class="op">,</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span> <span class="op">=</span> <span class="st">&quot;Custom document styles&quot;</span><span class="op">,</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Page configuration</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">page</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">size</span> <span class="op">=</span> <span class="st">&quot;A4&quot;</span><span class="op">,</span>              <span class="co">-- &quot;Letter&quot; or &quot;A4&quot;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">orientation</span> <span class="op">=</span> <span class="st">&quot;portrait&quot;</span><span class="op">,</span> <span class="co">-- &quot;portrait&quot; or &quot;landscape&quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">margins</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>            <span class="va">top</span> <span class="op">=</span> <span class="st">&quot;2.5cm&quot;</span><span class="op">,</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            <span class="va">bottom</span> <span class="op">=</span> <span class="st">&quot;2.5cm&quot;</span><span class="op">,</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>            <span class="va">left</span> <span class="op">=</span> <span class="st">&quot;3cm&quot;</span><span class="op">,</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>            <span class="va">right</span> <span class="op">=</span> <span class="st">&quot;2cm&quot;</span><span class="op">,</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="op">},</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Paragraph styles (array of style definitions)</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="va">paragraph_styles</span> <span class="op">=</span> <span class="op">{</span> <span class="op">...</span> <span class="op">},</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Table styles (array of table style definitions)</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="va">table_styles</span> <span class="op">=</span> <span class="op">{</span> <span class="op">...</span> <span class="op">},</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Caption formats per float type</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="va">captions</span> <span class="op">=</span> <span class="op">{</span> <span class="op">...</span> <span class="op">},</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Document settings</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="va">settings</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        <span class="va">default_tab_stop</span> <span class="op">=</span> <span class="dv">720</span><span class="op">,</span>   <span class="co">-- In twips (720 = 0.5 inch)</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        <span class="va">language</span> <span class="op">=</span> <span class="st">&quot;en-US&quot;</span><span class="op">,</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Optional: inherit from another preset</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="va">extends</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        <span class="va">template</span> <span class="op">=</span> <span class="st">&quot;default&quot;</span><span class="op">,</span>     <span class="co">-- Base template</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        <span class="va">preset</span> <span class="op">=</span> <span class="st">&quot;base&quot;</span><span class="op">,</span>          <span class="co">-- Base preset name</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <h2 data-number="3.2" data-pos="76:1-77:1" id="paragraph-style-fields"><span class="header-section-number">3.2</span> Paragraph Style Fields</h2>
 <a id="csv-tbl-docx-paragraph-style" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Paragraph style fields</figcaption>
@@ -446,79 +511,79 @@ Heading 2, etc.)</td>
 <h2 data-number="3.3" data-pos="156:1-157:1" id="paragraph-style-example"><span class="header-section-number">3.3</span> Paragraph Style Example</h2>
 <a id="listing-src-docx-paragraph-styles" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Paragraph style definitions</figcaption>
-<pre><code>paragraph_styles = {
-    {
-        id = &quot;Normal&quot;,
-        name = &quot;Normal&quot;,
-        font = { name = &quot;Calibri&quot;, size = 11 },
-        spacing = { line = 1.15, after = 8 },
-        alignment = &quot;left&quot;,
-    },
-    {
-        id = &quot;Heading1&quot;,
-        name = &quot;Heading 1&quot;,
-        based_on = &quot;Normal&quot;,
-        next = &quot;Normal&quot;,
-        font = { name = &quot;Calibri Light&quot;, size = 16, color = &quot;2F5496&quot; },
-        spacing = { before = 12, after = 0, line = 1.15 },
-        keep_next = true,
-        outline_level = 0,
-    },
-    {
-        id = &quot;Caption&quot;,
-        name = &quot;Caption&quot;,
-        based_on = &quot;Normal&quot;,
-        font = { name = &quot;Calibri&quot;, size = 9, italic = true },
-        spacing = { before = 0, after = 10, line = 1.15 },
-    },
-}</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">paragraph_styles</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;Normal&quot;</span><span class="op">,</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;Normal&quot;</span><span class="op">,</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">font</span> <span class="op">=</span> <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;Calibri&quot;</span><span class="op">,</span> <span class="va">size</span> <span class="op">=</span> <span class="dv">11</span> <span class="op">},</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">spacing</span> <span class="op">=</span> <span class="op">{</span> <span class="va">line</span> <span class="op">=</span> <span class="dv">1.15</span><span class="op">,</span> <span class="va">after</span> <span class="op">=</span> <span class="dv">8</span> <span class="op">},</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">alignment</span> <span class="op">=</span> <span class="st">&quot;left&quot;</span><span class="op">,</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;Heading1&quot;</span><span class="op">,</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;Heading 1&quot;</span><span class="op">,</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">based_on</span> <span class="op">=</span> <span class="st">&quot;Normal&quot;</span><span class="op">,</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="fu">next</span> <span class="op">=</span> <span class="st">&quot;Normal&quot;</span><span class="op">,</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">font</span> <span class="op">=</span> <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;Calibri Light&quot;</span><span class="op">,</span> <span class="va">size</span> <span class="op">=</span> <span class="dv">16</span><span class="op">,</span> <span class="va">color</span> <span class="op">=</span> <span class="st">&quot;2F5496&quot;</span> <span class="op">},</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">spacing</span> <span class="op">=</span> <span class="op">{</span> <span class="va">before</span> <span class="op">=</span> <span class="dv">12</span><span class="op">,</span> <span class="va">after</span> <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> <span class="va">line</span> <span class="op">=</span> <span class="dv">1.15</span> <span class="op">},</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">keep_next</span> <span class="op">=</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">outline_level</span> <span class="op">=</span> <span class="dv">0</span><span class="op">,</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;Caption&quot;</span><span class="op">,</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;Caption&quot;</span><span class="op">,</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">based_on</span> <span class="op">=</span> <span class="st">&quot;Normal&quot;</span><span class="op">,</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">font</span> <span class="op">=</span> <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;Calibri&quot;</span><span class="op">,</span> <span class="va">size</span> <span class="op">=</span> <span class="dv">9</span><span class="op">,</span> <span class="va">italic</span> <span class="op">=</span> <span class="kw">true</span> <span class="op">},</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="va">spacing</span> <span class="op">=</span> <span class="op">{</span> <span class="va">before</span> <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> <span class="va">after</span> <span class="op">=</span> <span class="dv">10</span><span class="op">,</span> <span class="va">line</span> <span class="op">=</span> <span class="dv">1.15</span> <span class="op">},</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <h2 data-number="3.4" data-pos="187:1-188:1" id="table-styles"><span class="header-section-number">3.4</span> Table Styles</h2>
 <a id="listing-src-docx-table-styles" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Table style definition</figcaption>
-<pre><code>table_styles = {
-    {
-        id = &quot;TableGrid&quot;,
-        name = &quot;Table Grid&quot;,
-        borders = {
-            top    = { style = &quot;single&quot;, width = 0.5, color = &quot;000000&quot; },
-            bottom = { style = &quot;single&quot;, width = 0.5, color = &quot;000000&quot; },
-            left   = { style = &quot;single&quot;, width = 0.5, color = &quot;000000&quot; },
-            right  = { style = &quot;single&quot;, width = 0.5, color = &quot;000000&quot; },
-            inside_h = { style = &quot;single&quot;, width = 0.5, color = &quot;000000&quot; },
-            inside_v = { style = &quot;single&quot;, width = 0.5, color = &quot;000000&quot; },
-        },
-        cell_margins = {
-            top = &quot;0.05in&quot;,
-            bottom = &quot;0.05in&quot;,
-            left = &quot;0.08in&quot;,
-            right = &quot;0.08in&quot;,
-        },
-        autofit = true,
-    },
-}</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">table_styles</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;TableGrid&quot;</span><span class="op">,</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;Table Grid&quot;</span><span class="op">,</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">borders</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>            <span class="va">top</span>    <span class="op">=</span> <span class="op">{</span> <span class="va">style</span> <span class="op">=</span> <span class="st">&quot;single&quot;</span><span class="op">,</span> <span class="va">width</span> <span class="op">=</span> <span class="dv">0.5</span><span class="op">,</span> <span class="va">color</span> <span class="op">=</span> <span class="st">&quot;000000&quot;</span> <span class="op">},</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>            <span class="va">bottom</span> <span class="op">=</span> <span class="op">{</span> <span class="va">style</span> <span class="op">=</span> <span class="st">&quot;single&quot;</span><span class="op">,</span> <span class="va">width</span> <span class="op">=</span> <span class="dv">0.5</span><span class="op">,</span> <span class="va">color</span> <span class="op">=</span> <span class="st">&quot;000000&quot;</span> <span class="op">},</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>            <span class="va">left</span>   <span class="op">=</span> <span class="op">{</span> <span class="va">style</span> <span class="op">=</span> <span class="st">&quot;single&quot;</span><span class="op">,</span> <span class="va">width</span> <span class="op">=</span> <span class="dv">0.5</span><span class="op">,</span> <span class="va">color</span> <span class="op">=</span> <span class="st">&quot;000000&quot;</span> <span class="op">},</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>            <span class="va">right</span>  <span class="op">=</span> <span class="op">{</span> <span class="va">style</span> <span class="op">=</span> <span class="st">&quot;single&quot;</span><span class="op">,</span> <span class="va">width</span> <span class="op">=</span> <span class="dv">0.5</span><span class="op">,</span> <span class="va">color</span> <span class="op">=</span> <span class="st">&quot;000000&quot;</span> <span class="op">},</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>            <span class="va">inside_h</span> <span class="op">=</span> <span class="op">{</span> <span class="va">style</span> <span class="op">=</span> <span class="st">&quot;single&quot;</span><span class="op">,</span> <span class="va">width</span> <span class="op">=</span> <span class="dv">0.5</span><span class="op">,</span> <span class="va">color</span> <span class="op">=</span> <span class="st">&quot;000000&quot;</span> <span class="op">},</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>            <span class="va">inside_v</span> <span class="op">=</span> <span class="op">{</span> <span class="va">style</span> <span class="op">=</span> <span class="st">&quot;single&quot;</span><span class="op">,</span> <span class="va">width</span> <span class="op">=</span> <span class="dv">0.5</span><span class="op">,</span> <span class="va">color</span> <span class="op">=</span> <span class="st">&quot;000000&quot;</span> <span class="op">},</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">},</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">cell_margins</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>            <span class="va">top</span> <span class="op">=</span> <span class="st">&quot;0.05in&quot;</span><span class="op">,</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>            <span class="va">bottom</span> <span class="op">=</span> <span class="st">&quot;0.05in&quot;</span><span class="op">,</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>            <span class="va">left</span> <span class="op">=</span> <span class="st">&quot;0.08in&quot;</span><span class="op">,</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>            <span class="va">right</span> <span class="op">=</span> <span class="st">&quot;0.08in&quot;</span><span class="op">,</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">},</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">autofit</span> <span class="op">=</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <h2 data-number="3.5" data-pos="213:1-214:1" id="caption-configuration"><span class="header-section-number">3.5</span> Caption Configuration</h2>
 <a id="listing-src-docx-captions" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Caption configuration per float type</figcaption>
-<pre><code>captions = {
-    figure = {
-        template = &quot;{prefix} {number}: {title}&quot;,
-        prefix = &quot;Figure&quot;,
-        separator = &quot;: &quot;,
-        style = &quot;Caption&quot;,
-    },
-    table = {
-        template = &quot;{prefix} {number}: {title}&quot;,
-        prefix = &quot;Table&quot;,
-        separator = &quot;: &quot;,
-        style = &quot;Caption&quot;,
-    },
-    listing = {
-        template = &quot;{prefix} {number}: {title}&quot;,
-        prefix = &quot;Listing&quot;,
-        separator = &quot;: &quot;,
-        style = &quot;Caption&quot;,
-    },
-}</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="va">captions</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">figure</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">template</span> <span class="op">=</span> <span class="st">&quot;{prefix} {number}: {title}&quot;</span><span class="op">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">prefix</span> <span class="op">=</span> <span class="st">&quot;Figure&quot;</span><span class="op">,</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">separator</span> <span class="op">=</span> <span class="st">&quot;: &quot;</span><span class="op">,</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">style</span> <span class="op">=</span> <span class="st">&quot;Caption&quot;</span><span class="op">,</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">table</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">template</span> <span class="op">=</span> <span class="st">&quot;{prefix} {number}: {title}&quot;</span><span class="op">,</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">prefix</span> <span class="op">=</span> <span class="st">&quot;Table&quot;</span><span class="op">,</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">separator</span> <span class="op">=</span> <span class="st">&quot;: &quot;</span><span class="op">,</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">style</span> <span class="op">=</span> <span class="st">&quot;Caption&quot;</span><span class="op">,</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">listing</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">template</span> <span class="op">=</span> <span class="st">&quot;{prefix} {number}: {title}&quot;</span><span class="op">,</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">prefix</span> <span class="op">=</span> <span class="st">&quot;Listing&quot;</span><span class="op">,</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">separator</span> <span class="op">=</span> <span class="st">&quot;: &quot;</span><span class="op">,</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">style</span> <span class="op">=</span> <span class="st">&quot;Caption&quot;</span><span class="op">,</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <h2 data-number="3.6" data-pos="238:1-239:1" id="preset-inheritance"><span class="header-section-number">3.6</span>
 Preset Inheritance</h2>
 <div data-pos="240:1-241:1">
@@ -527,32 +592,32 @@ merges with the base, with child values taking precedence:</p>
 </div>
 <a id="listing-src-docx-preset-extends" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Preset inheritance</figcaption>
-<pre><code>-- models/mymodel/styles/academic/preset.lua
-return {
-    name = &quot;Academic&quot;,
-    description = &quot;Academic paper styles&quot;,
-
-    extends = {
-        template = &quot;default&quot;,    -- Base template
-        preset = &quot;default&quot;,      -- Base preset name
-    },
-
-    -- Override only what changes
-    page = {
-        size = &quot;A4&quot;,
-        margins = { top = &quot;2.5cm&quot;, bottom = &quot;2.5cm&quot;, left = &quot;3cm&quot;, right = &quot;2cm&quot; },
-    },
-
-    paragraph_styles = {
-        {
-            id = &quot;Normal&quot;,
-            name = &quot;Normal&quot;,
-            font = { name = &quot;Times New Roman&quot;, size = 12 },
-            spacing = { line = 1.5, after = 0 },
-            alignment = &quot;both&quot;,   -- Justified
-        },
-    },
-}</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- models/mymodel/styles/academic/preset.lua</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;Academic&quot;</span><span class="op">,</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">description</span> <span class="op">=</span> <span class="st">&quot;Academic paper styles&quot;</span><span class="op">,</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">extends</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">template</span> <span class="op">=</span> <span class="st">&quot;default&quot;</span><span class="op">,</span>    <span class="co">-- Base template</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">preset</span> <span class="op">=</span> <span class="st">&quot;default&quot;</span><span class="op">,</span>      <span class="co">-- Base preset name</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Override only what changes</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="va">page</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">size</span> <span class="op">=</span> <span class="st">&quot;A4&quot;</span><span class="op">,</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">margins</span> <span class="op">=</span> <span class="op">{</span> <span class="va">top</span> <span class="op">=</span> <span class="st">&quot;2.5cm&quot;</span><span class="op">,</span> <span class="va">bottom</span> <span class="op">=</span> <span class="st">&quot;2.5cm&quot;</span><span class="op">,</span> <span class="va">left</span> <span class="op">=</span> <span class="st">&quot;3cm&quot;</span><span class="op">,</span> <span class="va">right</span> <span class="op">=</span> <span class="st">&quot;2cm&quot;</span> <span class="op">},</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="va">paragraph_styles</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>            <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;Normal&quot;</span><span class="op">,</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>            <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;Normal&quot;</span><span class="op">,</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>            <span class="va">font</span> <span class="op">=</span> <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;Times New Roman&quot;</span><span class="op">,</span> <span class="va">size</span> <span class="op">=</span> <span class="dv">12</span> <span class="op">},</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>            <span class="va">spacing</span> <span class="op">=</span> <span class="op">{</span> <span class="va">line</span> <span class="op">=</span> <span class="dv">1.5</span><span class="op">,</span> <span class="va">after</span> <span class="op">=</span> <span class="dv">0</span> <span class="op">},</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>            <span class="va">alignment</span> <span class="op">=</span> <span class="st">&quot;both&quot;</span><span class="op">,</span>   <span class="co">-- Justified</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        <span class="op">},</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div data-pos="271:1-272:1">
 <p>The loader detects circular dependencies and reports them as
 errors.</p>
@@ -669,27 +734,27 @@ Postprocessor</h2>
 </div>
 <a id="listing-src-docx-custom-postprocessor" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Custom DOCX postprocessor</figcaption>
-<pre><code>local M = {}
-
-function M.process_document(content, config, log)
-    local modified = content
-
-    -- Example: Add custom watermark text to every paragraph
-    -- (Real implementations would use proper OOXML patterns)
-
-    log.debug(&quot;[MYMODEL-POST] Processing document.xml&quot;)
-    return modified
-end
-
-function M.process_styles(content, log, config)
-    local modified = content
-
-    -- Example: Inject a custom paragraph style
-    log.debug(&quot;[MYMODEL-POST] Processing styles.xml&quot;)
-    return modified
-end
-
-return M</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">local</span> <span class="cn">M</span> <span class="op">=</span> <span class="op">{}</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="cn">M</span><span class="op">.</span>process_document<span class="op">(</span><span class="va">content</span><span class="op">,</span> <span class="va">config</span><span class="op">,</span> <span class="va">log</span><span class="op">)</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">local</span> <span class="va">modified</span> <span class="op">=</span> <span class="va">content</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Example: Add custom watermark text to every paragraph</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- (Real implementations would use proper OOXML patterns)</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="va">log</span><span class="op">.</span>debug<span class="op">(</span><span class="st">&quot;[MYMODEL-POST] Processing document.xml&quot;</span><span class="op">)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">modified</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="cn">M</span><span class="op">.</span>process_styles<span class="op">(</span><span class="va">content</span><span class="op">,</span> <span class="va">log</span><span class="op">,</span> <span class="va">config</span><span class="op">)</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">local</span> <span class="va">modified</span> <span class="op">=</span> <span class="va">content</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">-- Example: Inject a custom paragraph style</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="va">log</span><span class="op">.</span>debug<span class="op">(</span><span class="st">&quot;[MYMODEL-POST] Processing styles.xml&quot;</span><span class="op">)</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">modified</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="cn">M</span></span></code></pre></div>
 <h2 data-number="4.4" data-pos="359:1-360:1" id="the-config-parameter"><span class="header-section-number">4.4</span>
 The <code data-pos="359:9-359:17">config</code> Parameter</h2>
 <div data-pos="361:1-362:1">
@@ -785,15 +850,15 @@ generation. Use them when you need to manipulate the final XML directly
 <h2 data-number="6.1" data-pos="402:1-403:1" id="docx-specific-settings"><span class="header-section-number">6.1</span> DOCX-Specific Settings</h2>
 <a id="listing-src-docx-project-config" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> DOCX configuration in project.yaml</figcaption>
-<pre><code># Output format entry
-outputs:
-  - format: docx
-    path: build/docx/{spec_id}.docx
-
-# DOCX-specific configuration
-docx:
-  preset: default              # Style preset name
-  # reference_doc: assets/reference.docx  # Custom reference (overrides preset)</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Output format entry</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">outputs</span><span class="kw">:</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">format</span><span class="kw">:</span><span class="at"> docx</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">path</span><span class="kw">:</span><span class="at"> build/docx/{spec_id}.docx</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># DOCX-specific configuration</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">docx</span><span class="kw">:</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">preset</span><span class="kw">:</span><span class="at"> default</span><span class="co">              # Style preset name</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">  # reference_doc: assets/reference.docx  # Custom reference (overrides preset)</span></span></code></pre></div>
 <h2 data-number="6.2" data-pos="416:1-417:1" id="configuration-precedence"><span class="header-section-number">6.2</span> Configuration Precedence</h2>
 <div data-pos="418:1-423:1">
 <ol type="1">
@@ -843,7 +908,7 @@ and update the cache.
 </div>
 <a id="listing-src-docx-force-reference" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Force reference document regeneration</figcaption>
-<pre><code>rm -f build/reference.docx
-./bin/speccompiler-core</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-f</span> build/reference.docx</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./bin/speccompiler-core</span></span></code></pre></div>
 </body>
 </html>

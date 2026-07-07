@@ -266,21 +266,20 @@ a document processing pipeline for structured specifications.</p>
 </div>
 <div data-pos="9:1-10:1">
 <p>The document is organized in two parts. The first part defines the
-SpecIR data model, the six core types that the <a href="#TERM-15" data-pos="9:115-9:132">Pipeline</a> operates on. The second part
+SpecIR data model, the six core types that the <a href="#TERM-15" data-pos="9:115-9:132">&lt;Pipeline&gt;</a> operates on. The second part
 specifies the functional requirements, grouped into System Features (<a href="#SF-001" data-pos="9:231-9:242">Pipeline Execution</a> through <a href="#SF-006" data-pos="9:251-9:262">Audit and Integrity</a>), each
 decomposed into High-Level Requirements.</p>
 </div>
 <h1 data-number="2" data-pos="3:1-4:1" data-source-file="./dic.md" id="SRS-001-sec2"><span class="header-section-number">2</span> SpecIR
 Types</h1>
 <div data-pos="5:1-6:1" data-source-file="./dic.md">
-<p>SpecIR (see <a href="#TERM-SPECIR" data-pos="5:13-5:28">SpecIR</a>)
-is the data model that SpecCompiler builds from source Markdown during
-the <a href="#TERM-19" data-pos="5:105-5:130">INITIALIZE Phase</a>
-phase. The core task of parsing is to <em>lower</em> Markdown
-annotations into a set of typed content tables that the <a href="#TERM-15" data-pos="5:242-5:259">Pipeline</a> can analyze,
-transform, verify, and emit. The entries below define each of these six
-content tables as a formal tuple specifying the Markdown syntax that
-produces it.</p>
+<p>SpecIR (see <a href="#TERM-SPECIR" data-pos="5:13-5:28">&lt;SpecIR&gt;</a>) is the data model that
+SpecCompiler builds from source Markdown during the <a href="#TERM-19" data-pos="5:105-5:130">&lt;INITIALIZE Phase&gt;</a> phase. The core task
+of parsing is to <em>lower</em> Markdown annotations into a set of typed
+content tables that the <a href="#TERM-15" data-pos="5:242-5:259">&lt;Pipeline&gt;</a> can analyze, transform,
+verify, and emit. The entries below define each of these six content
+tables as a formal tuple specifying the Markdown syntax that produces
+it.</p>
 </div>
 <div class="spec-object">
 <section id="SpecIR-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
@@ -468,8 +467,7 @@ assembly based on specification data.</p>
 — a pair of view type and parameter string.</p>
 <p><strong>Syntax:</strong> <code data-pos="9:15-9:42">`TypeRef:[ViewParam]`</code></p>
 <p><strong>Full specification:</strong> See the CommonSpec Language
-Specification for view types, materialization strategies, and
-examples.</p>
+Specification for view types, rendering, and examples.</p>
 </dd>
 </dl>
 </div>
@@ -479,8 +477,8 @@ examples.</p>
 <p>With the data model established, the following sections define the
 functional requirements for SpecCompiler Core. Requirements are
 organized into System Features (SF), each covering a distinct functional
-domain. Every SF is decomposed into <a href="#TERM-HLR" data-pos="17:241-17:272">High-Level Requirement</a>s that state what the
-system shall do.</p>
+domain. Every SF is decomposed into <a href="#TERM-HLR" data-pos="17:241-17:272">&lt;High-Level Requirement&gt;</a>s that state
+what the system shall do.</p>
 </div>
 <h1 data-number="4" data-pos="1:1-2:1" data-source-file="./requirements/pipeline.md" id="SRS-001-sec4"><span class="header-section-number">4</span> Pipeline Requirements</h1>
 <div class="spec-object">
@@ -490,7 +488,8 @@ Pipeline Execution</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="5:1-6:1" data-source-file="./requirements/pipeline.md">
-<p>Five-phase document processing lifecycle with <a href="#TERM-16" data-pos="5:47-5:63">Handler</a> orchestration and <a href="#TERM-25" data-pos="5:82-5:107">Topological Sort</a> ordering.</p>
+<p>Five-phase document processing lifecycle with <a href="#TERM-16" data-pos="5:47-5:63">&lt;Handler&gt;</a> orchestration and <a href="#TERM-25" data-pos="5:82-5:107">&lt;Topological Sort&gt;</a>
+ordering.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -507,7 +506,7 @@ the
 
 core
 
-<a href="#TERM-15" data-pos="7:49-7:66">Pipeline</a>
+<a href="#TERM-15" data-pos="7:49-7:66">&lt;Pipeline&gt;</a>
 
 that
 
@@ -519,19 +518,19 @@ processing
 
 through
 
-<a href="#TERM-19" data-pos="8:11-8:36">INITIALIZE Phase</a>
+<a href="#TERM-19" data-pos="8:11-8:36">&lt;INITIALIZE Phase&gt;</a>
 ,
 
-<a href="#TERM-20" data-pos="8:38-8:60">ANALYZE Phase</a>
+<a href="#TERM-20" data-pos="8:38-8:60">&lt;RESOLVE Phase&gt;</a>
 ,
 
-<a href="#TERM-22" data-pos="8:62-8:86">TRANSFORM Phase</a>
+<a href="#TERM-22" data-pos="8:62-8:86">&lt;TRANSFORM Phase&gt;</a>
 ,
 
-<a href="#TERM-21" data-pos="8:88-8:109">VERIFY Phase</a>
+<a href="#TERM-21" data-pos="8:88-8:110">&lt;ANALYZE Phase&gt;</a>
 ,
 
-<a href="#TERM-23" data-pos="8:111-8:130">EMIT Phase</a>
+<a href="#TERM-23" data-pos="8:112-8:131">&lt;EMIT Phase&gt;</a>
 
 phases
 
@@ -559,7 +558,7 @@ Lifecycle</h3>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="15:1-16:1" data-source-file="./requirements/pipeline.md">
 <p>The pipeline shall execute handlers in a five-phase lifecycle:
-INITIALIZE, ANALYZE, TRANSFORM, VERIFY, EMIT.</p>
+INITIALIZE, RESOLVE, TRANSFORM, ANALYZE, EMIT.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -574,7 +573,7 @@ with specifications, spec_objects, floats, relations, views, and
 attributes
 </div></li>
 <li><div data-pos="20:6-21:1">
-<strong>ANALYZE</strong>: Resolve relations between objects (link target
+<strong>RESOLVE</strong>: Resolve relations between objects (link target
 resolution, type inference)
 </div></li>
 <li><div data-pos="21:6-22:1">
@@ -582,7 +581,7 @@ resolution, type inference)
 (PlantUML, charts), prepare for output
 </div></li>
 <li><div data-pos="22:6-23:1">
-<strong>VERIFY</strong>: Run verification views to validate data
+<strong>ANALYZE</strong>: Run analyze queries to validate data
 integrity, type constraints, cardinality rules
 </div></li>
 <li><div data-pos="23:6-24:1">
@@ -611,8 +610,8 @@ and Prerequisites</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="32:1-33:1" data-source-file="./requirements/pipeline.md">
-<p>The pipeline shall support handler registration with declarative <a href="#TERM-24" data-pos="32:66-32:88">Prerequisites</a> for dependency
-ordering.</p>
+<p>The pipeline shall support handler registration with declarative <a href="#TERM-24" data-pos="32:66-32:88">&lt;Prerequisites&gt;</a> for
+dependency ordering.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -697,12 +696,12 @@ Approved
 </div>
 <div class="spec-object">
 <section id="HLR-PIPE-004" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-004: Phase Abort on VERIFY
-Errors</h3>
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-004: Phase Abort on
+ANALYZE Errors</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="65:1-66:1" data-source-file="./requirements/pipeline.md">
-<p>The pipeline shall abort execution after VERIFY phase if any errors
+<p>The pipeline shall abort execution after ANALYZE phase if any errors
 are recorded.</p>
 </div>
 </div>
@@ -710,7 +709,7 @@ are recorded.</p>
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-After running VERIFY phase, the pipeline checks <code data-pos="67:64-67:90">diagnostics:has_errors()</code>. If true,
+After running ANALYZE phase, the pipeline checks <code data-pos="67:65-67:91">diagnostics:has_errors()</code>. If true,
 execution halts before EMIT phase, with TRANSFORM already completed.
 Error message is logged with error count. This prevents generating
 invalid output from documents with specification violations.
@@ -718,7 +717,7 @@ invalid output from documents with specification violations.
 <dt><strong>RATIONALE:</strong></dt>
 <dd>
 Early abort on verification failures saves computation and prevents
-distribution of invalid specification documents. Errors in VERIFY
+distribution of invalid specification documents. Errors in ANALYZE
 indicate data integrity issues that would produce incorrect outputs.
 </dd>
 <dt><strong>STATUS:</strong></dt>
@@ -826,7 +825,7 @@ resolving relative paths
 </div></li>
 </ul>
 <p>Context flows through all phases, enriched by handlers (e.g.,
-verification results in VERIFY phase).</p>
+verification results in ANALYZE phase).</p>
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
 <dd>
@@ -848,38 +847,42 @@ Parsing</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="114:1-115:1" data-source-file="./requirements/pipeline.md">
-<p>The system shall parse <a href="#TERM-COMMONSPEC" data-pos="114:24-114:43">CommonSpec</a> documents during the <a href="#TERM-19" data-pos="114:65-114:90">INITIALIZE Phase</a> phase,
-lowering Markdown annotations into <a href="#TERM-IR" data-pos="114:133-114:169">Intermediate Representation</a> content
-tables.</p>
+<p>The system shall parse <a href="#TERM-COMMONSPEC" data-pos="114:24-114:43">&lt;CommonSpec&gt;</a> documents during the <a href="#TERM-19" data-pos="114:65-114:90">&lt;INITIALIZE Phase&gt;</a>
+phase, lowering Markdown annotations into <a href="#TERM-IR" data-pos="114:133-114:169">&lt;Intermediate Representation&gt;</a>
+content tables.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p>The INITIALIZE phase <a href="#TERM-16" data-pos="116:37-116:53">Handler</a>s parse the Pandoc <a href="#TERM-AST" data-pos="116:72-116:101">Abstract Syntax Tree</a> and
-populate the six IR content tables according to these rules:</p>
+<p>The INITIALIZE phase <a href="#TERM-16" data-pos="116:37-116:53">&lt;Handler&gt;</a>s parse the Pandoc <a href="#TERM-AST" data-pos="116:72-116:101">&lt;Abstract Syntax
+Tree&gt;</a> and populate the six IR content tables according to these
+rules:</p>
 <ol type="1">
 <li><div data-pos="118:6-119:1">
-<strong>H1 headers</strong> register as <a href="#SpecIR-01" data-pos="118:33-118:55">Specification</a> records with optional <code data-pos="118:78-118:85">TYPE:</code> prefix and <code data-pos="118:97-118:103">@PID</code> suffix
+<strong>H1 headers</strong> register as <a href="#SpecIR-01" data-pos="118:33-118:55">&lt;Specification&gt;</a> records with optional
+<code data-pos="118:78-118:85">TYPE:</code> prefix and <code data-pos="118:97-118:103">@PID</code> suffix
 </div></li>
 <li><div data-pos="119:6-120:1">
-<strong>H2-H6 headers</strong> register as <a href="#SpecIR-02" data-pos="119:36-119:56">Spec Object</a> records with type inference
-(explicit <code data-pos="119:95-119:102">TYPE:</code> prefix, implicit
-alias lookup, or default type fallback)
+<strong>H2-H6 headers</strong> register as <a href="#SpecIR-02" data-pos="119:36-119:56">&lt;Spec Object&gt;</a> records with type
+inference (explicit <code data-pos="119:95-119:102">TYPE:</code> prefix,
+implicit alias lookup, or default type fallback)
 </div></li>
 <li><div data-pos="120:6-121:1">
-<strong>Blockquote lines</strong> (<code data-pos="120:28-120:42">&gt; key: value</code>) register as <a href="#SpecIR-04" data-pos="120:56-120:74">Attribute</a> records
+<strong>Blockquote lines</strong> (<code data-pos="120:28-120:42">&gt; key: value</code>) register as <a href="#SpecIR-04" data-pos="120:56-120:74">&lt;Attribute&gt;</a> records
 attached to the enclosing spec object
 </div></li>
 <li><div data-pos="121:6-122:1">
-<strong>Fenced code blocks</strong> with <code data-pos="121:34-121:49">TypeRef:Label</code> class register as <a href="#SpecIR-03" data-pos="121:68-121:87">Spec Float</a> records
+<strong>Fenced code blocks</strong> with <code data-pos="121:34-121:49">TypeRef:Label</code> class register as <a href="#SpecIR-03" data-pos="121:68-121:87">&lt;Spec Float&gt;</a>
+records
 </div></li>
 <li><div data-pos="122:6-123:1">
-<strong>Markdown links</strong> with <code data-pos="122:30-122:35">(@)</code> or <code data-pos="122:39-122:44">(#)</code> targets register as <a href="#SpecIR-05" data-pos="122:65-122:87">Spec Relation</a> records
+<strong>Markdown links</strong> with <code data-pos="122:30-122:35">(@)</code> or <code data-pos="122:39-122:44">(#)</code> targets register as <a href="#SpecIR-05" data-pos="122:65-122:87">&lt;Spec Relation&gt;</a>
+records
 </div></li>
 <li><div data-pos="123:6-124:1">
-<strong>Inline code</strong> with <code data-pos="123:27-123:45">TypeRef: content</code> syntax registers as <a href="#SpecIR-06" data-pos="123:66-123:84">Spec View</a> records
+<strong>Inline code</strong> with <code data-pos="123:27-123:45">TypeRef: content</code> syntax registers as <a href="#SpecIR-06" data-pos="123:66-123:84">&lt;Spec View&gt;</a> records
 </div></li>
 </ol>
 <p>Each handler populates its content table with content-addressable
@@ -906,7 +909,8 @@ Expansion</h3>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="134:1-135:1" data-source-file="./requirements/pipeline.md">
 <p>When a document contains <code data-pos="134:26-134:36">.include</code> code blocks, the system shall
-expand them by embedding the referenced file content before <a href="#TERM-15" data-pos="134:127-134:144">Pipeline</a> processing.</p>
+expand them by embedding the referenced file content before <a href="#TERM-15" data-pos="134:127-134:144">&lt;Pipeline&gt;</a>
+processing.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -958,28 +962,27 @@ Auto-Generation</h3>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="153:1-154:1" data-source-file="./requirements/pipeline.md">
 <p>When a spec object does not have an explicit <code data-pos="153:46-153:52">@PID</code>, the system shall auto-generate a
-<a href="#TERM-PID" data-pos="153:87-153:114">Project Identifier</a>
-during the <a href="#TERM-20" data-pos="153:126-153:148">ANALYZE
-Phase</a> phase based on the object’s type definition.</p>
+<a href="#TERM-PID" data-pos="153:87-153:114">&lt;Project
+Identifier&gt;</a> during the <a href="#TERM-20" data-pos="153:126-153:148">&lt;RESOLVE Phase&gt;</a> phase based on the
+object’s type definition.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p>The PID generator runs in the ANALYZE phase before relation
+<p>The PID generator runs in the RESOLVE phase before relation
 resolution:</p>
 <ol type="1">
 <li><div data-pos="157:6-158:1">
-<strong>Non-<a href="#TERM-COMPOSITE" data-pos="157:12-157:42">Composite
-Object Type</a> objects</strong>: PIDs are generated using the type’s
-<code data-pos="157:90-157:102">pid_prefix</code> and <code data-pos="157:107-157:119">pid_format</code> (e.g., <code data-pos="157:127-157:137">HLR-%03d</code> produces “HLR-001”), starting
+<strong>Non-<a href="#TERM-COMPOSITE" data-pos="157:12-157:42">&lt;Composite Object Type&gt;</a>
+objects</strong>: PIDs are generated using the type’s <code data-pos="157:90-157:102">pid_prefix</code> and <code data-pos="157:107-157:119">pid_format</code> (e.g., <code data-pos="157:127-157:137">HLR-%03d</code> produces “HLR-001”), starting
 from the next available sequence number
 </div></li>
 <li><div data-pos="158:6-159:1">
-<strong><a href="#TERM-COMPOSITE" data-pos="158:8-158:38">Composite
-Object Type</a> objects</strong>: Hierarchical PIDs are qualified by the
-specification PID (e.g., “SRS-sec1.2.3”)
+<strong><a href="#TERM-COMPOSITE" data-pos="158:8-158:38">&lt;Composite
+Object Type&gt;</a> objects</strong>: Hierarchical PIDs are qualified by
+the specification PID (e.g., “SRS-sec1.2.3”)
 </div></li>
 </ol>
 <p>Auto-generated PIDs never overwrite explicit <code data-pos="160:48-160:54">@PID</code> annotations. Collision detection
@@ -1004,8 +1007,8 @@ Inference</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="169:1-170:1" data-source-file="./requirements/pipeline.md">
-<p>The system shall infer relation types during the <a href="#TERM-20" data-pos="169:50-169:72">ANALYZE Phase</a> phase using constraint-based
-matching with <a href="#TERM-SPECIFICITY" data-pos="169:116-169:144">Specificity Scoring</a> scoring.</p>
+<p>The system shall infer relation types during the <a href="#TERM-20" data-pos="169:50-169:72">&lt;RESOLVE Phase&gt;</a> phase using
+constraint-based matching with <a href="#TERM-SPECIFICITY" data-pos="169:116-169:144">&lt;Specificity Scoring&gt;</a> scoring.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -1016,8 +1019,8 @@ matching with <a href="#TERM-SPECIFICITY" data-pos="169:116-169:144">Specificity
 <ol type="1">
 <li><div data-pos="173:6-174:1">
 <strong>Filter</strong>: Identifies candidate relation types whose
-constraints are compatible with the relation’s <a href="#TERM-SELECTOR" data-pos="173:107-173:133">Relation Selector</a>, source attribute,
-source type, and target type
+constraints are compatible with the relation’s <a href="#TERM-SELECTOR" data-pos="173:107-173:133">&lt;Relation Selector&gt;</a>, source
+attribute, source type, and target type
 </div></li>
 <li><div data-pos="174:6-175:1">
 <strong>Resolve</strong>: Calls the resolver (determined by the type’s
@@ -1094,6 +1097,53 @@ Approved
 </dl>
 </div>
 </div>
+<div class="spec-object">
+<section id="HLR-PIPE-012" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-PIPE-012: Section Scope
+Termination</h3>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="198:1-199:1" data-source-file="./requirements/pipeline.md">
+<p>A <a href="#SpecIR-02" data-pos="198:3-198:23">&lt;Spec
+Object&gt;</a>’s scope shall be closed either automatically by the next
+header of equal-or-shallower level, or manually by a <code data-pos="198:134-198:140">----</code> thematic break, and a heading
+shall not be empty.</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DESCRIPTION:</strong></dt>
+<dd>
+<p>When the INITIALIZE phase delimits each header’s section, the scope
+(the <code data-pos="200:89-200:99">end_line</code> that governs which
+trailing content and floats the object contains) ends at the first <code data-pos="200:186-200:192">----</code> thematic break inside the
+section, if present, rather than only at the next header. The thematic
+break is consumed — it is removed from the rendered body and produces no
+horizontal rule. Content between the marker and the next header keeps
+its document position but is contained by the parent section. This gives
+authors an explicit way to close a section without introducing a
+heading, replacing the anti-pattern of an empty <code data-pos="200:619-200:623">##</code> used as a “section reset”.</p>
+<p>An empty heading (a header whose title is blank) is rejected: it
+would otherwise render as an empty numbered heading and corrupt
+downstream numbering. The <code data-pos="202:158-202:183">object_broken_hierarchy</code> analyze query
+reports it as an error and directs the author to use <code data-pos="202:251-202:257">----</code> instead.</p>
+</dd>
+<dt><strong>RATIONALE:</strong></dt>
+<dd>
+Section scope previously closed only at the next header, so authors who
+wanted trailing content to belong to a parent section resorted to an
+empty heading, which renders as a blank numbered chapter and shifts all
+subsequent numbering. A consumed thematic break expresses the intent
+precisely with no rendering artifact, and rejecting empty headings
+removes the failure mode entirely.
+</dd>
+<dt><strong>STATUS:</strong></dt>
+<dd>
+Approved
+</dd>
+</dl>
+</div>
+</div>
 <h1 data-number="5" data-pos="1:1-2:1" data-source-file="./requirements/storage.md" id="SRS-001-sec5"><span class="header-section-number">5</span> Storage Requirements</h1>
 <div class="spec-object">
 <section id="SF-002" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
@@ -1102,8 +1152,9 @@ Specification Persistence</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="5:1-6:1" data-source-file="./requirements/storage.md">
-<p><a href="#TERM-SQLITE" data-pos="5:1-5:25">SQLite Database</a>-based
-storage with incremental build support and output caching.</p>
+<p><a href="#TERM-SQLITE" data-pos="5:1-5:25">&lt;SQLite
+Database&gt;</a>-based storage with incremental build support and output
+caching.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -1128,16 +1179,16 @@ ACID-compliant
 
 storage,
 
-<a href="#TERM-EAV" data-pos="8:12-8:30">EAV Model</a>
+<a href="#TERM-EAV" data-pos="8:12-8:30">&lt;EAV Model&gt;</a>
 
 attribute
 
 model,
 
-<a href="#TERM-30" data-pos="8:48-8:68">Build Cache</a>
+<a href="#TERM-30" data-pos="8:48-8:68">&lt;Build Cache&gt;</a>
 ,
 
-<a href="#TERM-31" data-pos="8:70-8:91">Output Cache</a>
+<a href="#TERM-31" data-pos="8:70-8:91">&lt;Output Cache&gt;</a>
 ,
 
 and
@@ -1236,7 +1287,8 @@ tracking.</p>
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-Source file hashes stored in source_files table (path, sha1). Build
+Source file hashes stored as build_graph nodes (root_path, node_path,
+node_sha1), where the root document is recorded as its own node. Build
 cache module provides is_document_dirty() to check if document content
 has changed since last build. Hash comparison enables change detection.
 </dd>
@@ -1257,7 +1309,7 @@ Approved
 <h3 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-STOR-004: Output Cache</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="60:1-61:1" data-source-file="./requirements/storage.md">
+<div data-pos="61:1-62:1" data-source-file="./requirements/storage.md">
 <p>The system shall cache output generation state with P-IR hash and
 timestamps.</p>
 </div>
@@ -1290,7 +1342,7 @@ Approved
 External Queries</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="76:1-77:1" data-source-file="./requirements/storage.md">
+<div data-pos="77:1-78:1" data-source-file="./requirements/storage.md">
 <p>The system shall generate per-object-type SQL views that pivot the
 EAV attribute model into typed columns for external BI queries.</p>
 </div>
@@ -1299,11 +1351,11 @@ EAV attribute model into typed columns for external BI queries.</p>
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-For each non-composite spec_object_type, a view named <code data-pos="79:3-79:30">view_{type_lower}_objects</code> is dynamically
-generated (e.g., <code data-pos="79:63-79:81">view_hlr_objects</code>,
-<code data-pos="80:3-80:20">view_vc_objects</code>). Each view flattens
+For each non-composite spec_object_type, a view named <code data-pos="80:3-80:30">view_{type_lower}_objects</code> is dynamically
+generated (e.g., <code data-pos="80:63-80:81">view_hlr_objects</code>,
+<code data-pos="81:3-81:20">view_vc_objects</code>). Each view flattens
 the EAV join into one row per object with typed attribute columns,
-enabling queries like <code data-pos="82:3-82:61">SELECT * FROM view_hlr_objects WHERE status = &#39;approved&#39;</code>.
+enabling queries like <code data-pos="83:3-83:61">SELECT * FROM view_hlr_objects WHERE status = &#39;approved&#39;</code>.
 These views are NOT used by internal pipeline queries — all internal
 code queries the raw EAV tables directly because it needs access to
 raw_value, datatype, ast, enum_ref, and other columns that the pivot
@@ -1330,7 +1382,7 @@ Approved
 Support</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="99:1-100:1" data-source-file="./requirements/storage.md">
+<div data-pos="100:1-101:1" data-source-file="./requirements/storage.md">
 <p>The system shall support incremental rebuilds via build graph
 tracking.</p>
 </div>
@@ -1340,9 +1392,10 @@ tracking.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 Build graph stored in build_graph table (root_path, node_path,
-node_sha1). Tracks include file dependencies for each root document.
-is_document_dirty_with_includes() checks root document and all includes.
-update_build_graph() refreshes dependency tree after successful build.
+node_sha1). Records the root document and its include file dependencies
+as nodes. is_document_dirty() checks the root document and all includes
+in one node walk. update_build_graph() refreshes the file set after
+successful build.
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
 <dd>
@@ -1365,7 +1418,8 @@ System</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="5:1-6:1" data-source-file="./requirements/types.md">
-<p>Dynamic type system providing typed containers for <a href="#SpecIR-01" data-pos="5:52-5:74">Specification</a>, <a href="#SpecIR-02" data-pos="5:76-5:96">Spec Object</a>, <a href="#SpecIR-03" data-pos="5:98-5:117">Spec Float</a>, <a href="#SpecIR-06" data-pos="5:119-5:137">Spec View</a>, <a href="#SpecIR-05" data-pos="5:139-5:161">Spec Relation</a>, and <a href="#SpecIR-04" data-pos="5:167-5:185">Attribute</a>.</p>
+<p>Dynamic type system providing typed containers for <a href="#SpecIR-01" data-pos="5:52-5:74">&lt;Specification&gt;</a>, <a href="#SpecIR-02" data-pos="5:76-5:96">&lt;Spec Object&gt;</a>, <a href="#SpecIR-03" data-pos="5:98-5:117">&lt;Spec Float&gt;</a>, <a href="#SpecIR-06" data-pos="5:119-5:137">&lt;Spec View&gt;</a>, <a href="#SpecIR-05" data-pos="5:139-5:161">&lt;Spec Relation&gt;</a>, and
+<a href="#SpecIR-04" data-pos="5:167-5:185">&lt;Attribute&gt;</a>.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -1378,7 +1432,7 @@ specification data plus the verification-view validation framework.
 <dt><strong>RATIONALE:</strong></dt>
 <dd>
 A typed container model enables schema validation, type-specific
-rendering, and data integrity checking through SQL verification views.
+rendering, and data integrity checking through SQL analyze queries.
 </dd>
 </dl>
 </div>
@@ -1399,7 +1453,8 @@ registering document-level specification records.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p>The <code data-pos="17:20-17:36">specifications</code> table stores
-metadata for each specification document parsed during <a href="#TERM-19" data-pos="17:105-17:130">INITIALIZE Phase</a> phase:</p>
+metadata for each specification document parsed during <a href="#TERM-19" data-pos="17:105-17:130">&lt;INITIALIZE Phase&gt;</a>
+phase:</p>
 <ul>
 <li><div data-pos="19:5-20:1">
 <code data-pos="19:5-19:17">identifier</code>: Unique specification ID
@@ -1557,7 +1612,7 @@ cross-referencing
 </div></li>
 <li><div data-pos="69:5-70:1">
 <code data-pos="69:5-69:13">number</code>: Sequential number within
-counter_group (assigned in <a href="#TERM-22" data-pos="69:67-69:91">TRANSFORM Phase</a>)
+counter_group (assigned in <a href="#TERM-22" data-pos="69:67-69:91">&lt;TRANSFORM Phase&gt;</a>)
 </div></li>
 <li><div data-pos="70:5-71:1">
 <code data-pos="70:5-70:14">caption</code>: Caption text from attributes
@@ -1582,8 +1637,8 @@ attributes (caption, source, language)
 backend matching
 </div></li>
 </ul>
-<p><a href="#TERM-28" data-pos="77:3-77:25">Counter Group</a> share
-numbering (e.g., FIGURE, CHART, PLANTUML all increment “FIGURE”
+<p><a href="#TERM-28" data-pos="77:3-77:25">&lt;Counter Group&gt;</a>
+share numbering (e.g., FIGURE, CHART, PLANTUML all increment “FIGURE”
 counter).</p>
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
@@ -1693,7 +1748,7 @@ syntax (e.g., “REQ-001”, “fig:diagram”)
 </div></li>
 <li><div data-pos="114:5-115:1">
 <code data-pos="114:5-114:17">target_ref</code>: Resolved target
-identifier (populated in <a href="#TERM-20" data-pos="114:60-114:82">ANALYZE Phase</a> phase)
+identifier (populated in <a href="#TERM-20" data-pos="114:60-114:82">&lt;RESOLVE Phase&gt;</a> phase)
 </div></li>
 <li><div data-pos="115:5-116:1">
 <code data-pos="115:5-115:15">type_ref</code>: Relation type from <code data-pos="115:36-115:57">spec_relation_types</code> (e.g., “TRACES”,
@@ -1796,7 +1851,7 @@ Approved
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="150:1-151:1" data-source-file="./requirements/types.md">
-<p>The type system shall provide verification views that detect data
+<p>The type system shall provide analyze queries that detect data
 integrity violations across all specification containers.</p>
 </div>
 <div data-pos="31:1-32:1">
@@ -1810,8 +1865,8 @@ presets.</p>
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p>Verification views are SQL queries registered in the <a href="#TERM-21" data-pos="152:69-152:90">VERIFY Phase</a> phase that
-check for constraint violations:</p>
+<p>Verification views are SQL queries registered in the <a href="#TERM-21" data-pos="152:69-152:91">&lt;ANALYZE Phase&gt;</a> phase
+that check for constraint violations:</p>
 <ul>
 <li><div data-pos="154:5-155:1">
 Specification-level (missing required attributes, invalid types)
@@ -1825,9 +1880,6 @@ Float-level (orphans, duplicate labels, render failures, invalid types)
 </div></li>
 <li><div data-pos="157:5-158:1">
 Relation-level (unresolved, dangling, ambiguous)
-</div></li>
-<li><div data-pos="158:5-159:1">
-View-level (materialization failures, query errors)
 </div></li>
 </ul>
 <p>The validation policy (configurable in project.yaml) determines
@@ -1854,7 +1906,7 @@ Extension Framework</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="5:1-6:1" data-source-file="./requirements/extension.md">
-<p>Model-based extensibility for type <a href="#TERM-16" data-pos="5:36-5:52">Handler</a>, renderers, and <a href="#TERM-35" data-pos="5:69-5:87">Data View</a>.</p>
+<p>Model-based extensibility for type <a href="#TERM-16" data-pos="5:36-5:52">&lt;Handler&gt;</a>, renderers, and <a href="#TERM-35" data-pos="5:69-5:87">&lt;Data View&gt;</a>.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -1889,7 +1941,7 @@ type
 
 handlers,
 
-<a href="#TERM-34" data-pos="8:29-8:55">External Renderer</a>
+<a href="#TERM-34" data-pos="8:29-8:55">&lt;External Renderer&gt;</a>
 ,
 
 data
@@ -1930,10 +1982,10 @@ point is one module that declares:</p>
 <div class="sourceCode" id="cb1" data-pos="24:1-35:1" data-source-file="./requirements/extension.md"><pre class="sourceCode lua"><code class="sourceCode lua"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="va">kind</span>   <span class="op">=</span> <span class="st">&quot;object|float|view|relation|specification|verification|dataview&quot;</span><span class="op">,</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="va">schema</span> <span class="op">=</span> <span class="op">{</span> <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;HLR&quot;</span><span class="op">,</span> <span class="va">long_name</span> <span class="op">=</span> <span class="op">...,</span> <span class="va">extends</span> <span class="op">=</span> <span class="st">&quot;TRACEABLE&quot;</span><span class="op">,</span> <span class="va">attributes</span> <span class="op">=</span> <span class="op">{...},</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>             <span class="co">-- kind-specific: inline_prefix/aliases/materializer_type/counter_group (view);</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>             <span class="co">-- kind-specific: inline_prefix/aliases (view);</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>             <span class="co">--   caption_format/needs_external_render (float); link_selector/source_type_ref/</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>             <span class="co">--   target_type_ref (relation); view/policy_key/sql/disabled (verification) },</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="va">hooks</span>  <span class="op">=</span> <span class="op">{</span> <span class="va">render</span><span class="op">=,</span> <span class="va">render_link</span><span class="op">=,</span> <span class="va">resolve</span><span class="op">=,</span> <span class="va">materialize</span><span class="op">=,</span> <span class="va">generate</span><span class="op">=,</span> <span class="va">prepare_task</span><span class="op">=,</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="va">hooks</span>  <span class="op">=</span> <span class="op">{</span> <span class="va">render</span><span class="op">=,</span> <span class="va">render_link</span><span class="op">=,</span> <span class="va">resolve</span><span class="op">=,</span> <span class="va">generate</span><span class="op">=,</span> <span class="va">prepare_task</span><span class="op">=,</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>             <span class="va">handle_result</span><span class="op">=,</span> <span class="va">message</span><span class="op">=,</span> <span class="va">on_</span><span class="op">&lt;</span><span class="va">phase</span><span class="op">&gt;=</span> <span class="op">},</span>  <span class="co">-- absent hook =&gt; host default</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <div data-pos="36:1-43:1" data-source-file="./requirements/extension.md">
@@ -2096,7 +2148,7 @@ Verification Descriptor</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="89:1-93:1" data-source-file="./requirements/extension.md">
-<p>A verification view shall be a <code data-pos="89:32-89:53">kind=&quot;verification&quot;</code> descriptor (<code data-pos="90:2-90:46">schema = {policy_key, view, sql, disabled}</code>,
+<p>A analyze query shall be a <code data-pos="89:28-89:49">kind=&quot;verification&quot;</code> descriptor (<code data-pos="90:2-90:46">schema = {policy_key, view, sql, disabled}</code>,
 <code data-pos="90:48-90:67">hooks = {message}</code>) forwarded to the
 host’s ordered policy_key registry, preserving override (later model
 wins, in place) and <code data-pos="92:1-92:16">disabled=true</code>
@@ -2153,8 +2205,8 @@ directories.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p>Type handlers control how specification content is rendered during
-the <a href="#TERM-22" data-pos="110:87-110:111">TRANSFORM Phase</a>
-phase. The loading mechanism supports:</p>
+the <a href="#TERM-22" data-pos="110:87-110:111">&lt;TRANSFORM
+Phase&gt;</a> phase. The loading mechanism supports:</p>
 <ul>
 <li><div data-pos="112:5-113:1">
 <strong>Object types</strong>: Loaded from <code data-pos="112:35-112:76">models/{model}/types/objects/{type}.lua</code>
@@ -2210,7 +2262,7 @@ hierarchy.</p>
     floats/        -- Float type handlers (TABLE, PLANTUML, CHART)
     views/         -- View type handlers (ABBREV, SYMBOL, MATH)
     relations/     -- Relation type definitions (TRACES_TO, etc.)
-  verification_views/ -- Verification descriptors (SQL views + message hooks)
+  analyze_queries/ -- Verification descriptors (SQL views + message hooks)
   filters/         -- Pandoc filters (docx.lua, html.lua, markdown.lua)
   postprocessors/  -- Format-specific postprocessors
   styles/          -- Style presets and templates</code></pre>
@@ -2610,19 +2662,19 @@ Document Assembly</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="15:1-16:1" data-source-file="./requirements/output.md">
-<p>The system shall reconstruct a complete Pandoc document from <a href="#TERM-IR" data-pos="15:62-15:98">Intermediate Representation</a>
-database content for each specification, preserving document order and
-embedding all resolved content.</p>
+<p>The system shall reconstruct a complete Pandoc document from <a href="#TERM-IR" data-pos="15:62-15:98">&lt;Intermediate
+Representation&gt;</a> database content for each specification,
+preserving document order and embedding all resolved content.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p>During the <a href="#TERM-23" data-pos="17:27-17:46">EMIT Phase</a>
-phase, the assembler queries <code data-pos="17:76-17:90">spec_objects</code> ordered by <code data-pos="17:102-17:112">file_seq</code>, decodes stored JSON <a href="#TERM-AST" data-pos="17:134-17:163">Abstract Syntax Tree</a>
-fragments back to Pandoc blocks, adjusts header levels for cross-file
-includes, and embeds:</p>
+<p>During the <a href="#TERM-23" data-pos="17:27-17:46">&lt;EMIT
+Phase&gt;</a> phase, the assembler queries <code data-pos="17:76-17:90">spec_objects</code> ordered by <code data-pos="17:102-17:112">file_seq</code>, decodes stored JSON <a href="#TERM-AST" data-pos="17:134-17:163">&lt;Abstract Syntax
+Tree&gt;</a> fragments back to Pandoc blocks, adjusts header levels for
+cross-file includes, and embeds:</p>
 <ol type="1">
 <li><div data-pos="19:6-20:1">
 <strong>Specification title</strong>: From <code data-pos="19:36-19:63">specifications.header_ast</code>, wrapped in a
@@ -2646,6 +2698,12 @@ document positions (expanded later by the view emitter)
 specification attributes (title, author, date). The result is a valid
 <code data-pos="24:132-24:147">pandoc.Pandoc</code> document suitable
 for format-specific output.</p>
+<p>Header-level adjustment rescales the shallowest header level to the
+top output level uniformly; it therefore assumes the source header
+levels form a well-formed tree (contiguous nesting, a single root
+depth). That precondition is enforced declaratively by the <code data-pos="26:263-26:288">object_broken_hierarchy</code> analyze query,
+which rejects skipped levels and orphaned roots before emission rather
+than letting a malformed hierarchy mis-render silently.</p>
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
 <dd>
@@ -2667,9 +2725,11 @@ Approved
 Float Resolution</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="33:1-34:1" data-source-file="./requirements/output.md">
-<p>The system shall replace <a href="#TERM-04" data-pos="33:26-33:40">Float</a> placeholder blocks in the assembled
-document with their rendered content, using results from the <a href="#TERM-22" data-pos="33:138-33:162">TRANSFORM Phase</a> phase.</p>
+<div data-pos="35:1-36:1" data-source-file="./requirements/output.md">
+<p>The system shall replace <a href="#TERM-04" data-pos="35:26-35:40">&lt;Float&gt;</a> placeholder blocks in the
+assembled document with their rendered content, using results from the
+<a href="#TERM-22" data-pos="35:138-35:162">&lt;TRANSFORM Phase&gt;</a>
+phase.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -2680,24 +2740,24 @@ document with their rendered content, using results from the <a href="#TERM-22" 
 replaces CodeBlock placeholders (identified by float labels) with
 rendered Div elements containing:</p>
 <ol type="1">
-<li><div data-pos="37:6-38:1">
-<strong>Rendered content</strong>: The <code data-pos="37:32-37:46">resolved_ast</code> from <code data-pos="37:52-37:65">spec_floats</code> (SVG images for PlantUML,
+<li><div data-pos="39:6-40:1">
+<strong>Rendered content</strong>: The <code data-pos="39:32-39:46">resolved_ast</code> from <code data-pos="39:52-39:65">spec_floats</code> (SVG images for PlantUML,
 parsed tables for CSV, chart images for ECharts)
 </div></li>
-<li><div data-pos="38:6-39:1">
+<li><div data-pos="40:6-41:1">
 <strong>Caption</strong>: A formatted caption with type prefix and
 sequential number (e.g., “Figure 1 – Diagram Title”)
 </div></li>
-<li><div data-pos="39:6-40:1">
-<strong>Semantic classes</strong>: CSS classes (<code data-pos="39:41-39:61">speccompiler-float</code>, <code data-pos="39:63-39:85">speccompiler-caption</code>, type-specific class)
+<li><div data-pos="41:6-42:1">
+<strong>Semantic classes</strong>: CSS classes (<code data-pos="41:41-41:61">speccompiler-float</code>, <code data-pos="41:63-41:85">speccompiler-caption</code>, type-specific class)
 for format-specific styling
 </div></li>
-<li><div data-pos="40:6-41:1">
+<li><div data-pos="42:6-43:1">
 <strong>Bookmark anchor</strong>: An identifier anchor for
 cross-reference navigation
 </div></li>
 </ol>
-<p>Floats whose <code data-pos="42:16-42:30">resolved_ast</code> is NULL
+<p>Floats whose <code data-pos="44:16-44:30">resolved_ast</code> is NULL
 (failed external renders) are preserved as error placeholders.</p>
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
@@ -2719,35 +2779,36 @@ Approved
 Float Numbering</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="51:1-52:1" data-source-file="./requirements/output.md">
-<p>The system shall assign sequential numbers to <a href="#TERM-04" data-pos="51:47-51:61">Float</a>s within their <a href="#TERM-28" data-pos="51:76-51:98">Counter Group</a>, producing a single numbering
-sequence across all documents in the project.</p>
+<div data-pos="53:1-54:1" data-source-file="./requirements/output.md">
+<p>The system shall assign sequential numbers to <a href="#TERM-04" data-pos="53:47-53:61">&lt;Float&gt;</a>s within their <a href="#TERM-28" data-pos="53:76-53:98">&lt;Counter Group&gt;</a>,
+producing a single numbering sequence across all documents in the
+project.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p>During the <a href="#TERM-22" data-pos="53:27-53:51">TRANSFORM
-Phase</a> phase, the float numberer:</p>
+<p>During the <a href="#TERM-22" data-pos="55:27-55:51">&lt;TRANSFORM
+Phase&gt;</a> phase, the float numberer:</p>
 <ol type="1">
-<li><div data-pos="55:6-56:1">
-Queries all floats across all specifications, ordered by <code data-pos="55:63-55:73">file_seq</code>
+<li><div data-pos="57:6-58:1">
+Queries all floats across all specifications, ordered by <code data-pos="57:63-57:73">file_seq</code>
 </div></li>
-<li><div data-pos="56:6-57:1">
-Groups floats by their <code data-pos="56:29-56:44">counter_group</code>
+<li><div data-pos="58:6-59:1">
+Groups floats by their <code data-pos="58:29-58:44">counter_group</code>
 (e.g., FIGURE, TABLE, LISTING, EQUATION)
 </div></li>
-<li><div data-pos="57:6-58:1">
+<li><div data-pos="59:6-60:1">
 Assigns monotonically increasing numbers within each group (starting at
 1)
 </div></li>
-<li><div data-pos="58:6-59:1">
+<li><div data-pos="60:6-61:1">
 Float types sharing a counter_group share the same sequence (e.g.,
 FIGURE, CHART, and PLANTUML all increment the “FIGURE” counter)
 </div></li>
 </ol>
-<p>The assigned numbers are stored in <code data-pos="60:38-60:58">spec_floats.number</code> and used for caption
+<p>The assigned numbers are stored in <code data-pos="62:38-62:58">spec_floats.number</code> and used for caption
 formatting and cross-reference display text.</p>
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
@@ -2770,36 +2831,36 @@ Approved
 Multi-Format Output</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="69:1-70:1" data-source-file="./requirements/output.md">
+<div data-pos="71:1-72:1" data-source-file="./requirements/output.md">
 <p>The system shall generate output documents in all formats specified
-by the project configuration, skipping outputs whose <a href="#TERM-PIR" data-pos="69:122-69:168">Processed Intermediate Representation</a> hash
-matches the cached value.</p>
+by the project configuration, skipping outputs whose <a href="#TERM-PIR" data-pos="71:122-71:168">&lt;Processed Intermediate
+Representation&gt;</a> hash matches the cached value.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p>The emitter orchestrator iterates over <code data-pos="71:55-71:71">config.outputs</code> (an array of <code data-pos="71:85-71:101">{format, path}</code> pairs) and for each
+<p>The emitter orchestrator iterates over <code data-pos="73:55-73:71">config.outputs</code> (an array of <code data-pos="73:85-73:101">{format, path}</code> pairs) and for each
 specification:</p>
 <ol type="1">
-<li><div data-pos="73:6-74:1">
+<li><div data-pos="75:6-76:1">
 Serializes the assembled Pandoc document to an intermediate JSON file
 </div></li>
-<li><div data-pos="74:6-75:1">
-Checks the output cache (<code data-pos="74:31-74:52">is_output_current()</code>) and skips generation
+<li><div data-pos="76:6-77:1">
+Checks the output cache (<code data-pos="76:31-76:52">is_output_current()</code>) and skips generation
 when the P-IR hash matches
 </div></li>
-<li><div data-pos="75:6-76:1">
-Applies format-specific Pandoc Lua filters (e.g., <code data-pos="75:56-75:66">docx.lua</code>, <code data-pos="75:68-75:78">html.lua</code> from the model’s <code data-pos="75:96-75:106">filters/</code> directory)
-</div></li>
-<li><div data-pos="76:6-77:1">
-Invokes Pandoc for format conversion
-</div></li>
 <li><div data-pos="77:6-78:1">
-Runs format-specific postprocessors after Pandoc generation completes
+Applies format-specific Pandoc Lua filters (e.g., <code data-pos="77:56-77:66">docx.lua</code>, <code data-pos="77:68-77:78">html.lua</code> from the model’s <code data-pos="77:96-77:106">filters/</code> directory)
 </div></li>
 <li><div data-pos="78:6-79:1">
+Invokes Pandoc for format conversion
+</div></li>
+<li><div data-pos="79:6-80:1">
+Runs format-specific postprocessors after Pandoc generation completes
+</div></li>
+<li><div data-pos="80:6-81:1">
 Cleans up intermediate JSON files
 </div></li>
 </ol>
@@ -2825,7 +2886,7 @@ Approved
 DOCX Generation</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="89:1-90:1" data-source-file="./requirements/output.md">
+<div data-pos="91:1-92:1" data-source-file="./requirements/output.md">
 <p>The system shall generate DOCX output with style customization via
 preset-based reference document generation and OOXML
 post-processing.</p>
@@ -2837,21 +2898,21 @@ post-processing.</p>
 <dd>
 <p>DOCX output generation follows this sequence:</p>
 <ol type="1">
-<li><div data-pos="93:6-94:1">
+<li><div data-pos="95:6-96:1">
 <strong>Preset loading</strong>: Loads style preset definitions from
-<code data-pos="93:62-93:94">models/{model}/styles/presets/</code> with
+<code data-pos="95:62-95:94">models/{model}/styles/presets/</code> with
 extends-chain merging and circular dependency detection
 </div></li>
-<li><div data-pos="94:6-95:1">
-<strong>Reference document generation</strong>: Generates a <code data-pos="94:53-94:69">reference.docx</code> from the resolved preset
+<li><div data-pos="96:6-97:1">
+<strong>Reference document generation</strong>: Generates a <code data-pos="96:53-96:69">reference.docx</code> from the resolved preset
 containing custom Word styles (headings, captions, code blocks, table
 styles)
 </div></li>
-<li><div data-pos="95:6-96:1">
-<strong>Pandoc conversion</strong>: Invokes Pandoc with <code data-pos="95:49-95:66">--reference-doc</code> pointing to the generated
+<li><div data-pos="97:6-98:1">
+<strong>Pandoc conversion</strong>: Invokes Pandoc with <code data-pos="97:49-97:66">--reference-doc</code> pointing to the generated
 reference and format-specific Lua filters
 </div></li>
-<li><div data-pos="96:6-97:1">
+<li><div data-pos="98:6-99:1">
 <strong>OOXML post-processing</strong>: Modifies the DOCX archive to
 apply style fixups, numbering definitions, and structural corrections
 that Pandoc cannot produce natively
@@ -2879,7 +2940,7 @@ Approved
 HTML5 Generation</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="107:1-108:1" data-source-file="./requirements/output.md">
+<div data-pos="109:1-110:1" data-source-file="./requirements/output.md">
 <p>The system shall generate standalone HTML5 output with table of
 contents, section numbering, and embedded resources when configured.</p>
 </div>
@@ -2890,25 +2951,25 @@ contents, section numbering, and embedded resources when configured.</p>
 <dd>
 <p>HTML5 output generation follows this sequence:</p>
 <ol type="1">
-<li><div data-pos="111:6-112:1">
+<li><div data-pos="113:6-114:1">
 <strong>Pandoc conversion</strong>: Invokes Pandoc with HTML5-specific
-options from project configuration (<code data-pos="111:100-111:117">number_sections</code>, <code data-pos="111:119-111:138">table_of_contents</code>, <code data-pos="111:140-111:151">toc_depth</code>, <code data-pos="111:153-111:165">standalone</code>, <code data-pos="111:167-111:184">embed_resources</code>)
+options from project configuration (<code data-pos="113:100-113:117">number_sections</code>, <code data-pos="113:119-113:138">table_of_contents</code>, <code data-pos="113:140-113:151">toc_depth</code>, <code data-pos="113:153-113:165">standalone</code>, <code data-pos="113:167-113:184">embed_resources</code>)
 </div></li>
-<li><div data-pos="112:6-113:1">
-<strong>Resource embedding</strong>: When <code data-pos="112:35-112:52">embed_resources</code> is enabled, all CSS,
+<li><div data-pos="114:6-115:1">
+<strong>Resource embedding</strong>: When <code data-pos="114:35-114:52">embed_resources</code> is enabled, all CSS,
 JavaScript, and image assets are embedded inline for single-file
 distribution
 </div></li>
-<li><div data-pos="113:6-114:1">
-<strong>Search index</strong>: When <a href="#TERM-FTS" data-pos="113:29-113:54">Full-Text Search</a> tables are populated, the
-HTML5 postprocessor bundles the search index for client-side full-text
-search
+<li><div data-pos="115:6-116:1">
+<strong>Search index</strong>: When <a href="#TERM-FTS" data-pos="115:29-115:54">&lt;Full-Text Search&gt;</a> tables are
+populated, the HTML5 postprocessor bundles the search index for
+client-side full-text search
 </div></li>
-<li><div data-pos="114:6-115:1">
-<strong>Internal links</strong>: Cross-reference <code data-pos="114:42-114:47">(@)</code> links resolve to <code data-pos="114:65-114:74">#anchor</code> URLs for in-page navigation
+<li><div data-pos="116:6-117:1">
+<strong>Internal links</strong>: Cross-reference <code data-pos="116:42-116:47">(@)</code> links resolve to <code data-pos="116:65-116:74">#anchor</code> URLs for in-page navigation
 </div></li>
 </ol>
-<p>Configuration is specified in the <code data-pos="116:37-116:45">html5:</code> section of <code data-pos="116:57-116:71">project.yaml</code>.</p>
+<p>Configuration is specified in the <code data-pos="118:37-118:45">html5:</code> section of <code data-pos="118:57-118:71">project.yaml</code>.</p>
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
 <dd>
@@ -2929,9 +2990,9 @@ Approved
 Full-Text Search Indexing</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
-<div data-pos="125:1-126:1" data-source-file="./requirements/output.md">
-<p>The system shall populate <a href="#full-text-search" data-pos="125:27-125:52">dic:full-text-search</a> virtual tables during
-the <a href="#emit-phase" data-pos="125:79-125:98">dic:emit-phase</a>
+<div data-pos="127:1-128:1" data-source-file="./requirements/output.md">
+<p>The system shall populate <a href="#full-text-search" data-pos="127:27-127:52">dic:full-text-search</a> virtual tables during
+the <a href="#emit-phase" data-pos="127:79-127:98">dic:emit-phase</a>
 phase to enable full-text search across specification content.</p>
 </div>
 <div data-pos="41:1-42:1">
@@ -2947,24 +3008,24 @@ auditable. The following section addresses these integrity concerns.</p>
 <p>The FTS indexer creates and populates three FTS5 virtual tables with
 Porter stemming:</p>
 <ol type="1">
-<li><div data-pos="129:6-130:1">
-<strong><code data-pos="129:8-129:21">fts_objects</code></strong>:
+<li><div data-pos="131:6-132:1">
+<strong><code data-pos="131:8-131:21">fts_objects</code></strong>:
 Indexes spec object titles and body text, keyed by identifier and
 spec_id
 </div></li>
-<li><div data-pos="130:6-131:1">
-<strong><code data-pos="130:8-130:24">fts_attributes</code></strong>:
+<li><div data-pos="132:6-133:1">
+<strong><code data-pos="132:8-132:24">fts_attributes</code></strong>:
 Indexes attribute names and string values, keyed by owner_ref and
 spec_id
 </div></li>
-<li><div data-pos="131:6-132:1">
-<strong><code data-pos="131:8-131:20">fts_floats</code></strong>:
+<li><div data-pos="133:6-134:1">
+<strong><code data-pos="133:8-133:20">fts_floats</code></strong>:
 Indexes float captions and raw source content, keyed by identifier and
 spec_id
 </div></li>
 </ol>
-<p><a href="#TERM-AST" data-pos="133:3-133:32">Abstract Syntax Tree</a>
-content is converted to plain text before indexing.</p>
+<p><a href="#TERM-AST" data-pos="135:3-135:32">&lt;Abstract Syntax
+Tree&gt;</a> content is converted to plain text before indexing.</p>
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
 <dd>
@@ -3012,7 +3073,8 @@ detection,
 
 structured
 
-<a href="#TERM-NDJSON" data-pos="8:14-8:45">Newline-Delimited JSON</a>
+<a href="#TERM-NDJSON" data-pos="8:14-8:45">&lt;Newline-Delimited
+JSON&gt;</a>
 
 logging
 
@@ -3074,21 +3136,24 @@ and include files to enable change detection.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p>The build engine computes SHA1 hashes for each document. Hashes are
-compared against cached values in the <code data-pos="18:122-18:136">source_files</code> table:</p>
+compared against the cached values recorded as <code data-pos="18:131-18:144">build_graph</code> nodes (the root document is
+its own node, alongside its includes):</p>
 <ol type="1">
 <li><div data-pos="20:6-21:1">
-If the content hash matches the cached hash, the system checks include
-file hashes
+Every node of the document’s build graph is compared against its current
+file hash
 </div></li>
 <li><div data-pos="21:6-22:1">
-If all hashes match, the document is skipped (cached <a href="#TERM-IR" data-pos="21:59-21:95">Intermediate Representation</a> state is reused)
+If all hashes match, the document is skipped (cached <a href="#TERM-IR" data-pos="21:59-21:95">&lt;Intermediate Representation&gt;</a> state is
+reused)
 </div></li>
 <li><div data-pos="22:6-23:1">
-If any hash differs, the document is rebuilt from source
+If any hash differs, a node file is missing, or no root node is
+recorded, the document is rebuilt from source
 </div></li>
 <li><div data-pos="23:6-24:1">
-After successful rebuild (no <a href="#TERM-21" data-pos="23:35-23:56">VERIFY Phase</a> errors), hashes are updated in
-the <code data-pos="23:92-23:106">source_files</code> table
+After successful rebuild (no <a href="#TERM-21" data-pos="23:35-23:57">&lt;ANALYZE Phase&gt;</a> errors), the <code data-pos="23:71-23:84">build_graph</code> nodes are rewritten with
+current hashes
 </div></li>
 </ol>
 <p>This provides O(1) change detection without parsing unchanged
@@ -3123,7 +3188,7 @@ includes.</p>
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p>Before <a href="#TERM-15" data-pos="36:23-36:40">Pipeline</a>
+<p>Before <a href="#TERM-15" data-pos="36:23-36:40">&lt;Pipeline&gt;</a>
 execution, the include handler expands <code data-pos="36:80-36:90">.include</code> code blocks by:</p>
 <ol type="1">
 <li><div data-pos="38:6-39:1">
@@ -3175,7 +3240,7 @@ with source location information throughout all pipeline phases.</p>
 reporting:</p>
 <ol type="1">
 <li><div data-pos="56:6-57:1">
-<strong>Collection</strong>: <a href="#TERM-16" data-pos="56:22-56:38">Handler</a>s report issues via <code data-pos="56:58-56:100">diagnostics:error(file, line, code, msg)</code>
+<strong>Collection</strong>: <a href="#TERM-16" data-pos="56:22-56:38">&lt;Handler&gt;</a>s report issues via <code data-pos="56:58-56:100">diagnostics:error(file, line, code, msg)</code>
 and <code data-pos="56:105-56:146">diagnostics:warn(file, line, code, msg)</code>
 </div></li>
 <li><div data-pos="57:6-58:1">
@@ -3183,9 +3248,8 @@ and <code data-pos="56:105-56:146">diagnostics:warn(file, line, code, msg)</code
 path, line number, diagnostic key, and human-readable message
 </div></li>
 <li><div data-pos="58:6-59:1">
-<strong>Severity control</strong>: The <code data-pos="58:32-58:46">has_errors()</code> method enables the <a href="#TERM-15" data-pos="58:66-58:83">Pipeline</a> to determine abort
-conditions after the <a href="#TERM-21" data-pos="58:124-58:145">VERIFY
-Phase</a> phase
+<strong>Severity control</strong>: The <code data-pos="58:32-58:46">has_errors()</code> method enables the <a href="#TERM-15" data-pos="58:66-58:83">&lt;Pipeline&gt;</a> to determine
+abort conditions after the <a href="#TERM-21" data-pos="58:124-58:146">&lt;ANALYZE Phase&gt;</a> phase
 </div></li>
 <li><div data-pos="59:6-60:1">
 <strong>Output integration</strong>: Diagnostics are emitted through the
@@ -3215,8 +3279,8 @@ Logging</h3>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="70:1-71:1" data-source-file="./requirements/audit.md">
-<p>The system shall provide <a href="#TERM-NDJSON" data-pos="70:26-70:57">Newline-Delimited JSON</a> structured logging
-with TTY-aware output formatting.</p>
+<p>The system shall provide <a href="#TERM-NDJSON" data-pos="70:26-70:57">&lt;Newline-Delimited JSON&gt;</a> structured
+logging with TTY-aware output formatting.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -3282,8 +3346,8 @@ usage context.</p>
 identifiers ensure consistent object identity
 </div></li>
 <li><div data-pos="91:6-92:1">
-<strong>Deterministic ordering</strong>: <a href="#TERM-25" data-pos="91:34-91:59">Topological Sort</a> with alphabetic tie-breaking
-produces the same <a href="#TERM-16" data-pos="91:107-91:123">Handler</a> execution order
+<strong>Deterministic ordering</strong>: <a href="#TERM-25" data-pos="91:34-91:59">&lt;Topological Sort&gt;</a> with alphabetic
+tie-breaking produces the same <a href="#TERM-16" data-pos="91:107-91:123">&lt;Handler&gt;</a> execution order
 </div></li>
 <li><div data-pos="92:6-93:1">
 <strong>Deterministic numbering</strong>: Float numbers assigned by
@@ -3390,7 +3454,7 @@ Specification Intermediate Representation
 <div class="spec-object">
 <section id="TERM-20" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
 <h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-20:
-ANALYZE Phase</h2>
+RESOLVE Phase</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="39:1-40:1" data-source-file="./dictionary/concepts.md">
@@ -3564,7 +3628,7 @@ outputs documents.</p>
 <dd>
 <p><strong>Purpose:</strong> Assembles transformed content and writes
 final output documents.</p>
-<p><strong>Position:</strong> Final phase after VERIFY.</p>
+<p><strong>Position:</strong> Final phase after ANALYZE.</p>
 </dd>
 </dl>
 </div>
@@ -3577,7 +3641,8 @@ Float</h2>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="119:1-120:1" data-source-file="./dictionary/concepts.md">
 <p>A <strong>numbered element</strong> (table, figure, diagram) with
-caption and cross-reference. See <a href="#SpecIR-03" data-pos="119:87-119:106">Spec Float</a> for full definition.</p>
+caption and cross-reference. See <a href="#SpecIR-03" data-pos="119:87-119:106">&lt;Spec Float&gt;</a> for full
+definition.</p>
 </div>
 </div>
 </div>
@@ -3733,7 +3798,7 @@ specific responsibilities.</p>
 <dd>
 <p><strong>Purpose:</strong> Separates document processing into
 well-defined sequential stages.</p>
-<p><strong>Phases:</strong> INITIALIZE, ANALYZE, TRANSFORM, VERIFY,
+<p><strong>Phases:</strong> INITIALIZE, RESOLVE, TRANSFORM, ANALYZE,
 EMIT.</p>
 </dd>
 </dl>
@@ -3747,7 +3812,7 @@ Pipeline</h2>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="186:1-187:1" data-source-file="./dictionary/concepts.md">
 <p>The <strong>5-phase processing system</strong> (INITIALIZE -&gt;
-ANALYZE -&gt; TRANSFORM -&gt; VERIFY -&gt; EMIT).</p>
+RESOLVE -&gt; TRANSFORM -&gt; ANALYZE -&gt; EMIT).</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -3825,8 +3890,8 @@ views and rewrites content.</p>
 <dd>
 <p><strong>Purpose:</strong> Materializes database views into content
 and applies content transformations.</p>
-<p><strong>Position:</strong> Third phase after ANALYZE, before
-VERIFY.</p>
+<p><strong>Position:</strong> Third phase after RESOLVE, before
+ANALYZE.</p>
 </dd>
 </dl>
 </div>
@@ -3913,20 +3978,20 @@ spec_attribute_types, etc.</p>
 <div class="spec-object">
 <section id="TERM-21" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
 <h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-21:
-VERIFY Phase</h2>
+ANALYZE Phase</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="256:1-257:1" data-source-file="./dictionary/concepts.md">
 <p>The <strong>fourth phase</strong> in the pipeline that validates
-content via verification views.</p>
+content via analyze queries.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p><strong>Purpose:</strong> Validates document content using
-verification views and constraint checking.</p>
+<p><strong>Purpose:</strong> Validates document content using analyze
+queries and constraint checking.</p>
 <p><strong>Position:</strong> Fourth phase after TRANSFORM, before
 EMIT.</p>
 </dd>
@@ -4117,13 +4182,13 @@ Project Identifier
 </div>
 <div class="spec-object">
 <section id="TERM-VERIFICATIONVIEW" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
-<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-VERIFICATIONVIEW: Verification
-View</h2>
+<h2 class="unnumbered" data-custom-style="SpecObjectHeader">TERM-VERIFICATIONVIEW: Analyze
+Query</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="354:1-355:1" data-source-file="./dictionary/concepts.md">
 <p>A <strong>SQL query</strong> that validates data integrity
-constraints during the VERIFY phase.</p>
+constraints during the ANALYZE phase.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -4136,7 +4201,7 @@ constraints during the VERIFY phase.</p>
 <dd>
 <p><strong>Purpose:</strong> Defines validation rules as SQL queries
 that detect specification errors.</p>
-<p><strong>Execution:</strong> Run during the VERIFY phase; violations
+<p><strong>Execution:</strong> Run during the ANALYZE phase; violations
 are reported as diagnostics.</p>
 <p><strong>Examples:</strong> Missing required attributes, unresolved
 relations, cardinality violations.</p>
@@ -4147,7 +4212,7 @@ Core
 </dd>
 <dt><strong>TERM:</strong></dt>
 <dd>
-Verification View
+Analyze Query
 </dd>
 </dl>
 </div>
@@ -4491,7 +4556,7 @@ Policy</h2>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="528:1-529:1" data-source-file="./dictionary/concepts.md">
-<p>A <strong>configuration mapping</strong> from verification view <code data-pos="528:52-528:64">policy_key</code> to severity level,
+<p>A <strong>configuration mapping</strong> from analyze query <code data-pos="528:48-528:60">policy_key</code> to severity level,
 controlling which violations are reported and at what severity.</p>
 </div>
 </div>
@@ -4500,7 +4565,7 @@ controlling which violations are reported and at what severity.</p>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
 <p><strong>Purpose:</strong> Allows projects to control validation
-strictness by mapping each verification view to a severity level.</p>
+strictness by mapping each analyze query to a severity level.</p>
 <p><strong>Severity levels:</strong> <code data-pos="538:24-538:31">error</code> (blocks output generation), <code data-pos="538:60-538:66">warn</code> (reported but build continues),
 <code data-pos="538:99-538:107">ignore</code> (suppressed).</p>
 <p><strong>Configuration:</strong> Set in the <code data-pos="540:33-540:46">validation:</code> section of <code data-pos="540:58-540:72">project.yaml</code> (e.g., <code data-pos="540:80-540:110">traceability_hlr_to_vc: warn</code>).</p>
@@ -4536,11 +4601,9 @@ Record</h2>
 human-readable feedback on specification errors and warnings throughout
 all pipeline phases.</p>
 <p><strong>Fields:</strong> Each record contains <code data-pos="556:36-556:42">file</code> (source path), <code data-pos="556:58-556:64">line</code> (source line number), <code data-pos="556:87-556:93">code</code> (stable diagnostic key, usually the
-verification view <code data-pos="556:148-556:160">policy_key</code>,
-e.g., <code data-pos="556:168-556:187">dangling_relation</code>), and
-<code data-pos="556:194-556:199">msg</code> (human-readable
-description).</p>
-<p><strong>Severity:</strong> Errors trigger abort after <a href="#TERM-21" data-pos="558:44-558:56">VERIFY Phase</a> phase;
+analyze query <code data-pos="556:144-556:156">policy_key</code>, e.g.,
+<code data-pos="556:164-556:183">dangling_relation</code>), and <code data-pos="556:190-556:195">msg</code> (human-readable description).</p>
+<p><strong>Severity:</strong> Errors trigger abort after <a href="#TERM-21" data-pos="558:44-558:56">ANALYZE Phase</a> phase;
 warnings are reported but do not block output generation.</p>
 </dd>
 <dt><strong>DOMAIN:</strong></dt>
@@ -4568,14 +4631,15 @@ file hierarchies for incremental rebuild support.</p>
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-<p><strong>Purpose:</strong> Tracks which files are included by each
-root document, enabling change detection across include hierarchies.</p>
-<p><strong>Storage:</strong> Stored in the <code data-pos="572:30-572:43">build_graph</code> table with columns <code data-pos="572:63-572:74">root_path</code> (the including document),
-<code data-pos="572:101-572:112">node_path</code> (the included file),
-and <code data-pos="572:138-572:149">node_sha1</code> (content hash at
-build time).</p>
-<p><strong>Usage:</strong> Queried by <a href="#TERM-30" data-pos="574:25-574:37">Build Cache</a> <code data-pos="574:38-574:73">is_document_dirty_with_includes()</code> to
-determine if any included file has changed since the last successful
+<p><strong>Purpose:</strong> Records the full file set of each document
+build — the root document itself and every included file — enabling
+change detection across include hierarchies with a single node walk.</p>
+<p><strong>Storage:</strong> Stored in the <code data-pos="572:30-572:43">build_graph</code> table with columns <code data-pos="572:63-572:74">root_path</code> (the document being built),
+<code data-pos="572:103-572:114">node_path</code> (a file that build
+read: the root itself or an include), and <code data-pos="572:176-572:187">node_sha1</code> (content hash at build
+time).</p>
+<p><strong>Usage:</strong> Queried by <a href="#TERM-30" data-pos="574:25-574:37">Build Cache</a> <code data-pos="574:38-574:59">is_document_dirty()</code> to determine if the
+root or any included file has changed since the last successful
 build.</p>
 </dd>
 <dt><strong>DOMAIN:</strong></dt>
