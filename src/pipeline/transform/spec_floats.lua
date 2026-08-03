@@ -48,14 +48,15 @@ local function get_float_transform(type_ref)
     return host and host:get_hook_inherited("float", canonical, "transform") or nil
 end
 
-function FloatResolver.new(data, log, diagnostics)
+function FloatResolver.new(data, log, diagnostics, build_dir)
     -- Store data manager reference for dynamic module discovery
     data_manager = data
 
     local self = {
         data = data,
         log = log,
-        diagnostics = diagnostics
+        diagnostics = diagnostics,
+        build_dir = build_dir
     }
     return setmetatable(self, { __index = FloatResolver })
 end
@@ -104,6 +105,9 @@ function FloatResolver:resolve_internal(float)
     -- the source file (FIGURE resolves image paths relative to it), and the
     -- float's attributes (LISTING reads its language attr). This keeps the
     -- cross-float resolved-AST reuse correct for every internal float type.
+    -- Caveat: FIGURE also reads the image file's bytes (content-addressed copy
+    -- into build_dir/images); editing the image without touching the markdown
+    -- reuses the cached resolution, same as every spec-cache-level input.
     local content_sha = hash_utils.sha1(table.concat({
         float.raw_content or "", float.from_file or "", float.pandoc_attributes or "",
     }, "\0"))
@@ -123,7 +127,8 @@ function FloatResolver:resolve_internal(float)
     -- a custom JSON for LISTING, TeX text for MATH, png-path JSON for FIGURE). It
     -- reads its inputs off dctx.subject (raw_content/float) and the DB off dctx.data.
     local dctx = hook_ctx.build_data({ log = self.log }, self.data, self.diagnostics,
-        { raw_content = float.raw_content, float = float }, "transform", float.specification_ref)
+        { raw_content = float.raw_content, float = float, build_dir = self.build_dir },
+        "transform", float.specification_ref)
     local resolved = transform(dctx)
     if not resolved then
         if self.log then
@@ -190,7 +195,7 @@ function M.on_transform(data, contexts, diagnostics)
     for _, ctx in ipairs(contexts) do
         local spec_id = ctx.spec_id or "default"
 
-        local resolver = FloatResolver.new(data, ctx.log, diagnostics)
+        local resolver = FloatResolver.new(data, ctx.log, diagnostics, ctx.build_dir)
         local resolved, cached = resolver:resolve_all(spec_id)
 
         -- Store resolution stats in context

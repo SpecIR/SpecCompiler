@@ -27,7 +27,7 @@
 ---    along when available). Data-tier hooks, their subject, and their ONE return:
 ---      view  dataset(dctx)       -> { source | data | links }   subject.params
 ---      view  build_block(dctx)   -> pandoc.Block                subject.params
----      float transform(dctx)     -> resolved-AST string         subject.raw_content/.float
+---      float transform(dctx)     -> resolved-AST string         subject.raw_content/.float/.build_dir
 ---      float prepare_task(dctx)  -> task table                  subject.float/.build_dir
 ---      float handle_result(dctx) -> (writes resolved_ast)       subject.task/.success/.stdout/.stderr
 ---      reln  resolve(dctx)       -> { target, ambiguous }       subject.target_text/.source_object_id
