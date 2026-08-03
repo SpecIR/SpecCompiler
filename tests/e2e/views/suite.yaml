@@ -8,5 +8,7 @@ project:
 output_format: json
 
 # Test case to VC mapping:
-# - vc_view_001_inline.md      -> VC-VIEW-001 (Inline View Syntax)
-# - vc_view_002_registration.md -> VC-VIEW-002 (View Registration and Built-ins)
+# - vc_016_03_inline_views.md                 -> VC-016 (Inline View Syntax)
+# - vc_016_04_view_render_characterization.md -> VC-016 (View Render Characterization)
+# - vc_016_05_view_params.md                  -> VC-016 (Inline View key=value Params)
+# - vc_025_02_view_registration.md            -> VC-025 (View Registration and Built-ins)

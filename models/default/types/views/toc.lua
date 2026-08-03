@@ -49,7 +49,6 @@ end
 
 local prefix_matcher = require("pipeline.shared.prefix_matcher")
 local match_toc_code = prefix_matcher.from_decl(schema)
-local match_toc_codeblock = prefix_matcher.codeblock_from_decl(schema)
 
 -- ============================================================================
 -- Data Generation
@@ -108,21 +107,20 @@ return {
 
             -- TOC generates block content - inline Code cannot be replaced with blocks.
             -- Return a placeholder or nil to keep the original code element.
-            -- Use ``` toc: ``` code block syntax for actual TOC rendering.
+            -- Place `toc:` alone in its own paragraph for the block-rendered TOC.
             return { pandoc.Str("[TOC]") }
         end,
 
-        ---EMIT: Render CodeBlock elements with toc class.
+        ---EMIT: Render a standalone `toc:` paragraph (block-promoted by emit_view,
+        ---which provides the content after the prefix on ctx.subject.content).
         ---Wraps output in a speccompiler-toc Div so format-specific filters
         ---(e.g., DOCX) can convert it to a native TOC field.
         ---The BulletList inside serves as fallback for formats without special handling.
-        ---@param block table Pandoc CodeBlock element
         ---@param ctx Context
         ---@return table|nil Replacement block
         render_block = function(ctx)
-            local block = ctx.subject.element
-            local rest = match_toc_codeblock(block)
-            if not rest then return nil end
+            local rest = ctx.subject.content
+            if rest == nil then return nil end
 
             local params = parse_params(rest)
             local data = ctx.data

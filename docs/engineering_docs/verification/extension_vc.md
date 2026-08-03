@@ -138,20 +138,25 @@ Verify float types can declare external rendering needs.
 
 Verify [dic:data-view](#) generators are loaded from model directories and injected into chart rendering.
 
-> objective: Confirm that data view modules in models/{model}/types/views/ are discovered and their generate() function produces data for chart consumers.
+> objective: Confirm that data view modules in models/{model}/types/views/ are discovered and their data hooks produce data for chart and table consumers.
 
-> verification_method: Inspection
+> verification_method: Test
 
 > approach:
-> - Examine data_loader.load_view() resolution logic (model-first, default fallback)
-> - Verify generate(params, data) receives user parameters and DataManager instance
+> - Examine data_loader.load_view() resolution logic (host `dataset` hook index,
+>   loose-module fallback for fixture views)
+> - Verify data hooks receive the frozen DATA ctx (dctx.subject.params, dctx.data)
 > - Confirm returned dataset is passed to chart float rendering
+> - Verify inline view params reach table-view `build_block` hooks
+>   (e.g., `allocation_matrix: status=complete` filters to complete chains)
 
 > pass_criteria:
 > - View modules loaded from models/{model}/types/views/
-> - Resolution tries specified model first, falls back to default
-> - generate() receives params table and DataManager instance
+> - Resolution uses the host hook index (default overlaid by template model)
+> - Data hooks receive dctx with subject.params and data (DataManager)
 > - Return value used as chart data source
+> - `allocation_matrix: status=` filters the allocation chain rows (inline
+>   view params delivered end-to-end)
 
 > traceability: [HLR-EXT-007](@), [LLR-095](@)
 
@@ -177,6 +182,10 @@ Verify type handler loaders cache modules to avoid repeated loading.
 > - No repeated require() for previously loaded types
 
 > traceability: [HLR-EXT-008](@), [LLR-096](@)
+
+_Retired with HLR-EXT-008 (Host Engine Refactor): the `{model}:{type_ref}` handler
+caches are deleted; the host's eager `(kind, id) -> hook` index replaces them and
+is covered by the extension-suite descriptor tests (VC-EXT-011)._
 
 
 ### VC: Canonical Hook Context @VC-EXT-009

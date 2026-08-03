@@ -49,3 +49,11 @@ architecture/sw_docs_model_design.md
 ```{.include}
 architecture/software_decomposition.md
 ```
+
+## Requirements Allocation Gaps
+
+The matrix below is generated live from SpecIR at build time and lists only
+HLRs whose allocation chain (SF -> FD -> CSC -> CSU) is incomplete. An empty
+result means every requirement is fully allocated to the design.
+
+`allocation_matrix: status=incomplete`

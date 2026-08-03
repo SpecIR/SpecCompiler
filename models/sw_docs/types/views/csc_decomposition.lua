@@ -7,9 +7,7 @@ local make_link_target = view_utils.make_link_target
 ---
 ---Usage in markdown:
 ---  Inline syntax: `csc_decomposition:`
----  Code block syntax:
----    ```csc_decomposition
----    ```
+---  Inline syntax: `csc_decomposition:` (alone in its own paragraph)
 ---
 ---@module csc_decomposition
 

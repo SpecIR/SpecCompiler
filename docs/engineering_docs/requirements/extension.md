@@ -51,7 +51,7 @@ or an unknown kind is a LOUD register-time error. The host runs once per build:
 | HLR-EXT-004 | Changed | One declarative `schema` per kind (the IR columns that kind needs); inheritance via `extends`. |
 | HLR-EXT-005 | **Retired** | The per-type model→default `require` fallback is gone; the host overlay (default then template, later-wins-by-id) replaces it. A fully-absent requested model is a loud error. |
 | HLR-EXT-006 | Changed | External rendering is `prepare_task`/`handle_result` **hooks** indexed by the host, not a require-time `external_render.register_renderer` side effect. |
-| HLR-EXT-007 | Changed | Data-view generation is a `generate` **hook** the host indexes; `data_loader` retains only the chart-config injection + a loose-load fallback for unregistered/fixture generators. |
+| HLR-EXT-007 | Changed | Data-view generation is a `dataset` **hook** the host indexes; `data_loader` retains only the chart-config injection + a loose-load fallback for unregistered/fixture generators. |
 | HLR-EXT-008 | **Retired** | The `{model}:{type_ref}` handler caches (incl. the `= false` negative cache) are deleted; the eager `(kind,id)->hook` index replaces them. A nil index ("not registered") is a distinct loud state from "registered, no such hook". |
 
 **New requirement stubs:**

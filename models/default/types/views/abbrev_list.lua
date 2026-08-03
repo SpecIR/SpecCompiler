@@ -30,7 +30,6 @@ local schema = {
 
 local prefix_matcher = require("pipeline.shared.prefix_matcher")
 local match_prefix = prefix_matcher.from_decl(schema)
-local match_abbrev_list_codeblock = prefix_matcher.codeblock_from_decl(schema)
 local function match_abbrev_list_code(text)
     return match_prefix(text) ~= nil
 end
@@ -81,8 +80,9 @@ end
 
 ---Build the abbreviation list as a SEMANTIC Pandoc table (two columns:
 ---Abbreviation | Description). Format-specific styling is left to the filters --
----no model hardcodes OOXML here. Shared by `render_block` (inline ```abbrev_list:```
----blocks) and `build_block` (cross-model reuse, e.g. the ABNT "Lista de Siglas").
+---no model hardcodes OOXML here. Shared by `render_block` (standalone
+---`abbrev_list:` paragraphs) and `build_block` (cross-model reuse, e.g. the
+---ABNT "Lista de Siglas").
 ---@param data DataManager Database instance
 ---@param spec_id string Specification identifier
 ---@return table|nil block A pandoc.Table, an empty-state Para, or nil
@@ -142,16 +142,16 @@ return {
 
             -- Non-empty abbreviation list generates block content (Table).
             -- Inline Code cannot be replaced with blocks.
-            -- Use ``` abbrev_list: ``` code block syntax for actual list rendering.
+            -- Place `abbrev_list:` alone in its own paragraph for the block list.
             return { pandoc.Str("[ABBREVIATION LIST]") }
         end,
 
-        ---EMIT: Render CodeBlock elements with abbrev_list class.
-        ---@param block table Pandoc CodeBlock element
+        ---EMIT: Render a standalone `abbrev_list:` paragraph (block-promoted by
+        ---emit_view, which already matched the prefix).
         ---@param ctx Context
         ---@return table|nil Replacement block
         render_block = function(ctx)
-            if not match_abbrev_list_codeblock(ctx.subject.element) then return nil end
+            if ctx.subject.content == nil then return nil end
             return build_abbrev_block(ctx.data, ctx.spec_id or "default")
         end,
 

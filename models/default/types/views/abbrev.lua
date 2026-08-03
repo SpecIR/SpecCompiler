@@ -6,14 +6,13 @@
 ---  `sigla: National Aeronautics (NASA)`   - Alias for abbrev:
 ---  `acronym: National Aeronautics (NASA)` - Alias for abbrev:
 ---
----Uses the unified INITIALIZE -> TRANSFORM -> EMIT pattern:
+---Uses the unified INITIALIZE -> EMIT pattern:
 ---  - INITIALIZE: Parse inline codes, store JSON in spec_views.raw_ast
----  - TRANSFORM: Convert raw_ast -> Pandoc JSON -> resolved_ast
----  - EMIT: Look up resolved_ast, return Pandoc element
+---    (consumed by abbrev_list to build the abbreviation list)
+---  - EMIT: Render the "Meaning (ABBR)" inlines live from the element text
 ---
 ---@module abbrev
 
-local view_utils = require("pipeline.shared.view_utils")
 local Queries = require("db.queries")
 
 local schema = {
@@ -127,49 +126,13 @@ local function on_initialize(data, contexts, diagnostics)
     end
 end
 
----TRANSFORM: Convert raw_ast to Pandoc JSON, store in resolved_ast
----@param data DataManager
----@param contexts Context[]
----@param diagnostics Diagnostics
-local function on_transform(data, contexts, diagnostics)
-    for _, ctx in ipairs(contexts) do
-        local spec_id = ctx.spec_id or "default"
-
-        -- Query abbrev views needing conversion
-        local views = data:query_all(Queries.content.views_needing_transform, {
-            spec_id = spec_id,
-            view_type = "ABBREV"
-        })
-
-        for _, view in ipairs(views or {}) do
-            local json = view.raw_ast or ""
-            local abbrev = json:match('"abbrev"%s*:%s*"([^"]*)"')
-            local meaning = json:match('"meaning"%s*:%s*"([^"]*)"')
-
-            if abbrev and meaning then
-                -- First occurrence format: "Full Meaning (ABBR)"
-                local output_text = meaning .. " (" .. abbrev .. ")"
-
-                -- Convert to Pandoc JSON
-                local str = pandoc.Str(output_text)
-                local resolved = view_utils.to_pandoc_json(str)
-                if resolved then
-                    data:execute(Queries.content.update_view_resolved, {
-                        id = view.id,
-                        resolved = resolved
-                    })
-                end
-            end
-        end
-    end
-end
-
 -- ============================================================================
 -- Render
 -- ============================================================================
 
 ---EMIT: Render inline Code elements with abbreviation syntax.
----@param code table Pandoc Code element
+---The output is a pure function of the element text, so it renders live --
+---no precomputed AST round-trip through the database.
 ---@param ctx Context
 ---@return table|nil Replacement inlines
 local function render(ctx)
@@ -182,29 +145,7 @@ local function render(ctx)
         return nil
     end
 
-    -- Look up resolved_ast from database
-    local spec_id = ctx.spec_id or "default"
-    local data = ctx.data
-    if data then
-        -- Build the raw_ast JSON to match
-        local raw_json = string.format(
-            '{"abbrev":"%s","meaning":"%s"}',
-            abbrev:gsub('"', '\\"'),
-            meaning:gsub('"', '\\"')
-        )
-        local resolved = view_utils.lookup_resolved_ast(data, spec_id, "ABBREV", raw_json)
-        if resolved then
-            local doc = view_utils.from_pandoc_json(resolved)
-            if doc and doc.blocks and #doc.blocks > 0 then
-                local block = doc.blocks[1]
-                if block.content then
-                    return block.content
-                end
-            end
-        end
-    end
-
-    -- Fallback: generate directly if no resolved_ast
+    -- First occurrence format: "Full Meaning (ABBR)"
     local output_text = meaning .. " (" .. abbrev .. ")"
     return { pandoc.Str(output_text) }
 end
@@ -218,6 +159,5 @@ return {
     hooks = {
         render = render,
         on_initialize = on_initialize,
-        on_transform = on_transform,
     },
 }

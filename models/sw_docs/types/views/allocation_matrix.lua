@@ -3,12 +3,13 @@
 ---Computes transitive traceability through the layered design indirection.
 ---
 ---Usage in markdown:
----  Inline syntax: `allocation_matrix:`
----  Code block syntax:
----    ```allocation_matrix
----    ```
+---  Inline syntax (alone in its own paragraph):
+---    `allocation_matrix:`                    -- full matrix
+---    `allocation_matrix: status=complete`    -- only complete chains
+---    `allocation_matrix: status=incomplete`  -- only broken chains (gap analysis)
 ---
----Both syntaxes produce a Pandoc Table via resolved_ast during TRANSFORM phase.
+---Renders live from the database at EMIT (like every other view), so cached
+---documents always reflect the current cross-document allocation data.
 ---
 ---@module allocation_matrix
 
@@ -19,10 +20,8 @@ local schema = {
     inline_prefix = "allocation_matrix"
 }
 
-local prefix_matcher = require("pipeline.shared.prefix_matcher")
 local view_utils = require("pipeline.shared.view_utils")
 local make_link_target = view_utils.make_link_target
-local match_codeblock = prefix_matcher.codeblock_from_decl(schema)
 
 ---Generate allocation matrix as a Pandoc Table.
 ---Queries the full HLR -> SF -> FD -> CSC -> CSU chain via spec_relations.
@@ -70,6 +69,19 @@ local function generate(params, data, spec_id)
         WHERE hlr.type_ref = 'HLR'
         ORDER BY hlr.pid, sf.pid, fd.pid, csc.pid, csu.pid
     ]], {})
+
+    -- status= param filters by chain completeness (complete | incomplete)
+    local status_filter = params and params.status
+    if status_filter == "complete" or status_filter == "incomplete" then
+        local wanted_complete = status_filter == "complete"
+        local filtered = {}
+        for _, rel in ipairs(relations or {}) do
+            if (rel.chain_status == "Complete") == wanted_complete then
+                table.insert(filtered, rel)
+            end
+        end
+        relations = filtered
+    end
 
     if not relations or #relations == 0 then
         return pandoc.Para({pandoc.Str("No HLR allocation chain data found.")})
@@ -135,20 +147,16 @@ local function generate(params, data, spec_id)
     return pandoc.utils.from_simple_table(simple_table)
 end
 
--- Phase ordering: needs objects and relations stored first
-schema.phase_prerequisites = { "spec_objects", "spec_relations" }
-
 return {
     kind = "view",
     schema = schema,
     hooks = {
-        ---EMIT: Render CodeBlock elements with allocation_matrix class.
-        ---@param block table Pandoc CodeBlock element
+        ---EMIT: Render a standalone `allocation_matrix:` paragraph
+        ---(block-promoted by emit_view, which already matched the prefix).
         ---@param ctx Context
         ---@return table|nil Replacement block
         render_block = function(ctx)
-            local block = ctx.subject.element
-            if not match_codeblock(block) then return nil end
+            if ctx.subject.content == nil then return nil end
 
             local data = ctx.data
             local spec_id = ctx.spec_id or "default"
@@ -157,55 +165,7 @@ return {
                 return nil
             end
 
-            -- Look up resolved_ast from spec_views
-            local view = data:query_one([[
-                SELECT resolved_ast FROM spec_views
-                WHERE specification_ref = :spec_id
-                  AND view_type_ref = 'ALLOCATION_MATRIX'
-                  AND resolved_ast IS NOT NULL
-                LIMIT 1
-            ]], { spec_id = spec_id })
-
-            if view and view.resolved_ast then
-                local ok, doc = pcall(pandoc.read, view.resolved_ast, "json")
-                if ok and doc and doc.blocks and #doc.blocks > 0 then
-                    return doc.blocks[1]
-                end
-            end
-
-            -- Fallback: generate on-the-fly
-            return generate({}, data, spec_id)
+            return generate(ctx.subject.params or {}, data, spec_id)
         end,
-
-        ---TRANSFORM: Pre-compute allocation matrix and store in resolved_ast.
-        ---@param data DataManager
-        ---@param contexts Context[]
-        ---@param diagnostics Diagnostics
-        on_transform = function(data, contexts, diagnostics)
-            for _, ctx in ipairs(contexts) do
-                local spec_id = ctx.spec_id or "default"
-
-                local views = data:query_all([[
-                    SELECT id FROM spec_views
-                    WHERE specification_ref = :spec_id
-                      AND view_type_ref = 'ALLOCATION_MATRIX'
-                      AND resolved_ast IS NULL
-                ]], { spec_id = spec_id })
-
-                for _, view in ipairs(views or {}) do
-                    local table_elem = generate({}, data, spec_id)
-
-                    if table_elem and pandoc then
-                        local doc = pandoc.Pandoc({table_elem})
-                        local ast_json = pandoc.write(doc, "json")
-
-                        data:execute([[
-                            UPDATE spec_views SET resolved_ast = :ast
-                            WHERE id = :id
-                        ]], { id = view.id, ast = ast_json })
-                    end
-                end
-            end
-        end
     }
 }

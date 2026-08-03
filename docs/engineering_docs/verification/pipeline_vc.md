@@ -303,5 +303,6 @@ Verify that cross-document view output is regenerated when source data in anothe
 > - The affected output is regenerated
 > - The rendered view reflects the updated cross-document data
 > - The output cache does not suppress emission when the assembled render input changes
+> - Views render live at EMIT; no view serves a stale precomputed AST across builds
 
 > traceability: [HLR-OUT-001](@), [HLR-OUT-004](@), [HLR-STOR-004](@), [LLR-049](@)

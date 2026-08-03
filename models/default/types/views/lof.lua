@@ -46,7 +46,6 @@ end
 
 local prefix_matcher = require("pipeline.shared.prefix_matcher")
 local match_lof_code = prefix_matcher.from_decl(schema)
-local match_lof_codeblock = prefix_matcher.codeblock_from_decl(schema)
 
 -- ============================================================================
 -- Data Generation
@@ -115,19 +114,19 @@ return {
 
             -- LOF/LOT generates block content - inline Code cannot be replaced with blocks.
             -- Return a placeholder or nil to keep the original code element.
-            -- Use ``` lof: ``` or ``` lot: ``` code block syntax for actual list rendering.
+            -- Place `lof:` or `lot:` alone in its own paragraph for the block list.
             local placeholder = prefix == "lot" and "[LOT]" or "[LOF]"
             return { pandoc.Str(placeholder) }
         end,
 
-        ---EMIT: Render CodeBlock elements with lof/lot class.
-        ---@param block table Pandoc CodeBlock element
+        ---EMIT: Render a standalone `lof:`/`lot:` paragraph (block-promoted by
+        ---emit_view; matched prefix and content arrive on ctx.subject).
         ---@param ctx Context
         ---@return table|nil Replacement block
         render_block = function(ctx)
-            local block = ctx.subject.element
-            local rest, prefix = match_lof_codeblock(block)
-            if not prefix then return nil end
+            local rest = ctx.subject.content
+            if rest == nil then return nil end
+            local prefix = ctx.subject.prefix
 
             local params = parse_params(rest)
 

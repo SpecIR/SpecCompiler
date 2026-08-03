@@ -12,6 +12,18 @@ local M = {}
 
 local registry = require("contract.registry")
 local hook_ctx = require("pipeline.shared.hook_ctx")
+local view_utils = require("pipeline.shared.view_utils")
+
+---Match Code text against a registered inline view prefix (case-insensitive).
+---Returns the content after `prefix:` (left-trimmed, original case) or nil.
+---@param text string Code element text
+---@param prefix string Registered inline view prefix (lowercase)
+---@return string|nil content
+local function match_prefix_content(text, prefix)
+    local prefix_colon = prefix .. ":"
+    if text:lower():sub(1, #prefix_colon) ~= prefix_colon then return nil end
+    return (text:sub(#prefix_colon + 1):gsub("^%s+", ""))
+end
 
 -- Shared state for inline handlers (e.g., tracking first-use abbreviations)
 -- This persists across the document walk
@@ -35,10 +47,15 @@ function M.transform_views_in_doc(doc, data, spec_id, log, pctx, diagnostics)
     inline_state = {}
 
     -- Build the canonical frozen ctx (HLR-EXT-009) for a view hook: the matched
-    -- Code/CodeBlock element is the subject; inline_state persists across the walk.
-    local function view_ctx(element, capability, view_id)
+    -- Code/CodeBlock element is the subject, along with the matched prefix, the
+    -- content after `prefix:`, and its parsed key=value params (parsed ONCE here
+    -- so hooks never re-match the surface text); inline_state persists across
+    -- the walk.
+    local function view_ctx(element, capability, iv, content)
         return hook_ctx.build(pctx, data, diagnostics,
-            { element = element, state = inline_state, view_id = view_id }, capability, spec_id)
+            { element = element, state = inline_state, view_id = iv.id,
+              prefix = iv.prefix, content = content,
+              params = view_utils.parse_params(content) }, capability, spec_id)
     end
 
     -- Two-pass walk: block-level promotion FIRST, then inline views.
@@ -57,10 +74,9 @@ function M.transform_views_in_doc(doc, data, spec_id, log, pctx, diagnostics)
             local text = elem.text or ""
 
             -- Try to match against registered inline view handlers
-            local text_lower = text:lower()
             for _, iv in ipairs(inline_views) do
-                local prefix_colon = iv.prefix .. ":"
-                if text_lower:sub(1, #prefix_colon) == prefix_colon then
+                local content = match_prefix_content(text, iv.prefix)
+                if content then
                     -- Block-promoted output uses the view's render_block hook,
                     -- not the inline render hook.
                     local render_block = host:get_hook_inherited("view", iv.id, "render_block")
@@ -68,7 +84,7 @@ function M.transform_views_in_doc(doc, data, spec_id, log, pctx, diagnostics)
                         -- Create synthetic CodeBlock for the handler
                         local synthetic = pandoc.CodeBlock(text,
                             pandoc.Attr("", {iv.prefix}))
-                        local result = render_block(view_ctx(synthetic, "render_block", iv.id))
+                        local result = render_block(view_ctx(synthetic, "render_block", iv, content))
                         if result then
                             log.debug("View Para handler: %s -> block", iv.id)
                             return result
@@ -87,14 +103,13 @@ function M.transform_views_in_doc(doc, data, spec_id, log, pctx, diagnostics)
             local text = code.text or ""
 
             -- Try to match against registered inline view handlers
-            local text_lower = text:lower()
             for _, iv in ipairs(inline_views) do
-                local prefix_colon = iv.prefix .. ":"
-                if text_lower:sub(1, #prefix_colon) == prefix_colon then
+                local content = match_prefix_content(text, iv.prefix)
+                if content then
                     -- Inline output uses the view's render hook.
                     local render = host:get_hook_inherited("view", iv.id, "render")
                     if render then
-                        local result = render(view_ctx(code, "render", iv.id))
+                        local result = render(view_ctx(code, "render", iv, content))
                         if result then
                             log.debug("View inline handler %s processed: %s",
                                 iv.id, text:sub(1, 20))

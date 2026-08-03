@@ -98,18 +98,22 @@ Verify spec_views table stores view definitions and views render from live data.
 > verification_method: Test
 
 > approach:
-> - Process document with ```toc and ```lof code blocks
+> - Process document with standalone inline views (`toc:`, `lof:`) and
+>   parameterized inline views (`toc: depth=1`)
 > - Query spec_views table
 > - Verify view_type_ref, raw_ast fields
 > - Verify the emitted output contains the rendered view content
+> - Verify `key=value` parameters survive block promotion and are honored
 
 > pass_criteria:
-> - Each view code block creates one record
+> - Each inline view creates one record
 > - view_type_ref matches view type
 > - raw_ast preserves the view definition content
 > - View content is rendered live at EMIT from current database state
->   (resolved_ast is populated only by view types that pre-render during
->   [dic:transform-phase](#), e.g. abbreviations)
+>   (spec_views.resolved_ast is reserved for views that declare external
+>   rendering; no in-tree view precomputes its output)
+> - Inline `key=value` parameters are parsed once at EMIT dispatch and honored
+>   by the view (e.g., a depth-limited TOC)
 
 > traceability: [HLR-TYPE-004](@), [LLR-062](@), [LLR-063](@)
 

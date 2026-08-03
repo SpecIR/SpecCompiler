@@ -122,25 +122,12 @@ M.insert_view = [[
     )
 ]]
 
--- Get views needing transformation (resolved_ast is NULL)
-M.views_needing_transform = [[
-    SELECT id, raw_ast FROM spec_views
-    WHERE specification_ref = :spec_id
-      AND view_type_ref = :view_type
-      AND resolved_ast IS NULL
-]]
-
 -- Get views by type and spec
 M.views_by_type = [[
     SELECT raw_ast FROM spec_views
     WHERE specification_ref = :spec_id
       AND view_type_ref = :view_type
     ORDER BY file_seq
-]]
-
--- Update view resolved_ast
-M.update_view_resolved = [[
-    UPDATE spec_views SET resolved_ast = :resolved WHERE id = :id
 ]]
 
 -- ============================================================================

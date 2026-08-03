@@ -4,9 +4,7 @@ local make_link_target = view_utils.make_link_target
 ---Generates a Pandoc Table showing HLR counts grouped by Software Function (SF).
 ---
 ---Usage in markdown:
----  Code block syntax:
----    ```requirements_summary
----    ```
+---  Inline syntax: `requirements_summary:` (alone in its own paragraph)
 ---
 ---@module requirements_summary
 

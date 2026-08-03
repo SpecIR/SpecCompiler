@@ -85,16 +85,16 @@ The type system shall provide a spec_floats container for numbered floating cont
 
 The type system shall provide a spec_views container for data-driven view definitions.
 
-> description: The `spec_views` table stores view definitions from code blocks and inline syntax:
+> description: The `spec_views` table stores view definitions from inline view syntax (views are inline-only; a view alone in its own paragraph is transparently promoted to block output at EMIT):
 >
 > - `identifier`: SHA1 hash of specification + sequence + content
 > - `specification_ref`: Foreign key to parent specification
-> - `view_type_ref`: Uppercase view type (e.g., "SELECT", "SYMBOL", "MATH", "ABBREV")
+> - `view_type_ref`: Uppercase view type (e.g., "TOC", "SYMBOL", "MATH", "ABBREV")
 > - `from_file`: Source file path
 > - `file_seq`: Document order sequence number
-> - `raw_ast`: View definition content (SQL query, symbol path, expression)
+> - `raw_ast`: View definition content (symbol path, expression, parameters)
 >
-> View types with `needs_external_render = 1` in `spec_view_types` are delegated to specialized renderers. Inline views use `TypeRef: content` syntax (e.g., `symbol: Class.method`).
+> View types with `needs_external_render = 1` in `spec_view_types` are delegated to specialized renderers. Inline views use `prefix: content` syntax (e.g., `symbol: Class.method`). The content may carry `key=value` parameters (e.g., `toc: depth=2`, `allocation_matrix: status=complete`); the EMIT dispatcher parses the prefix, content, and parameters once and passes them to the view's render hooks (`ctx.subject.prefix/content/params`).
 
 > rationale: Separating view definitions from rendering enables format-agnostic processing. External render delegation supports complex transformations (PlantUML, charts) without core handler changes.
 

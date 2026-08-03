@@ -4,9 +4,7 @@ local make_link_target = view_utils.make_link_target
 ---Generates a Pandoc Table showing HLR -> VC traceability with TR results.
 ---
 ---Usage in markdown:
----  Code block syntax:
----    ```traceability_matrix
----    ```
+---  Inline syntax: `traceability_matrix:` (alone in its own paragraph)
 ---
 ---@module traceability_matrix
 
