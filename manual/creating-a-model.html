@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>creating-a-model_html5</title>
   <style>
-
 html {
 color: #1a1a1a;
 background-color: #fdfdfd;
@@ -61,10 +60,6 @@ color: #1a1a1a;
 img {
 max-width: 100%;
 }
-svg {
-height: auto;
-max-width: 100%;
-}
 h1, h2, h3, h4, h5, h6 {
 margin-top: 1.4em;
 }
@@ -108,8 +103,8 @@ background-color: transparent;
 overflow: visible;
 }
 hr {
+background-color: #1a1a1a;
 border: none;
-border-top: 1px solid #1a1a1a;
 height: 1px;
 margin: 1em 0;
 }
@@ -167,9 +162,8 @@ vertical-align: middle;
 }
 .display.math{display: block; text-align: center; margin: 0.5rem auto;}
 
-html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -307,13 +301,13 @@ registration step and no magic file naming.</p>
 </div>
 <div data-pos="13:1-18:1">
 <ol type="1">
-<li><div data-pos="13:4-14:1">
+<li><div data-pos="13:1-14:1">
 Decide the <strong>kind</strong> (<code data-pos="13:25-13:33">object</code>, <code data-pos="13:35-13:42">float</code>, <code data-pos="13:44-13:50">view</code>, <code data-pos="13:52-13:62">relation</code>, <code data-pos="13:64-13:79">specification</code>, or <code data-pos="13:84-13:98">verification</code>).
 </div></li>
-<li><div data-pos="14:4-15:1">
+<li><div data-pos="14:1-15:1">
 Put your data in <strong><code data-pos="14:23-14:31">schema</code></strong> (the authoritative <code data-pos="14:53-14:57">id</code>, <code data-pos="14:59-14:68">extends</code>, <code data-pos="14:70-14:82">attributes</code>, …).
 </div></li>
-<li><div data-pos="15:4-16:1">
+<li><div data-pos="15:1-17:1">
 Pick the <strong>hook</strong> whose name matches the intent — a <code data-pos="15:56-15:64">render</code>/<code data-pos="15:65-15:79">render_block</code>/<code data-pos="15:80-15:93">render_link</code> hook to produce output during
 EMIT, or a data hook like <code data-pos="15:150-15:159">dataset</code>,
 <code data-pos="15:161-15:172">transform</code>, or <code data-pos="15:177-15:186">resolve</code> to produce data earlier. The
@@ -441,11 +435,11 @@ passes:</p>
 </div>
 <div data-pos="115:1-119:1">
 <ol type="1">
-<li><div data-pos="115:4-116:1">
+<li><div data-pos="115:1-116:1">
 <code data-pos="115:4-115:27">models/default/types/</code> — loaded
 first.
 </div></li>
-<li><div data-pos="116:4-117:1">
+<li><div data-pos="116:1-118:1">
 <code data-pos="116:4-116:27">models/mymodel/types/</code> — loaded
 second; a descriptor whose <code data-pos="116:64-116:75">schema.id</code> matches a default one replaces
 the default (the database insert is <code data-pos="116:143-116:162">INSERT OR REPLACE</code>, so the last writer
@@ -510,7 +504,7 @@ useful when a type needs helper modules alongside it.</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Type categories, their kind, and the hooks they typically declare</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">Category</th>
 <th style="text-align: left;"><code>kind</code></th>
 <th style="text-align: left;">Example file</th>
@@ -518,28 +512,28 @@ useful when a type needs helper modules alongside it.</p>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;">Object</td>
 <td style="text-align: left;"><code>&quot;object&quot;</code></td>
 <td style="text-align: left;"><code>types/objects/hlr.lua</code></td>
 <td style="text-align: left;">none (omit <code>hooks</code>), or
 <code>render</code></td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;">Float</td>
 <td style="text-align: left;"><code>&quot;float&quot;</code></td>
 <td style="text-align: left;"><code>types/floats/figure.lua</code></td>
 <td style="text-align: left;"><code>transform</code>, or
 <code>prepare_task</code> + <code>handle_result</code></td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;">Relation</td>
 <td style="text-align: left;"><code>&quot;relation&quot;</code></td>
 <td style="text-align: left;"><code>types/relations/traces_to.lua</code></td>
 <td style="text-align: left;">none, <code>render_link</code>, or
 <code>resolve</code></td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;">View</td>
 <td style="text-align: left;"><code>&quot;view&quot;</code></td>
 <td style="text-align: left;"><code>types/views/abbrev.lua</code></td>
@@ -547,13 +541,13 @@ useful when a type needs helper modules alongside it.</p>
 <code>render_block</code>, <code>dataset</code>,
 <code>build_block</code></td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;">Specification</td>
 <td style="text-align: left;"><code>&quot;specification&quot;</code></td>
 <td style="text-align: left;"><code>types/specifications/srs.lua</code></td>
 <td style="text-align: left;">none (omit <code>hooks</code>)</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;">Verification</td>
 <td style="text-align: left;"><code>&quot;verification&quot;</code></td>
 <td style="text-align: left;"><code>verification_views/vc_missing_hlr.lua</code></td>
@@ -614,7 +608,7 @@ another handler, declare the ordering in the schema: <code data-pos="199:433-199
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> The hook catalogue: each hook&#39;s kind, tier, the one return type, and when it fires</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">Hook</th>
 <th style="text-align: left;">Kind(s)</th>
 <th style="text-align: left;">Tier</th>
@@ -623,7 +617,7 @@ another handler, declare the ordering in the schema: <code data-pos="199:433-199
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>render</code></td>
 <td style="text-align: left;">object, specification, float, view</td>
 <td style="text-align: left;">render</td>
@@ -631,7 +625,7 @@ another handler, declare the ordering in the schema: <code data-pos="199:433-199
 <td style="text-align: left;">EMIT, when the element of this type is
 being rendered.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>render_block</code></td>
 <td style="text-align: left;">view</td>
 <td style="text-align: left;">render</td>
@@ -639,7 +633,7 @@ being rendered.</td>
 <td style="text-align: left;">EMIT, for a block view written as a fenced
 <code>```prefix</code> code block.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>render_link</code></td>
 <td style="text-align: left;">relation</td>
 <td style="text-align: left;">render</td>
@@ -647,7 +641,7 @@ being rendered.</td>
 <td style="text-align: left;">EMIT, to produce the visible text of a
 link of this relation type.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>message</code></td>
 <td style="text-align: left;">verification</td>
 <td style="text-align: left;">render</td>
@@ -655,7 +649,7 @@ link of this relation type.</td>
 <td style="text-align: left;">VERIFY, once per row the verification SQL
 view returns.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>dataset</code></td>
 <td style="text-align: left;">view</td>
 <td style="text-align: left;">data</td>
@@ -663,7 +657,7 @@ view returns.</td>
 <td style="text-align: left;">When a chart/data view needs its dataset
 (<code>ctx.subject.params</code>).</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>build_block</code></td>
 <td style="text-align: left;">view</td>
 <td style="text-align: left;">data</td>
@@ -671,7 +665,7 @@ view returns.</td>
 <td style="text-align: left;">When a <code>TABLE_VIEW</code> subtype
 builds its generated table.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>transform</code></td>
 <td style="text-align: left;">float</td>
 <td style="text-align: left;">data</td>
@@ -679,7 +673,7 @@ builds its generated table.</td>
 <td style="text-align: left;">TRANSFORM, to resolve a float internally
 (<code>ctx.subject.raw_content</code>, <code>.float</code>).</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>prepare_task</code></td>
 <td style="text-align: left;">float</td>
 <td style="text-align: left;">data</td>
@@ -688,7 +682,7 @@ skip)</td>
 <td style="text-align: left;">TRANSFORM, to spawn an external tool
 (<code>ctx.subject.float</code>, <code>.build_dir</code>).</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>handle_result</code></td>
 <td style="text-align: left;">float</td>
 <td style="text-align: left;">data</td>
@@ -697,7 +691,7 @@ skip)</td>
 (<code>ctx.subject.task</code>, <code>.success</code>,
 <code>.stderr</code>).</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>resolve</code></td>
 <td style="text-align: left;">relation</td>
 <td style="text-align: left;">data</td>
@@ -718,13 +712,13 @@ the host rejects it.</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> The frozen context fields, by tier</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">Field</th>
 <th style="text-align: left;">Meaning</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>ctx.subject</code></td>
 <td style="text-align: left;">The polymorphic payload for this hook
 (e.g. <code>{ object, attributes, specification, element }</code> for an
@@ -733,40 +727,40 @@ transform, <code>{ params }</code> for a view dataset,
 <code>{ target }</code> for a link render, <code>{ row }</code> for a
 verification message). The shape depends on the hook.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>ctx.data</code></td>
 <td style="text-align: left;">The <code>DataManager</code> (the SpecIR
 database) for custom queries. Present on both tiers.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>ctx.spec_id</code></td>
 <td style="text-align: left;">Identifier of the specification being
 processed. Present on both tiers.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>ctx.log</code></td>
 <td style="text-align: left;">Logger (<code>log.warn</code>,
 <code>log.debug</code>, …). Present on both tiers.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>ctx.pandoc</code></td>
 <td style="text-align: left;">The Pandoc module. <strong>Render tier
 only</strong> — a data hook has no Pandoc element yet.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>ctx.format</code></td>
 <td style="text-align: left;">Target output format (<code>docx</code>,
 <code>html5</code>, <code>gfm</code>, <code>json</code>). <strong>Render
 tier only.</strong></td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>ctx.diagnostics</code>,
 <code>ctx.model</code>, <code>ctx.config</code></td>
 <td style="text-align: left;">Diagnostics sink, model name, project
 config. Always on the render tier; on the data tier when the caller has
 them.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>ctx.host</code></td>
 <td style="text-align: left;">The registry, for cross-hook dispatch
 (e.g. <code>ctx.host:get_hook(&quot;view&quot;, id, &quot;build_block&quot;)</code>). Render
@@ -987,7 +981,7 @@ it. (The host enforces this: a view that extends <code data-pos="421:381-421:393
 <span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>                    <span class="op">{</span> <span class="va">pandoc</span><span class="op">.</span>Plain<span class="op">({</span> <span class="va">pandoc</span><span class="op">.</span>Str<span class="op">(</span><span class="va">row</span><span class="op">.</span><span class="va">vc_pid</span>  <span class="kw">or</span> <span class="st">&quot;&quot;</span><span class="op">)</span> <span class="op">})</span> <span class="op">},</span></span>
 <span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>                <span class="op">})</span></span>
 <span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
-<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">tbl</span> <span class="op">=</span> <span class="va">pandoc</span><span class="op">.</span>SimpleTable<span class="op">({},</span> <span class="op">{</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">AlignLeft</span><span class="op">,</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">AlignLeft</span> <span class="op">},</span></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">tbl</span> <span class="op">=</span> <span class="va">pandoc</span><span class="op">.</span>SimpleTable<span class="op">({},</span> <span class="op">{</span> <span class="va">pandoc</span><span class="op">.</span><span class="cn">A</span><span class="va">lignLeft</span><span class="op">,</span> <span class="va">pandoc</span><span class="op">.</span><span class="cn">A</span><span class="va">lignLeft</span> <span class="op">},</span></span>
 <span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>                <span class="op">{</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span> <span class="op">},</span> <span class="va">header</span><span class="op">,</span> <span class="va">body</span><span class="op">)</span></span>
 <span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">pandoc</span><span class="op">.</span><span class="va">utils</span><span class="op">.</span>from_simple_table<span class="op">(</span><span class="va">tbl</span><span class="op">)</span></span>
 <span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
@@ -1072,7 +1066,7 @@ is ignored by the insert.</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Object schema fields</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">Field</th>
 <th style="text-align: left;">Type</th>
 <th style="text-align: left;">Default</th>
@@ -1080,81 +1074,81 @@ is ignored by the insert.</p>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>id</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">required</td>
 <td style="text-align: left;">Unique identifier (uppercase
 convention).</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>long_name</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">same as <code>id</code></td>
 <td style="text-align: left;">Human-readable name.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>description</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;"><code>&quot;&quot;</code></td>
 <td style="text-align: left;">Description text.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>extends</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Base type for attribute + hook inheritance
 (e.g. <code>TRACEABLE</code>).</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>is_default</code></td>
 <td style="text-align: left;">boolean</td>
 <td style="text-align: left;">false</td>
 <td style="text-align: left;">Headers without an explicit type match
 this type.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>is_composite</code></td>
 <td style="text-align: left;">boolean</td>
 <td style="text-align: left;">false</td>
 <td style="text-align: left;">Hierarchical object (contains children
 with their own PIDs).</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>is_required</code></td>
 <td style="text-align: left;">boolean</td>
 <td style="text-align: left;">false</td>
 <td style="text-align: left;">The specification must contain at least
 one object of this type.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>pid_prefix</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Prefix for auto-generated PIDs.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>pid_format</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Printf format
 (e.g. <code>&quot;%s-%03d&quot;</code>).</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>aliases</code></td>
 <td style="text-align: left;">list</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Alternative identifiers for syntax
 matching.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>implicit_aliases</code></td>
 <td style="text-align: left;">list</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Titles that auto-resolve to this type
 (e.g. <code>&quot;References&quot;</code> -&gt; <code>REFERENCES</code>).</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>attributes</code></td>
 <td style="text-align: left;">list</td>
 <td style="text-align: left;">nil</td>
@@ -1167,7 +1161,7 @@ matching.</td>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Attribute definition fields</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">Field</th>
 <th style="text-align: left;">Type</th>
 <th style="text-align: left;">Default</th>
@@ -1175,13 +1169,13 @@ matching.</td>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>name</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">required</td>
 <td style="text-align: left;">Attribute identifier.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>type</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;"><code>&quot;STRING&quot;</code></td>
@@ -1190,33 +1184,33 @@ matching.</td>
 <code>BOOLEAN</code>, <code>DATE</code>, <code>ENUM</code>,
 <code>XHTML</code>.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>min_occurs</code></td>
 <td style="text-align: left;">integer</td>
 <td style="text-align: left;">0</td>
 <td style="text-align: left;">0 = optional, 1 = required.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>max_occurs</code></td>
 <td style="text-align: left;">integer</td>
 <td style="text-align: left;">1</td>
 <td style="text-align: left;">Maximum number of values.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>min_value</code> /
 <code>max_value</code></td>
 <td style="text-align: left;">number</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Bounds for numeric types.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>values</code></td>
 <td style="text-align: left;">list</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Required when
 <code>type = &quot;ENUM&quot;</code>.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>datatype_ref</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">auto</td>
@@ -1231,7 +1225,7 @@ For <code>ENUM</code> the default is
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Float schema fields</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">Field</th>
 <th style="text-align: left;">Type</th>
 <th style="text-align: left;">Default</th>
@@ -1239,45 +1233,45 @@ For <code>ENUM</code> the default is
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>id</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">required</td>
 <td style="text-align: left;">Unique identifier.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>long_name</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">same as <code>id</code></td>
 <td style="text-align: left;">Human-readable name.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>description</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;"><code>&quot;&quot;</code></td>
 <td style="text-align: left;">Description text.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>caption_format</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">same as <code>id</code></td>
 <td style="text-align: left;">Prefix used in output captions
 (e.g. <code>&quot;Figure&quot;</code>).</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>counter_group</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">same as <code>id</code></td>
 <td style="text-align: left;">Counter sharing group. Floats with the
 same <code>counter_group</code> share one numbering sequence.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>aliases</code></td>
 <td style="text-align: left;">list</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Alternative fence prefixes.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>needs_external_render</code></td>
 <td style="text-align: left;">boolean</td>
 <td style="text-align: left;">false</td>
@@ -1291,7 +1285,7 @@ renderers</a>.</td>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Relation schema fields</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">Field</th>
 <th style="text-align: left;">Type</th>
 <th style="text-align: left;">Default</th>
@@ -1299,13 +1293,13 @@ renderers</a>.</td>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>id</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">required</td>
 <td style="text-align: left;">Unique identifier.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>extends</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
@@ -1314,35 +1308,35 @@ renderers</a>.</td>
 (<code>#</code>). Inherits selector, <code>resolve</code>, and default
 <code>render_link</code>.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>link_selector</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">inherited</td>
 <td style="text-align: left;">Override the inherited selector
 (<code>@</code> or <code>#</code>). Rarely needed.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>source_type_ref</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Constrain the source object type (nil =
 any).</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>target_type_ref</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Constrain the target type (nil = any).
 Comma-separated list accepted.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>source_attribute</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Constrain to links inside this
 attribute.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>is_structural</code></td>
 <td style="text-align: left;">boolean</td>
 <td style="text-align: left;">false</td>
@@ -1368,7 +1362,7 @@ FIGURE matches <code data-pos="706:293-706:306">XREF_FIGURE</code>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> View schema fields</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">Field</th>
 <th style="text-align: left;">Type</th>
 <th style="text-align: left;">Default</th>
@@ -1376,53 +1370,53 @@ FIGURE matches <code data-pos="706:293-706:306">XREF_FIGURE</code>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>id</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">required</td>
 <td style="text-align: left;">Unique identifier.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>long_name</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">same as <code>id</code></td>
 <td style="text-align: left;">Human-readable name.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>inline_prefix</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Prefix for inline-code dispatch
 (<code>&quot;symbol&quot;</code> enables <code>`symbol: ...`</code>).</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>aliases</code></td>
 <td style="text-align: left;">list</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Alternative prefixes for the same view
 type.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>materializer_type</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Strategy (<code>&#39;toc&#39;</code>,
 <code>&#39;lof&#39;</code>, …) for built-in materialised views.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>counter_group</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Counter group for numbered views.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>view_subtype_ref</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">The view-element subtype this view
 aggregates (e.g. <code>ABBREV</code>).</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>needs_external_render</code></td>
 <td style="text-align: left;">boolean</td>
 <td style="text-align: left;">false</td>
@@ -1435,28 +1429,28 @@ renderers</a>.</td>
 Extension checklist</h1>
 <div data-pos="754:1-763:1">
 <ol type="1">
-<li><div data-pos="754:4-755:1">
+<li><div data-pos="754:1-755:1">
 Pick a model name (lowercase, matches the directory name).
 </div></li>
-<li><div data-pos="755:4-756:1">
+<li><div data-pos="755:1-756:1">
 Create <code data-pos="755:11-755:34">models/&lt;name&gt;/types/…</code>
 with the categories you need.
 </div></li>
-<li><div data-pos="756:4-757:1">
+<li><div data-pos="756:1-757:1">
 Write each type as one descriptor: pick the <code data-pos="756:48-756:54">kind</code>, fill <code data-pos="756:61-756:69">schema</code>, return <code data-pos="756:78-756:103">{ kind, schema, hooks }</code>.
 </div></li>
-<li><div data-pos="757:4-758:1">
+<li><div data-pos="757:1-758:1">
 Add a hook to <code data-pos="757:18-757:25">hooks</code> only if you
 need custom behaviour — pick the hook whose name matches the intent.
 </div></li>
-<li><div data-pos="758:4-759:1">
+<li><div data-pos="758:1-759:1">
 Set <code data-pos="758:8-758:26">template: &lt;name&gt;</code> in <code data-pos="758:30-758:44">project.yaml</code>.
 </div></li>
-<li><div data-pos="759:4-760:1">
+<li><div data-pos="759:1-760:1">
 Run <code data-pos="759:8-759:21">specc build</code> and inspect the
 output.
 </div></li>
-<li><div data-pos="760:4-761:1">
+<li><div data-pos="760:1-762:1">
 Add a verification descriptor if the domain has rules to enforce (see <a href="#verification-views" data-pos="760:74-760:115">Verification
 views</a>).
 </div></li>
@@ -1591,27 +1585,27 @@ external pair is also rejected.)</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Task descriptor returned by prepare_task</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">Field</th>
 <th style="text-align: left;">Purpose</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>cmd</code>, <code>args</code>,
 <code>opts</code></td>
 <td style="text-align: left;">Process to spawn and its options.
 <code>opts.timeout</code> is in milliseconds; <code>opts.cwd</code> sets
 the working directory.</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>output_path</code></td>
 <td style="text-align: left;">File-based cache key. If the file already
 exists, the process is not spawned — <code>handle_result</code> runs
 immediately with the cached path. Put the content hash in the filename
 so input changes trigger a fresh render.</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>context</code></td>
 <td style="text-align: left;">Arbitrary table passed through to
 <code>handle_result</code> (read as <code>task.context</code>).</td>
@@ -1676,15 +1670,15 @@ unchanged input hits the file-based cache.</p>
 <h1 data-number="15" data-pos="908:1-909:1" id="pointers"><span class="header-section-number">15</span> Pointers</h1>
 <div data-pos="910:1-913:1">
 <ul>
-<li><div data-pos="910:3-911:1">
+<li><div data-pos="910:1-911:1">
 <a href="../manual.md" data-pos="910:3-910:30">User manual</a> —
 day-to-day authoring syntax.
 </div></li>
-<li><div data-pos="911:3-912:1">
+<li><div data-pos="911:1-912:1">
 Engineering docs — the <a href="../../engineering_docs/architecture/type_system.md" data-pos="911:26-911:95">type system SDD</a> is the authoritative
 contract; <a href="../../engineering_docs/architecture/type_discovery_design.md" data-pos="911:127-911:205">type discovery</a> and <a href="../../engineering_docs/architecture/model_design.md" data-pos="911:210-911:277">model design</a> cover internals.
 </div></li>
-<li><div data-pos="912:3-913:1">
+<li><div data-pos="912:1-913:1">
 <a href="../../engineering_docs/dictionary/concepts.md" data-pos="912:3-912:71">Concepts dictionary</a> — vocabulary reference.
 </div></li>
 </ul>

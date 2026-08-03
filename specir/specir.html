@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>specir_html5</title>
   <style>
-
 html {
 color: #1a1a1a;
 background-color: #fdfdfd;
@@ -61,10 +60,6 @@ color: #1a1a1a;
 img {
 max-width: 100%;
 }
-svg {
-height: auto;
-max-width: 100%;
-}
 h1, h2, h3, h4, h5, h6 {
 margin-top: 1.4em;
 }
@@ -108,8 +103,8 @@ background-color: transparent;
 overflow: visible;
 }
 hr {
+background-color: #1a1a1a;
 border: none;
-border-top: 1px solid #1a1a1a;
 height: 1px;
 margin: 1em 0;
 }
@@ -257,17 +252,17 @@ common ground.</p>
 </div>
 <div data-pos="33:1-38:1">
 <ol type="1">
-<li><div data-pos="33:4-34:1">
+<li><div data-pos="33:1-34:1">
 <strong>Type System</strong> — defines the metamodel (what types of
 objects, floats, relations, and views can exist). Populated from model
 definitions.
 </div></li>
-<li><div data-pos="34:4-35:1">
+<li><div data-pos="34:1-35:1">
 <strong>Content</strong> — stores actual specification data
 (requirements, tests, figures, traceability links). Populated by the
 compiler or by importers.
 </div></li>
-<li><div data-pos="35:4-36:1">
+<li><div data-pos="35:1-37:1">
 <strong>Tooling</strong> (non-core) — build caches, full-text search
 indexes, and output tracking. These are SpecCompiler implementation
 details and are <strong>not part of the SpecIR specification</strong>.
@@ -294,59 +289,59 @@ question: “What kinds of things can exist in this specification?”</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_object_types columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>identifier</td>
 <td>TEXT PK</td>
 <td>Unique type code (e.g. HLR)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>long_name</td>
 <td>TEXT NOT NULL UNIQUE</td>
 <td>Human-readable name</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>description</td>
 <td>TEXT</td>
 <td>Documentation</td>
 </tr>
-<tr>
+<tr class="even">
 <td>extends</td>
 <td>TEXT</td>
 <td>Parent type for inheritance</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>is_composite</td>
 <td>INTEGER DEFAULT 0</td>
 <td>1 = container type (e.g. SECTION)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>is_required</td>
 <td>INTEGER DEFAULT 0</td>
 <td>1 = every spec must have at least one</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>is_default</td>
 <td>INTEGER DEFAULT 0</td>
 <td>1 = used when header has no explicit type</td>
 </tr>
-<tr>
+<tr class="even">
 <td>pid_prefix</td>
 <td>TEXT</td>
 <td>Default PID prefix for auto-generation</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>pid_format</td>
 <td>TEXT DEFAULT &#39;%s-%03d&#39;</td>
 <td>Printf format for auto-generated PIDs</td>
 </tr>
-<tr>
+<tr class="even">
 <td>aliases</td>
 <td>TEXT</td>
 <td>Comma-wrapped aliases (e.g. &quot;,hlr,req,&quot;)</td>
@@ -361,44 +356,44 @@ question: “What kinds of things can exist in this specification?”</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_float_types columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>identifier</td>
 <td>TEXT PK</td>
 <td>Unique type code (e.g. FIGURE)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>long_name</td>
 <td>TEXT NOT NULL UNIQUE</td>
 <td>Human-readable name</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>description</td>
 <td>TEXT</td>
 <td>Documentation</td>
 </tr>
-<tr>
+<tr class="even">
 <td>caption_format</td>
 <td>TEXT</td>
 <td>Printf format for captions (e.g. Figure %d)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>counter_group</td>
 <td>TEXT</td>
 <td>Shared numbering group</td>
 </tr>
-<tr>
+<tr class="even">
 <td>aliases</td>
 <td>TEXT</td>
 <td>Comma-wrapped aliases for syntax recognition</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>needs_external_render</td>
 <td>INTEGER DEFAULT 0</td>
 <td>1 = requires external tool</td>
@@ -415,49 +410,49 @@ TRACES_TO).</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_relation_types columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>identifier</td>
 <td>TEXT PK</td>
 <td>Unique relation type code</td>
 </tr>
-<tr>
+<tr class="even">
 <td>long_name</td>
 <td>TEXT NOT NULL UNIQUE</td>
 <td>Human-readable name</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>description</td>
 <td>TEXT</td>
 <td>Documentation</td>
 </tr>
-<tr>
+<tr class="even">
 <td>extends</td>
 <td>TEXT</td>
 <td>Parent relation type for inheritance</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>source_type_ref</td>
 <td>TEXT FK</td>
 <td>Constrain source object type (NULL = any)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>target_type_ref</td>
 <td>TEXT FK</td>
 <td>Constrain target object type (NULL = any)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>link_selector</td>
 <td>TEXT</td>
 <td>Syntax selector (&quot;@&quot; or &quot;#&quot;)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>source_attribute</td>
 <td>TEXT</td>
 <td>Attribute name for inference</td>
@@ -472,54 +467,54 @@ TRACES_TO).</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_view_types columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>identifier</td>
 <td>TEXT PK</td>
 <td>Unique view type code</td>
 </tr>
-<tr>
+<tr class="even">
 <td>long_name</td>
 <td>TEXT NOT NULL UNIQUE</td>
 <td>Human-readable name</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>description</td>
 <td>TEXT</td>
 <td>Documentation</td>
 </tr>
-<tr>
+<tr class="even">
 <td>counter_group</td>
 <td>TEXT</td>
 <td>Float counter group to list</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>aliases</td>
 <td>TEXT</td>
 <td>Comma-wrapped aliases</td>
 </tr>
-<tr>
+<tr class="even">
 <td>inline_prefix</td>
 <td>TEXT</td>
 <td>Prefix for inline syntax (e.g. abbrev)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>materializer_type</td>
 <td>TEXT</td>
 <td>Materialization strategy (toc, lof, abbrev_list, custom)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>view_subtype_ref</td>
 <td>TEXT</td>
 <td>Parent view type for subtyped views</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>needs_external_render</td>
 <td>INTEGER DEFAULT 0</td>
 <td>1 = requires external tool</td>
@@ -534,34 +529,34 @@ TRACES_TO).</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_specification_types columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>identifier</td>
 <td>TEXT PK</td>
 <td>Unique specification type code</td>
 </tr>
-<tr>
+<tr class="even">
 <td>long_name</td>
 <td>TEXT NOT NULL UNIQUE</td>
 <td>Human-readable name</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>description</td>
 <td>TEXT</td>
 <td>Documentation</td>
 </tr>
-<tr>
+<tr class="even">
 <td>extends</td>
 <td>TEXT</td>
 <td>Parent type for inheritance</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>is_default</td>
 <td>INTEGER DEFAULT 0</td>
 <td>1 = default when no explicit type</td>
@@ -578,24 +573,24 @@ etc.).</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> datatype_definitions columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>identifier</td>
 <td>TEXT PK</td>
 <td>Unique datatype ID</td>
 </tr>
-<tr>
+<tr class="even">
 <td>long_name</td>
 <td>TEXT NOT NULL UNIQUE</td>
 <td>Human-readable name</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>type</td>
 <td>TEXT NOT NULL</td>
 <td>Primitive category: STRING, INTEGER, REAL, BOOLEAN, DATE, ENUM,
@@ -617,49 +612,49 @@ spec_attribute_types</h2>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_attribute_types columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>identifier</td>
 <td>TEXT PK</td>
 <td>Unique attribute definition ID</td>
 </tr>
-<tr>
+<tr class="even">
 <td>owner_type_ref</td>
 <td>TEXT NOT NULL FK</td>
 <td>Object type that owns this attribute</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>long_name</td>
 <td>TEXT NOT NULL</td>
 <td>Attribute name as written in source</td>
 </tr>
-<tr>
+<tr class="even">
 <td>datatype_ref</td>
 <td>TEXT NOT NULL FK</td>
 <td>Data type (FK to datatype_definitions)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>min_occurs</td>
 <td>INTEGER DEFAULT 0</td>
 <td>Minimum occurrences (0 = optional)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>max_occurs</td>
 <td>INTEGER DEFAULT 1</td>
 <td>Maximum occurrences</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>min_value</td>
 <td>REAL</td>
 <td>Minimum bound for INTEGER/REAL</td>
 </tr>
-<tr>
+<tr class="even">
 <td>max_value</td>
 <td>REAL</td>
 <td>Maximum bound for INTEGER/REAL</td>
@@ -678,29 +673,29 @@ can define an attribute name only once.</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> enum_values columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>identifier</td>
 <td>TEXT PK</td>
 <td>Unique enum value ID (e.g. STATUS_DRAFT)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>datatype_ref</td>
 <td>TEXT NOT NULL FK</td>
 <td>Parent ENUM datatype</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>key</td>
 <td>TEXT NOT NULL</td>
 <td>Value as written in source</td>
 </tr>
-<tr>
+<tr class="even">
 <td>sequence</td>
 <td>INTEGER DEFAULT 0</td>
 <td>Display order</td>
@@ -716,19 +711,19 @@ can define an attribute name only once.</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> implicit_type_aliases columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>alias</td>
 <td>TEXT PK COLLATE NOCASE</td>
 <td>Title text that triggers this type</td>
 </tr>
-<tr>
+<tr class="even">
 <td>object_type_id</td>
 <td>TEXT NOT NULL FK</td>
 <td>Object type to assign</td>
@@ -745,19 +740,19 @@ implicit_spec_type_aliases</h2>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> implicit_spec_type_aliases columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>alias</td>
 <td>TEXT PK COLLATE NOCASE</td>
 <td>Title text that triggers this type</td>
 </tr>
-<tr>
+<tr class="even">
 <td>spec_type_id</td>
 <td>TEXT NOT NULL FK</td>
 <td>Specification type to assign</td>
@@ -781,44 +776,44 @@ question: “What does this specification contain?”</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> specifications columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>identifier</td>
 <td>TEXT PK</td>
 <td>Filename slug (natural key)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>root_path</td>
 <td>TEXT NOT NULL UNIQUE</td>
 <td>Absolute path to root .md file</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>long_name</td>
 <td>TEXT</td>
 <td>Document title from H1 header</td>
 </tr>
-<tr>
+<tr class="even">
 <td>type_ref</td>
 <td>TEXT FK</td>
 <td>Specification type</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>pid</td>
 <td>TEXT</td>
 <td>Project identifier from @PID syntax</td>
 </tr>
-<tr>
+<tr class="even">
 <td>header_ast</td>
 <td>JSON</td>
 <td>Rendered H1 header as Pandoc AST</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>body_ast</td>
 <td>JSON</td>
 <td>Body content between H1 and first H2</td>
@@ -834,89 +829,89 @@ headers.</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_objects columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>id</td>
 <td>INTEGER PK</td>
 <td>Auto-assigned internal key</td>
 </tr>
-<tr>
+<tr class="even">
 <td>content_sha</td>
 <td>TEXT</td>
 <td>SHA1 checksum for change detection</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>specification_ref</td>
 <td>TEXT NOT NULL FK</td>
 <td>Parent specification</td>
 </tr>
-<tr>
+<tr class="even">
 <td>type_ref</td>
 <td>TEXT NOT NULL FK</td>
 <td>Object type</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>from_file</td>
 <td>TEXT NOT NULL</td>
 <td>Source file path</td>
 </tr>
-<tr>
+<tr class="even">
 <td>file_seq</td>
 <td>INTEGER NOT NULL</td>
 <td>Sequence within file (0-indexed)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>pid</td>
 <td>TEXT</td>
 <td>Project identifier</td>
 </tr>
-<tr>
+<tr class="even">
 <td>pid_prefix</td>
 <td>TEXT</td>
 <td>Extracted PID prefix</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>pid_sequence</td>
 <td>INTEGER</td>
 <td>Extracted PID sequence number</td>
 </tr>
-<tr>
+<tr class="even">
 <td>pid_auto_generated</td>
 <td>INTEGER DEFAULT 0</td>
 <td>1 = PID was auto-generated</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>title_text</td>
 <td>TEXT NOT NULL</td>
 <td>Plain-text title</td>
 </tr>
-<tr>
+<tr class="even">
 <td>label</td>
 <td>TEXT</td>
 <td>Unified label for # resolution</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>level</td>
 <td>INTEGER</td>
 <td>Heading level (2--6)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>start_line</td>
 <td>INTEGER</td>
 <td>Start line in source (1-indexed)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>end_line</td>
 <td>INTEGER</td>
 <td>End line in source</td>
 </tr>
-<tr>
+<tr class="even">
 <td>ast</td>
 <td>JSON</td>
 <td>Body as Pandoc AST</td>
@@ -937,94 +932,94 @@ specification_ref + pid).</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_floats columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>id</td>
 <td>INTEGER PK</td>
 <td>Auto-assigned internal key</td>
 </tr>
-<tr>
+<tr class="even">
 <td>content_sha</td>
 <td>TEXT</td>
 <td>SHA1 checksum for change detection</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>specification_ref</td>
 <td>TEXT NOT NULL FK</td>
 <td>Parent specification</td>
 </tr>
-<tr>
+<tr class="even">
 <td>type_ref</td>
 <td>TEXT NOT NULL FK</td>
 <td>Float type</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>from_file</td>
 <td>TEXT NOT NULL</td>
 <td>Source file path</td>
 </tr>
-<tr>
+<tr class="even">
 <td>file_seq</td>
 <td>INTEGER NOT NULL</td>
 <td>Sequence within file</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>start_line</td>
 <td>INTEGER</td>
 <td>Start line in source</td>
 </tr>
-<tr>
+<tr class="even">
 <td>label</td>
 <td>TEXT NOT NULL</td>
 <td>Cross-reference label</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>number</td>
 <td>INTEGER</td>
 <td>Auto-assigned number within counter group</td>
 </tr>
-<tr>
+<tr class="even">
 <td>caption</td>
 <td>TEXT</td>
 <td>Caption text</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>pandoc_attributes</td>
 <td>JSON</td>
 <td>Parsed attributes from code block</td>
 </tr>
-<tr>
+<tr class="even">
 <td>raw_content</td>
 <td>TEXT</td>
 <td>Original raw content</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>raw_ast</td>
 <td>JSON</td>
 <td>Original Pandoc AST</td>
 </tr>
-<tr>
+<tr class="even">
 <td>resolved_ast</td>
 <td>JSON</td>
 <td>Processed AST after rendering</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>parent_object_id</td>
 <td>INTEGER FK</td>
 <td>Containing spec object</td>
 </tr>
-<tr>
+<tr class="even">
 <td>anchor</td>
 <td>TEXT</td>
 <td>HTML anchor for linking</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>syntax_key</td>
 <td>TEXT</td>
 <td>Original syntax from code block</td>
@@ -1039,74 +1034,74 @@ specification_ref + pid).</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_relations columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>id</td>
 <td>INTEGER PK</td>
 <td>Auto-assigned internal key</td>
 </tr>
-<tr>
+<tr class="even">
 <td>content_sha</td>
 <td>TEXT</td>
 <td>SHA1 checksum for change detection</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>specification_ref</td>
 <td>TEXT NOT NULL FK</td>
 <td>Parent specification</td>
 </tr>
-<tr>
+<tr class="even">
 <td>source_object_id</td>
 <td>INTEGER NOT NULL FK</td>
 <td>Source object</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>target_text</td>
 <td>TEXT</td>
 <td>Target as written (before resolution)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>target_object_id</td>
 <td>INTEGER FK</td>
 <td>Resolved target object (NULL if unresolved)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>target_float_id</td>
 <td>INTEGER FK</td>
 <td>Resolved target float (NULL if unresolved)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>type_ref</td>
 <td>TEXT FK</td>
 <td>Inferred relation type</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>is_ambiguous</td>
 <td>INTEGER DEFAULT 0</td>
 <td>1 = multiple matches found</td>
 </tr>
-<tr>
+<tr class="even">
 <td>from_file</td>
 <td>TEXT NOT NULL</td>
 <td>Source file</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>link_line</td>
 <td>INTEGER DEFAULT 0</td>
 <td>Line number of link</td>
 </tr>
-<tr>
+<tr class="even">
 <td>source_attribute</td>
 <td>TEXT</td>
 <td>Attribute containing the link (NULL if in body)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>link_selector</td>
 <td>TEXT</td>
 <td>Selector syntax (&quot;@&quot; or &quot;#&quot;)</td>
@@ -1121,59 +1116,59 @@ specification_ref + pid).</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_views columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>id</td>
 <td>INTEGER PK</td>
 <td>Auto-assigned internal key</td>
 </tr>
-<tr>
+<tr class="even">
 <td>content_sha</td>
 <td>TEXT</td>
 <td>SHA1 checksum for change detection</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>specification_ref</td>
 <td>TEXT NOT NULL FK</td>
 <td>Parent specification</td>
 </tr>
-<tr>
+<tr class="even">
 <td>view_type_ref</td>
 <td>TEXT NOT NULL FK</td>
 <td>View type</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>from_file</td>
 <td>TEXT NOT NULL</td>
 <td>Source file path</td>
 </tr>
-<tr>
+<tr class="even">
 <td>file_seq</td>
 <td>INTEGER NOT NULL</td>
 <td>Sequence within file</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>start_line</td>
 <td>INTEGER</td>
 <td>Start line in source</td>
 </tr>
-<tr>
+<tr class="even">
 <td>raw_ast</td>
 <td>JSON</td>
 <td>Original Pandoc AST</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>resolved_ast</td>
 <td>JSON</td>
 <td>Materialized view as Pandoc AST</td>
 </tr>
-<tr>
+<tr class="even">
 <td>resolved_data</td>
 <td>JSON</td>
 <td>Pre-computed view data</td>
@@ -1189,84 +1184,84 @@ pattern.</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> spec_attribute_values columns</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th>Column</th>
 <th>Type</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>id</td>
 <td>INTEGER PK</td>
 <td>Auto-assigned internal key</td>
 </tr>
-<tr>
+<tr class="even">
 <td>content_sha</td>
 <td>TEXT</td>
 <td>SHA1 checksum for change detection</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>specification_ref</td>
 <td>TEXT NOT NULL FK</td>
 <td>Parent specification</td>
 </tr>
-<tr>
+<tr class="even">
 <td>owner_object_id</td>
 <td>INTEGER FK</td>
 <td>Owner spec object (NULL if float)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>owner_float_id</td>
 <td>INTEGER FK</td>
 <td>Owner spec float (NULL if object)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>name</td>
 <td>TEXT NOT NULL</td>
 <td>Attribute name</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>raw_value</td>
 <td>TEXT</td>
 <td>Original value (before type casting)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>string_value</td>
 <td>TEXT</td>
 <td>For STRING datatype</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>int_value</td>
 <td>INTEGER</td>
 <td>For INTEGER datatype</td>
 </tr>
-<tr>
+<tr class="even">
 <td>real_value</td>
 <td>REAL</td>
 <td>For REAL datatype</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>bool_value</td>
 <td>INTEGER</td>
 <td>For BOOLEAN datatype (0/1)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>date_value</td>
 <td>TEXT</td>
 <td>For DATE datatype (YYYY-MM-DD)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>enum_ref</td>
 <td>TEXT FK</td>
 <td>For ENUM datatype (FK to enum_values)</td>
 </tr>
-<tr>
+<tr class="even">
 <td>ast</td>
 <td>JSON</td>
 <td>For XHTML datatype (Pandoc AST)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>datatype</td>
 <td>TEXT NOT NULL</td>
 <td>Actual datatype used</td>
@@ -1291,16 +1286,16 @@ should ignore these tables.</p>
 Build Infrastructure</h2>
 <div data-pos="331:1-336:1">
 <ul>
-<li><div data-pos="331:3-332:1">
+<li><div data-pos="331:1-332:1">
 <strong>build_graph</strong> — tracks file include/dependency
 relationships for incremental builds. Columns: <code data-pos="331:101-331:112">root_path</code>, <code data-pos="331:114-331:125">node_path</code>, <code data-pos="331:127-331:138">node_sha1</code>.
 </div></li>
-<li><div data-pos="332:3-333:1">
+<li><div data-pos="332:1-333:1">
 <strong>source_files</strong> — stores SHA1 hashes of source files for
 change detection. Columns: <code data-pos="332:90-332:96">path</code>,
 <code data-pos="332:98-332:104">sha1</code>.
 </div></li>
-<li><div data-pos="333:3-334:1">
+<li><div data-pos="333:1-335:1">
 <strong>output_cache</strong> — tracks generated output files and their
 source state. Columns: <code data-pos="333:87-333:96">spec_id</code>,
 <code data-pos="333:98-333:111">output_path</code>, <code data-pos="333:113-333:123">pir_hash</code>, <code data-pos="333:125-333:139">generated_at</code>.
@@ -1310,15 +1305,15 @@ source state. Columns: <code data-pos="333:87-333:96">spec_id</code>,
 <h2 data-number="4.2" data-pos="335:1-336:1" id="full-text-search"><span class="header-section-number">4.2</span> Full-Text Search</h2>
 <div data-pos="337:1-342:1">
 <ul>
-<li><div data-pos="337:3-338:1">
+<li><div data-pos="337:1-338:1">
 <strong>fts_objects</strong> — FTS5 virtual table indexing spec object
 text.
 </div></li>
-<li><div data-pos="338:3-339:1">
+<li><div data-pos="338:1-339:1">
 <strong>fts_attributes</strong> — FTS5 virtual table indexing attribute
 values.
 </div></li>
-<li><div data-pos="339:3-340:1">
+<li><div data-pos="339:1-341:1">
 <strong>fts_floats</strong> — FTS5 virtual table indexing float content.
 </div></li>
 </ul>
@@ -1355,26 +1350,26 @@ names.</p>
 </div>
 <div data-pos="363:1-371:1">
 <ul>
-<li><div data-pos="363:3-364:1">
+<li><div data-pos="363:1-364:1">
 <strong>public_traceability_matrix</strong> — all resolved
 object-to-object relations with source/target PIDs, types, and titles.
 </div></li>
-<li><div data-pos="364:3-365:1">
+<li><div data-pos="364:1-365:1">
 <strong>public_coverage_report</strong> — traceability status of each
 object (orphan, traces_only, traced_by_only, fully_traced).
 </div></li>
-<li><div data-pos="365:3-366:1">
+<li><div data-pos="365:1-366:1">
 <strong>public_dangling_references</strong> — unresolved relations
 (broken links).
 </div></li>
-<li><div data-pos="366:3-367:1">
+<li><div data-pos="366:1-367:1">
 <strong>public_float_inventory</strong> — all floats with type, caption,
 number, and parent object.
 </div></li>
-<li><div data-pos="367:3-368:1">
+<li><div data-pos="367:1-368:1">
 <strong>public_object_summary</strong> — object counts by type.
 </div></li>
-<li><div data-pos="368:3-369:1">
+<li><div data-pos="368:1-370:1">
 <strong>public_specification_list</strong> — all specifications with
 object/float/relation counts.
 </div></li>
@@ -1386,18 +1381,18 @@ object/float/relation counts.
 </div>
 <div data-pos="374:1-380:1">
 <ul>
-<li><div data-pos="374:3-375:1">
+<li><div data-pos="374:1-375:1">
 <strong>CommonSpec</strong> compiles into SpecIR via SpecCompiler.
 </div></li>
-<li><div data-pos="375:3-376:1">
+<li><div data-pos="375:1-376:1">
 <strong>ReqIF</strong> can be exported from SpecIR (current) and
 imported into SpecIR (planned).
 </div></li>
-<li><div data-pos="376:3-377:1">
+<li><div data-pos="376:1-377:1">
 <strong>SQL</strong> provides direct read/write access for custom
 tooling, dashboards, and integrations.
 </div></li>
-<li><div data-pos="377:3-378:1">
+<li><div data-pos="377:1-379:1">
 <strong>Any format</strong> that can express typed objects, attributes,
 and relations can map to and from SpecIR.
 </div></li>

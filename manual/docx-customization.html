@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>docx-customization_html5</title>
   <style>
-
 html {
 color: #1a1a1a;
 background-color: #fdfdfd;
@@ -61,10 +60,6 @@ color: #1a1a1a;
 img {
 max-width: 100%;
 }
-svg {
-height: auto;
-max-width: 100%;
-}
 h1, h2, h3, h4, h5, h6 {
 margin-top: 1.4em;
 }
@@ -108,8 +103,8 @@ background-color: transparent;
 overflow: visible;
 }
 hr {
+background-color: #1a1a1a;
 border: none;
-border-top: 1px solid #1a1a1a;
 height: 1px;
 margin: 1em 0;
 }
@@ -167,9 +162,8 @@ vertical-align: middle;
 }
 .display.math{display: block; text-align: center; margin: 0.5rem auto;}
 
-html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -281,23 +275,23 @@ pipeline:</p>
 </div>
 <div data-pos="7:1-14:1">
 <ol type="1">
-<li><div data-pos="7:4-8:1">
+<li><div data-pos="7:1-8:1">
 <strong>SpecIR</strong> – Structured data in SQLite (objects, relations,
 floats, attributes).
 </div></li>
-<li><div data-pos="8:4-9:1">
+<li><div data-pos="8:1-9:1">
 <strong>Pandoc AST</strong> – The emitter assembles a Pandoc document
 from the SpecIR.
 </div></li>
-<li><div data-pos="9:4-10:1">
+<li><div data-pos="9:1-10:1">
 <strong>Pandoc DOCX Writer</strong> – Pandoc converts the AST to DOCX
 using a <code data-pos="9:70-9:86">reference.docx</code> for styles.
 </div></li>
-<li><div data-pos="10:4-11:1">
+<li><div data-pos="10:1-11:1">
 <strong>Lua Filter</strong> – A format-specific filter converts
 SpecCompiler markers to OOXML (captions, bookmarks, math).
 </div></li>
-<li><div data-pos="11:4-12:1">
+<li><div data-pos="11:1-13:1">
 <strong>Postprocessor</strong> – Manipulates the generated DOCX ZIP
 archive (positioned floats, caption orphan prevention, template-specific
 OOXML).
@@ -324,12 +318,12 @@ only styles and settings.</p>
 </div>
 <div data-pos="21:1-25:1">
 <ol type="1">
-<li><div data-pos="21:4-22:1">
+<li><div data-pos="21:1-22:1">
 <strong>Auto-generated from presets</strong> (default): SpecCompiler
 builds a <code data-pos="21:69-21:85">reference.docx</code> from Lua
 style presets, storing it at <code data-pos="21:124-21:153">{output_dir}/reference.docx</code>.
 </div></li>
-<li><div data-pos="22:4-23:1">
+<li><div data-pos="22:1-24:1">
 <strong>User-provided</strong>: Set <code data-pos="22:27-22:47">docx.reference_doc</code> in <code data-pos="22:51-22:65">project.yaml</code> to use your own Word
 template.
 </div></li>
@@ -390,7 +384,7 @@ keys:</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Paragraph style fields</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">Field</th>
 <th style="text-align: left;">Type</th>
 <th style="text-align: left;">Default</th>
@@ -398,108 +392,108 @@ keys:</p>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>id</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">required</td>
 <td style="text-align: left;">Internal style ID (e.g., “Heading1”)</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>name</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">required</td>
 <td style="text-align: left;">Display name in Word (e.g., “Heading
 1”)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>based_on</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Parent style ID for inheritance</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>next</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Style to apply to the next paragraph</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>font.name</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Font family name</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>font.size</code></td>
 <td style="text-align: left;">number</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Font size in points</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>font.color</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Hex color without <code>#</code> (e.g.,
 “2F5496”)</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>font.bold</code></td>
 <td style="text-align: left;">boolean</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Bold text</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>font.italic</code></td>
 <td style="text-align: left;">boolean</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Italic text</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>spacing.line</code></td>
 <td style="text-align: left;">number</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Line spacing multiplier (1.0 = single,
 1.15, 2.0, etc.)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>spacing.before</code></td>
 <td style="text-align: left;">number</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Space before paragraph in points</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>spacing.after</code></td>
 <td style="text-align: left;">number</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Space after paragraph in points</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>alignment</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Text alignment: “left”, “center”, “right”,
 “both” (justified)</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>indent.left</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Left indent (e.g., “0.5in”, “1cm”)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>indent.right</code></td>
 <td style="text-align: left;">string</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Right indent</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>keep_next</code></td>
 <td style="text-align: left;">boolean</td>
 <td style="text-align: left;">nil</td>
 <td style="text-align: left;">Keep with next paragraph (prevent
 orphaning)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>outline_level</code></td>
 <td style="text-align: left;">integer</td>
 <td style="text-align: left;">nil</td>
@@ -630,11 +624,11 @@ can provide format-specific style files:</p>
 </div>
 <div data-pos="277:1-281:1">
 <ul>
-<li><div data-pos="277:3-278:1">
+<li><div data-pos="277:1-278:1">
 <code data-pos="277:3-277:47">models/{template}/styles/{preset}/docx.lua</code>
 – DOCX-specific overrides
 </div></li>
-<li><div data-pos="278:3-279:1">
+<li><div data-pos="278:1-280:1">
 <code data-pos="278:3-278:47">models/{template}/styles/{preset}/html.lua</code>
 – HTML-specific overrides
 </div></li>
@@ -656,11 +650,11 @@ is always loaded. It handles:</p>
 </div>
 <div data-pos="290:1-294:1">
 <ul>
-<li><div data-pos="290:3-291:1">
+<li><div data-pos="290:1-291:1">
 <strong>Positioned floats</strong> – Converts inline images to anchored
 format with margin-relative positioning.
 </div></li>
-<li><div data-pos="291:3-292:1">
+<li><div data-pos="291:1-293:1">
 <strong>Caption orphan prevention</strong> – Adds <code data-pos="291:41-291:51">keepNext</code> to Caption-styled paragraphs.
 </div></li>
 </ul>
@@ -677,46 +671,46 @@ sequence:</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Postprocessor hook functions</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">Hook</th>
 <th style="text-align: left;">Input</th>
 <th style="text-align: left;">Purpose</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>process_document(content, config, log)</code></td>
 <td style="text-align: left;"><code>document.xml</code> content</td>
 <td style="text-align: left;">Modify main document body</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>process_styles(content, log, config)</code></td>
 <td style="text-align: left;"><code>styles.xml</code> content</td>
 <td style="text-align: left;">Modify or inject style definitions</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>process_numbering(content, log)</code></td>
 <td style="text-align: left;"><code>numbering.xml</code> content</td>
 <td style="text-align: left;">Modify list numbering definitions</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>process_content_types(content, log)</code></td>
 <td style="text-align: left;"><code>[Content_Types].xml</code>
 content</td>
 <td style="text-align: left;">Add content type declarations</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>process_settings(content, log)</code></td>
 <td style="text-align: left;"><code>settings.xml</code> content</td>
 <td style="text-align: left;">Modify document settings</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>process_rels(content, log)</code></td>
 <td style="text-align: left;"><code>document.xml.rels</code>
 content</td>
 <td style="text-align: left;">Add/modify relationship entries</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>create_additional_parts(temp_dir, log, config)</code></td>
 <td style="text-align: left;">Temp directory path</td>
 <td style="text-align: left;">Create new parts (headers, footers)</td>
@@ -763,13 +757,13 @@ contains:</p>
 </div>
 <div data-pos="363:1-368:1">
 <ul>
-<li><div data-pos="363:3-364:1">
+<li><div data-pos="363:1-364:1">
 <code data-pos="363:3-363:13">template</code> – The template name
 </div></li>
-<li><div data-pos="364:3-365:1">
+<li><div data-pos="364:1-365:1">
 <code data-pos="364:3-364:9">docx</code> – DOCX configuration from <code data-pos="364:37-364:51">project.yaml</code>
 </div></li>
-<li><div data-pos="365:3-366:1">
+<li><div data-pos="365:1-367:1">
 <code data-pos="365:3-365:18">spec_metadata</code> – Specification-level
 attributes (in <code data-pos="365:57-365:82">create_additional_parts</code>)
 </div></li>
@@ -785,44 +779,44 @@ handles:</p>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Default DOCX filter conversions</figcaption>
 <table>
 <thead>
-<tr>
+<tr class="header">
 <th style="text-align: left;">Input Marker</th>
 <th style="text-align: left;">Output</th>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>RawBlock(&quot;speccompiler&quot;, &quot;page-break&quot;)</code></td>
 <td style="text-align: left;">OOXML page break</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>RawBlock(&quot;speccompiler&quot;, &quot;vertical-space:NNNN&quot;)</code></td>
 <td style="text-align: left;">OOXML spacing (in twips)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>RawBlock(&quot;speccompiler&quot;, &quot;bookmark-start:ID:NAME&quot;)</code></td>
 <td style="text-align: left;">OOXML bookmark start</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>pandoc.Math</code> (native inline or
 display)</td>
 <td style="text-align: left;">OOXML math element (native
 <code>&lt;m:oMath&gt;</code> via Pandoc’s texmath)</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>Div.speccompiler-caption</code></td>
 <td style="text-align: left;">OOXML caption with SEQ field</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>Div.speccompiler-numbered-equation</code></td>
 <td style="text-align: left;">OOXML numbered equation with tab
 layout</td>
 </tr>
-<tr>
+<tr class="odd">
 <td style="text-align: left;"><code>Div.speccompiler-positioned-float</code></td>
 <td style="text-align: left;">Position markers for postprocessor</td>
 </tr>
-<tr>
+<tr class="even">
 <td style="text-align: left;"><code>Link</code> with <code>.ext</code>
 target</td>
 <td style="text-align: left;">Rewritten to <code>.docx</code>
@@ -834,12 +828,12 @@ target</td>
 Postprocessors</h2>
 <div data-pos="397:1-401:1">
 <ul>
-<li><div data-pos="397:3-398:1">
+<li><div data-pos="397:1-398:1">
 <strong>Filters</strong> operate on the Pandoc AST before DOCX
 generation. Use them when you need to convert SpecCompiler markers to
 OOXML elements that Pandoc will then place in the document.
 </div></li>
-<li><div data-pos="398:3-399:1">
+<li><div data-pos="398:1-400:1">
 <strong>Postprocessors</strong> operate on the raw OOXML after DOCX
 generation. Use them when you need to manipulate the final XML directly
 (style injection, image positioning, headers/footers).
@@ -862,16 +856,16 @@ generation. Use them when you need to manipulate the final XML directly
 <h2 data-number="6.2" data-pos="416:1-417:1" id="configuration-precedence"><span class="header-section-number">6.2</span> Configuration Precedence</h2>
 <div data-pos="418:1-423:1">
 <ol type="1">
-<li><div data-pos="418:4-419:1">
+<li><div data-pos="418:1-419:1">
 If <code data-pos="418:7-418:27">docx.reference_doc</code> is set, that
 file is used directly as the Pandoc reference document.
 </div></li>
-<li><div data-pos="419:4-420:1">
+<li><div data-pos="419:1-420:1">
 If <code data-pos="419:7-419:20">docx.preset</code> is set (or defaults
 to the model’s styles), SpecCompiler generates <code data-pos="419:88-419:117">{output_dir}/reference.docx</code> from the
 preset.
 </div></li>
-<li><div data-pos="420:4-421:1">
+<li><div data-pos="420:1-422:1">
 If neither is set, Pandoc uses its built-in default styles.
 </div></li>
 </ol>
@@ -886,18 +880,18 @@ on every build.</p>
 </div>
 <div data-pos="428:1-434:1">
 <ol type="1">
-<li><div data-pos="428:4-429:1">
+<li><div data-pos="428:1-429:1">
 Compute SHA-1 hash of the preset file content.
 </div></li>
-<li><div data-pos="429:4-430:1">
+<li><div data-pos="429:1-430:1">
 Compare against the stored hash in the <code data-pos="429:43-429:55">build_meta</code> table (key-value store in
 <code data-pos="429:82-429:93">specir.db</code>).
 </div></li>
-<li><div data-pos="430:4-431:1">
+<li><div data-pos="430:1-431:1">
 If the hashes match and <code data-pos="430:28-430:44">reference.docx</code> exists on disk, skip
 generation.
 </div></li>
-<li><div data-pos="431:4-432:1">
+<li><div data-pos="431:1-433:1">
 If the preset changed or <code data-pos="431:29-431:45">reference.docx</code> is missing, regenerate
 and update the cache.
 </div></li>
