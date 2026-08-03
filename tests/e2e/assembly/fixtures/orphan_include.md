@@ -1,6 +1,8 @@
 # Orphan Via Include @SPEC-HIER-ORPHANINC
 
-### Section before any chapter
+The included file opens at level 3 before ascending to its own shallower
+level-2 chapter. Relative include normalization must preserve that orphaned
+opening structure.
 
 ```include
 chapter.md

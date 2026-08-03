@@ -642,7 +642,7 @@ Each line is a file path relative to the including document's directory. Absolut
 
 Include blocks are expanded recursively before the pipeline runs. Circular includes are detected and produce an error. The maximum nesting depth is 100 levels.
 
-An included file is authored as a standalone document starting at `#`. During expansion its headings are shifted by the heading level in effect at the include point, so its content nests under the section that contains the directive: an include under a `##` section turns the included `#` into `###` and its `##` into `####`. Nested includes compose their shifts. A `----` section close before the directive pops the context one level, making the included file a sibling of the section just closed instead of its child:
+During expansion an included file's headings are shifted uniformly so that its shallowest heading lands one level below the heading in effect at the include point: an include under a `##` section turns an included `#` into `###` and its `##` into `####`, and a legacy fragment whose shallowest heading is `##` or `###` normalizes to the same position without editing its source. Relative depths inside the file are preserved — a skipped level stays skipped and is reported. Nested includes compose their shifts. A `----` section close before the directive pops the context one level, making the included file a sibling of the section just closed instead of its child:
 
 ````src.markdown:src-include-level-shift{caption="Include heading levels are relative to the include point"}
 ## Design

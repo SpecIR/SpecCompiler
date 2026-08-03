@@ -1,20 +1,15 @@
--- Test oracle for VC-OUT-008: Heading Hierarchy (levels / siblings / children)
+-- Test oracle for VC-OUT-011: Include Heading Level Shift (LLR-071)
 --
--- Drives a real DOCX build of a five-file-deep include chain and asserts the
--- resulting Word Heading styles in document order. This pins the end-to-end
--- contract that HLR-OUT-001 calls "adjusts header levels for cross-file
--- includes" (LLR-071): each included file starts at `#` and is shifted by the
--- level at its include point, shifts compose across nesting, the assembler
--- rescales the shallowest level to Heading1, and siblings/children/ascents map
--- to the right style.
+-- Drives a real DOCX build and asserts the Word Heading styles in document
+-- order. Included files are standalone documents starting at `#`; expansion
+-- shifts their headings by the level in effect at the include point:
 --
---   ## Chapter A          -> Heading1   (sibling root, main file)
---   # Section A.1   (a)   -> Heading2   (1 + 2 = 3)
---   # Subsection .. (a1)  -> Heading3   (1 + 1 + 2 = 4)
---   # Deep B        (b)   -> Heading4   (1 + 1 + 1 + 2 = 5)
---   # Deepest B.1   (b1)  -> Heading5   (1 + 1 + 1 + 1 + 2 = 6)
---   # Section A.2   (a)   -> Heading2   (ascend 6 -> 3: "go back up")
---   ## Chapter C          -> Heading1   (sibling root, back in main file)
+--   ## Child Section                    -> Heading1  (main file, level 2)
+--   # Parent      (grand_child.md)      -> Heading2  (1 + 2 = 3)
+--   ## Child      (grand_child.md)      -> Heading3  (2 + 2 = 4)
+--   # Leaf        (great_grand_child.md)-> Heading4  (nested: 1 + 2 + 2 = 5)
+--   ## Sibling After                    -> Heading1  (main file, level 2)
+--   # Appendix    (appendix.md)         -> Heading1  (`----` pops 2 -> 1, so 1 + 1 = 2)
 
 local docx = require("docx_helpers")
 
@@ -40,13 +35,13 @@ return function(actual_doc, helpers)
 
     local build_dir = helpers.build_dir .. "/"
     local suite_dir = helpers.suite_dir .. "/"
-    local test_name = "vc_out_008_01_heading_hierarchy"
+    local test_name = "vc_out_011_01_include_level_shift"
     local docx_path = build_dir .. test_name .. ".docx"
-    local docx_db = build_dir .. "docx_hier_" .. tostring(os.clock()):gsub("%.", "") .. ".db"
+    local docx_db = build_dir .. "docx_shift_" .. tostring(os.clock()):gsub("%.", "") .. ".db"
 
     local engine = require("core.engine")
     local ok, gen_err = pcall(engine.run_project, {
-        project = { code = "TEST_ASSEMBLY", name = "Heading Hierarchy" },
+        project = { code = "TEST_ASSEMBLY", name = "Include Level Shift" },
         template = "default",
         files = { suite_dir .. test_name .. ".md" },
         output_dir = build_dir,
@@ -66,13 +61,12 @@ return function(actual_doc, helpers)
     end
 
     local expected = {
-        { style = "Heading1", text = "Chapter A" },
-        { style = "Heading2", text = "Section A.1" },
-        { style = "Heading3", text = "Subsection A.1.1" },
-        { style = "Heading4", text = "Deep B" },
-        { style = "Heading5", text = "Deepest B.1" },
-        { style = "Heading2", text = "Section A.2" },
-        { style = "Heading1", text = "Chapter C" },
+        { style = "Heading1", text = "Child Section" },
+        { style = "Heading2", text = "Parent" },
+        { style = "Heading3", text = "Child" },
+        { style = "Heading4", text = "Leaf" },
+        { style = "Heading1", text = "Sibling After" },
+        { style = "Heading1", text = "Appendix" },
     }
 
     local got = heading_sequence(document_xml)
@@ -94,7 +88,7 @@ return function(actual_doc, helpers)
     end
 
     if #errors > 0 then
-        return false, "Heading hierarchy mismatch:\n  - " .. table.concat(errors, "\n  - ")
+        return false, "Include level shift mismatch:\n  - " .. table.concat(errors, "\n  - ")
     end
     return true, nil
 end

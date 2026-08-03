@@ -8,8 +8,9 @@
 #
 # Test case -> VC mapping:
 #   vc_out_001_01_assembly_order    -> VC-OUT-001  document ordering with includes
-#   vc_out_008_01_heading_hierarchy -> VC-OUT-008  deep-include multi-level: asserts
-#                                                   real DOCX Heading styles
+#   vc_out_008_01_heading_hierarchy -> VC-OUT-008  deep-include multi-level: standalone
+#                                                   files shifted at each include point;
+#                                                   asserts real DOCX Heading styles
 #                                                   (siblings / children / ascending)
 #   vc_out_008_02_broken_hierarchy  -> VC-OUT-008  object_broken_hierarchy rejects
 #                                                   skipped levels, orphaned roots,
@@ -22,6 +23,19 @@
 #   vc_out_010_01_cross_format_levels -> VC-OUT-010  LaTeX and DOCX render the same
 #                                                   heading at the same depth (no
 #                                                   cross-format nesting divergence)
+#   vc_out_011_01_include_level_shift -> VC-OUT-011  include expansion shifts included
+#                                                   headings by the level at the include
+#                                                   point; nested shifts compose; `----`
+#                                                   pops the context [LLR-071]
+#   vc_out_011_02_include_level_combos -> VC-OUT-011  shift combinations: multi-section
+#                                                   files, multi-path blocks, sibling
+#                                                   includes, includes under `###`,
+#                                                   double `----` pops, internal `----`
+#                                                   + nested include
+#   vc_out_011_03_include_level_guards -> VC-OUT-011  compatibility + guard rails:
+#                                                   roots at `##`/`###` normalize;
+#                                                   relative gaps remain invalid;
+#                                                   levels 7+ remain distinct
 
 project:
   code: TEST_ASSEMBLY

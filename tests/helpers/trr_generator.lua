@@ -227,7 +227,10 @@ local function generate_tr_block(test, vc_pid, tr_pid)
     local title = test.name:gsub("^vc_", ""):gsub("_", " ")
     title = title:gsub("(%a)([%w]*)", function(a, b) return a:upper() .. b end)
 
-    table.insert(lines, "### TR: " .. title .. " @" .. tr_pid)
+    -- H1: tr.md is only ever consumed via includes (trr.md -> svc.md), where
+    -- the include shift nests these under the TRR scope; deeper source levels
+    -- would compose past H6 and abort the docs build.
+    table.insert(lines, "# TR: " .. title .. " @" .. tr_pid)
     table.insert(lines, "")
     table.insert(lines, "> result: " .. status_to_result(test.status))
     table.insert(lines, "")
@@ -272,11 +275,19 @@ function Meta(meta)
     -- Group TRs by domain
     local domain_trs = {}
     local unmapped = 0
+    local excluded = 0
+
+    -- Model-owned suites whose VCs live in the model's own engineering docs,
+    -- not the core SVC. Their TRs would trace to VC PIDs the core SVC does not
+    -- define, breaking traceability_tr_to_vc when building the core docs.
+    local excluded_domains = { ABNT = true }
 
     for _, test in ipairs(tests) do
         local vc_pid = resolve_vc_pid(test.name)
         local tr_pid = resolve_tr_pid(test.name)
-        if vc_pid and tr_pid then
+        if vc_pid and tr_pid and excluded_domains[get_domain(vc_pid)] then
+            excluded = excluded + 1
+        elseif vc_pid and tr_pid then
             local domain = get_domain(vc_pid)
 
             if not domain_trs[domain] then
@@ -292,6 +303,10 @@ function Meta(meta)
 
     if unmapped > 0 then
         io.stderr:write("[trr] Skipped " .. unmapped .. " tests without VC mapping\n")
+    end
+    if excluded > 0 then
+        io.stderr:write("[trr] Excluded " .. excluded
+            .. " model-owned tests (VCs documented outside the core SVC)\n")
     end
 
     -- Generate markdown grouped by domain

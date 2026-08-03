@@ -8,7 +8,10 @@ This section should appear FIRST (section 1) in the output.
 
 The following include has a filename "_aaa_included.md" that sorts alphabetically
 BEFORE "Introduction". If the assembler incorrectly sorts by from_file, the
-included content would appear before this Introduction section.
+included content would appear before this Introduction section. The `----`
+closes Introduction so the included file becomes a sibling section.
+
+----
 
 ```include
 includes/_aaa_included.md

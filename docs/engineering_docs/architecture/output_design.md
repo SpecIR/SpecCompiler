@@ -208,7 +208,7 @@ Given a [dic:specification](#) identifier, [csu:document-assembler](#) shall que
 
 #### LLR: Include Header Level Adjustment @LLR-071
 
-Given a [dic:spec-object](#) from an included file with header level offset, [csu:document-assembler](#) shall adjust the Pandoc Header level to maintain correct document hierarchy.
+Given an included file under an active heading, [csu:include-handler](#) shall shift its Pandoc Header levels uniformly so that the included file's shallowest heading is one level below the heading in effect at the include point — preserving all relative depths, composing across nested includes, and treating a `----` section close as a one-level context pop. With no active heading, source levels shall be preserved. This shall support both standalone included documents beginning at H1 and legacy fragments beginning at H2 or deeper. Computed Pandoc Header levels deeper than 6 shall be preserved without rejection or clamping.
 
 > verification_method: Test
 

@@ -56,7 +56,10 @@ local function adjust_header_levels(blocks, level_offset)
 
     for _, block in ipairs(blocks) do
         if block.t == "Header" then
-            block.level = math.min(math.max(block.level + level_offset, 1), 6)
+            -- Pandoc supports Header levels deeper than Markdown's six ATX
+            -- source levels. Preserve those levels instead of collapsing all
+            -- deep descendants into level 6.
+            block.level = math.max(block.level + level_offset, 1)
         end
     end
 
@@ -73,15 +76,15 @@ local function normalize_header_levels(blocks)
     if not blocks then return blocks end
 
     -- Find minimum header level in the document
-    local min_level = 6
+    local min_level = nil
     for _, block in ipairs(blocks) do
-        if block.t == "Header" and block.level < min_level then
+        if block.t == "Header" and (not min_level or block.level < min_level) then
             min_level = block.level
         end
     end
 
     -- If min level > 1, normalize so top-level headers become H1
-    if min_level > 1 and min_level <= 6 then
+    if min_level and min_level > 1 then
         local offset = 1 - min_level  -- e.g., min=2 -> offset=-1
         adjust_header_levels(blocks, offset)
     end

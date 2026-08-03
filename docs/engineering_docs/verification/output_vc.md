@@ -103,6 +103,8 @@ Verify DOCX output uses reference document.
 > - Execute markdown-driven preset loader probe with layered DOCX preset files
 > - Verify extends-chain merge, optional format styles, and validation behavior
 > - Verify preset lookup and style resolution for DOCX float/object rendering paths
+> - Unzip postprocessed DOCX and verify every hyperlink anchor and PAGEREF/REF field resolves to a bookmark
+> - When LibreOffice/UNO is available, round-trip the DOCX through field update and PDF export and re-verify bookmark integrity
 
 > pass_criteria:
 > - Preset files load and merge according to extends-chain precedence
@@ -111,6 +113,8 @@ Verify DOCX output uses reference document.
 > - Custom styles (Caption, Code) applied correctly
 > - Page layout matches reference
 > - OOXML postprocessing applied
+> - No hyperlink anchor or field reference dangles without a matching bookmark
+> - LibreOffice finalization (docx.update_fields / docx.export_pdf) updates fields in place and produces a valid PDF
 
 > traceability: [HLR-OUT-005](@), [LLR-OUT-029-01](@)
 
@@ -229,18 +233,18 @@ Verify that [dic:full-text-search](#) virtual tables are populated with specific
 
 Verify that header levels assembled across cross-file includes form a well-formed tree, that the renderer maps them to the correct heading depth, and that structurally invalid hierarchies are rejected before emission.
 
-> objective: Confirm that the `object_broken_hierarchy` analyze query rejects skipped heading levels and orphaned roots, that a heading's level survives deep include nesting unchanged, and that the assembler maps valid levels to the correct DOCX Heading style (siblings share a style, children nest one deeper, ascending returns to the shallower style).
+> objective: Confirm that the `object_broken_hierarchy` analyze query rejects skipped heading levels and orphaned roots, that heading levels shifted by include expansion form a well-formed tree across deep include nesting, and that the assembler maps valid levels to the correct DOCX Heading style (siblings share a style, children nest one deeper, ascending returns to the shallower style).
 
 > verification_method: Test
 
 > approach:
-> - Build a five-file-deep include chain mixing descents, an ascent (level 4 back to level 2), and sibling chapters; generate DOCX and assert the `w:pStyle` of each heading in document order
+> - Build a five-file-deep include chain of standalone files (each starting at `#`) mixing descents, an ascent back to a shallower level, and sibling chapters; generate DOCX and assert the `w:pStyle` of each heading in document order
 > - Build fixtures with a skipped level (`##` then `####`) and with an orphaned root (a document opening at level 3 with a shallower level-2 heading later, including the case where the chapter is one include deeper than the section)
 > - Build a contiguous multi-level control with an ascent
 
 > pass_criteria:
-> - Include nesting never changes a heading's level; level is governed only by the markdown `#`-count
-> - Valid hierarchy maps to `Heading1/2/3` so that siblings share a style, each child is exactly one level deeper, and an ascent returns to the shallower style
+> - Include expansion shifts each included file's headings by the level at its include point (see VC-OUT-011); the shifted levels form a contiguous tree across the whole chain
+> - Valid hierarchy maps to `Heading1..5` so that siblings share a style, each child is exactly one level deeper, and an ascent returns to the shallower style
 > - A skipped level raises an `object_broken_hierarchy` error naming the skipped level
 > - An orphaned root raises an `object_broken_hierarchy` error, including when the parent chapter is one include deep
 > - The contiguous control raises no `object_broken_hierarchy` diagnostic
@@ -288,3 +292,31 @@ Verify that LaTeX and DOCX render the same heading at the same depth, since both
 > - Each heading's depth is identical in LaTeX and DOCX
 
 > traceability: [HLR-OUT-001](@), [HLR-OUT-004](@)
+
+
+### VC: Include Heading Level Shift @VC-OUT-011
+
+Verify that include expansion shifts an included file relative to its own shallowest heading, placing that heading one level below the include point while supporting both standalone files starting at `#` and legacy fragments starting deeper.
+
+> objective: Confirm that the shallowest included heading nests one level below the section containing the include directive, that relative depths and malformed gaps are preserved, that nested includes compose their shifts, and that a `----` section close pops the include context back to the parent level.
+
+> verification_method: Test
+
+> approach:
+> - Build a document with an include under a level-2 section whose included file contains `#` and `##` headings, itself including a third file under its own `##`; generate DOCX and assert the `w:pStyle` of each heading in document order
+> - After a `----` that closes the level-2 section, include a further standalone file and assert its `#` lands as a sibling of the level-2 sections
+> - Build a combination document: a multi-section included file with internal multi-level structure and ascents, several paths in one include block, a sibling include after deep spliced content, an include under a level-3 heading, single and double `----` pops, a prose-only include, and an included file that closes its own section with `----` before nesting a further include
+> - Build compatibility fixtures whose included files start at `##` and `###`, a malformed relative-gap fixture, and a deep include fixture whose computed levels reach 7 and 8
+
+> pass_criteria:
+> - An included `#` under a `##` section renders one level deeper than the section (`###`), and its `##` renders as `####`
+> - A file included under the first file's `##` composes both shifts (its `#` renders at level 5)
+> - After a `----`, the included `#` renders at the closed section's own level (a sibling)
+> - Headings authored in the including file keep their literal level
+> - All paths in one include block share the include point's shift; spliced content never changes the context for a later directive in the same file
+> - A `----` inside an included file pops that file's own context before a nested include
+> - Files whose shallowest heading is `##` or `###` normalize that heading to one level below the include point without changing their source Markdown
+> - A skipped relative level inside an included file remains skipped and raises an `object_broken_hierarchy` diagnostic
+> - Computed levels 7 and 8 remain distinct in SpecIR; whole-document normalization preserves their relative depths and DOCX renders the deepest result with `Heading7` rather than clamping it to `Heading6`
+
+> traceability: [HLR-OUT-001](@), [HLR-PIPE-008](@), [LLR-071](@)

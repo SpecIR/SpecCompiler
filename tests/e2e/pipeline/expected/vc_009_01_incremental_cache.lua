@@ -139,7 +139,7 @@ includes/part.md
     end
 
     ok, err = write_file(include_path, [[
-## SECTION: Included @SEC-INC-001
+# SECTION: Included @SEC-INC-001
 
 Included v1 text.
 ]])
@@ -202,7 +202,7 @@ Included v1 text.
 
     -- Run 3: include changed, rebuild must occur
     ok, err = write_file(include_path, [[
-## SECTION: Included @SEC-INC-001
+# SECTION: Included @SEC-INC-001
 
 Included v2 text.
 ]])
@@ -329,7 +329,7 @@ includes/b.md
     end
 
     ok, err = write_file(m_inc_a, [[
-## SECTION: Included A @SEC-INC-A-001
+# SECTION: Included A @SEC-INC-A-001
 
 A v1.
 ]])
@@ -338,7 +338,7 @@ A v1.
     end
 
     ok, err = write_file(m_inc_b, [[
-## SECTION: Included B @SEC-INC-B-001
+# SECTION: Included B @SEC-INC-B-001
 
 B v1.
 ]])
@@ -354,7 +354,7 @@ B v1.
     sleep_tick()
 
     ok, err = write_file(m_inc_a, [[
-## SECTION: Included A @SEC-INC-A-001
+# SECTION: Included A @SEC-INC-A-001
 
 A v2.
 ]])

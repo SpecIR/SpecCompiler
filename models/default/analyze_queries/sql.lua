@@ -280,7 +280,8 @@ WHERE ad.min_occurs > 0
 --                  opening heading has no parent at its own level.
 --
 -- Ascending any number of levels (#### -> ##) is valid (it closes subsections),
--- and include nesting never changes a header's level, so neither is flagged.
+-- so it is not flagged. Include expansion shifts included headers by the level
+-- at the include point (LLR-071), so this view sees the final shifted levels.
 M.view_object_broken_hierarchy = [[
 CREATE VIEW IF NOT EXISTS view_object_broken_hierarchy AS
 WITH ordered AS (

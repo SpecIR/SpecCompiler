@@ -16,7 +16,9 @@
 local CODE = "object_broken_hierarchy"
 
 -- Build a fixture and return how many `object_broken_hierarchy` diagnostics
--- fired, plus their concatenated messages.
+-- fired, their concatenated messages, whether the engine returned normally,
+-- and the total error count. The last two values keep the valid control from
+-- passing when its build fails for an unrelated reason.
 local function broken_count(suite_dir, build_dir, name)
     local engine = require("core.engine")
     local db = build_dir .. "fix_" .. name:gsub("%.md$", "") .. "_"
@@ -32,9 +34,7 @@ local function broken_count(suite_dir, build_dir, name)
     })
     os.remove(db)
     if not ok then
-        -- A thrown error still carries the diagnostic in its text; treat the
-        -- presence of the code as a hit so the build-abort path is covered.
-        return select(2, pcall(function() return tostring(diag):find(CODE) and 1 or 0 end)) or 0, tostring(diag)
+        return 0, tostring(diag), false, nil
     end
 
     local n, msgs = 0, {}
@@ -44,7 +44,7 @@ local function broken_count(suite_dir, build_dir, name)
     for _, w in ipairs((diag and diag.warnings) or {}) do
         if w.code == CODE then n = n + 1; msgs[#msgs + 1] = w.message or "" end
     end
-    return n, table.concat(msgs, " | ")
+    return n, table.concat(msgs, " | "), true, #((diag and diag.errors) or {})
 end
 
 return function(actual_doc, helpers)
@@ -68,9 +68,11 @@ return function(actual_doc, helpers)
         err("orphan.md: diagnostic did not describe an orphaned root: " .. orphan_msg)
     end
 
-    local orphinc_n = broken_count(suite_dir, build_dir, "orphan_include.md")
+    local orphinc_n, orphinc_msg = broken_count(suite_dir, build_dir, "orphan_include.md")
     if orphinc_n < 1 then
         err("orphan_include.md: expected a diagnostic when the chapter is one include deep, got none")
+    elseif not orphinc_msg:find("orphaned") then
+        err("orphan_include.md: diagnostic did not describe an orphaned included heading: " .. orphinc_msg)
     end
 
     -- An empty heading (the empty-`##` "section reset" hack) renders as a blank
@@ -82,7 +84,12 @@ return function(actual_doc, helpers)
     end
 
     -- The valid control must stay clean — no false positives.
-    local valid_n, valid_msg = broken_count(suite_dir, build_dir, "valid.md")
+    local valid_n, valid_msg, valid_ok, valid_errors = broken_count(suite_dir, build_dir, "valid.md")
+    if not valid_ok then
+        err("valid.md: fixture build failed unexpectedly: " .. valid_msg)
+    elseif valid_errors ~= 0 then
+        err(string.format("valid.md: expected no errors, got %d", valid_errors))
+    end
     if valid_n > 0 then
         err("valid.md: false positive — contiguous multi-level + ascend was flagged: " .. valid_msg)
     end

@@ -52,6 +52,23 @@ function M.resolve_path(base_dir, rel_path)
     return path
 end
 
+---Detect a thematic break (`----`), possibly wrapped in a sourcepos Div.
+---A thematic break closes the current section, so the include context pops
+---back to the parent heading level.
+---@param block table Pandoc block
+---@return boolean
+function M.is_thematic_break(block)
+    if not block then return false end
+    if block.t == "HorizontalRule" then return true end
+    if block.t == "Div" then
+        local content = block.content or (block.c and block.c[2]) or {}
+        if #content == 1 and content[1] and content[1].t == "HorizontalRule" then
+            return true
+        end
+    end
+    return false
+end
+
 ---Read file content from disk.
 ---@param path string
 ---@return string|nil

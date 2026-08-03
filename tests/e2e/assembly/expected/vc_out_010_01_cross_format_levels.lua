@@ -30,7 +30,7 @@ end
 local function docx_headings(xml)
     local seq = {}
     for para in xml:gmatch("<w:p[%s>].-</w:p>") do
-        local n = para:match('<w:pStyle w:val="Heading(%d)"')
+        local n = para:match('<w:pStyle w:val="Heading(%d+)"')
         if n then
             local t = {}
             for s in para:gmatch("<w:t[^>]*>(.-)</w:t>") do t[#t + 1] = s end
@@ -75,6 +75,13 @@ return function(actual_doc, helpers)
 
     local lh = latex_headings(tex)
     local dh = docx_headings(xml)
+    local expected = {
+        { level = 1, title = "Chapter One" },
+        { level = 2, title = "Section 1.1" },
+        { level = 3, title = "Subsection 1.1.1" },
+        { level = 1, title = "Chapter Two" },
+        { level = 2, title = "Section 2.1" },
+    }
 
     local errors = {}
     if #lh ~= #dh then
@@ -82,10 +89,27 @@ return function(actual_doc, helpers)
     end
     local n = math.min(#lh, #dh)
     for i = 1, n do
-        if lh[i].level ~= dh[i].level then
+        if lh[i].level ~= dh[i].level or lh[i].title ~= dh[i].title then
             errors[#errors + 1] = string.format(
-                "depth mismatch at heading %d '%s': LaTeX depth %d vs DOCX depth %d",
-                i, dh[i].title ~= "" and dh[i].title or lh[i].title, lh[i].level, dh[i].level)
+                "format mismatch at heading %d: LaTeX [%d] '%s' vs DOCX [%d] '%s'",
+                i, lh[i].level, lh[i].title, dh[i].level, dh[i].title)
+        end
+    end
+
+    -- Cross-format equality alone is insufficient: both renderers could agree
+    -- on the same incorrectly assembled hierarchy.
+    for format_name, headings in pairs({ LaTeX = lh, DOCX = dh }) do
+        if #headings ~= #expected then
+            errors[#errors + 1] = string.format(
+                "%s: expected %d headings, got %d", format_name, #expected, #headings)
+        end
+        for i = 1, math.min(#headings, #expected) do
+            local got, want = headings[i], expected[i]
+            if got.level ~= want.level or got.title ~= want.title then
+                errors[#errors + 1] = string.format(
+                    "%s heading %d: expected [%d] '%s', got [%d] '%s'",
+                    format_name, i, want.level, want.title, got.level, got.title)
+            end
         end
     end
 

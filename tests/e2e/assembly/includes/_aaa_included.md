@@ -1,4 +1,4 @@
-## Included Section
+# Included Section
 
 This section comes from an included file.
 

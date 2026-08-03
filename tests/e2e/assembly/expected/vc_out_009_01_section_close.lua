@@ -69,11 +69,20 @@ return function(actual_doc, helpers)
     end
 
     -- 3. Trailing content after the marker still renders, in order.
-    if not docx.contains_text(docx_path, "Trailing content after the rule") then
+    local before_pos = xml:find("Body of A before the rule", 1, true)
+    local trailing_pos = xml:find("Trailing content after the rule", 1, true)
+    local section_b_pos = xml:find("Section B", 1, true)
+    if not trailing_pos then
         err("Content after the `----` was dropped from the output")
     end
-    if not docx.contains_text(docx_path, "Body of A before the rule") then
+    if not before_pos then
         err("Content before the `----` was dropped from the output")
+    end
+    if before_pos and trailing_pos and before_pos >= trailing_pos then
+        err("Content after the `----` rendered before the section content it follows")
+    end
+    if trailing_pos and section_b_pos and trailing_pos >= section_b_pos then
+        err("Trailing parent content should render before Section B")
     end
 
     if #errors > 0 then

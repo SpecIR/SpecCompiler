@@ -25,22 +25,18 @@ return function(actual_doc, helpers)
         end
     end
 
-    -- The key test: "Introduction" must come BEFORE any included content
-    -- and "Conclusion" must come LAST
-    local intro_idx = nil
-    local conclusion_idx = nil
-
-    for i, header in ipairs(headers) do
-        if header:match("Introduction") then
-            intro_idx = i
-        elseif header:match("Conclusion") then
-            conclusion_idx = i
-        end
+    -- Require the complete sequence. Merely comparing Introduction and
+    -- Conclusion lets the test pass when include expansion drops the included
+    -- section altogether.
+    local expected_headers = { "Introduction", "Included Section", "Conclusion" }
+    if #headers ~= #expected_headers then
+        err(string.format("Expected %d section headers, got %d: %s",
+            #expected_headers, #headers, table.concat(headers, ", ")))
     end
-
-    if intro_idx and conclusion_idx then
-        if intro_idx >= conclusion_idx then
-            err("Introduction should appear before Conclusion")
+    for i, expected in ipairs(expected_headers) do
+        if headers[i] ~= expected then
+            err(string.format("Header %d should be '%s', got '%s'",
+                i, expected, tostring(headers[i])))
         end
     end
 

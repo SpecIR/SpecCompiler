@@ -1,4 +1,4 @@
-## Chapter B
+# Deep B
 
 ```include
 b1.md

@@ -122,7 +122,7 @@ function M.count_headings(docx_path)
 
     local count = 0
     -- Count Heading1, Heading2, Heading3, etc.
-    for _ in xml:gmatch('<w:pStyle w:val="Heading%d"') do
+    for _ in xml:gmatch('<w:pStyle w:val="Heading%d+"') do
         count = count + 1
     end
     -- Also count unnumbered headings
