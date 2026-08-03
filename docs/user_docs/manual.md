@@ -27,14 +27,14 @@ This manual is itself a complete working example of a SpecCompiler document auth
 
 ### What is SpecCompiler?
 
-SpecCompiler is the reference compiler for **CommonSpec**, a structured Markdown language for typed, traceable specifications. It lowers CommonSpec into SpecIR (a SQLite-backed intermediate representation) and generates multiple output formats (DOCX, HTML5, ReqIF). It provides:
+SpecCompiler is the reference compiler for **CommonSpec**, a structured Markdown language for typed, traceable specifications. It lowers CommonSpec into SpecIR (a SQLite-backed intermediate representation) and generates multiple output formats (DOCX, HTML5, GitHub-Flavored Markdown, and JSON Pandoc AST). It provides:
 
 - **Structured authoring**: Define requirements, designs, and verification cases using a consistent syntax.
 - **Traceability**: Link objects together with `abbrev: Project Identifier (PID)` and `#label` references.
 - **Validation**: Automatically verify data integrity through verification views backed by `abbrev: Structured Query Language (SQL)` queries against the `abbrev: Specification Intermediate Representation (SpecIR)`.
 - **Multi-format output**: Generate Word documents and web content from a single source.
 
-SpecCompiler processes documents through a five-phase pipeline: INITIALIZE, ANALYZE, TRANSFORM, VERIFY, and EMIT, as illustrated in [plantuml:diag-pipeline](#).
+SpecCompiler processes documents through a five-phase pipeline: INITIALIZE, RESOLVE, TRANSFORM, ANALYZE, and EMIT, as illustrated in [plantuml:diag-pipeline](#).
 
 ### Scope
 
@@ -53,11 +53,11 @@ This manual covers:
 
 The processing pipeline consists of five phases:
 
-1. **INITIALIZE** -- Parse Markdown input via `abbrev: Pandoc Abstract Syntax Tree (AST)`, extract specifications, spec objects, attributes, floats, relations, and views into the SpecIR stored in `abbrev: SQLite Database (SQLite)`.
-2. **ANALYZE** -- Resolve relation types and cross-references using specificity-based inference rules (see [math:eq-specificity](#)).
-3. **TRANSFORM** -- Resolve floats (render PlantUML, charts, tables), materialize views, rewrite links, and render spec objects using each type's render hook.
-4. **VERIFY** -- Execute verification views (SQL queries) against the SpecIR database to detect constraint violations; see [section:verification-views](#) in the model guide.
-5. **EMIT** -- Assemble Pandoc documents from the SpecIR and generate output files in configured formats via parallel Pandoc subprocess invocations.
+1. **INITIALIZE** -- Extract specifications, spec objects, attributes, floats, relations, and view definitions from the parsed `abbrev: Pandoc Abstract Syntax Tree (AST)` into the SpecIR stored in `abbrev: SQLite Database (SQLite)`, casting attribute values into typed columns.
+2. **RESOLVE** -- Generate missing PIDs, resolve relation targets, and infer relation types from model constraints (see [math:eq-specificity](#)).
+3. **TRANSFORM** -- Resolve and number floats, render typed content, and rewrite resolved links.
+4. **ANALYZE** -- Execute SQL policy views against SpecIR, apply configured severities, and report violations; see [section:verification-views](#) in the model guide.
+5. **EMIT** -- Assemble Pandoc documents from SpecIR, expand generated views, and generate configured outputs via parallel Pandoc subprocesses.
 
 ```plantuml:diag-pipeline{caption="Processing Pipeline"}
 @startuml
@@ -68,22 +68,23 @@ skinparam ArrowColor #333333
 skinparam RectangleBorderColor #333333
 
 rectangle "INITIALIZE" as init #E8F0FE
-rectangle "ANALYZE" as analyze #E8F0FE
+rectangle "RESOLVE" as resolve #E8F0FE
 rectangle "TRANSFORM" as transform #E8F0FE
-rectangle "VERIFY" as verify #E8F0FE
+rectangle "ANALYZE" as analyze #E8F0FE
 rectangle "EMIT" as emit #E8F0FE
 
-init -right-> analyze
-analyze -right-> transform
-transform -right-> verify
-verify -right-> emit
+init -right-> resolve
+resolve -right-> transform
+transform -right-> analyze
+analyze -right-> emit
 
 note bottom of init
-  Parse Markdown
-  Extract to SpecIR
+  Extract and cast
+  Store in SpecIR
 end note
 
-note bottom of analyze
+note bottom of resolve
+  Generate PIDs
   Resolve references
   Infer relation types
 end note
@@ -91,16 +92,16 @@ end note
 note bottom of transform
   Render floats
   Rewrite links
-  Materialize views
 end note
 
-note bottom of verify
-  Execute verification views
+note bottom of analyze
+  Execute SQL policy views
   Report violations
 end note
 
 note bottom of emit
   Assemble documents
+  Expand generated views
   Generate outputs
 end note
 @enduml
@@ -108,7 +109,7 @@ end note
 
 ```json
 {
-  "xAxis": { "type": "category", "data": ["INITIALIZE", "ANALYZE", "TRANSFORM", "VERIFY", "EMIT"] },
+  "xAxis": { "type": "category", "data": ["INITIALIZE", "RESOLVE", "TRANSFORM", "ANALYZE", "EMIT"] },
   "yAxis": { "type": "value", "name": "Hook count" },
   "series": [{ "type": "bar", "data": [6, 2, 5, 1, 3], "itemStyle": { "color": "#5470c6" } }]
 }
@@ -129,36 +130,43 @@ The following are required to run SpecCompiler-Core:
 * - Prerequisite
   - Minimum Version
   - Notes
-* - Docker runtime
-  - 20.10+
-  - Docker Desktop or Docker Engine (daemon must be running)
+* - Container engine
+  - Docker 20.10+ or Podman 4+
+  - Docker Desktop, Docker Engine, or Podman (daemon/VM must be running)
 * - Disk space
   - 2 GB
-  - For the Docker image and build artifacts
+  - For the container image and build artifacts
 * - Host OS
-  - Linux, macOS, or Windows (with WSL2)
-  - The container runs Debian Bookworm (slim)
+  - Linux, macOS, or Windows
+  - The container runs Ubuntu 24.04
 ```
 
 All dependency versions are pinned in `scripts/versions.env`. 
 
-### Building the Image
+### Installing
 
-The image is a thin overlay on the official pandoc image (`Dockerfile.lean`): stock pandoc, the four compiled Lua C extensions, and the SpecCompiler Lua source. No compiler toolchain, no pandoc build. From the repository root:
+One command on Linux, macOS, or WSL2 (requires docker or podman):
 
-```src.bash:src-build-image{caption="Build and install via Docker"}
-docker build -f Dockerfile.lean --target full -t speccompiler-core:latest .
-bash scripts/install.sh
+```src.bash:src-install-oneliner{caption="Container install (Linux/macOS/WSL2)"}
+curl -fsSL https://raw.githubusercontent.com/SpecIR/SpecCompiler/main/scripts/install.sh | bash
 ```
 
-Two targets are available:
+One command on Windows, in PowerShell (after Docker Desktop or Podman is installed):
 
-- **`full`** (recommended) -- core plus the optional external renderers: deno for model-owned `chart:` floats (e.g. the `abnt` model) and PlantUML for `puml:` diagrams.
-- **`lean`** -- core only (stock pandoc + extensions + Lua source); chart and PlantUML floats are unavailable.
+```src.bash:src-install-windows{caption="Container install (Windows PowerShell)"}
+irm https://raw.githubusercontent.com/SpecIR/SpecCompiler/main/scripts/install.ps1 | iex
+```
 
-`install.sh` installs the `specc` `abbrev: Command-Line Interface (CLI)` wrapper at `~/.local/bin/specc` and writes the image reference to `~/.config/speccompiler/env`. If a local image exists it is used automatically; otherwise, the GHCR image is pulled on first use.
+`install.sh` installs the `specc` `abbrev: Command-Line Interface (CLI)` wrapper at `~/.local/bin/specc` and writes the engine and image reference to `~/.config/speccompiler/env`; the Windows installer places `specc` under `%LOCALAPPDATA%\SpecCompiler\bin` and adds it to the user PATH. If a local image exists it is used automatically; otherwise, the GHCR image is pulled on first use.
 
-For maintainers who need the fully from-source toolchain (custom-compiled pandoc, air-gapped builds), the pre-lean path remains available via `bash scripts/docker_build.sh` (old `Dockerfile`) and `bash scripts/build.sh` — it is no longer the default.
+### Building the Image
+
+There is a single image, built on Ubuntu 24.04 (`Dockerfile`): the stock apt pandoc, the four compiled Lua C extensions, the SpecCompiler Lua source, and the optional renderers (deno for model-owned `chart:` floats, PlantUML for `puml:` diagrams, python/reqif for ReqIF interop). No compiler toolchain, no pandoc build. To build it locally instead of pulling from GHCR, from the repository root:
+
+```src.bash:src-build-image{caption="Build and install via Docker"}
+docker build -t speccompiler-core:latest .
+bash scripts/install.sh
+```
 
 ### Verifying Installation
 
@@ -176,31 +184,29 @@ specc build
 
 ### The specc Wrapper
 
-The `specc` command is a Docker wrapper generated by the installer. It supports three subcommands:
+The `specc` command is a single wrapper shared by every install mode. Its mode is read from `~/.config/speccompiler/env`:
 
-```list-table:tbl-wrapper-commands{caption="Wrapper subcommands"}
+```list-table:tbl-wrapper-modes{caption="Wrapper modes"}
 > header-rows: 1
 > aligns: l,l
 
-* - Command
-  - Description
-* - `specc build [project.yaml]`
-  - Build the project (default file: `project.yaml`)
-* - `specc clean`
-  - Remove `build/` directory and `specir.db`
-* - `specc shell`
-  - Open an interactive Bash shell inside the container
+* - Mode
+  - Behavior
+* - `SPECC_MODE=image`
+  - Runs the container image via docker or podman (written by `install.sh`)
+* - `SPECC_MODE=native`
+  - Invokes the host pandoc with the compiled extensions (written by `install-native.sh`)
 ```
 
-The `build` subcommand runs `docker run --rm` with:
+The command surface is `specc build [project.yaml]` (default file: `project.yaml`).
 
-- `--user "$(id -u):$(id -g)"` -- Preserves host UID/GID.
+In image mode, the wrapper runs `docker run --rm` (or `podman run --rm`) with:
+
+- `--user "$(id -u):$(id -g)"` -- Preserves host UID/GID (docker; rootless podman uses `--userns=keep-id` instead).
 - `-v "$(pwd):/workspace"` -- Mounts current directory.
-- `-e "SPECCOMPILER_HOME=/opt/speccompiler"` -- Sets installation root.
-- `-e "SPECCOMPILER_DIST=/opt/speccompiler"` -- Sets distribution root.
 - `-e "SPECCOMPILER_LOG_LEVEL=${SPECCOMPILER_LOG_LEVEL:-INFO}"` -- Passes log level.
 
-Inside the container, the `speccompiler-core` entry point invokes Pandoc with the SpecCompiler Lua filter. The `-o /dev/null` Pandoc flag is intentional -- actual output files are generated by the EMIT phase.
+Inside the container, the same wrapper runs in native mode and invokes Pandoc with the SpecCompiler Lua filter. The `-o /dev/null` Pandoc flag is intentional -- actual output files are generated by the EMIT phase.
 
 ## Project Configuration
 
@@ -636,6 +642,29 @@ Each line is a file path relative to the including document's directory. Absolut
 
 Include blocks are expanded recursively before the pipeline runs. Circular includes are detected and produce an error. The maximum nesting depth is 100 levels.
 
+An included file is authored as a standalone document starting at `#`. During expansion its headings are shifted by the heading level in effect at the include point, so its content nests under the section that contains the directive: an include under a `##` section turns the included `#` into `###` and its `##` into `####`. Nested includes compose their shifts. A `----` section close before the directive pops the context one level, making the included file a sibling of the section just closed instead of its child:
+
+````src.markdown:src-include-level-shift{caption="Include heading levels are relative to the include point"}
+## Design
+
+Content of Design. The include below nests under Design: the included
+file's `#` becomes `###`.
+
+```include
+design_details.md
+```
+
+----
+
+The `----` closed Design, so this include becomes a sibling `##` section:
+
+```include
+next_chapter.md
+```
+````
+
+An included file is positioned relative to its shallowest heading, so both standalone files beginning at `#` and legacy fragments beginning at `##` or deeper are supported. Include nesting can produce Pandoc Header levels deeper than 6; SpecCompiler preserves those levels without rejection or clamping. Output formats render them according to their own capabilities.
+
 Included files are tracked in the build graph for incremental builds -- a change to any included file triggers a rebuild.
 
 ## Using the Default Model
@@ -910,7 +939,8 @@ Processes all files from `doc_files` in the current directory's `project.yaml`. 
 ```csv:tbl-exit-codes{caption="Exit Codes"}
 Code,Meaning
 0,Success: all documents processed and outputs generated
-1,Failure: Docker not running or missing config or pipeline error
+1,Failure: Docker unavailable or configuration or pipeline error
+2,Blocking diagnostics: analysis reported one or more errors
 ```
 
 ## Output Formats
@@ -1105,7 +1135,7 @@ SPECCOMPILER_LOG_LEVEL=DEBUG specc build
 ## Known Limitations
 
 - **No interactive validation** -- Batch mode only, no LSP or watch mode.
-- **Docker-only distribution** -- Native install requires replicating the full build environment (`scripts/build.sh --install` is provided but requires all system dependencies).
+- **Native install is Ubuntu-first** -- `scripts/install-native.sh` automates Ubuntu 24.04 (apt); other distros must install the documented package equivalents manually before running it.
 - **Single-writer SQLite** -- Concurrent builds cause locking errors; use separate output directories.
 - **Float labels per-specification** -- Same label can exist across specs; use scoped syntax for cross-spec references.
 - **PID case sensitivity** -- `[hlr-001](@)` will not match `@HLR-001`.

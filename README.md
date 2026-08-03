@@ -49,29 +49,49 @@ The fundamental purpose of SpecCompiler is to prevent the occurrence of *finding
 
 ### Install
 
-Docker is recommended. One-liner (Linux/Mac/WSL2):
+**Container (recommended).** One command, needs docker or podman
+(Linux/macOS/WSL2):
 ```bash
 curl -fsSL https://raw.githubusercontent.com/SpecIR/SpecCompiler/main/scripts/install.sh | bash
 ```
 
-Or clone and build the Docker image locally — a thin overlay on the official
-pandoc image, no compiler toolchain:
-```bash
-git clone https://github.com/SpecIR/SpecCompiler.git
-cd SpecCompiler
-docker build -f Dockerfile.lean --target full -t speccompiler-core:latest .
-bash scripts/install.sh
+**Windows.** One command in PowerShell, after Docker Desktop or Podman is
+installed:
+```powershell
+irm https://raw.githubusercontent.com/SpecIR/SpecCompiler/main/scripts/install.ps1 | iex
 ```
 
-For native ubuntu/debian (stock apt pandoc + compiled Lua extensions):
+**Native — Ubuntu 24.04** (stock apt pandoc + compiled Lua extensions):
 ```bash
 git clone https://github.com/SpecIR/SpecCompiler.git
 cd SpecCompiler
 bash scripts/install-native.sh
 ```
 
-(`scripts/build.sh` / `scripts/docker_build.sh` remain as the maintainer path
-for building the entire toolchain — custom pandoc included — from source.)
+Other Linux distros: install the equivalents of the packages below, then run
+`bash scripts/install-native.sh` (its apt step is skipped on non-apt systems):
+
+- `pandoc` >= 3.1 — the **distro package**, which links a shared liblua5.4
+  (not the official static release tarball — its sealed Lua cannot load our
+  extensions)
+- `build-essential` (gcc, make), `cmake`, `pkg-config`, `git`, `curl`,
+  `unzip`, `ca-certificates`
+- `liblua5.4-dev`, `libsqlite3-dev`, `libzip-dev`
+- `poppler-utils`, `fontconfig`, `ttf-mscorefonts-installer` (Microsoft core
+  fonts used by the official DOCX templates; the installer auto-accepts the
+  EULA)
+- `peg` — optional; built from source when absent
+- Default-on extras (disable with `WITH_PUML=0` / `WITH_LIBREOFFICE=0`):
+  `default-jre-headless` for PlantUML floats; `libreoffice-writer`,
+  `libreoffice-math`, `python3-uno` for DOCX field update and PDF export
+
+To build the Docker image locally instead of pulling from GHCR:
+```bash
+git clone https://github.com/SpecIR/SpecCompiler.git
+cd SpecCompiler
+docker build -t speccompiler-core:latest .
+bash scripts/install.sh
+```
 
 Build the docs.
 

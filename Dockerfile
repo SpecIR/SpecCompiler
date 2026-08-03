@@ -1,149 +1,102 @@
 # =============================================================================
-# SpecCompiler - Unified Docker Build
+# SpecCompiler — the single distribution image.
 #
-# Stages:
-#   toolchain  — expensive vendor deps (Lua, Pandoc/GHC, Deno, PlantUML, etc.)
-#   builder    — alias that pulls the pre-built toolchain from a registry
-#   runtime    — lean production image (default target)
-#   codeonly   — fast overlay of src/ and models/ onto an existing image
+# Built on Ubuntu 24.04: the same stock apt pandoc + compiled Lua C extensions
+# the native install uses (scripts/install-native.sh), plus the optional
+# renderers — deno (model-owned charts), JRE + PlantUML + graphviz (puml
+# floats), python + reqif (ReqIF interop). One published tag:
 #
-# Usage:
-#   docker build --target toolchain -t speccompiler-toolchain:latest .
-#   docker build --target runtime   -t speccompiler-core:latest \
-#       --build-arg TOOLCHAIN_IMAGE=speccompiler-toolchain:latest .
-#   docker build --target codeonly  -t speccompiler-core:latest \
-#       --build-arg BASE_IMAGE=speccompiler-core-base:latest .
+#   ghcr.io/specir/speccompiler:latest
 #
-# All versions are pinned in scripts/versions.env.
+# Local build:  docker build -t speccompiler-core:latest .
+# Versions are pinned in scripts/versions.env.
 # =============================================================================
 
-ARG DEBIAN_TAG=bookworm
-ARG TOOLCHAIN_IMAGE=ghcr.io/specir/speccompiler-toolchain:latest
-ARG BASE_IMAGE=speccompiler-core-base:latest
+# --- build stage: compile the four Lua C extensions, fetch pinned tools ------
+FROM ubuntu:24.04 AS build
 
-# =============================================================================
-# Stage: toolchain
-# Builds only the expensive vendor dependencies. Rebuilt ONLY when
-# toolchain-related files change (versions.env, build.sh, src/tools/).
-# Published to GHCR as speccompiler-toolchain:latest.
-# =============================================================================
-FROM debian:${DEBIAN_TAG}-slim AS toolchain
-LABEL org.opencontainers.image.source="https://github.com/SpecIR/SpecCompiler" \
-      org.opencontainers.image.description="SpecCompiler toolchain (Lua, Pandoc, Deno, PlantUML)" \
-      org.opencontainers.image.licenses="MIT"
-
-# Install ALL build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential cmake git curl unzip ca-certificates pkg-config \
-    libreadline-dev libgmp-dev libffi-dev zlib1g-dev \
-    libzip-dev peg default-jdk-headless graphviz \
+    build-essential cmake pkg-config git curl unzip ca-certificates \
+    liblua5.4-dev libsqlite3-dev libzip-dev peg \
     python3 python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy ONLY the files build.sh actually reads during the build.
-# Keeping this set minimal ensures the Docker cache is only invalidated
-# when the toolchain itself needs to change.
-COPY scripts/versions.env        /build/scripts/versions.env
-COPY scripts/build.sh     /build/scripts/build.sh
-COPY src/tools/amath/            /build/src/tools/amath/
-COPY models/abnt/tools/echarts-render.ts /build/models/abnt/tools/echarts-render.ts
-
-# Build everything: Lua, Pandoc (via GHCup/Cabal), Deno, PlantUML, SQLite,
-# all Lua C extensions (lsqlite3, luv, brimworks/zip, luaamath), and pure Lua
-# libraries. Also caches Deno TypeScript dependencies.
-ENV GHCUP_PREFIX=/opt
-RUN bash /build/scripts/build.sh \
-    --skip-system-deps \
-    --prefix /opt/speccompiler \
-    --source-dir /build
-
-# =============================================================================
-# Stage: builder
-# Uses the pre-built toolchain image so that the expensive Pandoc/GHC
-# compilation is never re-triggered by ordinary source-code changes.
-# The toolchain stage above is rebuilt separately only when
-# scripts/versions.env, build.sh, or src/tools/ change.
-# =============================================================================
-FROM ${TOOLCHAIN_IMAGE} AS builder
-
-# =============================================================================
-# Stage: runtime-base — lean production image WITHOUT application code.
-# This stage is tagged separately so --code-only builds always start from
-# a fixed base, preventing Docker layer accumulation.
-# =============================================================================
-FROM debian:${DEBIAN_TAG}-slim AS runtime-base
-
-# Runtime-only packages (no -dev packages, no build tools).
-# Python packages (reqif) are vendored by build.sh into vendor/python/.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgmp10 \
-    libffi8 \
-    zlib1g \
-    libzip4 \
-    graphviz \
-    lcov \
-    ca-certificates \
-    bash \
-    zip \
-    unzip \
-    python3 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create an unprivileged runtime user.
-RUN groupadd --system --gid 10001 speccompiler \
-    && useradd --system --uid 10001 --gid speccompiler \
-        --create-home --home-dir /home/speccompiler --shell /usr/sbin/nologin speccompiler
-
 WORKDIR /opt/speccompiler
 
-# All build artifacts from the toolchain
-COPY --from=builder /opt/speccompiler/bin/     ./bin/
-COPY --from=builder /opt/speccompiler/vendor/  ./vendor/
-COPY --from=builder /opt/speccompiler/jre/     ./jre/
-# Ensure liblua5.4.so.0 exists (pandoc compiled with +system-lua expects this soname).
-# The builder already creates .so.0 as the real file and .so as a symlink to it,
-# so this is a no-op when COPY preserves symlinks — but acts as a safety net.
-RUN test -e /opt/speccompiler/vendor/lua/lib/liblua5.4.so.0 \
-    || ln -s liblua5.4.so /opt/speccompiler/vendor/lua/lib/liblua5.4.so.0
+COPY scripts/build-extensions.sh scripts/versions.env ./scripts/
+COPY src/tools/ ./src/tools/
+RUN bash scripts/build-extensions.sh /opt/speccompiler/vendor
 
-# Ensure /opt/speccompiler/bin is on PATH even in login shells (which reset PATH via /etc/profile)
-RUN echo 'export PATH="/opt/speccompiler/bin:$PATH"' > /etc/profile.d/specc.sh
+# deno (official glibc binary) + plantuml.jar, pinned via versions.env
+RUN . ./scripts/versions.env \
+    && case "$(uname -m)" in \
+         x86_64)  DENO_ARCH=x86_64-unknown-linux-gnu ;; \
+         aarch64) DENO_ARCH=aarch64-unknown-linux-gnu ;; \
+         *) echo "unsupported arch: $(uname -m)" && exit 1 ;; \
+       esac \
+    && curl -fsSL "https://github.com/denoland/deno/releases/download/v${DENO_VERSION}/deno-${DENO_ARCH}.zip" -o /tmp/deno.zip \
+    && unzip -q /tmp/deno.zip -d /usr/local/bin && rm /tmp/deno.zip \
+    && curl -fsSL "https://github.com/plantuml/plantuml/releases/download/v${PLANTUML_VERSION}/plantuml-${PLANTUML_VERSION}.jar" \
+         -o /opt/speccompiler/vendor/plantuml.jar
 
-# Environment setup
-ENV SPECCOMPILER_HOME=/opt/speccompiler
-ENV SPECCOMPILER_DIST=/opt/speccompiler
-ENV DENO_DIR=/opt/speccompiler/vendor/deno_cache
-ENV PYTHONPATH="/opt/speccompiler/vendor/python"
-ENV LD_LIBRARY_PATH="/opt/speccompiler/vendor/lua/lib"
-ENV LUA_PATH="/opt/speccompiler/src/?.lua;/opt/speccompiler/src/?/init.lua;/opt/speccompiler/?.lua;/opt/speccompiler/?/init.lua;/opt/speccompiler/vendor/?.lua;/opt/speccompiler/vendor/?/init.lua;/opt/speccompiler/vendor/slaxml/?.lua;/opt/speccompiler/tests/?.lua;/opt/speccompiler/tests/?/init.lua"
-ENV LUA_CPATH="/opt/speccompiler/vendor/?.so;/opt/speccompiler/vendor/?/?.so"
-ENV PATH="/opt/speccompiler/bin:${PATH}"
-ENV HOME=/home/speccompiler
+# reqif (fork with the specir subpackage) for `python3 -m reqif.specir`
+RUN python3 -m pip install --break-system-packages --no-cache-dir \
+      --target=/opt/speccompiler/vendor/python \
+      "git+https://github.com/crisclacerda/reqif.git@main"
 
-RUN mkdir -p /workspace \
-    && chown -R speccompiler:speccompiler /opt/speccompiler /workspace /home/speccompiler
-
-USER speccompiler
-
-WORKDIR /workspace
-
-# =============================================================================
-# Stage: runtime — production image with application code (default target)
-# =============================================================================
-FROM runtime-base AS runtime
+# --- runtime stage -----------------------------------------------------------
+FROM ubuntu:24.04
 LABEL org.opencontainers.image.source="https://github.com/SpecIR/SpecCompiler" \
       org.opencontainers.image.description="SpecCompiler - extensible type system for Markdown" \
       org.opencontainers.image.licenses="MIT"
-COPY --chown=speccompiler:speccompiler src/    /opt/speccompiler/src/
-COPY --chown=speccompiler:speccompiler models/ /opt/speccompiler/models/
-COPY --chown=speccompiler:speccompiler tests/  /opt/speccompiler/tests/
 
-# =============================================================================
-# Stage: codeonly — fast overlay of src/ and models/ onto runtime-base.
-# Used by: scripts/docker_build.sh --code-only
-# Always builds from runtime-base (fixed layer count), never from itself.
-# =============================================================================
-FROM ${BASE_IMAGE} AS codeonly
-COPY --chown=speccompiler:speccompiler src/    /opt/speccompiler/src/
-COPY --chown=speccompiler:speccompiler models/ /opt/speccompiler/models/
-COPY --chown=speccompiler:speccompiler tests/  /opt/speccompiler/tests/
+# stock pandoc (links shared liblua5.4) + runtime libs for the extensions
+# + LibreOffice for DOCX field/PDF finalization + Microsoft core fonts used by
+# the official ABNT/USP templates. The fonts are downloaded by Ubuntu's
+# installer after accepting Microsoft's core-font EULA.
+RUN apt-get update \
+    && echo 'ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true' \
+       | debconf-set-selections \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    pandoc \
+    liblua5.4-0 libsqlite3-0 libzip4t64 \
+    python3 python3-uno libreoffice-writer libreoffice-math poppler-utils \
+    default-jre-headless graphviz fonts-dejavu-core \
+    fontconfig ttf-mscorefonts-installer \
+    zip unzip ca-certificates \
+    && fc-cache -f \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/speccompiler
+
+COPY --from=build /opt/speccompiler/vendor/ ./vendor/
+COPY --from=build /usr/local/bin/deno /usr/local/bin/deno
+COPY src/ ./src/
+COPY models/default/ ./models/default/
+COPY models/sw_docs/ ./models/sw_docs/
+# tests/ ships too so model-overlay images (e.g. specc-abnt) can run their
+# model suite via /opt/speccompiler/tests/run.sh <model>-tests
+COPY tests/ ./tests/
+# guard: the core must stay Deno-free (charts are model-owned)
+RUN ! grep -rq "deno" src/ models/default/ || (echo "core references deno" && exit 1)
+
+# `plantuml` on PATH for the puml float
+RUN printf '#!/bin/sh\nexec java -jar /opt/speccompiler/vendor/plantuml.jar "$@"\n' \
+      > /usr/local/bin/plantuml && chmod +x /usr/local/bin/plantuml
+
+# the same unified wrapper the native install uses, running in native mode
+COPY scripts/specc /usr/local/bin/specc
+RUN chmod +x /usr/local/bin/specc
+
+ENV SPECC_MODE=native \
+    SPECCOMPILER_HOME=/opt/speccompiler \
+    SPECCOMPILER_DIST=/opt/speccompiler \
+    PYTHONPATH=/opt/speccompiler/vendor/python \
+    DENO_DIR=/opt/speccompiler/vendor/deno_cache \
+    DENO_NO_UPDATE_CHECK=1 \
+    LANG=C.UTF-8 \
+    LUA_PATH="/opt/speccompiler/src/?.lua;/opt/speccompiler/src/?/init.lua;/opt/speccompiler/?.lua;/opt/speccompiler/?/init.lua;/opt/speccompiler/vendor/?.lua;/opt/speccompiler/vendor/?/init.lua;/opt/speccompiler/vendor/slaxml/?.lua;;" \
+    LUA_CPATH="/opt/speccompiler/vendor/?.so;/opt/speccompiler/vendor/?/?.so;;"
+
+WORKDIR /workspace
+ENTRYPOINT ["specc"]

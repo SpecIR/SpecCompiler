@@ -1,15 +1,12 @@
 # Build, test, and publish the SpecCompiler image.
 #
-# The image is a thin overlay on the OFFICIAL pandoc image (Dockerfile.lean):
-# stock pandoc + our four C extensions + Lua source. There is no toolchain
-# image and no pandoc/GHC compilation — that was the pre-lean build
-# (Dockerfile, kept as the maintainer/air-gapped path).
+# ONE image (Dockerfile, ubuntu:24.04): stock apt pandoc + our four C
+# extensions + Lua source + the optional renderers (deno for model-owned
+# charts, JRE/PlantUML/graphviz for puml, python/reqif for interop).
+# No toolchain image, no pandoc/GHC compilation, no variants.
 #
-# Published tags:
-#   :latest / :<sha> / semver  — the `full` target (core + deno/charts +
-#                                plantuml), what users and model overlays
-#                                (e.g. specc-abnt) consume.
-#   :lean                      — the core-only target (no external renderers).
+# Published tags: :latest / :<sha> / semver — what users and model overlays
+# (e.g. specc-abnt) consume.
 name: Build, Test, and Publish
 
 on:
@@ -21,7 +18,7 @@ on:
       - 'tests/**'
       - 'scripts/**'
       - 'assets/**'
-      - 'Dockerfile.lean'
+      - 'Dockerfile'
       - '.github/workflows/docker-publish.yml'
     tags: ['v*']
   pull_request:
@@ -32,7 +29,7 @@ on:
       - 'tests/**'
       - 'scripts/**'
       - 'assets/**'
-      - 'Dockerfile.lean'
+      - 'Dockerfile'
       - '.github/workflows/docker-publish.yml'
 
 env:
@@ -77,31 +74,18 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
-      - name: Build and push (full)
+      - name: Build and push
         id: build-push
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Dockerfile.lean
-          target: full
+          file: Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           load: ${{ github.event_name == 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=lean
-          cache-to: type=gha,mode=max,scope=lean
-
-      - name: Build and push (lean core)
-        if: github.event_name != 'pull_request'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Dockerfile.lean
-          target: lean
-          push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:lean
-          cache-from: type=gha,scope=lean
-          cache-to: type=gha,mode=max,scope=lean
+          cache-from: type=gha,scope=image
+          cache-to: type=gha,mode=max,scope=image
 
       - name: Export image ref for docs
         id: imgref
@@ -148,7 +132,7 @@ jobs:
           if [ -f tests/reports/coverage/merged.lcov ]; then
             sed -i 's|SF:/workspace/|SF:|g' tests/reports/coverage/merged.lcov
           else
-            echo "::notice::No coverage report generated (luacov is not present in the lean image); skipping Codecov upload."
+            echo "::notice::No coverage report generated (luacov is not present in the image); skipping Codecov upload."
           fi
 
       - name: Upload coverage to Codecov
@@ -228,7 +212,19 @@ jobs:
             THIRD_PARTY_NOTICES
           generate_release_notes: true
           body: |
-            ## Install (native, stock pandoc)
+            ## Install (container — Linux/macOS/WSL2)
+
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/scripts/install.sh | bash
+            ```
+
+            ## Install (container — Windows PowerShell)
+
+            ```powershell
+            irm https://raw.githubusercontent.com/${{ github.repository }}/main/scripts/install.ps1 | iex
+            ```
+
+            ## Install (native — Ubuntu 24.04)
 
             ```bash
             git clone https://github.com/${{ github.repository }}.git
@@ -237,10 +233,8 @@ jobs:
 
             ## Docker Image
 
-            Thin overlay on the official pandoc image — no compiler toolchain:
+            One image on Ubuntu 24.04 — stock apt pandoc + compiled Lua extensions + renderers:
 
             ```bash
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}
-            # core-only variant (no chart/plantuml renderers):
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:lean
             ```

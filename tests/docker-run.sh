@@ -24,7 +24,7 @@ fi
 
 if ! docker image inspect "$DOCKER_IMAGE" > /dev/null 2>&1; then
     echo "Error: Docker image not found: $DOCKER_IMAGE"
-    echo "Build it first with: bash scripts/install.sh --force"
+    echo "Build it first with: docker build -t speccompiler-core:latest ."
     exit 1
 fi
 

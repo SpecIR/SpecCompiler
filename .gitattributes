@@ -1,0 +1,2 @@
+# PowerShell scripts must keep CRLF line endings on checkout
+*.ps1 text eol=crlf

@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+# SpecCompiler — the one `specc` wrapper for every install mode.
+#
+#   SPECC_MODE=native  stock pandoc + compiled extensions on this machine
+#                      (written by scripts/install-native.sh; also how the
+#                      Docker image runs it internally)
+#   SPECC_MODE=image   docker/podman run of the published image
+#                      (written by scripts/install.sh)
+#
+# Config file: ${XDG_CONFIG_HOME:-~/.config}/speccompiler/env, written by the
+# installers with VAR="${VAR:-value}" lines so exported environment variables
+# keep priority over it.
+set -e
+
+SPECCOMPILER_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/speccompiler/env"
+[ -f "$SPECCOMPILER_CONFIG" ] && . "$SPECCOMPILER_CONFIG"
+
+MODE="${SPECC_MODE:-image}"
+
+RED='\033[0;31m'; GREEN='\033[0;32m'; CYAN='\033[0;36m'; NC='\033[0m'
+
+usage() {
+    echo -e "${CYAN}SpecCompiler${NC}"
+    echo ""
+    echo "Usage: specc build [project.yaml]"
+    echo ""
+    echo "  Build the project (default: project.yaml)"
+    echo ""
+    echo "Environment:"
+    echo "  SPECC_MODE                native | image (current: $MODE)"
+    echo "  SPECC_ENGINE              container engine for image mode (docker | podman)"
+    echo "  SPECCOMPILER_IMAGE        full image reference (highest priority)"
+    echo "  SPECCOMPILER_REPOSITORY   GitHub slug to resolve the GHCR image (e.g. org/repo)"
+}
+
+build_native() {
+    local project="${1:-project.yaml}"
+    if [ ! -f "$project" ]; then
+        echo -e "${RED}Error: $project not found${NC}"; exit 1
+    fi
+    : "${SPECCOMPILER_HOME:?SPECC_MODE=native requires SPECCOMPILER_HOME (run scripts/install-native.sh)}"
+    local dist="${SPECCOMPILER_DIST:-$SPECCOMPILER_HOME}"
+    export SPECCOMPILER_HOME SPECCOMPILER_DIST="$dist"
+    export LUA_PATH="$SPECCOMPILER_HOME/src/?.lua;$SPECCOMPILER_HOME/src/?/init.lua;$SPECCOMPILER_HOME/?.lua;$SPECCOMPILER_HOME/?/init.lua;$dist/vendor/?.lua;$dist/vendor/?/init.lua;$dist/vendor/slaxml/?.lua;${LUA_PATH:-}"
+    export LUA_CPATH="$dist/vendor/?.so;$dist/vendor/?/?.so;${LUA_CPATH:-}"
+    export PATH="$dist/bin:$PATH"
+    cd "$(dirname "$project")"
+    exec pandoc --from markdown --to json \
+        --lua-filter "$SPECCOMPILER_HOME/src/filter.lua" \
+        --metadata-file "$(basename "$project")" "$(basename "$project")" -o /dev/null
+}
+
+detect_engine() {
+    if [ -n "${SPECC_ENGINE:-}" ]; then
+        ENGINE="$SPECC_ENGINE"
+    elif command -v docker &> /dev/null; then
+        ENGINE=docker
+    elif command -v podman &> /dev/null; then
+        ENGINE=podman
+    else
+        echo -e "${RED}Error: no container engine found${NC}"
+        echo "Install Docker (https://docs.docker.com/get-docker/) or Podman (https://podman.io),"
+        echo "or use the native install: bash scripts/install-native.sh"
+        exit 1
+    fi
+    local engine_err
+    if ! engine_err=$("$ENGINE" info 2>&1 >/dev/null); then
+        echo -e "${RED}Error: cannot connect to $ENGINE${NC}"
+        echo "$engine_err" | tail -1
+        if [ "$ENGINE" = docker ]; then
+            echo ""
+            echo "Possible fixes:"
+            echo "  sudo systemctl start docker"
+            echo "  sudo usermod -aG docker \$USER  (then log out and back in)"
+        fi
+        exit 1
+    fi
+}
+
+build_image() {
+    local project="${1:-project.yaml}"
+    if [ ! -f "$project" ]; then
+        echo -e "${RED}Error: $project not found${NC}"; exit 1
+    fi
+    detect_engine
+    local image
+    if [ -n "${SPECCOMPILER_IMAGE:-}" ]; then
+        image="$SPECCOMPILER_IMAGE"
+    elif [ -n "${SPECCOMPILER_REPOSITORY:-}" ]; then
+        image="ghcr.io/${SPECCOMPILER_REPOSITORY}:latest"
+    else
+        image="speccompiler-core:latest"
+    fi
+    if ! "$ENGINE" image inspect "$image" &> /dev/null; then
+        echo -e "${CYAN}Image '$image' not found locally. Pulling...${NC}"
+        if ! "$ENGINE" pull "$image"; then
+            echo -e "${RED}Error: failed to pull image '$image'${NC}"
+            echo "If this is a local dev image, build it with:"
+            echo "  docker build -t speccompiler-core:latest ."
+            exit 1
+        fi
+    fi
+    # rootless podman maps the host user by itself; docker needs explicit uid:gid
+    local userflags=(-u "$(id -u):$(id -g)")
+    if [ "$ENGINE" = podman ]; then
+        userflags=(--userns=keep-id)
+    fi
+    echo -e "${CYAN}Building project...${NC}"
+    "$ENGINE" run --rm \
+        "${userflags[@]}" \
+        -v "$(pwd):/workspace" \
+        -w /workspace \
+        -e "SPECCOMPILER_LOG_LEVEL=${SPECCOMPILER_LOG_LEVEL:-INFO}" \
+        "$image" build "$project"
+    echo -e "${GREEN}Build complete.${NC}"
+}
+
+case "${1:-}" in
+    build) shift ;;
+    -h|--help|help|"") usage; exit 0 ;;
+esac
+
+case "$MODE" in
+    native) build_native "$@" ;;
+    image)  build_image "$@" ;;
+    *) echo -e "${RED}Unknown SPECC_MODE: $MODE${NC}"; usage; exit 1 ;;
+esac

@@ -66,6 +66,10 @@ if [ ! -f "$OUT/brimworks/zip.so" ]; then
     && cd lua-zip \
     && gcc -shared -fPIC -o "$OUT/brimworks/zip.so" lua_zip.c -I"$LUA_INCDIR" $(pkg-config --cflags --libs libzip) )
 fi
+# a missing libzip-dev/pkg-config leaves $(pkg-config ...) empty and gcc -shared
+# still "succeeds" — the .so then fails only at runtime. Catch it here instead.
+readelf -d "$OUT/brimworks/zip.so" | grep -q 'libzip' \
+  || { echo "ERROR: zip.so is not linked against libzip (install libzip-dev + pkg-config and rebuild)"; exit 1; }
 
 # --- luaamath (AsciiMath->MathML for the math float; needs peg/leg + amath) --
 if [ ! -f "$OUT/luaamath.so" ]; then
