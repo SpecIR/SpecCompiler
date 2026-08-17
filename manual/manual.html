@@ -376,9 +376,9 @@ Identifier (PID) and <code data-pos="33:87-33:95">#label</code>
 references.
 </div></li>
 <li><div data-pos="34:1-35:1">
-<strong>Validation</strong>: Automatically verify data integrity through
-verification views backed by Structured Query Language (SQL) queries
-against the Specification Intermediate Representation (SpecIR).
+<strong>Validation</strong>: Check data integrity with Structured Query
+Language (SQL) analyze queries against the Specification Intermediate
+Representation (SpecIR).
 </div></li>
 <li><div data-pos="35:1-37:1">
 <strong>Multi-format output</strong>: Generate Word documents and web
@@ -447,8 +447,7 @@ content, and rewrite resolved links.
 </div></li>
 <li><div data-pos="59:1-60:1">
 <strong>ANALYZE</strong> – Execute SQL policy views against SpecIR,
-apply configured severities, and report violations; see <a href="creating-a-model.html#SPEC-sec11" data-pos="59:116-59:147">creating-a-model: 11 Verification views</a> in
-the model guide.
+apply configured severities, and report violations.
 </div></li>
 <li><div data-pos="60:1-62:1">
 <strong>EMIT</strong> – Assemble Pandoc documents from SpecIR, expand
@@ -920,15 +919,10 @@ Listing (Code)</h3>
 <h3 data-number="4.4.5" data-pos="457:1-458:1" id="MANUAL-sec5.4.5"><span class="header-section-number">4.4.5</span>
 Chart (ECharts)</h3>
 <div data-pos="459:1-460:1">
-<p>The <code data-pos="459:5-459:12">CHART</code> float lives in an
-overlay model such as <code data-pos="459:53-459:59">abnt</code>, not in
-the lean core: set <code data-pos="459:87-459:103">template: abnt</code>
-in <code data-pos="459:107-459:121">project.yaml</code> (or use any
-model that carries the CHART float). Rendering needs deno — the Docker
-<code data-pos="459:205-459:211">full</code> image ships it; native
-installs can run the model’s <code data-pos="459:264-459:286">scripts/bootstrap.sh</code>. The default core
-is deliberately deno-free, so the chart examples in this manual show
-authoring syntax only and are not rendered here.</p>
+<p>The <code data-pos="459:5-459:14">default</code> model does not
+define the <code data-pos="459:41-459:48">CHART</code> float. Use an
+overlay model that defines <code data-pos="459:90-459:97">CHART</code>
+and its renderer. Install any external tool required by that model.</p>
 </div>
 <a id="listing-src-chart-float-syntax" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Chart float syntax</figcaption>
@@ -1241,16 +1235,12 @@ Circular includes are detected and produce an error. The maximum nesting
 depth is 100 levels.</p>
 </div>
 <div data-pos="645:1-646:1">
-<p>During expansion an included file’s headings are shifted uniformly so
-that its shallowest heading lands one level below the heading in effect
-at the include point: an include under a <code data-pos="645:184-645:188">##</code> section turns an included <code data-pos="645:215-645:218">#</code> into <code data-pos="645:224-645:229">###</code> and its <code data-pos="645:238-645:242">##</code> into <code data-pos="645:248-645:254">####</code>, and a legacy fragment whose
-shallowest heading is <code data-pos="645:306-645:310">##</code> or
-<code data-pos="645:314-645:319">###</code> normalizes to the same
-position without editing its source. Relative depths inside the file are
-preserved — a skipped level stays skipped and is reported. Nested
-includes compose their shifts. A <code data-pos="645:515-645:521">----</code> section close before the
-directive pops the context one level, making the included file a sibling
-of the section just closed instead of its child:</p>
+<p>During expansion, SpecCompiler shifts all headings in an included
+file by the same amount. The shallowest heading becomes a child of the
+active heading. For example, an include under <code data-pos="645:184-645:188">##</code> changes an included <code data-pos="645:209-645:212">#</code> to <code data-pos="645:216-645:221">###</code>. It changes the included <code data-pos="645:247-645:251">##</code> to <code data-pos="645:255-645:261">####</code>. SpecCompiler preserves relative
+depths and reports skipped levels. Nested includes combine these shifts.
+A <code data-pos="645:370-645:376">----</code> marker before the
+directive reduces the active level by one:</p>
 </div>
 <a id="listing-src-include-level-shift" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Include heading levels are relative to the include point</figcaption>
@@ -1271,12 +1261,11 @@ of the section just closed instead of its child:</p>
 <span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="in">next_chapter.md</span></span>
 <span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
 <div data-pos="666:1-667:1">
-<p>An included file is positioned relative to its shallowest heading, so
-both standalone files beginning at <code data-pos="666:106-666:109">#</code> and legacy fragments beginning at
-<code data-pos="666:144-666:148">##</code> or deeper are supported.
-Include nesting can produce Pandoc Header levels deeper than 6;
-SpecCompiler preserves those levels without rejection or clamping.
-Output formats render them according to their own capabilities.</p>
+<p>SpecCompiler positions an included file relative to its shallowest
+heading. The first heading can have any level. Nested includes can
+produce Pandoc heading levels greater than 6. SpecCompiler preserves
+these levels. Each output format renders them according to its
+capabilities.</p>
 </div>
 <div data-pos="668:1-669:1">
 <p>Included files are tracked in the build graph for incremental builds
@@ -1293,8 +1282,8 @@ technical documents without defining custom types. It provides:</p>
 <ul>
 <li><div data-pos="676:1-677:1">
 <strong>Numbered floats</strong> – figures, tables, code listings, math
-equations, PlantUML diagrams, and ECharts charts, each with automatic
-numbering and captions.
+equations, and PlantUML diagrams, each with automatic numbering and
+captions.
 </div></li>
 <li><div data-pos="677:1-678:1">
 <strong>Typed cross-references</strong> – relation types that resolve
@@ -1958,12 +1947,10 @@ policy key:</p>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">float_orphan</span><span class="kw">:</span><span class="at"> ignore</span><span class="co">              # suppress entirely</span></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">unresolved_relation</span><span class="kw">:</span><span class="at"> warn</span><span class="co">         # downgrade to warning</span></span></code></pre></div>
 <div data-pos="1061:1-1062:1">
-<p>All verification views default to <code data-pos="1061:35-1061:42">error</code> (halt the build). Set a key to
-<code data-pos="1061:74-1061:80">warn</code> to emit a warning without
-halting, or <code data-pos="1061:119-1061:127">ignore</code> to suppress
-the diagnostic entirely. Custom verification views can define their own
-policy keys; see <a href="creating-a-model.html#SPEC-sec11" data-pos="1061:229-1061:260">creating-a-model: 11 Verification views</a>
-in the model guide.</p>
+<p>Analyze-query diagnostics default to <code data-pos="1061:38-1061:45">error</code>. Set a key to <code data-pos="1061:60-1061:66">warn</code> to continue the build with a
+warning. Set it to <code data-pos="1061:115-1061:123">ignore</code> to
+suppress the diagnostic. Custom analyze queries can define policy
+keys.</p>
 </div>
 <h1 data-number="9" data-pos="1063:1-1064:1" id="MANUAL-sec10"><span class="header-section-number">9</span> Incremental Builds</h1>
 <h2 data-number="9.1" data-pos="1065:1-1066:1" id="MANUAL-sec10.1"><span class="header-section-number">9.1</span> Build Cache Mechanism</h2>
@@ -1993,10 +1980,9 @@ data.
 <h2 data-number="10.1" data-pos="1081:1-1082:1" id="MANUAL-sec11.1"><span class="header-section-number">10.1</span>
 Built-in Models</h2>
 <div data-pos="1083:1-1084:1">
-<p>SpecCompiler ships with <code data-pos="1083:25-1083:34">default</code>, <code data-pos="1083:36-1083:42">abnt</code>, and <code data-pos="1083:48-1083:57">sw_docs</code>. The <code data-pos="1083:63-1083:72">default</code> model provides general-purpose
-types (specifications, sections, floats, cross-references, views). The
-<code data-pos="1083:175-1083:184">sw_docs</code> model overlays <code data-pos="1083:200-1083:209">default</code> with types for requirements
-engineering and traceability:</p>
+<p>SpecCompiler includes the <code data-pos="1083:27-1083:36">default</code> and <code data-pos="1083:41-1083:50">sw_docs</code> models. The <code data-pos="1083:63-1083:72">default</code> model provides general-purpose
+types. The <code data-pos="1083:115-1083:124">sw_docs</code> model adds
+requirements-engineering and traceability types:</p>
 </div>
 <div data-pos="1085:1-1093:1">
 <ul>
@@ -2020,8 +2006,8 @@ TEST_EXECUTION_MATRIX, COVERAGE_SUMMARY, REQUIREMENTS_SUMMARY
 (query-based tables materialized from the SpecIR)
 </div></li>
 <li><div data-pos="1089:1-1090:1">
-<strong>Verification views</strong>: Traceability chain validation
-(VC-HLR, TR-VC, FD-CSC/CSU coverage)
+<strong>Analyze queries</strong>: Traceability-chain validation for
+VC-HLR, TR-VC, and FD-CSC/CSU coverage
 </div></li>
 <li><div data-pos="1090:1-1092:1">
 <strong>Postprocessor</strong>: Interactive single-file HTML5 web
@@ -2030,120 +2016,104 @@ application
 </ul>
 </div>
 <div data-pos="1092:1-1093:1">
-<p>The <code data-pos="1092:5-1092:11">abnt</code> model overlays <code data-pos="1092:27-1092:36">default</code> with ABNT NBR 14724
-pre-textual elements (Capa, Folha de Rosto, lists of
-figures/tables/abbreviations), citation formatting, and a DOCX
-postprocessor tuned for Brazilian academic standards.</p>
+<p>The <code data-pos="1092:5-1092:29">docs/engineering_docs/</code>
+project uses <code data-pos="1092:43-1092:52">sw_docs</code>.</p>
 </div>
-<div data-pos="1094:1-1095:1">
-<p>The <code data-pos="1094:5-1094:29">docs/engineering_docs/</code>
-directory in this repository uses <code data-pos="1094:64-1094:73">sw_docs</code> and serves as a living example
-of the model in practice.</p>
-</div>
-<h2 data-number="10.2" data-pos="1096:1-1097:1" id="MANUAL-sec11.2"><span class="header-section-number">10.2</span>
+<h2 data-number="10.2" data-pos="1094:1-1095:1" id="MANUAL-sec11.2"><span class="header-section-number">10.2</span>
 Custom Models</h2>
-<div data-pos="1098:1-1099:1">
-<p>Set <code data-pos="1098:5-1098:24">template: mymodel</code> in <code data-pos="1098:28-1098:42">project.yaml</code>. Custom types layer as
-overlays on top of <code data-pos="1098:85-1098:94">default</code>
-(types with matching <code data-pos="1098:116-1098:120">id</code>
-replace the default; new <code data-pos="1098:146-1098:150">id</code>s
+<div data-pos="1096:1-1097:1">
+<p>Set <code data-pos="1096:5-1096:24">template: mymodel</code> in <code data-pos="1096:28-1096:42">project.yaml</code>. Custom types layer as
+overlays on top of <code data-pos="1096:85-1096:94">default</code>
+(types with matching <code data-pos="1096:116-1096:120">id</code>
+replace the default; new <code data-pos="1096:146-1096:150">id</code>s
 add). The model directory is resolved under the SpecCompiler
-installation (<code data-pos="1098:227-1098:244">models/mymodel/</code>)
+installation (<code data-pos="1096:227-1096:244">models/mymodel/</code>)
 first, then under the project directory itself — so a project can ship
 its own model alongside its documents.</p>
 </div>
+<div data-pos="1098:1-1099:1">
+<p>Each extension module returns one Lua descriptor table. The
+descriptor contains a <code data-pos="1098:83-1098:89">kind</code>, a
+<code data-pos="1098:93-1098:101">schema</code>, and optional <code data-pos="1098:116-1098:123">hooks</code>. Supported kinds are <code data-pos="1098:145-1098:153">object</code>, <code data-pos="1098:155-1098:162">float</code>, <code data-pos="1098:164-1098:170">view</code>, <code data-pos="1098:172-1098:182">relation</code>, <code data-pos="1098:184-1098:199">specification</code>, and <code data-pos="1098:205-1098:214">analyze</code>. The <code data-pos="1098:220-1098:231">schema.id</code> field is the authoritative
+identifier. Each hook name determines its context and return type. A
+descriptor can inherit shared behavior through <code data-pos="1098:375-1098:391">schema.extends</code>.</p>
+</div>
 <div data-pos="1100:1-1101:1">
-<p>Each extension point is a single Lua file that returns one descriptor
-table – a <code data-pos="1100:82-1100:88">kind</code> (<code data-pos="1100:90-1100:98">object</code>, <code data-pos="1100:100-1100:107">float</code>, <code data-pos="1100:109-1100:115">view</code>, <code data-pos="1100:117-1100:127">relation</code>, <code data-pos="1100:129-1100:144">specification</code>, or <code data-pos="1100:149-1100:163">verification</code>), a <code data-pos="1100:168-1100:176">schema</code> holding your data (the
-authoritative <code data-pos="1100:214-1100:218">id</code>, <code data-pos="1100:220-1100:229">extends</code>, <code data-pos="1100:231-1100:243">attributes</code>, and so on), and an
-optional <code data-pos="1100:273-1100:280">hooks</code> table holding
-any behaviour. A pure-data type omits <code data-pos="1100:333-1100:340">hooks</code> entirely. The recipe is
-simple: decide the kind, put your data in <code data-pos="1100:407-1100:415">schema</code>, and pick the hook whose name
-matches what you want to do – a <code data-pos="1100:479-1100:487">render</code>/<code data-pos="1100:488-1100:502">render_block</code>/<code data-pos="1100:503-1100:516">render_link</code> hook to produce output
-during the EMIT walk, or a data hook like <code data-pos="1100:582-1100:591">dataset</code> or <code data-pos="1100:595-1100:606">transform</code> to produce data earlier in
-the pipeline. You receive the right context and return the documented
-type. Shared behaviour lives once on a base type and is inherited
-through <code data-pos="1100:778-1100:794">schema.extends</code> (for
-example, objects extend <code data-pos="1100:824-1100:835">TRACEABLE</code> to get the standard card,
-and matrix views extend <code data-pos="1100:886-1100:898">TABLE_VIEW</code>).</p>
+<p>The <a href="guides/creating-a-model.md" data-pos="1100:5-1100:58">Creating a Custom Model</a> guide defines the
+directory layout, hook contract, schema fields, analyze queries, and
+external renderers.</p>
 </div>
-<div data-pos="1102:1-1103:1">
-<p>Everything else — directory layout, the full hook catalogue and the
-context each one receives, schema fields for each kind, verification
-views, and external renderers — lives in the companion <a href="guides/creating-a-model.md" data-pos="1102:193-1102:246">Creating
-a Custom Model</a> guide.</p>
-</div>
-<h1 data-number="11" data-pos="1104:1-1105:1" id="MANUAL-sec12"><span class="header-section-number">11</span> Troubleshooting</h1>
-<h2 data-number="11.1" data-pos="1106:1-1107:1" id="MANUAL-sec12.1"><span class="header-section-number">11.1</span>
+<h1 data-number="11" data-pos="1102:1-1103:1" id="MANUAL-sec12"><span class="header-section-number">11</span> Troubleshooting</h1>
+<h2 data-number="11.1" data-pos="1104:1-1105:1" id="MANUAL-sec12.1"><span class="header-section-number">11.1</span>
 Docker Not Running</h2>
-<div data-pos="1108:1-1109:1">
-<p><code data-pos="1108:1-1108:31">Error: Docker is not running</code> –
-Start Docker daemon, verify with <code data-pos="1108:68-1108:81">docker info</code>.</p>
+<div data-pos="1106:1-1107:1">
+<p><code data-pos="1106:1-1106:31">Error: Docker is not running</code> –
+Start Docker daemon, verify with <code data-pos="1106:68-1106:81">docker info</code>.</p>
 </div>
-<h2 data-number="11.2" data-pos="1110:1-1111:1" id="MANUAL-sec12.2"><span class="header-section-number">11.2</span> No
+<h2 data-number="11.2" data-pos="1108:1-1109:1" id="MANUAL-sec12.2"><span class="header-section-number">11.2</span> No
 project.yaml Found</h2>
-<div data-pos="1112:1-1113:1">
-<p>Run <code data-pos="1112:5-1112:18">specc build</code> from the
-directory containing <code data-pos="1112:49-1112:63">project.yaml</code>.</p>
+<div data-pos="1110:1-1111:1">
+<p>Run <code data-pos="1110:5-1110:18">specc build</code> from the
+directory containing <code data-pos="1110:49-1110:63">project.yaml</code>.</p>
 </div>
-<h2 data-number="11.3" data-pos="1114:1-1115:1" id="MANUAL-sec12.3"><span class="header-section-number">11.3</span>
+<h2 data-number="11.3" data-pos="1112:1-1113:1" id="MANUAL-sec12.3"><span class="header-section-number">11.3</span>
 PlantUML Render Failure</h2>
-<div data-pos="1116:1-1117:1">
-<p>Verify PlantUML syntax, ensure Docker image has Java JRE, check <code data-pos="1116:65-1116:76">@startuml</code>/<code data-pos="1116:77-1116:86">@enduml</code> markers.</p>
+<div data-pos="1114:1-1115:1">
+<p>Verify PlantUML syntax, ensure Docker image has Java JRE, check <code data-pos="1114:65-1114:76">@startuml</code>/<code data-pos="1114:77-1114:86">@enduml</code> markers.</p>
 </div>
-<h2 data-number="11.4" data-pos="1118:1-1119:1" id="MANUAL-sec12.4"><span class="header-section-number">11.4</span>
+<h2 data-number="11.4" data-pos="1116:1-1117:1" id="MANUAL-sec12.4"><span class="header-section-number">11.4</span>
 Unresolved Relations</h2>
-<div data-pos="1120:1-1121:1">
+<div data-pos="1118:1-1119:1">
 <p>PIDs are <strong>case-sensitive</strong>. Verify target PID exists in
-<code data-pos="1120:58-1120:69">doc_files</code>. For cross-document
-references, ensure both documents are listed in the same <code data-pos="1120:147-1120:161">project.yaml</code>.</p>
+<code data-pos="1118:58-1118:69">doc_files</code>. For cross-document
+references, ensure both documents are listed in the same <code data-pos="1118:147-1118:161">project.yaml</code>.</p>
 </div>
-<h2 data-number="11.5" data-pos="1122:1-1123:1" id="MANUAL-sec12.5"><span class="header-section-number">11.5</span>
+<h2 data-number="11.5" data-pos="1120:1-1121:1" id="MANUAL-sec12.5"><span class="header-section-number">11.5</span>
 Build Seems Stale</h2>
 <a id="listing-src-clean-stale-build" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Clean stale build cache</figcaption>
 <div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> clean</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build</span></code></pre></div>
-<h2 data-number="11.6" data-pos="1129:1-1130:1" id="MANUAL-sec12.6"><span class="header-section-number">11.6</span>
+<h2 data-number="11.6" data-pos="1127:1-1128:1" id="MANUAL-sec12.6"><span class="header-section-number">11.6</span>
 Debugging</h2>
 <a id="listing-src-debug-log-level" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Enable debug logging</figcaption>
 <div class="sourceCode" id="cb32"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="va">SPECCOMPILER_LOG_LEVEL</span><span class="op">=</span>DEBUG <span class="ex">specc</span> build</span></code></pre></div>
-<h1 data-number="12" data-pos="1135:1-1136:1" id="MANUAL-sec13"><span class="header-section-number">12</span> Known Limitations</h1>
-<div data-pos="1137:1-1144:1">
+<h1 data-number="12" data-pos="1133:1-1134:1" id="MANUAL-sec13"><span class="header-section-number">12</span> Known Limitations</h1>
+<div data-pos="1135:1-1142:1">
 <ul>
-<li><div data-pos="1137:1-1138:1">
+<li><div data-pos="1135:1-1136:1">
 <strong>No interactive validation</strong> – Batch mode only, no LSP or
 watch mode.
 </div></li>
-<li><div data-pos="1138:1-1139:1">
-<strong>Native install is Ubuntu-first</strong> – <code data-pos="1138:41-1138:68">scripts/install-native.sh</code> automates
+<li><div data-pos="1136:1-1137:1">
+<strong>Native install is Ubuntu-first</strong> – <code data-pos="1136:41-1136:68">scripts/install-native.sh</code> automates
 Ubuntu 24.04 (apt); other distros must install the documented package
 equivalents manually before running it.
 </div></li>
-<li><div data-pos="1139:1-1140:1">
+<li><div data-pos="1137:1-1138:1">
 <strong>Single-writer SQLite</strong> – Concurrent builds cause locking
 errors; use separate output directories.
 </div></li>
-<li><div data-pos="1140:1-1141:1">
+<li><div data-pos="1138:1-1139:1">
 <strong>Float labels per-specification</strong> – Same label can exist
 across specs; use scoped syntax for cross-spec references.
 </div></li>
-<li><div data-pos="1141:1-1143:1">
-<strong>PID case sensitivity</strong> – <code data-pos="1141:31-1141:45">[hlr-001](@)</code> will not match <code data-pos="1141:61-1141:71">@HLR-001</code>.
+<li><div data-pos="1139:1-1141:1">
+<strong>PID case sensitivity</strong> – <code data-pos="1139:31-1139:45">[hlr-001](@)</code> will not match <code data-pos="1139:61-1139:71">@HLR-001</code>.
 </div></li>
 </ul>
 </div>
-<h1 data-number="13" data-pos="1143:1-1144:1" id="MANUAL-sec14"><span class="header-section-number">13</span> List of Figures</h1>
-<div data-pos="1145:1-1146:1">
+<h1 data-number="13" data-pos="1141:1-1142:1" id="MANUAL-sec14"><span class="header-section-number">13</span> List of Figures</h1>
+<div data-pos="1143:1-1144:1">
 <ul>
 <li><a href="#puml-diag-pipeline">Figure 1 - Processing
 Pipeline</a></li>
 <li><a href="#puml-diag-layers">Figure 2 - Layered Architecture</a></li>
 </ul>
 </div>
-<h1 data-number="14" data-pos="1147:1-1148:1" id="MANUAL-sec15"><span class="header-section-number">14</span> List of Tables</h1>
-<div data-pos="1149:1-1150:1">
+<h1 data-number="14" data-pos="1145:1-1146:1" id="MANUAL-sec15"><span class="header-section-number">14</span> List of Tables</h1>
+<div data-pos="1147:1-1148:1">
 <ul>
 <li><a href="#csv-tbl-prerequisites">Table 1 - Runtime
 prerequisites</a></li>
@@ -2174,8 +2144,8 @@ options</a></li>
 diagnostics</a></li>
 </ul>
 </div>
-<h1 data-number="15" data-pos="1151:1-1152:1" id="MANUAL-sec16"><span class="header-section-number">15</span> List of Listings</h1>
-<div data-pos="1153:1-1154:1">
+<h1 data-number="15" data-pos="1149:1-1150:1" id="MANUAL-sec16"><span class="header-section-number">15</span> List of Listings</h1>
+<div data-pos="1151:1-1152:1">
 <ul>
 <li><a href="#listing-src-install-oneliner">Listing 1 - Container
 install (Linux/macOS/WSL2)</a></li>
@@ -2239,8 +2209,8 @@ build cache</a></li>
 logging</a></li>
 </ul>
 </div>
-<h1 data-number="16" data-pos="1155:1-1156:1" id="MANUAL-sec17"><span class="header-section-number">16</span> List of Abbreviations</h1>
-<div data-pos="1157:1-1158:1">
+<h1 data-number="16" data-pos="1153:1-1154:1" id="MANUAL-sec17"><span class="header-section-number">16</span> List of Abbreviations</h1>
+<div data-pos="1155:1-1156:1">
 <table>
 <tbody>
 <tr class="odd">

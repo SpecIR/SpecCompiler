@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>SpecCompiler</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">SpecCompiler</h1>
+</header>
+<p align="center"><em>CommonSpec is a structured Markdown language for typed, traceable specifications.</em></p>
+
+<p align="center">
+  <img src="assets/logo.jpg" alt="SpecCompiler logo" width="160"/>
+</p>
+
+<p align="center">
+  <a href="https://github.com/SpecIR/SpecCompiler/actions/workflows/docker-publish.yml"><img src="https://github.com/SpecIR/SpecCompiler/actions/workflows/docker-publish.yml/badge.svg" alt="CI"></a>
+  <a href="https://codecov.io/gh/SpecIR/SpecCompiler"><img src="https://codecov.io/gh/SpecIR/SpecCompiler/branch/main/graph/badge.svg?token=GC8S08LK2G" alt="Coverage"></a>
+  <a href="https://github.com/SpecIR/SpecCompiler/blob/main/LICENSE"><img src="https://img.shields.io/github/license/SpecIR/SpecCompiler" alt="License"></a>
+  <img src="https://img.shields.io/badge/status-alpha-orange" alt="Status: Alpha">
+</p>
+
+<h2 id="commonspec-specir--speccompiler">CommonSpec, SpecIR &amp;
+SpecCompiler</h2>
+<p><strong>CommonSpec</strong> is a structured Markdown language for
+authoring typed, traceable specifications. It extends standard Markdown
+with six constructs — specifications, objects, floats, attributes,
+relations, and views — that give documents a formal type system.</p>
+<p><strong>SpecIR</strong> is a typed relational intermediate
+representation stored in SQLite. CommonSpec compiles into SpecIR. Other
+formats (ReqIF, DOORS CSV) can also encode and decode into SpecIR,
+making it a universal interchange hub for specification data.</p>
+<p><strong>SpecCompiler</strong> is the reference compiler. It lowers
+CommonSpec into SpecIR and executes declarative structural constraints
+over the resulting model.</p>
+<p>By imposing a type system on Markdown, SpecCompiler guarantees
+referential and schema integrity: detecting invalid object kinds,
+missing mandatory attributes, and traceability gaps at <strong>compile
+time</strong>.</p>
+<blockquote>
+<p>"The fundamental purpose of a type system is to prevent the
+occurrence of execution errors during the running of a program."
+Cardelli, <a href="http://lucacardelli.name/Papers/TypeSystems.pdf">Type
+Systems</a></p>
+</blockquote>
+<p>The fundamental purpose of SpecCompiler is to prevent the occurrence
+of <em>findings</em> during the review of a specification.</p>
+<h3 id="see-it-in-action">See It in Action</h3>
+<p align="center">
+  <img src="assets/demo.gif" alt="SpecCompiler demo: writing CommonSpec, catching type errors, and compiling to DOCX" width="700"/>
+</p>
+
+<p align="center"><em>Well-typed specifications don't go wrong.</em></p>
+
+<h2 id="output">Output</h2>
+<p><strong>DOCX (Print is Default):</strong> Maps types directly to DOCX
+style presets and supports direct OOXML transformations. Generate
+branded corporate templates or academic formats.</p>
+<p><strong>HTML + WASM (Web Native):</strong> A self-contained html file
+bundled with SQLite.js enables queries directly in the browser without
+any server infrastructure.</p>
+<p><strong>ReqIF (Interoperability):</strong> Author and validate your
+specs in Git but emit industry-standard ReqIF to integrate with legacy
+RE tools.</p>
+<p><strong>Anything (that Pandoc supports):</strong> The pipeline is
+extensible via custom Lua filters and post-processing hooks for any
+format Pandoc can target.</p>
+<h2 id="quickstart">Quickstart</h2>
+<h3 id="install">Install</h3>
+<p><strong>Container (recommended).</strong> One command, needs docker
+or podman (Linux/macOS/WSL2):</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-fsSL</span> https://raw.githubusercontent.com/SpecIR/SpecCompiler/main/scripts/install.sh <span class="kw">|</span> <span class="fu">bash</span></span></code></pre></div>
+<p><strong>Windows.</strong> One command in PowerShell, after Docker
+Desktop or Podman is installed:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">irm</span> https<span class="op">://</span>raw<span class="op">.</span><span class="fu">githubusercontent</span><span class="op">.</span><span class="fu">com</span><span class="op">/</span>SpecIR<span class="op">/</span>SpecCompiler<span class="op">/</span>main<span class="op">/</span>scripts<span class="op">/</span>install<span class="op">.</span><span class="fu">ps1</span> <span class="op">|</span> <span class="fu">iex</span></span></code></pre></div>
+<p><strong>Native — Ubuntu 24.04</strong> (stock apt pandoc + compiled
+Lua extensions):</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/SpecIR/SpecCompiler.git</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> SpecCompiler</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/install-native.sh</span></code></pre></div>
+<p>Other Linux distros: install the equivalents of the packages below,
+then run <code>bash scripts/install-native.sh</code> (its apt step is
+skipped on non-apt systems):</p>
+<ul>
+<li><code>pandoc</code> &gt;= 3.1 — the <strong>distro package</strong>,
+which links a shared liblua5.4 (not the official static release tarball
+— its sealed Lua cannot load our extensions)</li>
+<li><code>build-essential</code> (gcc, make), <code>cmake</code>,
+<code>pkg-config</code>, <code>git</code>, <code>curl</code>,
+<code>unzip</code>, <code>ca-certificates</code></li>
+<li><code>liblua5.4-dev</code>, <code>libsqlite3-dev</code>,
+<code>libzip-dev</code></li>
+<li><code>poppler-utils</code>, <code>fontconfig</code>,
+<code>ttf-mscorefonts-installer</code> (Microsoft core fonts used by the
+official DOCX templates; the installer auto-accepts the EULA)</li>
+<li><code>peg</code> — optional; built from source when absent</li>
+<li>Default-on extras (disable with <code>WITH_PUML=0</code> /
+<code>WITH_LIBREOFFICE=0</code>): <code>default-jre-headless</code> for
+PlantUML floats; <code>libreoffice-writer</code>,
+<code>libreoffice-math</code>, <code>python3-uno</code> for DOCX field
+update and PDF export</li>
+</ul>
+<p>To build the Docker image locally instead of pulling from GHCR:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/SpecIR/SpecCompiler.git</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> SpecCompiler</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> speccompiler-core:latest .</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/install.sh</span></code></pre></div>
+<p>Build the docs.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build docs/commonspec/project.yaml</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build docs/specir/project.yaml</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build docs/user_docs/project.yaml</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build docs/engineering_docs/project.yaml</span></code></pre></div>
+<h2 id="documentation">Documentation</h2>
+<p><a href="https://specir.github.io/SpecCompiler/"><strong>Published
+Documentation</strong></a> — generated HTML and DOCX documentation.</p>
+<p><a
+href="https://github.com/SpecIR/SpecCompiler/blob/main/docs/commonspec"><strong>CommonSpec
+Language Specification</strong></a> — formal language definition,
+syntax, and type system. <a
+href="https://specir.github.io/SpecCompiler/commonspec/">Published
+HTML</a>.</p>
+<p><a
+href="https://github.com/SpecIR/SpecCompiler/blob/main/docs/specir"><strong>SpecIR
+Schema Specification</strong></a> — intermediate representation,
+database schema, and public API views. <a
+href="https://specir.github.io/SpecCompiler/specir/">Published
+HTML</a>.</p>
+<p><a
+href="https://github.com/SpecIR/SpecCompiler/blob/main/docs/user_docs"><strong>User
+Manual</strong></a> — installation, authoring, configuration, and
+troubleshooting. <a
+href="https://specir.github.io/SpecCompiler/manual/#/manual"><strong>Published
+HTML — start here</strong></a>.</p>
+<p><a
+href="https://github.com/SpecIR/SpecCompiler/blob/main/docs/engineering_docs"><strong>Engineering
+Specifications</strong></a> — SRS, SDD, and SVC for SpecCompiler. <a
+href="https://specir.github.io/SpecCompiler/engineering/#/srs">Published
+HTML</a>.</p>
+<h2 id="how-it-works">How It Works</h2>
+<h3 id="a-minimal-spec">A Minimal Spec</h3>
+<p><strong>srs.md</strong> — a requirement in CommonSpec:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># SRS: Login Service</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## HLR: Authenticate Users @0013</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>The system shall authenticate users via OAuth 2.0.</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; status: Draft</span></span></code></pre></div>
+<p><strong>svc.md</strong> — a verification case that covers it:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># SVC: Login Verification</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## VC: Verify Authentication</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>Verify the authentication flow works end to end.</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; objective: Confirm OAuth 2.0 login succeeds</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; verification_method: Test</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; traceability: </span><span class="co">[</span><span class="ot">0013</span><span class="co">](@)</span></span></code></pre></div>
+<h3 id="commonspec--specir--output">CommonSpec → SpecIR → Output</h3>
+<p>SpecCompiler runs as a Pandoc Lua filter and adds a SQLite middle-end
+between Pandoc's reader and writer:</p>
+<p><strong>0. Type loading (Γ).</strong> Before any document is parsed,
+SpecCompiler reads type definitions from Lua modules and INSERTs them
+into SpecIR. A type defines what a spec object <em>is</em>: its
+identifier, display name, PID format, and typed attributes.</p>
+<p>For example, the HLR type
+(<code>models/sw_docs/types/objects/hlr.lua</code>):</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode lua"><code class="sourceCode lua"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cn">M</span><span class="op">.</span><span class="va">object</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;HLR&quot;</span><span class="op">,</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">long_name</span> <span class="op">=</span> <span class="st">&quot;High-Level Requirement&quot;</span><span class="op">,</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">extends</span> <span class="op">=</span> <span class="st">&quot;TRACEABLE&quot;</span><span class="op">,</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">attributes</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;rationale&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;XHTML&quot;</span> <span class="op">},</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Loading this module produces:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> spec_object_types (<span class="kw">identifier</span>, long_name, <span class="op">..</span>.)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;HLR&#39;</span>, <span class="st">&#39;High-Level Requirement&#39;</span>, <span class="op">..</span>.);</span></code></pre></div>
+<p><strong>1. Frontend (Pandoc reader).</strong> Parse CommonSpec
+(<code>commonmark_x</code>) into Pandoc AST.</p>
+<p><strong>2. Middle-end (SpecCompiler).</strong> Lower the AST into
+SpecIR (SQLite), apply type rules, and assemble the transformed AST. For
+the two-file spec above, the middle-end produces the following SpecIR
+entries:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Specification (from the # heading)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> specifications (<span class="kw">identifier</span>, long_name, type_ref)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;srs&#39;</span>, <span class="st">&#39;Login Service&#39;</span>, <span class="st">&#39;SRS&#39;</span>);</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- Object (from the ## heading)</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> spec_objects (specification_ref, type_ref, pid)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;srs&#39;</span>, <span class="st">&#39;HLR&#39;</span>, <span class="st">&#39;0013&#39;</span>);</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- Attribute (from the &gt; blockquote)</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> spec_attribute_values</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  (specification_ref, owner_object_id, name, raw_value, enum_ref, datatype)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;srs&#39;</span>, <span class="dv">1</span>, <span class="st">&#39;status&#39;</span>, <span class="st">&#39;Draft&#39;</span>, <span class="st">&#39;TRACEABLE_status_Draft&#39;</span>, <span class="st">&#39;ENUM&#39;</span>);</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- Relation (from [0013](@) in svc.md&#39;s traceability attribute → inferred as VERIFIES)</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> spec_relations</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  (specification_ref, source_object_id, target_text, type_ref, link_selector, source_attribute)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;svc&#39;</span>, <span class="dv">2</span>, <span class="st">&#39;0013&#39;</span>, <span class="st">&#39;VERIFIES&#39;</span>, <span class="st">&#39;@&#39;</span>, <span class="st">&#39;traceability&#39;</span>);</span></code></pre></div>
+<p>Type-checking is then a query against SpecIR. For example, the
+verification view <code>invalid_cast</code> checks whether
+<code>'Pending'</code> is a legal value for
+<code>TRACEABLE.status</code> — it is not (only Draft, Review, Approved,
+Implemented are). And <code>traceability_hlr_to_vc</code> finds HLRs
+that are never the target of a VERIFIES relation.</p>
+<p><strong>3. Backend (Pandoc writer).</strong> If no violations are
+found render the AST to selected formats.</p>
+<p><strong>4. Post-processing (optional).</strong> Format-specific
+adjustments to the emitted artifacts. For example, OOXML tweaks in DOCX
+output or packaging sqlite.js in HTML.</p>
+<h2 id="license">License</h2>
+<p>Apache License 2.0, see <a href="LICENSE">LICENSE</a> and <a
+href="NOTICE">NOTICE</a>.</p>
+<p><a href="THIRD_PARTY_NOTICES.md">THIRD_PARTY_NOTICES</a>.</p>
+</body>
+</html>

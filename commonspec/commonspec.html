@@ -599,12 +599,9 @@ rule in the output.
 </ol>
 </div>
 <div data-pos="189:1-190:1">
-<p>A <code data-pos="189:3-189:9">----</code> is the correct way to end
-a section without opening a new heading. It replaces the anti-pattern of
-an empty <code data-pos="189:118-189:122">##</code> used as a “section
-reset”: an <strong>empty heading</strong> (a header with no title) is
-rejected, because it would render as a blank numbered heading and
-corrupt downstream numbering.</p>
+<p>Use <code data-pos="189:5-189:11">----</code> to end a section
+without opening another heading. CommonSpec rejects an <strong>empty
+heading</strong> because it produces an invalid numbered section.</p>
 </div>
 <pre data-pos="191:1-202:1"><code>## Pesquisa-Ação @SEC-PA
 
@@ -1075,8 +1072,7 @@ is the raw parameter string.
 </div></li>
 <li><div data-pos="466:1-467:1">
 <strong>ABBREV</strong> (<code data-pos="466:15-466:24">abbrev:</code>)
-— abbreviation expansion (e.g., <code data-pos="466:60-466:73">abbrev: PID</code> expands to “Project
-Identifier (PID)”).
+— abbreviation expansion (e.g., Project Identifier (PID)).
 </div></li>
 <li><div data-pos="467:1-468:1">
 <strong>MATH_INLINE</strong> (<code data-pos="467:20-467:34">math_inline:</code>) — inline math expression.
