@@ -17,7 +17,9 @@ return {
         extends = "SECTION",
         -- Common attributes inherited by all traceable types
         attributes = {
-            { name = "status", type = "ENUM", values = { "Draft", "Review", "Approved", "Implemented", "Deprecated", "Retired" } },
+            { name = "status", type = "ENUM",
+              values = { "Draft", "Review", "Approved",
+                         "Implemented", "Deprecated", "Retired" } },
         }
     },
     -- The standard requirement-card render, inherited by every leaf type that

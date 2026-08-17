@@ -1030,7 +1030,8 @@ end
 ---Finalize DOCX postprocessing for all generated files.
 ---Called by the emitter after all DOCX files are generated.
 ---Queries spec-level metadata from the database and runs postprocessing
----on each file.
+---on each file, then applies optional LibreOffice finalization (field
+---updates, PDF export) when the docx config enables it.
 ---@param paths string[] List of DOCX file paths
 ---@param config table Configuration with template, output_dir, db_path
 ---@param log table Logger instance
@@ -1044,10 +1045,13 @@ function M.finalize(paths, config, log)
     -- Enrich config with spec metadata
     config.spec_metadata = spec_metadata
 
+    local libreoffice = require("infra.process.libreoffice")
     for _, path in ipairs(paths) do
         local ok, err = pcall(M.run, path, config, log)
         if not ok then
             log.warn("[DOCX-POST] Postprocess failed for %s: %s", path, tostring(err))
+        else
+            libreoffice.maybe_finalize(path, config, log)
         end
     end
 end

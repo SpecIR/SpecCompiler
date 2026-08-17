@@ -257,6 +257,7 @@ function M:execute(docs, opts)
         reference_doc = reference_doc,  -- Path to generated reference.docx with custom styles
         docx = docx_info,  -- Full DOCX config from project.yaml
         project_root = pinfo.project_root or ".",  -- For resolving relative paths
+        db_file = pinfo.db_file,  -- SPEC-IR database path (postprocessor metadata queries)
         -- Multi-format output support
         outputs = pinfo.outputs,  -- Array of {format, path} from project.yaml
         html5 = pinfo.html5,  -- HTML5 config from project.yaml

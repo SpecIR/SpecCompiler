@@ -1,8 +1,15 @@
-# E2E Test Suite: OOXML Schema Validation
-# Verifies: VC-OOXML-001 (DOCX structural validity)
+# E2E Test Suite: OOXML and DOCX reference generation
 
 project:
   code: TEST_OOXML
   name: OOXML Validation Tests
 
 output_format: json
+
+# Test case to VC mapping:
+# - vc_029_01_ooxml_schema_validation.md -> VC-029 (DOCX structural validity)
+# - vc_029_02_ooxml_validator_selftest.md -> VC-029 (Validator rejection paths)
+# - vc_029_03_caption_seq_cache.md -> VC-029 (Cached caption field values)
+# - vc_029_04_bookmark_resolution.md -> VC-029 (Bookmark/field integrity)
+# - vc_029_05_libreoffice_roundtrip.md -> VC-029 (LibreOffice field/PDF round trip)
+# - vc_029_07_reference_table_header.md -> VC-029 (Generated reference table alignment)

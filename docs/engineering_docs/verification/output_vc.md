@@ -103,6 +103,8 @@ Verify DOCX output uses reference document.
 > - Execute markdown-driven preset loader probe with layered DOCX preset files
 > - Verify extends-chain merge, optional format styles, and validation behavior
 > - Verify preset lookup and style resolution for DOCX float/object rendering paths
+> - Verify reference caching hashes the complete preset extends chain
+> - Verify generated reference.docx table headers are top-aligned without changing unrelated styles
 > - Unzip postprocessed DOCX and verify every hyperlink anchor and PAGEREF/REF field resolves to a bookmark
 > - When LibreOffice/UNO is available, round-trip the DOCX through field update and PDF export and re-verify bookmark integrity
 
@@ -112,6 +114,8 @@ Verify DOCX output uses reference document.
 > - Heading styles match reference document
 > - Custom styles (Caption, Code) applied correctly
 > - Page layout matches reference
+> - Editing an inherited base preset invalidates the cached reference.docx
+> - First-row table cells are top-aligned and unrelated vertical alignment remains unchanged
 > - OOXML postprocessing applied
 > - No hyperlink anchor or field reference dangles without a matching bookmark
 > - LibreOffice finalization (docx.update_fields / docx.export_pdf) updates fields in place and produces a valid PDF

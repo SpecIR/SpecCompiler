@@ -10,4 +10,5 @@ docx:
   preset: test_preset_default
 
 # Test case mapping:
-# - vc_preset_001_load_chain.md -> VC-PRESET-001 (Preset extends chain)
+# - vc_019_01_preset_load_chain.md -> VC-019 (Preset extends-chain merge)
+# - vc_029_06_reference_cache_chain.md -> VC-029 (Whole-chain reference cache invalidation)

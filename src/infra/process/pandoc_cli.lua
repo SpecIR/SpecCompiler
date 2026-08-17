@@ -288,6 +288,9 @@ local function append_citation_options(args, format_config, project_root, templa
             table.insert(args, "--bibliography=" .. bib_path)
             if format_config.citeproc ~= false then
                 table.insert(args, "--citeproc")
+                if format_config.link_citations ~= false then
+                    table.insert(args, "--metadata=link-citations=true")
+                end
             end
         else
             io.stderr:write(string.format("Warning: Bibliography file not found: %s\n", bib_path))

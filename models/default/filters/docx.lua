@@ -462,8 +462,11 @@ end
 ---Generates a dynamic TOC field that Word/LibreOffice renders on document open.
 ---@param div pandoc.Div The TOC div (from toc.lua view)
 ---@param heading_text string|nil Text from the preceding heading (if any)
+---@param heading_id string|nil Identifier of the replaced heading; Pandoc's
+---writer would have emitted its bookmark, so re-emit it here or links to the
+---TOC-hosting section dangle
 ---@return table Array of RawBlock elements
-local function convert_toc_div(div, heading_text)
+local function convert_toc_div(div, heading_text, heading_id)
     local depth = get_attr(div, "data-depth") or "3"
     local instr = string.format(' TOC \\o "1-%s" ', depth)
 
@@ -474,17 +477,29 @@ local function convert_toc_div(div, heading_text)
     -- Must include explicit run properties because Word's built-in
     -- "Contents Heading" style uses blue color; we need black.
     if heading_text then
-        local toc_heading = xml.serialize_element(xml.node("w:p", {}, {
+        local children = {
             xml.node("w:pPr", {}, {
                 xml.node("w:pStyle", {["w:val"] = "TOCHeading"})
             }),
-            xml.node("w:r", {}, {
-                xml.node("w:rPr", {}, {
-                    xml.node("w:color", {["w:val"] = "000000"}),
-                }),
-                xml.node("w:t", {["xml:space"] = "preserve"}, {xml.text(heading_text)})
-            })
+        }
+        if heading_id and heading_id ~= "" then
+            table.insert(children, xml.node("w:bookmarkStart", {
+                ["w:id"] = tostring(float_anchor.bookmark_id(heading_id)),
+                ["w:name"] = heading_id,
+            }))
+        end
+        table.insert(children, xml.node("w:r", {}, {
+            xml.node("w:rPr", {}, {
+                xml.node("w:color", {["w:val"] = "000000"}),
+            }),
+            xml.node("w:t", {["xml:space"] = "preserve"}, {xml.text(heading_text)})
         }))
+        if heading_id and heading_id ~= "" then
+            table.insert(children, xml.node("w:bookmarkEnd", {
+                ["w:id"] = tostring(float_anchor.bookmark_id(heading_id)),
+            }))
+        end
+        local toc_heading = xml.serialize_element(xml.node("w:p", {}, children))
         table.insert(result, pandoc.RawBlock("openxml", toc_heading))
     end
 
@@ -634,7 +649,7 @@ local FILTER_PASS0_PRE = {
                 local toc_div = find_toc_div(blocks[i + 1])
                 if toc_div then
                     local heading_text = pandoc.utils.stringify(block.content)
-                    local toc_blocks = convert_toc_div(toc_div, heading_text)
+                    local toc_blocks = convert_toc_div(toc_div, heading_text, block.identifier)
                     for _, b in ipairs(toc_blocks) do
                         table.insert(new_blocks, b)
                     end

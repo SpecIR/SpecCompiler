@@ -399,7 +399,7 @@ local function finalize_postprocessors(outputs_by_format, contexts, log)
             template = template,
             project_root = project_root,
             output_dir = output_dir,
-            db_path = output_dir .. "/specir.db",
+            db_path = contexts[1].db_file or (output_dir .. "/specir.db"),
         }
         local ctx_config = contexts[1] and contexts[1].config or {}
         for k, v in pairs(ctx_config) do
