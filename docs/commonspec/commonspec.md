@@ -463,7 +463,7 @@ Views are defined by the model. Common view types include:
 - **TOC** (`toc:`) --- table of contents.
 - **LOF** (`lof:`) --- list of figures.
 - **LOT** (`lot:`) --- list of tables.
-- **ABBREV** (`abbrev:`) --- abbreviation expansion (e.g., `abbrev: PID` expands to "Project Identifier (PID)").
+- **ABBREV** (`abbrev:`) --- abbreviation expansion (e.g., `abbrev: Project Identifier (PID)`).
 - **MATH_INLINE** (`math_inline:`) --- inline math expression.
 - **TRACEABILITY_MATRIX** --- coverage matrix showing which objects trace to which.
 - **REQUIREMENTS_SUMMARY** --- summary report of requirements by type and status.

@@ -104,15 +104,15 @@ specc build docs/engineering_docs/project.yaml
 
 ## Documentation
 
-- **[CommonSpec Language Specification](docs/commonspec/)** — formal language definition, syntax, and type system.
-- **[SpecIR Schema Specification](docs/specir/)** — intermediate representation, database schema, and public API views.
-- **[User Manual](docs/user_docs/)** — installation, authoring, configuration, and troubleshooting.
-- **[Engineering Specs](docs/engineering_docs/)** — self-hosted SRS/SDD/SVC for SpecCompiler itself.
+[**Published Documentation**](https://specir.github.io/SpecCompiler/) — generated HTML and DOCX documentation.
 
-### Online
+[**CommonSpec Language Specification**](https://github.com/SpecIR/SpecCompiler/blob/main/docs/commonspec) — formal language definition, syntax, and type system. [Published HTML](https://specir.github.io/SpecCompiler/commonspec/).
 
-- **[Manual](https://specir.github.io/SpecCompiler/manual/#/manual)**, installation, authoring syntax, configuration [(start here)](https://github.com/SpecIR/SpecCompiler/releases/download/v/manual.docx)
-- **[Engineering Specs](https://specir.github.io/SpecCompiler/engineering/#/srs)**, SRS, SDD, SVC for SpecCompiler itself.
+[**SpecIR Schema Specification**](https://github.com/SpecIR/SpecCompiler/blob/main/docs/specir) — intermediate representation, database schema, and public API views. [Published HTML](https://specir.github.io/SpecCompiler/specir/).
+
+[**User Manual**](https://github.com/SpecIR/SpecCompiler/blob/main/docs/user_docs) — installation, authoring, configuration, and troubleshooting. [**Published HTML — start here**](https://specir.github.io/SpecCompiler/manual/#/manual).
+
+[**Engineering Specifications**](https://github.com/SpecIR/SpecCompiler/blob/main/docs/engineering_docs) — SRS, SDD, and SVC for SpecCompiler. [Published HTML](https://specir.github.io/SpecCompiler/engineering/#/srs).
 
 ## How It Works
 
@@ -215,4 +215,4 @@ VERIFIES relation.
 
 Apache License 2.0, see [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
-[THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES).
+[THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md).

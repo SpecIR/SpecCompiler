@@ -1,4 +1,4 @@
-# TRR: SpecCompiler Core Test Results @TRR-001
+# SpecCompiler Core Test Results @TRR-001
 
 > version: 1.0
 

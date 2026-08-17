@@ -1,9 +1,13 @@
 name: Deploy Documentation
 
 on:
-  # Manual/standalone docs deploy: push any tag starting with "docs".
   push:
+    branches: [main]
     tags: ['docs*']
+    paths:
+      - 'docs/**'
+      - '.github/workflows/deploy-docs.yml'
+  workflow_dispatch:
   # Called by the release pipeline (docker-publish.yml) after the image is built,
   # so a `v*` release tag updates gh-pages automatically with the just-built image.
   workflow_call:
@@ -29,7 +33,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Lowercase image name
-        run: echo "IMAGE_NAME=${IMAGE_NAME,,}" >> $GITHUB_ENV
+        run: echo "IMAGE_NAME=${IMAGE_NAME,,}" >> "$GITHUB_ENV"
 
       - name: Resolve docs image
         run: |
@@ -76,6 +80,7 @@ jobs:
 
       - name: Build all documentation
         run: |
+          set -euo pipefail
           for project in \
             docs/engineering_docs/project.yaml \
             docs/user_docs/project.yaml \
@@ -86,10 +91,29 @@ jobs:
               --user "$(id -u):$(id -g)" \
               -v "${{ github.workspace }}:/workspace" \
               -w /workspace \
+              -e SPECCOMPILER_HOME=/workspace \
+              -e SPECCOMPILER_DIST=/opt/speccompiler \
+              -e 'LUA_PATH=/workspace/src/?.lua;/workspace/src/?/init.lua;/workspace/?.lua;/workspace/?/init.lua;/opt/speccompiler/vendor/?.lua;/opt/speccompiler/vendor/?/init.lua;/opt/speccompiler/vendor/slaxml/?.lua;;' \
               "${{ env.DOC_IMAGE }}" \
               build "$project"
             echo "::endgroup::"
           done
+
+      - name: Generate Pages index from README
+        run: |
+          mkdir -p docs/build
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            --entrypoint pandoc \
+            "${{ env.DOC_IMAGE }}" \
+            README.md \
+              --from=gfm \
+              --to=html5 \
+              --standalone \
+              --metadata title="SpecCompiler" \
+              --output=docs/build/index.html
 
       - name: Deploy to GitHub Pages
         run: |
@@ -127,6 +151,20 @@ jobs:
           mkdir -p _gh-pages/specir/downloads
           cp docs/specir/build/www/* _gh-pages/specir/
           cp docs/specir/build/docx/*.docx _gh-pages/specir/downloads/
+
+          # Site root
+          cp docs/build/index.html _gh-pages/index.html
+          rm -rf _gh-pages/assets
+          cp -R assets _gh-pages/assets
+          cp LICENSE NOTICE THIRD_PARTY_NOTICES.md _gh-pages/
+          touch _gh-pages/.nojekyll
+
+          # Do not publish an incomplete tree.
+          test -s _gh-pages/index.html
+          test -s _gh-pages/engineering/index.html
+          test -s _gh-pages/manual/index.html
+          test -s _gh-pages/commonspec/index.html
+          test -s _gh-pages/specir/index.html
 
           # Commit and push
           cd _gh-pages
