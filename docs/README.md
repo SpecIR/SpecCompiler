@@ -1,12 +1,12 @@
-# SpecCompiler Core Documentation
+# SpecCompiler Documentation
 
-This directory contains two documentation sets, each built as an independent SpecCompiler project with its own model and configuration.
+This directory contains four documentation sets. Each set is an independent SpecCompiler project with its own configuration.
 
-## engineering_docs/ -- Engineering Specification Set
+## `engineering_docs/` — Engineering specifications
 
 **Model:** `sw_docs` (safety-critical traceability)
 
-The engineering documentation for SpecCompiler Core itself, structured as a formal specification set following DO-178C and MIL-STD-498 conventions:
+This set specifies SpecCompiler. It follows DO-178C and MIL-STD-498 conventions.
 
 | Document | Description |
 |----------|-------------|
@@ -15,9 +15,7 @@ The engineering documentation for SpecCompiler Core itself, structured as a form
 | **SVC** (`svc.md`) | Software Verification Cases -- test specifications and results |
 | **DIC** (`dic.md`) | Data Dictionary -- SpecIR type definitions and syntax reference |
 
-These documents use full traceability enforcement: HLR to VC to TR, FD to CSC to CSU. Verification views (SQL validation queries) run during the VERIFY phase to detect missing traceability, unresolved references, and other constraint violations.
-
-**This is a dogfooding example.** It demonstrates how SpecCompiler can be used to author, validate, and publish safety-critical software documentation from plain Markdown. The same pipeline that builds user projects builds its own engineering docs.
+These documents enforce HLR-to-VC-to-TR and FD-to-CSC-to-CSU traceability. SQL analyze queries detect unresolved references, missing traceability, and other constraint violations.
 
 Build:
 
@@ -25,11 +23,11 @@ Build:
 specc build docs/engineering_docs/project.yaml
 ```
 
-## user_docs/ -- User-Facing Documentation
+## `user_docs/` — User documentation
 
 **Model:** `default` (standard content)
 
-End-user documentation without engineering traceability overhead:
+This set explains installation, authoring, output configuration, and model development.
 
 | Document | Description |
 |----------|-------------|
@@ -41,4 +39,20 @@ Build:
 
 ```bash
 specc build docs/user_docs/project.yaml
+```
+
+## `commonspec/` — CommonSpec language specification
+
+This set defines the CommonSpec authoring language.
+
+```bash
+specc build docs/commonspec/project.yaml
+```
+
+## `specir/` — SpecIR schema specification
+
+This set defines the SQLite intermediate representation.
+
+```bash
+specc build docs/specir/project.yaml
 ```

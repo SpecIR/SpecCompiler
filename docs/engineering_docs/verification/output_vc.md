@@ -296,7 +296,7 @@ Verify that LaTeX and DOCX render the same heading at the same depth, since both
 
 ### VC: Include Heading Level Shift @VC-OUT-011
 
-Verify that include expansion shifts an included file relative to its own shallowest heading, placing that heading one level below the include point while supporting both standalone files starting at `#` and legacy fragments starting deeper.
+Verify that include expansion places the shallowest included heading one level below the active heading. Verify source files that start at different heading levels.
 
 > objective: Confirm that the shallowest included heading nests one level below the section containing the include directive, that relative depths and malformed gaps are preserved, that nested includes compose their shifts, and that a `----` section close pops the include context back to the parent level.
 

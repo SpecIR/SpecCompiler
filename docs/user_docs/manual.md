@@ -17,7 +17,7 @@
 
 > document_id: SC-UM-001
 
-This manual is itself a complete working example of a SpecCompiler document authored with `template: default`. Every core feature described in these pages -- floats, cross-references, abbreviations, diagrams, views, and math -- is demonstrated inline and renders with the default model. Charts (`chart:` floats) are an overlay-model feature: their authoring syntax is shown below but is not rendered here, because the default core is deliberately deno-free (see *Chart (ECharts)*). Process this file with `specc build` to see the rendered output. The companion guides *Creating a Custom Model* and *DOCX Customization* are included in the same project and can be cross-referenced by section label.
+This manual uses `template: default` and contains executable examples. The default model renders the floats, references, diagrams, views, and math examples. Chart examples require an overlay model that defines the `chart:` float. Run `specc build docs/user_docs/project.yaml` to generate the manual and its companion guides.
 
 ## INDEX
 
@@ -31,7 +31,7 @@ SpecCompiler is the reference compiler for **CommonSpec**, a structured Markdown
 
 - **Structured authoring**: Define requirements, designs, and verification cases using a consistent syntax.
 - **Traceability**: Link objects together with `abbrev: Project Identifier (PID)` and `#label` references.
-- **Validation**: Automatically verify data integrity through verification views backed by `abbrev: Structured Query Language (SQL)` queries against the `abbrev: Specification Intermediate Representation (SpecIR)`.
+- **Validation**: Check data integrity with `abbrev: Structured Query Language (SQL)` analyze queries against the `abbrev: Specification Intermediate Representation (SpecIR)`.
 - **Multi-format output**: Generate Word documents and web content from a single source.
 
 SpecCompiler processes documents through a five-phase pipeline: INITIALIZE, RESOLVE, TRANSFORM, ANALYZE, and EMIT, as illustrated in [plantuml:diag-pipeline](#).
@@ -56,7 +56,7 @@ The processing pipeline consists of five phases:
 1. **INITIALIZE** -- Extract specifications, spec objects, attributes, floats, relations, and view definitions from the parsed `abbrev: Pandoc Abstract Syntax Tree (AST)` into the SpecIR stored in `abbrev: SQLite Database (SQLite)`, casting attribute values into typed columns.
 2. **RESOLVE** -- Generate missing PIDs, resolve relation targets, and infer relation types from model constraints (see [math:eq-specificity](#)).
 3. **TRANSFORM** -- Resolve and number floats, render typed content, and rewrite resolved links.
-4. **ANALYZE** -- Execute SQL policy views against SpecIR, apply configured severities, and report violations; see [section:verification-views](#) in the model guide.
+4. **ANALYZE** -- Execute SQL policy views against SpecIR, apply configured severities, and report violations.
 5. **EMIT** -- Assemble Pandoc documents from SpecIR, expand generated views, and generate configured outputs via parallel Pandoc subprocesses.
 
 ```plantuml:diag-pipeline{caption="Processing Pipeline"}
@@ -456,7 +456,7 @@ void init(void) {
 
 #### Chart (ECharts)
 
-The `CHART` float lives in an overlay model such as `abnt`, not in the lean core: set `template: abnt` in `project.yaml` (or use any model that carries the CHART float). Rendering needs deno — the Docker `full` image ships it; native installs can run the model's `scripts/bootstrap.sh`. The default core is deliberately deno-free, so the chart examples in this manual show authoring syntax only and are not rendered here.
+The `default` model does not define the `CHART` float. Use an overlay model that defines `CHART` and its renderer. Install any external tool required by that model.
 
 ````src.markdown:src-chart-float-syntax{caption="Chart float syntax"}
 ```chart:chart-coverage{caption="Test Coverage"}
@@ -642,7 +642,7 @@ Each line is a file path relative to the including document's directory. Absolut
 
 Include blocks are expanded recursively before the pipeline runs. Circular includes are detected and produce an error. The maximum nesting depth is 100 levels.
 
-During expansion an included file's headings are shifted uniformly so that its shallowest heading lands one level below the heading in effect at the include point: an include under a `##` section turns an included `#` into `###` and its `##` into `####`, and a legacy fragment whose shallowest heading is `##` or `###` normalizes to the same position without editing its source. Relative depths inside the file are preserved — a skipped level stays skipped and is reported. Nested includes compose their shifts. A `----` section close before the directive pops the context one level, making the included file a sibling of the section just closed instead of its child:
+During expansion, SpecCompiler shifts all headings in an included file by the same amount. The shallowest heading becomes a child of the active heading. For example, an include under `##` changes an included `#` to `###`. It changes the included `##` to `####`. SpecCompiler preserves relative depths and reports skipped levels. Nested includes combine these shifts. A `----` marker before the directive reduces the active level by one:
 
 ````src.markdown:src-include-level-shift{caption="Include heading levels are relative to the include point"}
 ## Design
@@ -663,7 +663,7 @@ next_chapter.md
 ```
 ````
 
-An included file is positioned relative to its shallowest heading, so both standalone files beginning at `#` and legacy fragments beginning at `##` or deeper are supported. Include nesting can produce Pandoc Header levels deeper than 6; SpecCompiler preserves those levels without rejection or clamping. Output formats render them according to their own capabilities.
+SpecCompiler positions an included file relative to its shallowest heading. The first heading can have any level. Nested includes can produce Pandoc heading levels greater than 6. SpecCompiler preserves these levels. Each output format renders them according to its capabilities.
 
 Included files are tracked in the build graph for incremental builds -- a change to any included file triggers a rebuild.
 
@@ -673,7 +673,7 @@ Included files are tracked in the build graph for incremental builds -- a change
 
 The `default` model ships a complete document authoring toolkit so that authors can write structured technical documents without defining custom types. It provides:
 
-- **Numbered floats** -- figures, tables, code listings, math equations, PlantUML diagrams, and ECharts charts, each with automatic numbering and captions.
+- **Numbered floats** -- figures, tables, code listings, math equations, and PlantUML diagrams, each with automatic numbering and captions.
 - **Typed cross-references** -- relation types that resolve `@` and `#` links to specific float and object categories, enabling the pipeline to render appropriate display text (for example, "Figure 3" or "Table 1").
 - **Bibliography citations** -- integration with Pandoc's citeproc for parenthetical and in-text citation rendering from BibTeX files.
 - **Content views** -- generated content blocks such as TOC, list of figures, abbreviation tables, and inline math.
@@ -1058,7 +1058,7 @@ validation:
   unresolved_relation: warn         # downgrade to warning
 ```
 
-All verification views default to `error` (halt the build). Set a key to `warn` to emit a warning without halting, or `ignore` to suppress the diagnostic entirely. Custom verification views can define their own policy keys; see [section:verification-views](#) in the model guide.
+Analyze-query diagnostics default to `error`. Set a key to `warn` to continue the build with a warning. Set it to `ignore` to suppress the diagnostic. Custom analyze queries can define policy keys.
 
 ## Incremental Builds
 
@@ -1080,26 +1080,24 @@ specc build
 
 ### Built-in Models
 
-SpecCompiler ships with `default`, `abnt`, and `sw_docs`. The `default` model provides general-purpose types (specifications, sections, floats, cross-references, views). The `sw_docs` model overlays `default` with types for requirements engineering and traceability:
+SpecCompiler includes the `default` and `sw_docs` models. The `default` model provides general-purpose types. The `sw_docs` model adds requirements-engineering and traceability types:
 
 - **Object types**: HLR, LLR, NFR, VC, TR, FD, CSC, CSU, DIC, DD, SF (all extend a common TRACEABLE base with `status` attribute and PID auto-generation)
 - **Specification types**: SRS, SDD, SVC, SUM, TRR (document templates with version, status, date)
 - **Relation types**: TRACES_TO, BELONGS, REALIZES, VERIFIES, XREF_DECOMPOSITION, XREF_DIC (traceability links with specificity-based inference)
 - **View types**: TRACEABILITY_MATRIX, TEST_RESULTS_MATRIX, TEST_EXECUTION_MATRIX, COVERAGE_SUMMARY, REQUIREMENTS_SUMMARY (query-based tables materialized from the SpecIR)
-- **Verification views**: Traceability chain validation (VC-HLR, TR-VC, FD-CSC/CSU coverage)
+- **Analyze queries**: Traceability-chain validation for VC-HLR, TR-VC, and FD-CSC/CSU coverage
 - **Postprocessor**: Interactive single-file HTML5 web application
 
-The `abnt` model overlays `default` with ABNT NBR 14724 pre-textual elements (Capa, Folha de Rosto, lists of figures/tables/abbreviations), citation formatting, and a DOCX postprocessor tuned for Brazilian academic standards.
-
-The `docs/engineering_docs/` directory in this repository uses `sw_docs` and serves as a living example of the model in practice.
+The `docs/engineering_docs/` project uses `sw_docs`.
 
 ### Custom Models
 
 Set `template: mymodel` in `project.yaml`. Custom types layer as overlays on top of `default` (types with matching `id` replace the default; new `id`s add). The model directory is resolved under the SpecCompiler installation (`models/mymodel/`) first, then under the project directory itself — so a project can ship its own model alongside its documents.
 
-Each extension point is a single Lua file that returns one descriptor table -- a `kind` (`object`, `float`, `view`, `relation`, `specification`, or `verification`), a `schema` holding your data (the authoritative `id`, `extends`, `attributes`, and so on), and an optional `hooks` table holding any behaviour. A pure-data type omits `hooks` entirely. The recipe is simple: decide the kind, put your data in `schema`, and pick the hook whose name matches what you want to do -- a `render`/`render_block`/`render_link` hook to produce output during the EMIT walk, or a data hook like `dataset` or `transform` to produce data earlier in the pipeline. You receive the right context and return the documented type. Shared behaviour lives once on a base type and is inherited through `schema.extends` (for example, objects extend `TRACEABLE` to get the standard card, and matrix views extend `TABLE_VIEW`).
+Each extension module returns one Lua descriptor table. The descriptor contains a `kind`, a `schema`, and optional `hooks`. Supported kinds are `object`, `float`, `view`, `relation`, `specification`, and `analyze`. The `schema.id` field is the authoritative identifier. Each hook name determines its context and return type. A descriptor can inherit shared behavior through `schema.extends`.
 
-Everything else — directory layout, the full hook catalogue and the context each one receives, schema fields for each kind, verification views, and external renderers — lives in the companion [Creating a Custom Model](guides/creating-a-model.md) guide.
+The [Creating a Custom Model](guides/creating-a-model.md) guide defines the directory layout, hook contract, schema fields, analyze queries, and external renderers.
 
 ## Troubleshooting
 

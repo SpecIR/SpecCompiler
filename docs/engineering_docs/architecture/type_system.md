@@ -48,14 +48,13 @@ TL --> PL : handlers
 
 ### Type Module Structure
 
-Each extension point is ONE Lua file that returns ONE descriptor table. The host
-reads only that table; it never sniffs which "magic key" exists.
+Each extension module returns one descriptor table. The host reads the declared descriptor fields.
 
 ```lua
 -- Example: models/default/types/objects/hlr.lua
 return {
-    kind = "object",            -- object | float | view | relation | specification | verification
-    schema = {                  -- declarative IR columns for this kind; schema.id is authoritative (not the filename)
+    kind = "object",            -- object | float | view | relation | specification | analyze
+    schema = {                  -- SpecIR fields for this kind. schema.id is authoritative.
         id = "HLR",
         long_name = "High-Level Requirement",
         extends = "TRACEABLE",  -- attribute + hook inheritance via the extends chain
@@ -63,18 +62,13 @@ return {
             { name = "status", type = "ENUM", values = { "Draft", "Review", "Approved", "Implemented" } },
         },
     },
-    hooks = {                   -- the ONLY behaviour surface; an absent hook = host default
+    hooks = {                   -- Optional custom behavior.
         render = function(ctx) ... end,
     },
 }
 ```
 
-Behaviour lives only under `hooks`. The host classifies each hook by name, infers
-the module's role from the hooks present, validates each against the kind, and
-rejects a function placed on any other top-level descriptor key. A pure-data type
-(most objects/floats) carries `hooks = {}`; phase participation is declared under a
-`on_<phase>` hooks (declared in `hooks`) the host synthesizes into the
-pipeline.
+Custom behavior belongs in `hooks`. The host validates each hook name against the descriptor kind. It rejects functions on other top-level keys. A data-only type can omit `hooks`. An `on_<phase>` function in `hooks` registers phase participation.
 
 ### Type Categories
 
@@ -104,9 +98,7 @@ pipeline.
 
 ### Hook Contract
 
-Every hook takes exactly ONE frozen context table as its sole argument, with a
-polymorphic `subject` (the thing being acted on) and a `capability` (which hook).
-The hook NAME selects one of two context tiers, which the host validates:
+Each hook accepts one frozen context table. The polymorphic `subject` field contains the hook input. The `capability` field identifies the hook. The hook name selects one of two context tiers:
 
 ```list-table:tbl-hook-contract{caption="The two hook tiers: the hook name selects the context and the return type"}
 > header-rows: 1
@@ -116,31 +108,26 @@ The hook NAME selects one of two context tiers, which the host validates:
   - Tier / context
   - Returns
 * - render, render_block, render_link, message
-  - render ctx -- the EMIT walk; has pandoc/format; subject is the Pandoc element
+  - render context with Pandoc and output-format fields
   - Pandoc AST / string
 * - dataset
-  - data ctx -- subject.params
+  - data context with `subject.params`
   - { source / data / links } dataset
 * - build_block
-  - data ctx -- subject.params
+  - data context with `subject.params`
   - pandoc.Block
 * - transform
-  - data ctx -- subject.raw_content, subject.float
+  - data context with `subject.raw_content` and `subject.float`
   - resolved-AST string
 * - resolve
-  - data ctx -- subject.target_text, subject.source_object_id
+  - data context with target text and source identifier
   - { target, ambiguous }
 * - prepare_task, handle_result
-  - data ctx -- subject.float/build_dir; subject.task/success/stdout/stderr
+  - data context with task or result fields
   - task table / DB write
 ```
 
-A render hook reads `ctx.subject.*` plus the render core (`data`, `pandoc`, `log`,
-`diagnostics`, `format`, `spec_id`, `model`, `config`, `host`); a data hook reads
-`dctx.subject.*` plus the data core (`data`, `spec_id`, `log`). The context is
-frozen (writes error) and its invariant core is asserted non-nil at build time. To
-EXTEND a model, pick the hook whose name matches the intent -- the name determines
-both the context it receives and the return type it owes.
+A render hook receives the render core and its subject. A data hook receives `data`, `spec_id`, `log`, and its subject. The host checks required context fields. It prevents assignment to top-level context fields. Each hook must return its documented type.
 
 ### Loading Process
 
@@ -153,6 +140,6 @@ both the context it receives and the return type it owes.
    consumer reads via `get_hook` / `get_hook_inherited` (which walks the `extends`
    chain). An `on_<phase>` hook in `hooks` is synthesized into
    `pipeline:register_handler`.
-4. `host:finalize()` propagates inherited attributes, creates the verification SQL
+4. `host:finalize()` propagates inherited attributes, creates the analyze-query SQL
    views, and asserts required hooks (e.g. a TABLE_VIEW subtype must resolve a
    `build_block`).

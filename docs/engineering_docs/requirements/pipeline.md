@@ -188,7 +188,7 @@ The system shall distinguish a handler prerequisite that resolves to another pha
 
 > description: The per-phase topological sort deliberately drops a prerequisite that does not participate in the current phase (handlers cannot be ordered across phases). `Pipeline:validate_prerequisites()`, run once when all handlers are registered, distinguishes the two cases the filter conflates: a prerequisite registered in ANOTHER phase (legitimate, silent) versus one registered in NO phase (a typo/bug). It emits a `prerequisite_not_found` diagnostic only for the latter, and only for phase handlers (those declaring an `on_<phase>` hook) -- a decorated per-item callback's `prerequisites` field is inert and not flagged. The cross-phase filter itself is unchanged.
 
-> rationale: A mistyped prerequisite silently never applied under the old behavior, so a missing cross-phase ordering constraint could corrupt output with no signal. Surfacing only the truly-unresolvable case avoids false positives on legitimate cross-phase prerequisites. (Verified by the pipeline suite's prereq-not-found test.)
+> rationale: An unresolved same-phase prerequisite can change handler order and corrupt output. The pipeline reports this error without rejecting valid cross-phase prerequisites.
 
 > status: Approved
 
@@ -197,11 +197,10 @@ The system shall distinguish a handler prerequisite that resolves to another pha
 
 A [dic:spec-object](#)'s scope shall be closed either automatically by the next header of equal-or-shallower level, or manually by a `----` thematic break, and a heading shall not be empty.
 
-> description: When the INITIALIZE phase delimits each header's section, the scope (the `end_line` that governs which trailing content and floats the object contains) ends at the first `----` thematic break inside the section, if present, rather than only at the next header. The thematic break is consumed — it is removed from the rendered body and produces no horizontal rule. Content between the marker and the next header keeps its document position but is contained by the parent section. This gives authors an explicit way to close a section without introducing a heading, replacing the anti-pattern of an empty `##` used as a "section reset".
+> description: During INITIALIZE, the first `----` thematic break ends the active section scope. The marker does not appear in rendered output. Later content keeps its document position and belongs to the parent section.
 >
 > An empty heading (a header whose title is blank) is rejected: it would otherwise render as an empty numbered heading and corrupt downstream numbering. The `object_broken_hierarchy` analyze query reports it as an error and directs the author to use `----` instead.
 
-> rationale: Section scope previously closed only at the next header, so authors who wanted trailing content to belong to a parent section resorted to an empty heading, which renders as a blank numbered chapter and shifts all subsequent numbering. A consumed thematic break expresses the intent precisely with no rendering artifact, and rejecting empty headings removes the failure mode entirely.
+> rationale: The marker closes a section without adding a rendered heading. Rejection of empty headings prevents invalid numbered sections.
 
 > status: Approved
-

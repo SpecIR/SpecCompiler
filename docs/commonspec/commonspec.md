@@ -186,7 +186,7 @@ A spec object's **scope** --- the body content and floats it contains --- runs f
 1. **Automatically**, at the next header of equal or shallower level (the usual case). A child object must be exactly one heading level deeper than its parent; skipping a level (for example `##` directly to `####`) is rejected as a broken hierarchy.
 2. **Manually**, at a `----` thematic break. The marker closes the current section so that following content belongs to the parent scope, and it is **consumed** --- it produces no horizontal rule in the output.
 
-A `----` is the correct way to end a section without opening a new heading. It replaces the anti-pattern of an empty `##` used as a "section reset": an **empty heading** (a header with no title) is rejected, because it would render as a blank numbered heading and corrupt downstream numbering.
+Use `----` to end a section without opening another heading. CommonSpec rejects an **empty heading** because it produces an invalid numbered section.
 
 ```
 ## Pesquisa-Ação @SEC-PA

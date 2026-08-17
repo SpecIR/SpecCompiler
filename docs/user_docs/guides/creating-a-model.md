@@ -2,33 +2,33 @@
 
 ## Introduction
 
-A **model** is the vocabulary and behaviour of your specification documents. It declares what object types exist (requirements, design items, test cases), what floats are available (diagrams, tables, code listings), how cross-references resolve, and what validation rules run. When your domain needs a type the defaults don't cover, you write a model.
+A **model** defines the vocabulary and behavior of specification documents. It declares object types, floats, relations, views, and verification rules.
 
-SpecCompiler ships with a `default` model that gives you the base types (`SECTION`, `FIGURE`, `TABLE`, `PLANTUML`, …). You create a custom model when your domain needs extra types, specialised rendering, or extra validation. Your model layers on top of `default`, so you only write the parts you want to change.
+The `default` model provides base types such as `SECTION`, `FIGURE`, `TABLE`, and `PLANTUML`. A custom model can add or replace types. SpecCompiler loads the custom model as an overlay on `default`.
 
-Here is the whole mental model in one breath: each extension point is **one Lua file that returns one descriptor table**. A descriptor has two required keys — a `kind` and a `schema` holding your data — plus an optional `hooks` table holding any behaviour. You pick the `kind`, put your data in `schema`, and (only when you need behaviour) pick the hook whose name matches what you want to do. The host engine reads that table, writes your type into the database, and indexes your hooks. That's it — there is no second registration step and no magic file naming.
+Each extension module returns one Lua descriptor table. The descriptor contains a `kind`, a `schema`, and an optional `hooks` table. The host registers the schema and indexes the hooks. The value of `schema.id` identifies the type.
 
-The recipe never changes:
+Create a type as follows:
 
-1. Decide the **kind** (`object`, `float`, `view`, `relation`, `specification`, or `verification`).
-2. Put your data in **`schema`** (the authoritative `id`, `extends`, `attributes`, …).
-3. Pick the **hook** whose name matches the intent — a `render`/`render_block`/`render_link` hook to produce output during EMIT, or a data hook like `dataset`, `transform`, or `resolve` to produce data earlier. The hook name decides both the context you receive and the type you must return.
+1. Decide the **kind** (`object`, `float`, `view`, `relation`, `specification`, or `analyze`).
+2. Define the type in **`schema`**. The `schema.id` field is the authoritative identifier.
+3. Add a **hook** only when the type requires custom behavior. The hook name determines its context and return type.
 
-A pure-data type — most objects and floats — simply omits `hooks` and inherits everything else.
+Most object and float types contain only data. These types omit `hooks` and inherit the applicable behavior.
 
 ## Quick-start template
 
-Every type module has the same shape. Copy this skeleton and keep only what you need:
+Each type module has the following structure:
 
 ```src.lua:src-model-quickstart{caption="The descriptor a type module returns, annotated"}
 -- File: models/<your-model>/types/<category>/<type-name>.lua
--- The module returns ONE descriptor table; the host reads only this table.
+-- The module returns one descriptor table.
 return {
-    -- kind: object | float | view | relation | specification | verification.
+    -- kind: object | float | view | relation | specification | analyze.
     -- It must match the category directory the file lives in.
     kind = "object",
 
-    -- schema: your DATA. schema.id is authoritative (NOT the filename).
+    -- schema contains data. schema.id is authoritative.
     -- These fields become columns in the SpecIR database.
     schema = {
         id = "...",            -- required, uppercase convention, globally unique
@@ -36,7 +36,7 @@ return {
         -- attributes = { ... },
     },
 
-    -- hooks (OPTIONAL): your BEHAVIOUR, and the ONLY place behaviour may live.
+    -- hooks contains optional custom behavior.
     -- The host classifies each hook by NAME, infers the role from the hooks
     -- present, and rejects a function placed on any other top-level key. A
     -- pure-data type (most objects/floats) omits this key entirely and
@@ -47,13 +47,13 @@ return {
 }
 ```
 
-Set `template: <your-model>` in `project.yaml` (see [Project Integration](#project-integration)) and `specc build` will load your types on top of `default`.
+Set `template: <your-model>` in `project.yaml`. The build then loads the model as an overlay on `default`.
 
 ## Worked example: a one-file, project-local model
 
-The smallest useful model is a single descriptor, and it can live **inside your project directory** — no need to touch the SpecCompiler installation. The loader resolves `models/<name>/` under `SPECCOMPILER_HOME` first, then under the project's working directory.
+A project-local model can contain one descriptor. The loader first searches `SPECCOMPILER_HOME/models/<name>/`. It then searches the project working directory.
 
-Suppose you want to record architecture decisions (ADRs) as first-class, traceable objects:
+The following model defines architecture decisions as traceable objects:
 
 ```src:src-model-adr-layout{caption="Project layout with a local model"}
 my-project/
@@ -93,29 +93,28 @@ No `hooks` key: rendering, PID assignment, labels, and cross-reference resolutio
 
 > status: Accepted
 
-> consequences: Single-file build artifact; traceability is SQL-queryable.
+> consequences: The build produces one file. SQL queries provide traceability data.
 
 We store the intermediate representation in a SQLite database rather than
-in-memory tables, so verification views can run plain SQL.
+in-memory tables, so analyze queries can use SQL.
 
 ## DECISION: Run on stock pandoc
 
 > status: Proposed
 
-No custom pandoc build; ship Lua + C extensions that load into the system
-pandoc.
+Use the system Pandoc with Lua and C extensions.
 ```
 
-`specc build` registers `DECISION`, gives the second decision the auto-generated PID `ADR-002` (from `pid_prefix`/`pid_format`), stores `status` and `consequences` as queryable attributes, and resolves `[ADR-001](@)` cross-references from anywhere in the document — all without a single line of behaviour code.
+The build registers `DECISION` and assigns the second decision the PID `ADR-002`. It stores the attributes for queries. It also resolves `[ADR-001](@)` references. The type requires no custom behavior.
 
 ## Overlay
 
 Models layer as **overlays** on top of `default`. When `project.yaml` sets `template: mymodel`, the loader runs two passes:
 
 1. `models/default/types/` — loaded first.
-2. `models/mymodel/types/` — loaded second; a descriptor whose `schema.id` matches a default one replaces the default (the database insert is `INSERT OR REPLACE`, so the last writer per id wins).
+2. `models/mymodel/types/` — loaded second. A descriptor with the same kind and `schema.id` replaces the default descriptor.
 
-Descriptors with new `id`s are added alongside the defaults. Everything you don't redefine is inherited.
+Descriptors with new identifiers supplement the default descriptors. The model inherits definitions that it does not replace.
 
 ## Model directory layout
 
@@ -127,28 +126,28 @@ models/<your-model>/
     floats/           -- Float types         (e.g., sequence_diagram.lua)
     views/            -- View types          (e.g., symbol.lua)
     relations/        -- Relation types      (e.g., traces_to.lua)
-  verification_views/ -- Verification descriptors (e.g., vc_missing_hlr.lua)
+  analyze_queries/     -- Analyze descriptors (e.g., vc_missing_hlr.lua)
   postprocessors/     -- Per-format post-processing (docx.lua, html5.lua)
   filters/            -- Pandoc Lua filters per output format
   styles/             -- Style presets (preset.lua, docx.lua, html.lua)
   model.yaml          -- Optional manifest: name, description, requires
 ```
 
-Only `types/` is required; everything else is optional.
+Only `types/` is required. All other directories are optional.
 
 A model that depends on another model declares it in `model.yaml`:
 
 ```src.yaml:src-model-manifest{caption="model.yaml — declaring a model dependency"}
 name: mymodel
 description: My domain model
-requires: [base_model]   # loaded before this model; missing = loud load error
+requires: [base_model]   # Load this model first.
 ```
 
-When the engine loads a model it first loads every model in `requires` (recursively, each at most once), erroring loudly if a required model is absent. A model can also carry its own external tooling under a `tools/` directory — the `abnt` model does exactly this for chart rendering: it owns the `CHART` float, the `gauss` dataset view, and the deno-based renderer at `models/abnt/tools/echarts-render.ts`, plus a `scripts/bootstrap.sh` to provision the deno dependency on native installs. The five `types/` subdirectory names are fixed — the loader maps each directory to a `kind` (`objects` -> `object`, `floats` -> `float`, and so on) and a descriptor's `kind` **must** match the directory it lives in, or load fails loudly.
+The engine loads each model in `requires` before it loads the requesting model. It loads each dependency once. A missing dependency stops the build. A model can contain external tools in `tools/`. The five `types/` directory names are fixed. Each directory maps to one descriptor kind. A mismatch between the directory and `kind` stops the build.
 
-The loader supports both single files (`types/floats/figure.lua`) and subdirectories with an `init.lua` (`types/floats/figure/init.lua`) — useful when a type needs helper modules alongside it.
+The loader supports single files such as `types/floats/figure.lua`. It also supports directories with an `init.lua` file.
 
-## Type categories at a glance
+## Type categories
 
 ```list-table:tbl-model-categories{caption="Type categories, their kind, and the hooks they typically declare"}
 > header-rows: 1
@@ -178,25 +177,25 @@ The loader supports both single files (`types/floats/figure.lua`) and subdirecto
   - `"specification"`
   - `types/specifications/srs.lua`
   - none (omit `hooks`)
-* - Verification
-  - `"verification"`
-  - `verification_views/vc_missing_hlr.lua`
+* - Analyze query
+  - `"analyze"`
+  - `analyze_queries/vc_missing_hlr.lua`
   - `message`
 ```
 
 ## The descriptor and hook contract
 
-`hooks` is the single behaviour surface for every type. Every hook takes exactly **one** frozen context table as its sole argument. That context carries a polymorphic `ctx.subject` (the thing being acted on) and a `ctx.capability` (which hook this is). Use `ctx:require("field")` to fetch a field, erroring loudly if it is nil.
+The `hooks` table contains all custom type behavior. Each hook accepts one frozen context table. The polymorphic `ctx.subject` field contains the hook input. The `ctx.capability` field identifies the hook. Use `ctx:require("field")` to require a non-nil field.
 
-The hook **name** decides everything: which of the two context tiers you receive, and which single value you must return. The host validates the name against the kind at load time, so a misspelled or wrong-kind hook is a loud register-time error, not a silent no-op.
+The hook name determines the context tier and return type. During model loading, the host validates each hook against the descriptor kind. An invalid hook stops the build.
 
-**Render-tier hooks** run during the EMIT walk, where a Pandoc element is being turned into output. They receive the render context (`data`, `pandoc`, `log`, `diagnostics`, `format`, `spec_id`, `model`, `config`, `host`) and `ctx.subject` holds the Pandoc element plus its resolved payload. They return Pandoc AST (or, for links, a display string).
+**Render-tier hooks** run during EMIT. They receive the render context and a resolved payload in `ctx.subject`. They return Pandoc AST. Link hooks return display text.
 
-**Data-tier hooks** run earlier, in a data or lifecycle phase (TRANSFORM / ANALYZE / external render). There is no Pandoc element and no chosen output format yet, so they receive the leaner data context (`data`, `spec_id`, `log`; `model`/`config`/`diagnostics`/`host` ride along when available). Each returns one documented value.
+**Data-tier hooks** run during a data or lifecycle phase. They receive a data context without a Pandoc element or output format. Each hook returns its documented value.
 
-**Return types are enforced.** Every hook's contract declares what it must return — Pandoc AST (a table/element) or a string — and the host checks the value at dispatch time. A wrong-typed return fails loudly with the kind, type id, and hook name, instead of surfacing as a confusing pandoc error or silently missing output. Returning `nil` always means "nothing produced, fall back" (except the verification `message` hook, which must return a string).
+**The host enforces return types.** The host checks the value when it dispatches a hook. An invalid value stops the build and identifies the kind, type, and hook. A `nil` value selects inherited behavior. The analyze-query `message` hook must return a string.
 
-**Phase hooks.** A type that needs to participate in a pipeline phase declares `on_<phase>` functions (`on_initialize`, `on_analyze`, `on_transform`, `on_verify`, `on_emit`) directly in `hooks`, beside its behaviour hooks. These run once per phase with the signature `(data, contexts, diagnostics)` — they are pipeline handlers, not per-element hooks. If the work must run after another handler, declare the ordering in the schema: `schema.phase_prerequisites = { "spec_views" }`. (The host registers the handler under the derived name `<lowercase id>_handler`.)
+**Phase hooks** participate in pipeline phases. Declare them as `on_<phase>` functions in `hooks`. Each phase hook runs once per phase with `(data, contexts, diagnostics)`. Use `schema.phase_prerequisites` to declare ordering constraints. The host names the handler `<lowercase id>_handler`.
 
 ```list-table:tbl-model-hook-catalogue{caption="The hook catalogue: each hook's kind, tier, the one return type, and when it fires"}
 > header-rows: 1
@@ -223,10 +222,10 @@ The hook **name** decides everything: which of the two context tiers you receive
   - display string (or `nil`)
   - EMIT, to produce the visible text of a link of this relation type.
 * - `message`
-  - verification
+  - analyze
   - render
   - diagnostic string
-  - VERIFY, once per row the verification SQL view returns.
+  - ANALYZE, once per row the SQL view returns.
 * - `dataset`
   - view
   - data
@@ -261,7 +260,7 @@ The hook **name** decides everything: which of the two context tiers you receive
 
 A float is internal **or** external: declaring `render` together with `prepare_task`/`handle_result` is a contradiction and the host rejects it.
 
-**What's on the context**
+**Context fields**
 
 ```list-table:tbl-model-ctx-fields{caption="The frozen context fields, by tier"}
 > header-rows: 1
@@ -270,7 +269,7 @@ A float is internal **or** external: declaring `render` together with `prepare_t
 * - Field
   - Meaning
 * - `ctx.subject`
-  - The polymorphic payload for this hook (e.g. `{ object, attributes, specification, element }` for an object render, `{ float, raw_content }` for a float transform, `{ params }` for a view dataset, `{ target }` for a link render, `{ row }` for a verification message). The shape depends on the hook.
+  - The hook-specific payload. Examples include an object, float, view parameters, relation target, or analyze-query row.
 * - `ctx.data`
   - The `DataManager` (the SpecIR database) for custom queries. Present on both tiers.
 * - `ctx.spec_id`
@@ -282,12 +281,12 @@ A float is internal **or** external: declaring `render` together with `prepare_t
 * - `ctx.format`
   - Target output format (`docx`, `html5`, `gfm`, `json`). **Render tier only.**
 * - `ctx.diagnostics`, `ctx.model`, `ctx.config`
-  - Diagnostics sink, model name, project config. Always on the render tier; on the data tier when the caller has them.
+  - Diagnostics sink, model name, and project config. These fields are always in the render tier. A data context contains them when available.
 * - `ctx.host`
   - The registry, for cross-hook dispatch (e.g. `ctx.host:get_hook("view", id, "build_block")`). Render tier.
 ```
 
-> If you catch yourself starting a render hook with a DB query for "the thing I'm rendering", check `ctx.subject` first — the pipeline has already resolved the element and its attributes onto it, so you rarely need a query for your own item.
+> Read the resolved element and its attributes from `ctx.subject`. Query the database only for data that the subject does not contain.
 
 ## Five canonical templates
 
@@ -348,7 +347,7 @@ Usage:
 The system shall authenticate users via username and password.
 ```
 
-Most object types don't need a `render` hook at all — omit `hooks` and the host emits the standard PID-header / attributes / body card. Add a `render` hook only when the default layout isn't what you want.
+Most object types do not require a `render` hook. Without this hook, the host emits the standard PID, attributes, and body. Add `render` only for a different layout.
 
 ### Relation type
 
@@ -368,7 +367,7 @@ return {
 }
 ```
 
-That's complete. The link `[HLR-001](@)` written inside an LLR will resolve as `TRACES_TO`.
+The link `[HLR-001](@)` inside an LLR resolves as `TRACES_TO`.
 
 When the default display text (PID for objects, `"<caption> <number>"` for floats) isn't right, add a `render_link` hook. It reads the pre-resolved target from `ctx.subject.target` and returns the display string (or `nil` to fall back to the base type):
 
@@ -386,13 +385,13 @@ hooks = {
 }
 ```
 
-`ctx.subject.target` is pre-resolved. Object targets carry `{ kind = "object", pid, title, type_ref }`; float targets carry `{ kind = "float", caption, number, ... }`. Return a string to override the display text, or `nil` to let the base type's `render_link` take over. `LABEL_REF` and `PID_REF` each ship with a default `render_link` (title for sections, PID for other objects, `"<caption> <number>"` for floats), inherited automatically through `extends`, so you only write `render_link` when you want something different.
+`ctx.subject.target` contains the resolved target. Object targets contain the kind, PID, title, and type. Float targets contain the kind, caption, and number. Return a string to replace the display text. Return `nil` to use inherited behavior. `LABEL_REF` and `PID_REF` provide default link rendering.
 
-If a relation needs custom resolution (how the link text maps to a target object), declare a `resolve` data hook returning `{ target, ambiguous }`. It reads `ctx.subject.target_text` and `ctx.subject.source_object_id` from the leaner data context (`PID_REF` and `LABEL_REF` provide the standard ones, so subtypes almost never need their own).
+For custom relation resolution, declare a `resolve` data hook. It reads the target text and source identifier from `ctx.subject`. It returns `{ target, ambiguous }`. Subtypes of `PID_REF` and `LABEL_REF` inherit their resolvers.
 
 ### Walkthrough custom view
 
-Views are written with backtick syntax. An **inline** view (`` `prefix: content` ``) uses a `render` hook returning inlines; a **block** view (a fenced ```` ```prefix ```` code block) uses a `render_block` hook returning a block. The view's `inline_prefix` (plus any `aliases`) is what routes the syntax to your hook.
+Backtick syntax invokes views. An **inline** view uses `render` and returns inlines. A **block** view uses `render_block` and returns a block. The `inline_prefix` and `aliases` fields select the view.
 
 ```src.lua:src-model-template-view{caption="types/views/symbol.lua"}
 return {
@@ -418,7 +417,7 @@ return {
 
 Usage: `The force is defined as` `` `symbol: F = ma` ``.
 
-Views that build their content from the database (lists of figures, abbreviation lists, traceability matrices) usually render a **block**. The cleanest way to do this is to extend `TABLE_VIEW` and declare only a `build_block` data hook — the shared `render_block` on `TABLE_VIEW` finds your `build_block` through the host and runs it. (The host enforces this: a view that extends `TABLE_VIEW` but provides no `build_block` is a load error.)
+Database-backed views usually render a **block**. Extend `TABLE_VIEW` and declare a `build_block` data hook. The inherited `render_block` hook dispatches `build_block`. A `TABLE_VIEW` subtype without `build_block` causes a load error.
 
 ```src.lua:src-model-template-view-block{caption="A generated table view via build_block (types/views/traceability_matrix.lua)"}
 return {
@@ -431,7 +430,7 @@ return {
         inline_prefix = "traceability_matrix",
     },
     hooks = {
-        -- DATA: build the generated table. dctx.data is the SpecIR database;
+        -- DATA: build the generated table. dctx.data is the SpecIR database.
         -- dctx.subject.params holds any view parameters.
         build_block = function(dctx)
             local rows = dctx.data:query_all([[
@@ -465,11 +464,11 @@ return {
 }
 ```
 
-A view that feeds a chart (rather than emitting its own block) declares a `dataset` data hook instead, returning a `{ source = ... }` dataset that the chart consumes. The `gauss` view in the `abnt` model (its chart capability) is the canonical example.
+A view that supplies chart data declares a `dataset` hook. The hook returns `{ source = ... }` or the data shape required by the chart type.
 
 ### Walkthrough custom float type
 
-Floats are usually purely declarative — most just need a `schema`:
+Most floats require only a `schema`:
 
 ```src.lua:src-model-template-float{caption="types/floats/sequence_diagram.lua"}
 return {
@@ -492,7 +491,7 @@ sequence diagram content here
 ```
 ````
 
-A float that resolves its own content **internally** (no external tool) declares a single `transform` data hook. It reads `ctx.subject.raw_content` and `ctx.subject.float` and returns the resolved-AST string the backend consumes — the `FIGURE` type does exactly this to turn an image path into the JSON the image fallback renders. For floats that need an **external** tool (PlantUML, charts), see [External renderers](#external-renderers).
+An internally rendered float can declare a `transform` data hook. The hook reads `ctx.subject.raw_content` and `ctx.subject.float`. It returns a resolved-AST string. See [External renderers](#external-renderers) for process-based rendering.
 
 ### Specification type
 
@@ -519,7 +518,7 @@ Usage: `# srs: My Project Requirements @SRS-MYPROJ-001` at the top of a `.md` fi
 
 ## Schema field reference
 
-The fields below are the real `schema` keys the host writes into the SpecIR database (from `contract.registry`). Anything not listed is ignored by the insert.
+The following tables define common schema fields. Some model hooks also read additional schema fields for rendering.
 
 ### Object schema
 
@@ -703,7 +702,7 @@ The fields below are the real `schema` keys the host writes into the SpecIR data
 
 ### Inference scoring
 
-When more than one relation type matches a link, the resolver scores each candidate (`+1` for each constraint that matches, eliminated on mismatch, `+0` on `nil`). The highest scorer wins; ties are flagged as `ambiguous_relation`. A link `[fig:diagram](#)` resolving against a FIGURE matches `XREF_FIGURE` (selector `#` + target_type_ref `FIGURE` = 2) over the generic `LABEL_REF` (selector `#` only = 1).
+When multiple relation types match a link, the resolver scores each candidate. A matching constraint adds one point. A mismatch removes the candidate. A `nil` constraint adds no points. The highest score wins. A tie produces an `ambiguous_relation` diagnostic.
 
 ### View schema
 
@@ -753,21 +752,21 @@ When more than one relation type matches a link, the resolver scores each candid
 
 1. Pick a model name (lowercase, matches the directory name).
 2. Create `models/<name>/types/…` with the categories you need.
-3. Write each type as one descriptor: pick the `kind`, fill `schema`, return `{ kind, schema, hooks }`.
-4. Add a hook to `hooks` only if you need custom behaviour — pick the hook whose name matches the intent.
+3. Return one descriptor with `kind`, `schema`, and optional `hooks` fields.
+4. Add only the hooks that implement required custom behavior.
 5. Set `template: <name>` in `project.yaml`.
 6. Run `specc build` and inspect the output.
-7. Add a verification descriptor if the domain has rules to enforce (see [Verification views](#verification-views)).
+7. Add an analyze descriptor if the domain has rules to enforce.
 
-## Verification views
+## Analyze queries
 
-Verification views are SQL-based validation rules that run during the VERIFY phase. Each one is a descriptor with `kind = "verification"`: its `schema` holds the SQL that creates a database view, and its `message` hook turns each row the view returns into a diagnostic.
+Analyze queries are SQL-based validation rules that run during ANALYZE. Each query uses a descriptor with `kind = "analyze"`. Its schema defines a SQL view. Its optional `message` hook converts a result row into a diagnostic.
 
-Place verification files under `models/<name>/verification_views/`. The loader scans that directory automatically — file names don't need a particular convention, but matching the `policy_key` helps (e.g. `vc_missing_hlr.lua`).
+Place analyze descriptors under `models/<name>/analyze_queries/`. The loader scans all Lua files in this directory. Use the policy key as the file name when practical.
 
-```src.lua:src-model-verification-view{caption="models/mymodel/verification_views/vc_missing_hlr.lua"}
+```src.lua:src-model-verification-view{caption="models/mymodel/analyze_queries/vc_missing_hlr.lua"}
 return {
-    kind = "verification",
+    kind = "analyze",
     schema = {
         id = "vc_missing_hlr",
         view = "view_traceability_vc_missing_hlr",
@@ -786,7 +785,7 @@ WHERE vc.type_ref = 'VC'
 ]],
     },
     hooks = {
-        -- VERIFY: one call per row the SQL view returns. ctx.subject.row is the row.
+        -- ANALYZE: one call per row. ctx.subject.row contains the query result.
         message = function(ctx)
             local row = ctx.subject.row
             local label = row.object_pid or row.object_title or row.object_id
@@ -797,18 +796,18 @@ WHERE vc.type_ref = 'VC'
 }
 ```
 
-`policy_key` is the handle authors use to tune severity. Repeating a `policy_key` in an overlay replaces the earlier descriptor in place; setting `disabled = true` in the `schema` removes it entirely (model layering). Suppress a verification view in `project.yaml` via its `policy_key`:
+The `policy_key` controls diagnostic severity. An overlay descriptor with the same key replaces the earlier descriptor. A schema with `disabled = true` removes the key. Set a policy to `ignore` in `project.yaml` to suppress its diagnostics:
 
-```src.yaml:src-model-suppress-verification-view{caption="Suppressing a verification view"}
+```src.yaml:src-model-suppress-verification-view{caption="Suppressing an analyze query"}
 validation:
   traceability_vc_to_hlr: ignore
 ```
 
 ## External renderers
 
-Float and view types that need an external tool (PlantUML, ECharts, Graphviz, …) set `needs_external_render = true` and declare a pair of float data hooks: `prepare_task` builds the spawn task, and `handle_result` writes the resolved AST once the tool finishes. The pipeline collects every such item, spawns the processes in parallel, and dispatches each result back through `handle_result`.
+Floats that require an external tool set `needs_external_render = true`. They declare `prepare_task` and `handle_result` data hooks. The pipeline collects tasks, runs processes, and dispatches each result.
 
-These two hooks are the external counterpart to `transform`. A float declares **either** an internal `transform` **or** the external `prepare_task` + `handle_result` pair — never both. (Declaring `render` alongside the external pair is also rejected.)
+The `prepare_task` hook returns a task descriptor. The `handle_result` hook stores the resolved result. A float cannot declare `render` with either external-render hook.
 
 ```src.lua:src-model-external-render{caption="types/floats/plantuml.lua — an external-render float"}
 local float_base  = require("pipeline.shared.float_base")
@@ -825,7 +824,7 @@ return {
         needs_external_render = true,
     },
     hooks = {
-        -- DATA: build the spawn task. dctx.subject carries { float, build_dir };
+        -- DATA: build the spawn task. dctx.subject contains { float, build_dir }.
         -- dctx.log is the logger. Return the task descriptor, or nil to skip.
         prepare_task = function(dctx)
             local float     = dctx.subject.float
@@ -849,7 +848,7 @@ return {
         end,
 
         -- DATA: write the resolved AST. dctx.subject carries
-        -- { task, success, stdout, stderr }; dctx.data is the SpecIR database.
+        -- { task, success, stdout, stderr }. dctx.data is the SpecIR database.
         handle_result = function(dctx)
             local task = dctx.subject.task
             local ctx  = task.context
@@ -871,14 +870,12 @@ return {
 * - Field
   - Purpose
 * - `cmd`, `args`, `opts`
-  - Process to spawn and its options. `opts.timeout` is in milliseconds; `opts.cwd` sets the working directory.
+  - Process and options. `opts.timeout` is in milliseconds. `opts.cwd` sets the working directory.
 * - `output_path`
   - File-based cache key. If the file already exists, the process is not spawned — `handle_result` runs immediately with the cached path. Put the content hash in the filename so input changes trigger a fresh render.
 * - `context`
   - Arbitrary table passed through to `handle_result` (read as `task.context`).
 ```
-
-The same mechanism works for **views** — `math_inline` uses it to convert AsciiMath to OMML. The render handler queries the view rows (instead of float rows) for view-typed items.
 
 ## Project integration
 
@@ -895,18 +892,18 @@ doc_files:
 
 ## Troubleshooting
 
-**My type doesn't load.** Check that the file is under `types/<category>/<name>.lua`, that the category is one of `{objects, floats, views, relations, specifications}`, and that the module **returns its descriptor table**. The descriptor's `kind` must match the directory; a mismatch is a hard error. Non-view categories fail loudly; view load failures become warnings on stderr — watch the build output.
+**A type does not load.** Check the file location and returned descriptor. The kind must match its category directory. Type-load errors stop the build. View module load errors produce warnings.
 
-**The host rejected my hook.** Each hook name is valid only for certain kinds (see [list-table:tbl-model-hook-catalogue](#)). A name that isn't allowed for the kind, or a function hung off a top-level key other than `hooks`, is a loud register-time error — by design, so behaviour never silently fails to fire. Move behaviour into `hooks` and check the spelling.
+**The host rejects a hook.** Check that the hook is valid for the descriptor kind. Put all custom behavior in `hooks`.
 
-**My override isn't taking effect.** Overrides replace by `schema.id`, not by filename. The custom type must declare the **same `id`** as the default (case-sensitive). The filename is irrelevant.
+**An overlay does not replace a type.** Use the same case-sensitive `schema.id` and kind as the base descriptor.
 
-**My render hook produces nothing.** A view that `extends = "TABLE_VIEW"` but declares no `build_block` is a load error — add the `build_block` data hook. For an object, remember that returning `nil` leaves the original element untouched; return the blocks you built.
+**A render hook produces no output.** A `TABLE_VIEW` subtype must declare `build_block`. An object hook that returns `nil` retains the original element. Return the generated blocks to replace it.
 
-**My external renderer runs every build even without changes.** Your `output_path` isn't content-addressed. Include the content hash in the filename so unchanged input hits the file-based cache.
+**An external renderer runs for unchanged input.** Include the content hash in `output_path` to use the file cache.
 
 ## Pointers
 
 - [User manual](../manual.md) — day-to-day authoring syntax.
-- Engineering docs — the [type system SDD](../../engineering_docs/architecture/type_system.md) is the authoritative contract; [type discovery](../../engineering_docs/architecture/type_discovery_design.md) and [model design](../../engineering_docs/architecture/model_design.md) cover internals.
+- Engineering docs — the [type system SDD](../../engineering_docs/architecture/type_system.md) defines the contract. [Type discovery](../../engineering_docs/architecture/type_discovery_design.md) and [model design](../../engineering_docs/architecture/model_design.md) define internal behavior.
 - [Concepts dictionary](../../engineering_docs/dictionary/concepts.md) — vocabulary reference.

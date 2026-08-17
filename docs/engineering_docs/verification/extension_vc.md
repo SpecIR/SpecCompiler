@@ -44,23 +44,23 @@ Verify [dic:type-loader](#) recognizes all type categories.
 > traceability: [HLR-EXT-002](@), [LLR-EXT-020-01](@)
 
 
-### VC: Handler Registration Interface @VC-021
+### VC: Descriptor Registration @VC-021
 
-Verify type modules can export handlers.
+Verify that the host registers descriptor hooks.
 
-> objective: Confirm M.handler is registered with pipeline
+> objective: Confirm the host indexes behavior hooks and registers phase hooks with the pipeline.
 
 > verification_method: Test
 
 > approach:
-> - Create type module with M.handler export
-> - Load model
-> - Verify handler is registered in pipeline
+> - Create a descriptor with a behavior hook and an `on_<phase>` hook
+> - Load the model
+> - Inspect the host hook index and pipeline handlers
 
 > pass_criteria:
-> - Handler registered if M.handler exists
-> - Handler prerequisites respected
-> - Handler invoked during appropriate phase
+> - The behavior hook is available from the host index
+> - The phase hook is registered under the derived handler name
+> - `schema.phase_prerequisites` controls handler order
 
 > traceability: [HLR-EXT-003](@), [LLR-EXT-021-01](@), [LLR-EXT-021-02](@)
 
@@ -69,18 +69,18 @@ Verify type modules can export handlers.
 
 Verify type modules follow required schema.
 
-> objective: Confirm type exports contain required fields
+> objective: Confirm descriptor schemas contain the required fields.
 
 > verification_method: Test
 
 > approach:
 > - Create valid and invalid type modules in a temporary model
 > - Load model through TypeLoader.load_model()
-> - Verify valid schemas register with defaults and invalid schemas are ignored
+> - Verify that valid schemas register and invalid schemas stop model loading
 
 > pass_criteria:
 > - Valid types are inserted into category tables
-> - Missing-id schemas are skipped
+> - A missing `schema.id` stops model loading
 > - Category defaults are applied (for example float long_name/counter_group)
 > - Enum attribute values are persisted
 
@@ -161,82 +161,76 @@ Verify [dic:data-view](#) generators are loaded from model directories and injec
 > traceability: [HLR-EXT-007](@), [LLR-095](@)
 
 
-### VC: Handler Caching @VC-026
+### VC: Hook Index @VC-026
 
-Verify type handler loaders cache modules to avoid repeated loading.
+Verify that the host indexes hooks for deterministic dispatch.
 
-> objective: Confirm handler dispatchers maintain a cache keyed by model and type_ref, including negative caching for missing handlers.
+> objective: Confirm hook lookup uses kind, type identifier, hook name, and the inheritance chain.
 
 > verification_method: Inspection
 
 > approach:
-> - Examine float_handlers, view_handlers, and inline_handlers dispatch modules
-> - Verify cache keyed by {model}:{type_ref}
-> - Confirm cache hit returns stored handler without re-loading
-> - Confirm failed lookups store false to prevent repeated require() calls
+> - Register a descriptor with a behavior hook
+> - Query the hook with `get_hook`
+> - Register a subtype and query the hook with `get_hook_inherited`
+> - Query an absent hook
 
 > pass_criteria:
-> - Cache keyed by model:type_ref combination
-> - Second access to same type returns cached handler
-> - Failed lookup stores false (negative cache)
-> - No repeated require() for previously loaded types
+> - Direct lookup returns the registered hook
+> - Inherited lookup returns the nearest hook in the `extends` chain
+> - An absent hook returns nil
+> - Phase hooks do not appear in the behavior-hook index
 
 > traceability: [HLR-EXT-008](@), [LLR-096](@)
 
-_Retired with HLR-EXT-008 (Host Engine Refactor): the `{model}:{type_ref}` handler
-caches are deleted; the host's eager `(kind, id) -> hook` index replaces them and
-is covered by the extension-suite descriptor tests (VC-EXT-011)._
-
-
 ### VC: Canonical Hook Context @VC-EXT-009
 
-Verify every plugin hook receives a single frozen context whose invariant core is non-nil, and that the two context tiers are dispatched by hook name.
+Verify that each behavior hook receives one frozen context for its tier.
 
-> objective: Confirm `contract.ctx` / `hook_ctx` build a frozen context that is the SOLE argument to every hook -- a render ctx (pandoc/format present) for render-tier hooks and a data ctx for data-tier hooks -- with the invariant core asserted non-nil.
+> objective: Confirm render hooks receive a render context and data hooks receive a data context.
 
 > verification_method: Test
 
 > approach:
-> - Build a model whose object/view/float/relation/verification hooks read `ctx.subject.*` and core fields
-> - Assert `ctx.new` / `ctx.new_data` reject a missing invariant-core field at build time
-> - Exercise a render hook (render ctx: data, pandoc, log, format, spec_id, model, config, host) and a data hook (data ctx: data, spec_id, log)
+> - Build a model whose object, view, float, relation, and analyze hooks read `ctx.subject`
+> - Exercise one render hook and one data hook
 > - Confirm `ctx:require(field)` raises on nil
 
 > pass_criteria:
-> - Every hook is invoked with exactly one frozen context table; writes to it error
-> - Render-tier hooks (render/render_block/render_link/message) receive the render ctx; data-tier hooks (dataset/build_block/transform/resolve/prepare_task/handle_result) receive the data ctx
-> - A missing required core field is a loud build-time error, not a silent nil
-> - The hook name selects the tier (registry ALLOWED_HOOKS); a hook in the wrong tier is rejected at registration
+> - Each hook receives one frozen context table
+> - Render hooks receive Pandoc and format fields
+> - Data hooks receive the fields required for data processing
+> - An invalid hook for the descriptor kind stops registration
 
 > traceability: [HLR-EXT-009](@)
 
 
 ### VC: Model Manifest @VC-EXT-010
 
-Verify each in-tree model carries a `model.yaml` declaring its overlay chain and that only repo-bundled models load.
+Verify that the host loads manifest dependencies before the selected model.
 
-> objective: Confirm `model.yaml` (`name`, `description`, `extends`, `requires`) is read and the declared overlay chain (default then template, later-wins-by-id) is honoured, with no out-of-tree search path.
+> objective: Confirm `model.yaml` dependencies define a deterministic load order.
 
 > verification_method: Test
 
 > approach:
-> - Load a model whose `model.yaml` sets `extends: [default]`
-> - Verify the host overlays default then the model, later-wins-by-id
-> - Confirm a requested model with no directory is a loud error
+> - Load a model whose `model.yaml` declares `requires: [base_model]`
+> - Verify that the host loads `base_model` before the selected model
+> - Request an absent model
 
 > pass_criteria:
-> - `model.yaml` is parsed and the overlay order matches `extends`
-> - Models resolve only under `models/<name>/`; no registry/package-manager lookup
-> - A fully-absent requested model aborts loudly
+> - Required models load before the requesting model
+> - Each model loads at most once
+> - An absent selected or required model stops the build
 
 > traceability: [HLR-EXT-010](@)
 
 
-### VC: Descriptor and Role Inference @VC-EXT-011
+### VC: Descriptor and Hook Validation @VC-EXT-011
 
-Verify a plugin returns one `{kind, schema, hooks}` descriptor and that role/hook validation is enforced at registration.
+Verify descriptor and hook validation during registration.
 
-> objective: Confirm the host registers one descriptor per file, indexes its `hooks` by name into the `(kind,id)->hook` index, infers role from the hooks present, and rejects malformed descriptors loudly.
+> objective: Confirm the host indexes valid hooks and rejects invalid descriptors.
 
 > verification_method: Test
 
@@ -254,43 +248,45 @@ Verify a plugin returns one `{kind, schema, hooks}` descriptor and that role/hoo
 > traceability: [HLR-EXT-011](@)
 
 
-### VC: Verification Descriptor @VC-EXT-012
+### VC: Analyze Query Descriptor @VC-EXT-012
 
-Verify a analyze query is a `kind="verification"` descriptor forwarded to the host's ordered policy_key registry with override and disabled semantics.
+Verify that a `kind = "analyze"` descriptor enters the ordered policy registry.
 
 > objective: Confirm `{schema = {policy_key, view, sql, disabled}, hooks = {message}}` descriptors feed the ordered registry, that a later model overrides an earlier policy_key in place, and that `disabled=true` removes it.
 
 > verification_method: Test
 
 > approach:
-> - Register two verification descriptors with the same `policy_key` from different models; confirm later-wins, in place
-> - Register one with `disabled=true`; confirm it is removed
-> - Run the verify phase and confirm each active view emits its `message`
+> - Register two analyze descriptors with the same `policy_key`
+> - Register an analyze descriptor with `disabled = true`
+> - Run ANALYZE and inspect diagnostics from active queries
 
 > pass_criteria:
-> - Verification descriptors register through the same `as_descriptor` path as type modules
-> - policy_key override preserves ordering; disabled removes the entry
-> - The verify phase emits diagnostics via the descriptor's `message` hook
+> - Analyze descriptors use the same descriptor registration path as type modules
+> - A repeated policy key replaces its entry without changing its position
+> - A disabled descriptor removes its policy key
+> - ANALYZE uses the descriptor's `message` hook for diagnostics
 
 > traceability: [HLR-EXT-012](@)
 
 
 ### VC: Manifest-Only Configuration @VC-CFG-001
 
-Verify all build configuration comes from `project.yaml` read once into a frozen config slice, with env reads limited to toolchain bootstrap and terminal autodetect.
+Verify that build options come from the frozen project configuration.
 
-> objective: Confirm `config.lua` reads `project.yaml` once into a frozen slice and that the former config-leak env reads (`OUTPUT_FORMAT`, `BUILD_DIR`, `SPECCOMPILER_LOG_LEVEL`) are gone.
+> objective: Confirm environment variables do not replace project build options.
 
 > verification_method: Analysis
 
 > approach:
-> - Static review of `src/core/config.lua`: configuration is sourced from the manifest, not the environment
-> - Grep the codebase for `os.getenv`; confirm only `SPECCOMPILER_HOME`/`SPECCOMPILER_DIST` (bootstrap) and `TERM`/`CI`/`NO_COLOR`/`NUMBER_OF_PROCESSORS` (autodetect) remain
+> - Inspect project configuration loading
+> - Inspect environment-variable reads for toolchain paths and terminal detection
 > - Confirm the config slice threaded onto `ctx.config` is frozen
 
 > pass_criteria:
 > - No `os.getenv` read sources a build configuration value
-> - `project.yaml` is authoritative; the config slice is read once and frozen
-> - Toolchain/terminal env reads are the only survivors
+> - `project.yaml` is authoritative for build options
+> - The host freezes the context configuration
+> - Environment reads only locate tools or detect runtime conditions
 
 > traceability: [HLR-CFG-001](@)

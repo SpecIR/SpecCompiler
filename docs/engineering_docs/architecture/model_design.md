@@ -2,7 +2,7 @@
 
 ### FD: Type System and Domain Model Definition @FD-005
 
-> traceability: [SF-003](@), [CSC-018](@), [CSC-019](@), [CSC-021](@), [CSC-022](@), [CSC-023](@), [CSC-024](@)
+> traceability: [SF-003](@), [CSC-017](@), [CSC-018](@), [CSC-019](@), [CSC-021](@), [CSC-022](@), [CSC-023](@), [CSC-024](@), [CSU-081](@), [CSU-082](@)
 
 The type system and domain model definition function encompasses the default model
 components that provide base type definitions, format-specific processing, and style
@@ -12,9 +12,8 @@ capabilities that all domain models inherit and extend.
 
 **Model Directory Structure**: Each model provides a standard directory layout with
 `types/` (objects, floats, relations, views, specifications), `filters/`, `postprocessors/`,
-and `styles/` subdirectories. Each `.lua` file under `types/` returns ONE descriptor table
-`{ kind, schema, [hooks] }`; the host reads only that table and never sniffs
-which "magic key" exists. The default model (`models/default/`) establishes baseline
+and `styles/` subdirectories. Each `.lua` file under `types/` returns one descriptor table
+`{ kind, schema, [hooks] }`. The host reads the descriptor fields. The default model (`models/default/`) establishes baseline
 definitions for all five type categories.
 
 **Type Definitions**: [CSC-017](@) defines the foundational document object and specification types

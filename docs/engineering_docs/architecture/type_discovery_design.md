@@ -2,24 +2,15 @@
 
 ### FD: Type Model Discovery and Registration @FD-002
 
-> traceability: [SF-005](@)
+> traceability: [SF-005](@), [CSC-001](@), [CSU-008](@)
 
-**Allocation:** Realized by [CSC-001](@) (Core Runtime) through [CSU-008](@) (Type Loader). The foundational type definitions are provided by [CSC-017](@) (Default Model), which all domain models extend.
+The host loads model descriptors from the filesystem. It registers schema data, behavior hooks, phase hooks, and analyze queries.
 
-The type model discovery function loads model definitions from the filesystem and
-registers them with the [dic:pipeline](#) and data manager through ONE uniform
-descriptor contract. It enables domain-specific extensibility by allowing models to
-define custom specification types, object types, float types, relation types, view
-types, analyze queries, and pipeline handlers.
+**Model order:** The engine loads `default` before the selected model. It loads manifest dependencies before the model that requires them. A descriptor with the same kind and identifier replaces the earlier descriptor.
 
-**Model Overlay**: The host engine ([CSU-008](@)) loads the `default` model first, then
-each requested overlay model in turn, later-wins-by-id, so a model overrides only the
-type ids it redefines. Models are resolved repo-bundled under
-`SPECCOMPILER_HOME/models/{model}` (then cwd); there is no out-of-tree search path,
-registry, or package manager, and a requested model with no directory is a loud error.
+**Model paths:** The host searches `$SPECCOMPILER_HOME/models/{model}` first. It then searches `{cwd}/models/{model}`. A missing selected or required model stops the build.
 
-**Directory Scanning**: The loader scans `models/{model}/types/` for category directories
-matching the five type categories:
+**Type discovery:** The host scans five directories under `models/{model}/types/`.
 
 ```list-table:tbl-type-categories{caption="Type category directory mapping"}
 > header-rows: 1
@@ -28,7 +19,7 @@ matching the five type categories:
 * - Category
   - Directory
   - Descriptor `kind`
-  - Database Table
+  - Database table
 * - Specifications
   - `specifications/`
   - `specification`
@@ -51,158 +42,62 @@ matching the five type categories:
   - `spec_view_types`
 ```
 
-A typical model directory layout for the default model:
+The host loads Lua files in sorted order. A type can use one file or a directory with `init.lua`. The declared kind must match the directory category.
 
+**Descriptor contract:** Each module returns `{ kind, schema, hooks }`. The `hooks` field is optional. The host requires a known kind and a non-empty `schema.id`. It rejects invalid hooks and functions outside `hooks`.
+
+```lua
+return {
+    kind = "object",
+    schema = {
+        id = "HLR",
+        extends = "TRACEABLE",
+        attributes = {
+            { name = "status", type = "ENUM",
+              values = { "Draft", "Approved" } },
+        },
+    },
+    hooks = {
+        render = function(ctx)
+            return ctx.subject.element
+        end,
+    },
+}
 ```
-models/default/types/
-├── specifications/
-│   └── srs.lua        -- returns a specification descriptor
-├── objects/
-│   ├── hlr.lua        -- returns an object descriptor (hooks = {} -- pure data)
-│   └── section.lua    -- returns an object descriptor
-├── floats/
-│   ├── figure.lua     -- returns a float descriptor (transform data hook)
-│   └── plantuml.lua   -- returns a float descriptor (prepare_task/handle_result)
-├── relations/
-│   └── traces_to.lua  -- returns a relation descriptor
-└── views/
-    └── toc.lua        -- returns a view descriptor (render_block hook)
-```
 
-**Descriptor Loading**: Each `.lua` file returns ONE descriptor table
-`{ kind, schema, [hooks] }`. The host validates it -- `kind` is a known
-category, `schema.id` is present (and authoritative; the filename is irrelevant),
-each declared hook is valid for the kind, and no behaviour is smuggled onto a top-level
-key -- then emits the type row into the table for that `kind` and eager-indexes each hook
-into the `(kind, id) -> hook` map. A malformed descriptor (unknown kind, missing id,
-invalid-for-kind hook, internal-render-plus-external-hooks) is a loud register-time error;
-a missing required hook (e.g. a TABLE_VIEW subtype with no `build_block`) is caught at
-`host:finalize()`.
+**Registration:** The host writes schema data to the applicable SpecIR table. It registers declared attributes and records the `extends` relationship. It indexes each behavior hook by kind, identifier, and hook name.
 
-**Attribute Registration**: Object and float schemas may declare `attributes` describing
-their data schema. The host registers these with the data manager, creating datatype
-definitions and attribute constraints (name, type, min/max occurs, enum values, bounds) in
-the `spec_attribute_defs` and `spec_datatype_defs` tables; `extends` inherits a base type's
-attributes.
+**Hook inheritance:** `get_hook_inherited` searches the descriptor and then its ancestors. This lookup applies to all descriptor kinds that support `extends`.
 
-**Hooks (two tiers)**: A descriptor declares behaviour only under `hooks`, keyed by name,
-and each hook takes ONE frozen context as its sole argument. Per-call RENDER hooks
-(`render`, `render_block`, `render_link`, `message`) receive the render context during the
-EMIT walk (it carries pandoc/format and the Pandoc element as `subject`). DATA hooks
-(`dataset`, `build_block`, `transform`, `resolve`, `prepare_task`, `handle_result`) receive a
-data context during the TRANSFORM/RESOLVE/external-render phases. The hook NAME selects the
-tier and the return type, and the host validates the mapping. `on_<phase>` functions in `hooks`
-contributes an `on_<phase>` hook to the pipeline's order via [dic:prerequisites](#) and
-[dic:topological-sort](#); a handler with no `prerequisites` is defaulted to an empty list by
-`pipeline:register_handler`.
+**Phase hooks:** An `on_<phase>` hook creates a pipeline handler named `<lowercase schema.id>_handler`. The `schema.phase_prerequisites` field defines its ordering constraints. Phase hooks do not enter the behavior-hook index.
 
-**Base Types and Inheritance**: A type inherits hooks and attributes from the ancestor named
-in `schema.extends`. Every consumer resolves a hook with `get_hook_inherited`, which walks the
-`extends` chain, so a shared render lives ONCE on a base type (the object card on `TRACEABLE`,
-the spec title on `SPEC_TITLE`, the matrix `render_block` on `TABLE_VIEW`) and leaf types stay
-pure schema. A relation's `resolve` data hook IS the type's resolver: the host registers it
-through an adapter ([src/contract/registry.lua](../../../src/contract/registry.lua)) so the
-RESOLVE-phase relation analyzer dispatches resolution by type id; a concrete relation type
-inherits a base resolver via `extends`.
+**Analyze queries:** The host scans `models/{model}/analyze_queries/`. Each descriptor uses `kind = "analyze"`. Repeated policy keys use later-model precedence. A descriptor with `disabled = true` removes the policy key.
 
-**Custom Display Text**: A relation type that needs custom link text declares a `render_link`
-render hook -- `render_link(ctx) -> string|nil` reading `ctx.subject.target`. The
-`relation_link_rewriter` (TRANSFORM phase) resolves it via `get_hook_inherited`; returning
-`nil` falls through to the base type. The base types `LABEL_REF` and `PID_REF` ship defaults
-(title for `SECTION` targets, PID for other objects, `"<caption> <number>"` for floats) that
-concrete types inherit automatically.
+**Finalization:** After model loading, the host propagates inherited attributes. It creates analyze-query SQL views and checks required hooks. A `TABLE_VIEW` subtype without `build_block` stops the build.
 
-**Component Interaction**
-
-The type discovery function is realized by the host engine and the default model
-that provides foundational type definitions.
-
-[csc:core-runtime](#) (Core Runtime) provides [csu:type-loader](#) (the host engine), which
-drives the entire model discovery lifecycle — overlaying `default` then each model
-(later-wins-by-id), scanning category directories, loading each module's descriptor,
-validating it, registering the type with the data manager, indexing its hooks into the
-`(kind, id) -> hook` map, and at `finalize()` propagating inherited attributes, creating
-the verification SQL views, and asserting required hooks.
-
-[csc:default-model](#) (Default Model) provides the two foundational types that every domain model
-inherits. [csu:section-object-type](#) (SECTION Object Type) defines the implicit structural type for
-untitled content sections, enabling document structure representation without requiring
-explicit type declarations. [csu:spec-specification-type](#) (SPEC Specification Type) defines the base
-specification type with version, status, and date attributes that all domain-specific
-specification types extend.
-
-```puml:fd-002-type-discovery{caption="Type Model Discovery and Registration"}
+```plantuml:seq-type-loading{caption="Model descriptor loading"}
 @startuml
-skinparam backgroundColor #FFFFFF
-skinparam sequenceMessageAlign center
+actor Engine
+participant Host
+database SpecIR
+participant Pipeline
 
-participant "CSU Build Engine" as E
-participant "CSU Type Loader" as TL
-participant "Filesystem" as FS
-participant "CSU Data Manager" as DB
-participant "CSU Pipeline" as P
-
-E -> TL: load_model(data, pipeline, "default")
-activate TL
-
-TL -> TL: resolve_model_path()
-note right: Check SPECCOMPILER_HOME\nthen project root
-
-TL -> FS: scan models/{model}/types/
-FS --> TL: category directories
-
-loop for each category
-    TL -> FS: list *.lua files
-    FS --> TL: module paths
-
-    loop for each module
-        TL -> TL: require(module_path) -> descriptor
-        TL -> TL: validate {kind, schema.id, hooks}
-
-        alt kind == "relation"
-            TL -> DB: register_relation_type(schema)
-            TL -> DB: register_resolver(id, resolve adapter)
-        else kind == "float"
-            TL -> DB: register_float_type(schema)
-        else kind == "object"
-            TL -> DB: register_object_type(schema)
-            alt has implicit_aliases
-                TL -> DB: register_implicit_aliases()
-            end
-        else kind == "view"
-            TL -> DB: register_view_type(schema)
-        else kind == "specification"
-            TL -> DB: register_specification_type(schema)
-            alt has implicit_aliases
-                TL -> DB: register_implicit_spec_aliases()
-            end
-        end
-
-        TL -> TL: index hooks into (kind,id)->hook
-
-        alt has attributes
-            TL -> DB: register_attributes(schema.attributes)
-        end
-
-        alt hooks contain on_<phase>
-            TL -> P: register_handler(derived from on_<phase> hooks)
-        end
-    end
-end
-
-TL -> DB: propagate_inherited_attributes()
-note right: Copy parent attributes\nto child types (iterative)
-
-TL --> E: types and handlers registered
-deactivate TL
+Engine -> Host: load_model("default")
+Engine -> Host: load_model(template)
+Host -> Host: load required models
+Host -> Host: scan descriptors
+Host -> Host: validate descriptor
+Host -> SpecIR: register schema
+Host -> Host: index behavior hooks
+Host -> Pipeline: register phase hooks
+Engine -> Host: finalize()
+Host -> SpecIR: propagate attributes and create views
 @enduml
 ```
 
 #### LLR: Known Type Categories Are Scanned @LLR-EXT-020-01
 
-Type loading shall scan each known category directory
-(`objects`, `floats`, `views`, `relations`, `specifications`) and register
-discovered modules.
+The host shall scan the five known type-category directories in deterministic order.
 
 > verification_method: Test
 
@@ -210,30 +105,23 @@ discovered modules.
 
 #### LLR: Declared Hooks Are Indexed @LLR-EXT-021-01
 
-A descriptor's declared `hooks` shall be eager-indexed into the host's
-`(kind, id) -> hook` map; `on_<phase>` hooks shall be forwarded to
-`pipeline:register_handler`, propagating registration errors.
+The host shall index each valid behavior hook by kind, `schema.id`, and hook name.
 
 > verification_method: Test
 
 > traceability: [HLR-EXT-003](@)
 
-#### LLR: Handler attr_order Controls Attribute Display Sequence @LLR-EXT-021-02
+#### LLR: Attribute Display Order @LLR-EXT-021-02
 
-When a type handler is created with an `attr_order` array in its options,
-the handler shall render attributes in the specified sequence first; any remaining
-attributes not listed in `attr_order` shall be appended alphabetically. When `attr_order`
-is absent, all attributes shall render alphabetically.
+The standard object renderer shall render attributes listed in `schema.attr_order` first. It shall append other attributes in alphabetical order.
 
 > verification_method: Test
 
 > traceability: [HLR-EXT-003](@)
 
-#### LLR: Schemas Without Identifier Are Ignored @LLR-EXT-022-01
+#### LLR: Schema Identifier Validation @LLR-EXT-022-01
 
-Category registration helpers shall ignore schema tables that do
-not provide `id`; valid schemas shall receive category defaults and attribute
-enum values shall be registered.
+The host shall stop model loading when a descriptor has no non-empty `schema.id`. It shall apply category defaults to valid schemas and register enum values.
 
 > verification_method: Test
 
@@ -241,8 +129,7 @@ enum values shall be registered.
 
 #### LLR: Model Path Resolution Order @LLR-EXT-023-01
 
-Model path resolution shall check `SPECCOMPILER_HOME/models/{model}`
-before checking `{cwd}/models/{model}`.
+Model resolution shall check `SPECCOMPILER_HOME/models/{model}` before `{cwd}/models/{model}`.
 
 > verification_method: Test
 
@@ -250,66 +137,55 @@ before checking `{cwd}/models/{model}`.
 
 #### LLR: Missing Model Paths Fail Fast @LLR-EXT-023-02
 
-Model loading shall raise an error when the model cannot be
-located in either `SPECCOMPILER_HOME` or project-root `models/`.
+Model loading shall stop when neither model path contains the selected or required model.
 
 > verification_method: Test
 
 > traceability: [HLR-EXT-005](@)
 
-#### LLR: Data Views Resolve With Default Fallback @LLR-EXT-024-01
+#### LLR: Data View Resolution @LLR-EXT-024-01
 
-Chart data view loading shall resolve
-`models.{requested}.types.views.{view}` first and fallback to
-`models.default.types.views.{view}` when the requested model module is missing.
+Chart data loading shall use the inherited `dataset` hook for the requested view. Fixture modules outside the host index can use the loose-module loader.
 
 > verification_method: Test
 
 > traceability: [HLR-EXT-006](@)
 
-#### LLR: Sankey Views Inject Series Data And Clear Dataset @LLR-EXT-024-02
+#### LLR: Sankey Data Injection @LLR-EXT-024-02
 
-When a chart contains a `sankey` series and view output returns
-`data`/`links`, injection shall write to `series[1].data` and
-`series[1].links`, and clear `dataset` to prevent conflicts.
+For a Sankey series, chart injection shall copy returned `data` and `links` to the first series. It shall remove the conflicting dataset.
 
 > verification_method: Test
 
 > traceability: [HLR-EXT-006](@)
 
-#### LLR: Chart Injection Leaves Config Intact For No-View Or Unsupported View Data @LLR-EXT-024-03
+#### LLR: Unsupported View Data @LLR-EXT-024-03
 
-Chart data injection shall preserve input chart configuration when
-no `view` is provided or when view output does not match supported shapes
-(`source` or `data`+`links` for sankey).
+Chart injection shall preserve the chart configuration when no view is specified or the view returns an unsupported shape.
 
 > verification_method: Test
 
 > traceability: [HLR-EXT-006](@)
 
-#### LLR: Type Handler Render Registration @LLR-094
+#### LLR: Phase Hook Registration @LLR-094
 
-Given a [dic:type](#) module with `handler` export, [csu:type-loader](#) shall call
-`pipeline:register_handler(handler)` to activate render callbacks for that type.
+The host shall register descriptor `on_<phase>` hooks with the pipeline.
 
 > verification_method: Test
 
 > traceability: [HLR-EXT-001](@)
 
-#### LLR: Data View Generator Discovery @LLR-095
+#### LLR: Data View Discovery @LLR-095
 
-Given a [dic:model](#) name, [csu:type-loader](#) shall scan the
-`models/{model}/types/views/` directory and register discovered [dic:data-view](#)
-modules.
+The host shall register view descriptors from `models/{model}/types/views/`.
 
 > verification_method: Test
 
 > traceability: [HLR-EXT-007](@)
 
-#### LLR: Handler Module Caching @LLR-096
+#### LLR: Hook Index Lookup @LLR-096
 
-When a module path is requested, [csu:type-loader](#) shall return the cached module if
-previously loaded; on first load, it shall store the result in a per-path cache.
+The host shall return direct hooks from its index and inherited hooks from the `extends` chain. An absent hook shall return nil.
 
 > verification_method: Test
 
@@ -317,15 +193,8 @@ previously loaded; on first load, it shall store the result in a per-path cache.
 
 ---
 
-### DD: Lua-Based Type System with Inheritance @DD-CORE-006
+### DD: Lua Type System with Inheritance @DD-CORE-006
 
-Selected Lua modules with `extends` chains for type definitions.
+SpecCompiler shall use Lua descriptor modules for model types.
 
-> rationale: Lua modules as type definitions enable:
->
-> - Type definitions are executable code, supporting computed defaults and complex attribute constraints
-> - `extends` field enables single-inheritance (e.g., HLR extends TRACEABLE) with automatic attribute + hook propagation
-> - One descriptor table per file (`{kind, schema, hooks}`) co-locates the type definition with its declarative behaviour
-> - `require()` loading reuses Pandoc's built-in Lua module system without additional dependency
-> - Layered model loading (default first, then domain model) with ID-based override enables extension without forking the default model
-> - Alternative of YAML/JSON config rejected: no computed defaults, no handler co-location
+> rationale: Lua supports computed schema data and co-locates behavior with its type. The `extends` field supports attribute and hook inheritance. Ordered model loading supports replacement without changes to the default model.
