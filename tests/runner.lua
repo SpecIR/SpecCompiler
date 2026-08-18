@@ -532,8 +532,9 @@ local function run_test(suite_dir, input_file)
         end
     end
 
-    -- LibreOffice round-trip needs soffice + a UNO-capable Python on the host.
-    if suite_dir:match("/ooxml$") and test_name == "vc_029_05_libreoffice_roundtrip" then
+    -- Tests naming "libreoffice" drive soffice + a UNO-capable Python; both are
+    -- optional on the host, so skip rather than fail when they are missing.
+    if test_name:find("libreoffice", 1, true) then
         local libreoffice = require("infra.process.libreoffice")
         local soffice, reason = libreoffice.available()
         if not soffice then

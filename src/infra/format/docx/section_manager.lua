@@ -270,9 +270,15 @@ end
 -- Body sectPr Replacement
 -- ============================================================================
 
----Replace only the LAST <w:sectPr>...</w:sectPr> in the document.
+---Replace the body-level <w:sectPr> in the document.
 ---Iterates to find ALL sectPr positions and replaces only the final one,
 ---avoiding Lua's non-greedy `.-` matching issues across multiple sectPr elements.
+---
+---Both shapes Pandoc's reference.docx produces are recognised: a populated
+---`<w:sectPr>...</w:sectPr>` (3.6+) and a self-closing `<w:sectPr/>` (3.1.x,
+---the stock Ubuntu 24.04 package, whose reference carries no page setup).
+---A sectPr held in `<w:pPr>` is a paragraph-level section break, not the body
+---element, so it is never replaced — the caller appends a body sectPr instead.
 ---
 ---@param content string document.xml content
 ---@param new_sectpr string Replacement sectPr XML
@@ -280,14 +286,23 @@ end
 ---@return boolean True if replacement was made
 function M.replace_body_sectpr(content, new_sectpr)
     -- Find ALL <w:sectPr positions, keep the last one
-    local last_start = nil
+    local last_start, last_finish = nil, nil
     local s = 1
     while true do
-        local found = content:find("<w:sectPr[>%s]", s)
+        local found = content:find("<w:sectPr[>/%s]", s)
         if not found then
             break
         end
-        last_start = found
+
+        local _, finish = content:find("^<w:sectPr[^>]*/>", found)
+        if not finish then
+            _, finish = content:find("</w:sectPr>", found)
+        end
+        if not finish then
+            break
+        end
+
+        last_start, last_finish = found, finish
         s = found + 1
     end
 
@@ -295,14 +310,13 @@ function M.replace_body_sectpr(content, new_sectpr)
         return content, false
     end
 
-    -- Find matching </w:sectPr> after the last opening
-    local close_start, close_end = content:find("</w:sectPr>", last_start)
-    if not close_start then
+    -- A sectPr closed by </w:pPr> belongs to a paragraph's section break.
+    if content:find("^%s*</w:pPr>", last_finish + 1) then
         return content, false
     end
 
     -- Replace that span with new_sectpr
-    return content:sub(1, last_start - 1) .. new_sectpr .. content:sub(close_end + 1), true
+    return content:sub(1, last_start - 1) .. new_sectpr .. content:sub(last_finish + 1), true
 end
 
 -- ============================================================================
