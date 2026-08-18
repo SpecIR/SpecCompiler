@@ -20,6 +20,8 @@ return {
             { name = "status", type = "ENUM",
               values = { "Draft", "Review", "Approved",
                          "Implemented", "Deprecated", "Retired" } },
+            -- Universal traceability links: > traceability: [PID](@)
+            { name = "traceability", type = "XHTML" },
         }
     },
     -- The standard requirement-card render, inherited by every leaf type that

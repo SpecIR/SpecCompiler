@@ -8,5 +8,7 @@ project:
 output_format: json
 
 # Test case to VC mapping:
+# - vc_013_03_blockquote_disambiguation.md -> VC-SYNTAX-003 (declared-name rule;
+#     prose blockquotes preserved; spec-level metadata stays permissive)
 # - vc_syntax_001_parsing.md   -> VC-SYNTAX-001 (Specification and Object Parsing)
 # - vc_syntax_002_attributes.md -> VC-SYNTAX-002 (Attribute and Include Processing)

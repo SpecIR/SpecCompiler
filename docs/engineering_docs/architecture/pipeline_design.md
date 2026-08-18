@@ -329,9 +329,16 @@ default fallback.
 
 #### LLR: Blockquotes Register as Attributes @LLR-032
 
-Given Pandoc BlockQuote lines matching `> key: value`, [csu:attribute-parser](#) shall insert
-[dic:attribute](#) records in `spec_attribute_values` linked to the enclosing
-[dic:spec-object](#) via `owner_object_id`.
+Given a Pandoc BlockQuote whose first paragraph matches `> key: value` and
+whose key is a declared attribute of the enclosing object's type (own or
+inherited, case-insensitive), [csu:attribute-parser](#) shall insert exactly ONE
+[dic:attribute](#) record in `spec_attribute_values` linked to the enclosing
+[dic:spec-object](#) via `owner_object_id`, with every later line or paragraph
+of the same BlockQuote continuing that attribute's value. A BlockQuote with an
+undeclared key shall remain plain prose and raise an `unknown_attribute`
+warning; specification-level BlockQuotes (owner is the specification) are
+stored permissively, with an `unknown_spec_attribute` warning for keys not
+declared on the specification's type.
 
 > verification_method: Test
 

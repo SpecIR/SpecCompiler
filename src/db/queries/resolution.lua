@@ -222,12 +222,19 @@ M.enum_value_by_type_and_key = [[
 
 -- Get attribute definition with datatype for validation
 -- Joins to datatype_definitions for type info
+-- Case-insensitive on the attribute name; long_name is returned so callers
+-- can store the canonical declared spelling.
 M.attribute_definition = [[
-    SELECT ad.identifier, ad.datatype_ref, dd.type as datatype,
+    SELECT ad.identifier, ad.long_name, ad.datatype_ref, dd.type as datatype,
            ad.min_value, ad.max_value
     FROM spec_attribute_types ad
     JOIN datatype_definitions dd ON ad.datatype_ref = dd.identifier
-    WHERE ad.owner_type_ref = :owner_type AND ad.long_name = :name
+    WHERE ad.owner_type_ref = :owner_type AND lower(ad.long_name) = lower(:name)
+]]
+
+-- Get a specification's type for spec-level attribute declaration lookups
+M.spec_type_by_id = [[
+    SELECT type_ref FROM specifications WHERE identifier = :spec_id
 ]]
 
 -- Get spec_object by file_seq (header sequence number)

@@ -164,10 +164,12 @@ return function(actual_doc, helpers)
                 pandoc.Attr("", {}, {})
             ),
         },
+        -- priority/rationale/verification_method are UNDECLARED for these
+        -- objects' type (SECTION): their blockquotes stay prose above and
+        -- nothing about them reaches metadata. Only spec-level version/status
+        -- (permissive) appear.
         pandoc.Meta({
             title = pandoc.MetaInlines({pandoc.Str("System Requirements")}),
-            priority = pandoc.MetaInlines({pandoc.Str("High")}),
-            verification_method = pandoc.MetaInlines({pandoc.Str("Review")}),
             version = pandoc.MetaInlines(I("1.0")),
             status = pandoc.MetaInlines(I("Draft"))
         })

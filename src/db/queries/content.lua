@@ -259,25 +259,14 @@ M.select_views_needing_external_render = [[
 -- Spec Object Rendering
 -- ============================================================================
 
--- Get typed objects (non-composite) for render handler
+-- Get ALL typed objects for the render handler. Every object renders through
+-- one dispatch: a type's render hook when one exists anywhere on its extends
+-- chain, the default object render otherwise.
 M.select_typed_objects_by_spec = [[
     SELECT so.id, so.type_ref, so.specification_ref, so.ast,
            so.pid, so.title_text, so.level
     FROM spec_objects so
-    JOIN spec_object_types sot ON so.type_ref = sot.identifier
-    WHERE sot.is_composite = 0
-      AND so.specification_ref = :spec_id
-]]
-
--- Get composite objects with PIDs for heading ID patching
-M.select_composite_objects_by_spec = [[
-    SELECT so.id, so.pid, so.ast
-    FROM spec_objects so
-    JOIN spec_object_types sot ON so.type_ref = sot.identifier
-    WHERE sot.is_composite = 1
-      AND so.pid IS NOT NULL AND so.pid != ''
-      AND so.ast IS NOT NULL
-      AND so.specification_ref = :spec_id
+    WHERE so.specification_ref = :spec_id
 ]]
 
 -- ============================================================================

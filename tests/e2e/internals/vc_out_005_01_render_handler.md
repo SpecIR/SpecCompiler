@@ -3,13 +3,13 @@
 ## COVER: Cover @COVER-001
 
 > subtitle: A Comprehensive Analysis
->
+
 > author: Jane Smith
->
+
 > date: 2025-12-01
->
+
 > document_id: DOC-TEST-001
->
+
 > version: 2.0
 
 ## EXEC_SUMMARY: Executive Summary @EXECSUM-001

@@ -712,14 +712,16 @@ var SpecCompiler = SpecCompiler || {};
 	  function formatAttrValue(a) {
 	    if (!a) return '';
 
-	    // Prefer typed values, fall back to raw.
+	    // Prefer typed values, fall back to raw. ENUM values store only
+	    // enum_ref (an internal id like TRACEABLE_status_Approved); the
+	    // human-readable key is raw_value, so raw_value wins over enum_ref.
 	    if (a.string_value != null) return String(a.string_value);
 	    if (a.int_value != null) return String(a.int_value);
 	    if (a.real_value != null) return String(a.real_value);
 	    if (a.date_value != null) return String(a.date_value);
 	    if (a.bool_value != null) return a.bool_value ? 'true' : 'false';
-	    if (a.enum_ref != null) return String(a.enum_ref);
 	    if (a.raw_value != null) return String(a.raw_value);
+	    if (a.enum_ref != null) return String(a.enum_ref);
 	    return '';
 	  }
 

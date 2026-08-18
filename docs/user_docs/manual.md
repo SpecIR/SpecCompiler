@@ -40,9 +40,9 @@ SpecCompiler processes documents through a five-phase pipeline: INITIALIZE, RESO
 
 This manual covers:
 
-- Installation and verification of the SpecCompiler-Core Docker image (see [MANUAL-sec2](@)).
+- Installation and verification of the SpecCompiler-Core Docker image (see [MANUAL-sec3](@)).
 - Configuration of project files (`project.yaml`) as described in [section:project-configuration](#).
-- Authoring specification documents using CommonSpec syntax ([MANUAL-sec4](@)).
+- Authoring specification documents using CommonSpec syntax ([MANUAL-sec5](@)).
 - Invocation of the tool and interpretation of its outputs ([section:invocation](#)).
 - Verification diagnostics and policy-key reference.
 - Incremental build behavior and cache management.
@@ -392,9 +392,10 @@ Blockquotes declare attributes using the `key: value` pattern. They belong to th
 
 Rules:
 
-- Each attribute blockquote must be separated by a blank line.
-- The first line must match `key: value` (where `key` is `[A-Za-z0-9_]+`). If not, the blockquote is treated as prose. The key does not need to be a registered attribute type; unregistered keys default to `STRING` datatype.
-- Multi-line values are supported: continuation lines append to the preceding attribute.
+- One blockquote declares ONE attribute. Distinct attributes are separate blockquotes, separated by a blank line.
+- The first line must match `key: value` (where `key` is `[A-Za-z0-9_]+`) AND `key` must be a declared attribute of the enclosing object's type (its own schema or one inherited through `extends`; matching is case-insensitive). Otherwise the blockquote is plain prose — so quotes like `> Note: remember this` are safe. An undeclared `key:`-shaped blockquote raises an `unknown_attribute` warning to make typos visible.
+- Multi-line values are supported: every later `> ` line or `>`-separated paragraph of the same blockquote continues the value, even when it looks like `key: value` itself.
+- Specification-level metadata (blockquotes under the `#` title, e.g. `title`, `author`, `version`) is permissive: any key is stored, with an `unknown_spec_attribute` warning when the key is not declared for the specification's type.
 - Supported datatypes: `STRING`, `INTEGER`, `REAL`, `BOOLEAN`, `DATE` (YYYY-MM-DD), `ENUM`, `XHTML`.
 
 ### Floats
@@ -773,7 +774,7 @@ Every float and object defined above can be referenced from prose. The following
 
 The system architecture is depicted in [plantuml:diag-layers](#). Component details, including the technology stack for each layer, are listed in [list-table:tbl-components](#). Performance targets and actuals are compared in [csv:tbl-metrics](#) -- all four metrics pass their thresholds. The initialization logic is shown in [listing:lst-init](#), and the latency model driving performance requirements is defined by [math:eq-latency](#). Finally, throughput measurements by module are described by the chart config shown above, which renders as a chart under overlay models that provide the `chart:` float.
 
-The `@` selector resolves by PID and works across documents. For example, this sentence references the introduction of this manual: [MANUAL-sec1](@). Cross-document references to the companion guides also work; see [section:model-directory-layout](#) for the model directory layout and [section:style-presets](#) for DOCX style presets.
+The `@` selector resolves by PID and works across documents. For example, this sentence references the introduction of this manual: [MANUAL-sec2](@). Cross-document references to the companion guides also work; see [section:model-directory-layout](#) for the model directory layout and [section:style-presets](#) for DOCX style presets.
 
 ```list-table:tbl-xref-selectors{caption="Cross-reference selector comparison"}
 > header-rows: 1
@@ -803,7 +804,7 @@ For cross-document section references with the `#` selector, use the explicit sc
 
 This manual references its own sections using both selectors. Here are examples that resolve within this document:
 
-- By PID: [MANUAL-sec2](@) links to Installation, [MANUAL-sec4](@) links to Document Authoring.
+- By PID: [MANUAL-sec3](@) links to Installation, [MANUAL-sec5](@) links to Document Authoring.
 - By label: [section:pipeline-summary](#) links to Pipeline Summary, [section:troubleshooting](#) links to Troubleshooting.
 
 Cross-document references work identically. Because the companion guides are listed in the same `project.yaml`, these links resolve at build time:

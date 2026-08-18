@@ -45,53 +45,6 @@ local function decode_ast(ast_json)
     return nil
 end
 
----Adjust header levels for cross-file includes.
----@param blocks table Array of Pandoc blocks
----@param level_offset number Level adjustment (positive = deeper)
----@return table blocks Modified blocks
-local function adjust_header_levels(blocks, level_offset)
-    if level_offset == 0 or not blocks then
-        return blocks
-    end
-
-    for _, block in ipairs(blocks) do
-        if block.t == "Header" then
-            -- Pandoc supports Header levels deeper than Markdown's six ATX
-            -- source levels. Preserve those levels instead of collapsing all
-            -- deep descendants into level 6.
-            block.level = math.max(block.level + level_offset, 1)
-        end
-    end
-
-    return blocks
-end
-
----Normalize header levels based on actual hierarchy.
----Finds the minimum header level and shifts all headers so that
----the minimum becomes level 1. This ensures proper numbering when
----the document title is not a Header (e.g., rendered as Div).
----@param blocks table Array of Pandoc blocks
----@return table blocks Modified blocks with normalized levels
-local function normalize_header_levels(blocks)
-    if not blocks then return blocks end
-
-    -- Find minimum header level in the document
-    local min_level = nil
-    for _, block in ipairs(blocks) do
-        if block.t == "Header" and (not min_level or block.level < min_level) then
-            min_level = block.level
-        end
-    end
-
-    -- If min level > 1, normalize so top-level headers become H1
-    if min_level and min_level > 1 then
-        local offset = 1 - min_level  -- e.g., min=2 -> offset=-1
-        adjust_header_levels(blocks, offset)
-    end
-
-    return blocks
-end
-
 ---Query and assemble spec_objects into blocks.
 ---@param data DataManager
 ---@param spec_id string Specification identifier
@@ -225,12 +178,11 @@ function M.assemble_document(data, spec_id, log)
         end
     end
 
-    -- 1.8 Normalize header levels based on actual hierarchy
-    -- Since the document title is a Div (not Header), compute the minimum
-    -- header level and shift all headers so the top-level becomes H1.
-    -- This ensures proper numbering (Introduction = "1" not "0.1")
-    normalize_header_levels(blocks)
-    log.debug("Normalized header levels for proper numbering")
+    -- Header levels need no normalization pass here: every object renders its
+    -- heading at the constant -1 shift (object level 2 = Heading 1), so the
+    -- assembled blocks already carry final levels. The old guess-the-minimum
+    -- scan only ever saw non-hook-rendered headings and promoted included
+    -- subtrees to siblings of their containers.
 
     -- 2. Build metadata
     -- Note: Model filters can suppress title/author if needed (e.g., ABNT cover page)

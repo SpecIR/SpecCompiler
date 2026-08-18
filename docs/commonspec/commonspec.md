@@ -485,10 +485,12 @@ CommonSpec reuses standard Markdown syntax. The following rules determine when a
 
 **Blockquote as Attribute vs. plain blockquote.** A blockquote (`> ...`) is recognized as an attribute if and only if:
 
-1. It immediately follows a header (Specification or Spec Object) or another recognized attribute. Each attribute is a separate Markdown blockquote, so distinct attributes must be separated by a blank line.
-2. Its first line matches the pattern `AttrName ":" ...`, where AttrName is a declared attribute name for the enclosing object's type.
+1. Its first line matches the pattern `AttrName ":" ...`, where AttrName is a declared attribute name for the enclosing object's type (own or inherited through the type's `extends` chain; matching is case-insensitive).
+2. It belongs to the most recently opened Specification or Spec Object header (it need not appear immediately after it). Each attribute is a separate Markdown blockquote, so distinct attributes must be separated by a blank line; every later line or paragraph within the same blockquote — including lines that themselves look like `key: value` — continues the first attribute's value.
 
-If either condition fails, the blockquote is treated as plain body content. For example, `> Note: this is important` is a plain blockquote unless the model declares an attribute named "Note" for the enclosing object type.
+If the first condition fails, the blockquote is treated as plain body content. For example, `> Note: this is important` is a plain blockquote unless the model declares an attribute named "Note" for the enclosing object type; the compiler emits an `unknown_attribute` warning so mistyped attribute names are visible.
+
+*Specification-level exception.* Blockquotes belonging to the H1 header (document metadata such as `title`, `author`, `version`) are permissive: any `key: value` blockquote is stored as specification metadata, with an `unknown_spec_attribute` warning when the key is not declared for the specification's type.
 
 **Fenced code block as Float vs. plain code block.** A fenced code block is recognized as a spec float if and only if its info string matches the pattern `TypeRef ":" Label`, where TypeRef (or one of its aliases) is a declared float type. A code block with an info string like `` ```python `` (no colon and label) is treated as a plain code block.
 

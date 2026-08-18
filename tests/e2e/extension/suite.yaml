@@ -12,3 +12,5 @@ output_format: json
 # - vc_ext_021_handler_registration_interface.md -> VC-021 (Handler Registration Interface)
 # - vc_ext_022_type_definition_schema.md      -> VC-022 (Type Definition Schema)
 # - vc_ext_023_model_path_resolution.md       -> VC-023 (Model Path Resolution)
+# - vc_ext_013_01_pid_scheme_validation.md    -> VC-EXT-013 (pid_scheme registration contract)
+# - vc_ext_014_01_dangling_extends.md         -> VC-EXT-014 (extends target must exist at finalize)

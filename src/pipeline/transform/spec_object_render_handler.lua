@@ -15,6 +15,7 @@ local logger = require("infra.logger")
 local attribute_para = require("pipeline.shared.attribute_para_utils")
 local render_utils = require("pipeline.shared.render_utils")
 local ast_utils = require("pipeline.shared.ast_utils")
+local spec_object_base = require("pipeline.shared.spec_object_base")
 local Queries = require("db.queries")
 local registry = require("contract.registry")
 local hook_ctx = require("pipeline.shared.hook_ctx")
@@ -95,19 +96,37 @@ local function filter_headers(blocks)
     return filtered
 end
 
----Filter out attribute BlockQuotes from an array of blocks.
+---Was this blockquote extracted as an attribute of the current object?
+---Mirrors the INITIALIZE-phase disambiguation: a blockquote is stripped iff
+---its first paragraph's key matches a STORED attribute (case-insensitive).
+---Prose blockquotes -- including `key:`-shaped ones whose key is not a
+---declared attribute -- are never stripped.
+---@param blockquote table Pandoc BlockQuote block
+---@param attributes table Stored attribute map (lowercased names)
+---@return boolean
+local function is_extracted_attribute_blockquote(blockquote, attributes)
+    local paras = attribute_para.collect_paragraphs(blockquote)
+    if #paras == 0 then return false end
+    local name = attribute_para.get_field_name(paras[1])
+    return name ~= nil and attributes[name:lower()] ~= nil
+end
+
+---Filter out EXTRACTED attribute BlockQuotes from an array of blocks.
 ---Attributes are extracted during INITIALIZE phase and rendered by spec_object_base.
----The raw blockquotes should not appear in the rendered output.
+---The raw blockquotes should not appear in the rendered output; prose
+---blockquotes pass through untouched.
 ---@param blocks table Array of Pandoc blocks
----@return table filtered Blocks without attribute BlockQuotes
-local function filter_attribute_blockquotes(blocks)
+---@param attributes table Stored attribute map for the object (lowercased names)
+---@return table filtered Blocks without extracted attribute BlockQuotes
+local function filter_attribute_blockquotes(blocks, attributes)
     if not blocks then return {} end
+    attributes = attributes or {}
     local filtered = {}
     for _, block in ipairs(blocks) do
         local block_type = block.t or (block.tag) or ""
 
-        -- Check if block is a BlockQuote containing only attributes
-        if block_type == "BlockQuote" and attribute_para.is_attribute_blockquote(block) then
+        -- Check if block is a BlockQuote holding an extracted attribute
+        if block_type == "BlockQuote" and is_extracted_attribute_blockquote(block, attributes) then
             -- Skip this attribute blockquote
             logger.debug("Filtered attribute blockquote")
         elseif block_type == "Div" then
@@ -116,10 +135,10 @@ local function filter_attribute_blockquotes(blocks)
             if type(div_content[2]) == "table" then
                 div_content = div_content[2]
             end
-            -- If Div contains only an attribute blockquote, skip it
+            -- If Div contains only an extracted attribute blockquote, skip it
             local is_attr_div = false
             if #div_content == 1 and div_content[1].t == "BlockQuote" then
-                if attribute_para.is_attribute_blockquote(div_content[1]) then
+                if is_extracted_attribute_blockquote(div_content[1], attributes) then
                     is_attr_div = true
                 end
             end
@@ -178,57 +197,66 @@ local function filter_divs_with_class(blocks, class)
     return filtered
 end
 
----Patch heading IDs for composite objects (SECTION, EXEC_SUMMARY, etc.).
----Composite objects are excluded from full type-handler rendering because
----their AST contains nested children whose headers must not be stripped.
----This lightweight pass only updates the FIRST header's ID to the PID,
----ensuring cross-references like [MANUAL-sec14](@) resolve in HTML output.
----@param data DataManager
----@param spec_id string Specification identifier
----@param log table Logger adapter
-local function patch_composite_heading_ids(data, spec_id, log)
-    local composites = data:query_all(Queries.content.select_composite_objects_by_spec,
-        { spec_id = spec_id })
-
-    local patched = 0
-    for _, obj in ipairs(composites or {}) do
-        local decoded = decode_ast(obj.ast)
-        if decoded and #decoded > 0 then
-            -- Find the first Header in the top-level blocks
-            for _, block in ipairs(decoded) do
-                local block_type = block.t or (block.tag) or ""
-                if block_type == "Header" then
-                    -- Check if the header ID already matches the PID
-                    local current_id = ""
-                    if block.attr then
-                        current_id = block.attr.identifier or
-                                     (type(block.attr[1]) == "string" and block.attr[1]) or ""
-                    end
-                    if current_id ~= obj.pid then
-                        -- Update the header ID to the PID
-                        if block.attr and block.attr.identifier ~= nil then
-                            block.attr.identifier = obj.pid
-                        else
-                            -- Reconstruct attr preserving classes and kvpairs
-                            local classes = block.attr and block.attr[2] or {}
-                            local kvpairs = block.attr and block.attr[3] or {}
-                            block.attr = pandoc.Attr(obj.pid, classes, kvpairs)
-                        end
-                        local new_ast = encode_ast(decoded)
-                        data:execute(Queries.content.update_object_ast, {
-                            ast = new_ast, id = obj.id
-                        })
-                        patched = patched + 1
-                    end
-                    break  -- Only patch the first header
-                end
-            end
+---Default render for objects whose type declares no render hook anywhere on
+---its extends chain (SECTION containers, plain data types like SYMBOL): the
+---authored heading shifted to the constant -1 emit level with the PID as the
+---anchor, the body passed through unchanged, and the attribute card. This is
+---the path that guarantees attributes ALWAYS appear -- the raw `> key: value`
+---blockquotes were already filtered from body_blocks by the caller.
+---The heading keeps its authored inlines (formatting preserved); declarative
+---schema options are honored: unnumbered/numbered gate the "unnumbered"
+---class, skip_attributes suppresses the card, attr_order orders it.
+---@param obj table Object row (level, pid, title_text, type_ref)
+---@param unwrapped table Decoded blocks before header filtering
+---@param body_blocks table Filtered body blocks
+---@param attributes table Attribute map from get_object_attributes
+---@param type_schema table The type's schema (render options)
+---@return table blocks Rendered blocks
+local function default_render(obj, unwrapped, body_blocks, attributes, type_schema)
+    local header
+    for _, block in ipairs(unwrapped) do
+        local block_type = block.t or (block.tag) or ""
+        if block_type == "Header" then
+            header = block
+            break
         end
     end
 
-    if patched > 0 then
-        log.info("Patched heading IDs for %d composite object(s)", patched)
+    local level = math.max((obj.level or 2) - 1, 1)
+    if header then
+        header.level = level
+        -- Typed headings are authored as "TYPE: Title"; show the parsed title.
+        -- Untyped headings stringify to exactly title_text and keep their
+        -- authored inlines (preserving inline formatting).
+        local authored = pandoc.utils.stringify(header.content)
+        if obj.title_text and obj.title_text ~= "" and authored ~= obj.title_text then
+            header.content = { pandoc.Str(obj.title_text) }
+        end
+    else
+        header = pandoc.Header(level, { pandoc.Str(obj.title_text or obj.type_ref or "") })
     end
+    if obj.pid and obj.pid ~= "" then
+        header.attr.identifier = obj.pid
+    end
+    if (type_schema.unnumbered == true or type_schema.numbered == false)
+        and not header.attr.classes:includes("unnumbered") then
+        header.attr.classes:insert("unnumbered")
+    end
+
+    local blocks = { header }
+    for _, block in ipairs(body_blocks) do
+        table.insert(blocks, block)
+    end
+
+    if not type_schema.skip_attributes then
+        local attr_div = spec_object_base.render_attributes(
+            { attributes = attributes }, pandoc, type_schema.attr_order)
+        if attr_div then
+            table.insert(blocks, attr_div)
+        end
+    end
+
+    return blocks
 end
 
 ---TRANSFORM phase: Invoke type handlers to render spec objects.
@@ -283,61 +311,67 @@ function M.on_transform(data, contexts, diagnostics)
         for _, obj in ipairs(objects) do
             local render = host and host:get_hook_inherited("object", obj.type_ref, "render")
 
-            if render then
-                -- Build context for type handler
-                -- Filter out headers, attribute blockquotes, and existing spec-object-attributes divs
-                -- - Headers: type handlers create styled headers
-                -- - Attribute blockquotes: rendered as DefinitionList by spec_object_base
-                -- - Spec-object-attributes divs: prevent duplicate attribute rendering
-                local decoded_blocks = decode_ast(obj.ast) or {}
-                local unwrapped = unwrap_spec_object_divs(decoded_blocks)
-                -- Sequential filtering: remove elements that type handlers will recreate
-                local body_blocks = filter_headers(unwrapped)
-                body_blocks = filter_attribute_blockquotes(body_blocks)
-                body_blocks = filter_divs_with_class(body_blocks, "spec-object-attributes")
-                body_blocks = filter_divs_with_class(body_blocks, "spec-object-header")
+            -- Filter out headers, attribute blockquotes, and existing spec-object-attributes divs
+            -- - Headers: renders create their own heading
+            -- - Attribute blockquotes: rendered as DefinitionList by spec_object_base
+            -- - Spec-object-attributes divs: prevent duplicate attribute rendering
+            local desc = host and host:get_descriptor("object", obj.type_ref)
+            local type_schema = desc and desc.schema or {}
+            local attributes = get_object_attributes(data, obj.id)
 
+            local decoded_blocks = decode_ast(obj.ast) or {}
+            local unwrapped = unwrap_spec_object_divs(decoded_blocks)
+            -- Sequential filtering: remove elements that renders will recreate
+            local body_blocks = filter_headers(unwrapped)
+            body_blocks = filter_attribute_blockquotes(body_blocks, attributes)
+            body_blocks = filter_divs_with_class(body_blocks, "spec-object-attributes")
+            body_blocks = filter_divs_with_class(body_blocks, "spec-object-header")
+
+            local ok, result
+            if render then
                 -- The object render hook receives the canonical frozen ctx
                 -- (HLR-EXT-009): invariant core + the object subject. spec_id is
                 -- the object's own specification.
                 -- The rendering type's schema carries declarative render options
                 -- (attr_order, show_pid, ...) for the host card renderer.
-                local desc = host:get_descriptor("object", obj.type_ref)
                 local subject = {
                     object = obj,
-                    attributes = get_object_attributes(data, obj.id),
+                    attributes = attributes,
                     specification = spec_info_for(obj.specification_ref),
                     spec_attributes = spec_attributes_for(obj.specification_ref),
                     element = body_blocks,
                     header_level = obj.level or 2,
-                    type_schema = desc and desc.schema or {},
+                    type_schema = type_schema,
                 }
                 local render_ctx = hook_ctx.build(
                     ctx, data, diagnostics, subject, "render", obj.specification_ref)
 
                 -- Call the host-indexed object render hook
-                local ok, result = pcall(render, render_ctx)
+                ok, result = pcall(render, render_ctx)
+            else
+                -- No render hook anywhere on the extends chain: default render
+                -- (heading at the constant -1 shift + body + attribute card).
+                ok, result = pcall(default_render,
+                    obj, unwrapped, body_blocks, attributes, type_schema)
+            end
 
-                if ok and result and #result > 0 then
-                    -- Encode new blocks and update database
-                    local new_ast = encode_ast(result)
+            if ok and result and #result > 0 then
+                -- Encode new blocks and update database
+                local new_ast = encode_ast(result)
 
-                    data:execute(Queries.content.update_object_ast, {
-                        ast = new_ast,
-                        id = obj.id
-                    })
+                data:execute(Queries.content.update_object_ast, {
+                    ast = new_ast,
+                    id = obj.id
+                })
 
-                    rendered_count = rendered_count + 1
-                    log.debug("Rendered %s: %s", obj.type_ref, obj.pid or obj.title_text or tostring(obj.id))
-                elseif not ok then
-                    log.warn("Handler error for %s '%s': %s", obj.type_ref, obj.pid or obj.title_text or tostring(obj.id), tostring(result))
-                end
+                rendered_count = rendered_count + 1
+                log.debug("Rendered %s: %s", obj.type_ref, obj.pid or obj.title_text or tostring(obj.id))
+            elseif not ok then
+                log.warn("Handler error for %s '%s': %s", obj.type_ref, obj.pid or obj.title_text or tostring(obj.id), tostring(result))
             end
         end
 
-        log.info("Rendered %d spec objects with type handlers", rendered_count)
-
-        patch_composite_heading_ids(data, spec_id, log)
+        log.info("Rendered %d spec objects", rendered_count)
 
         ::continue::
     end

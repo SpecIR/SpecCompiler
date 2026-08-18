@@ -57,9 +57,10 @@ return function(actual_doc, helpers)
                 pandoc.Attr("", {}, {})
             ),
         },
+        -- status is UNDECLARED on SECTION: its blockquotes stay prose above
+        -- and never reach metadata
         pandoc.Meta({
             title = pandoc.MetaInlines({pandoc.Str("Webapp Generation Test")}),
-            status = pandoc.MetaInlines(I("Draft"))
         })
     )
 

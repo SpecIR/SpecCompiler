@@ -39,23 +39,6 @@ function M.clear_cache()
 end
 cache_registry.register(M.clear_cache)
 
----Pre-index attribute positions in blockquote blocks for O(n) processing.
----Returns array of {pos, field_name} for each attribute-defining Para.
----@param bq_blocks table Array of blocks from blockquote
----@return table attr_index Array of {pos=number, field_name=string}
-local function index_attribute_positions(bq_blocks)
-    local attr_index = {}
-    for i, blk in ipairs(bq_blocks) do
-        if blk.t == "Para" then
-            local field_name = attribute_para.get_field_name(blk)
-            if field_name then
-                attr_index[#attr_index + 1] = { pos = i, field_name = field_name }
-            end
-        end
-    end
-    return attr_index
-end
-
 ---Process a single attribute with its continuation blocks.
 ---@param bq_blocks table All blocks in the blockquote
 ---@param attr_pos number Position of the attribute Para
@@ -104,8 +87,9 @@ local function process_single_attribute(bq_blocks, attr_pos, field_name, next_at
     local content_key = spec_id .. tostring(current_owner.id or "") .. field_name .. raw_value
     local content_sha = hash_utils.sha1(content_key)
 
-    -- Look up datatype from definition (module-level attr_def key-value cache)
-    local attr_definition = attr_def:get(current_owner_type .. ":" .. field_name, data)
+    -- Look up datatype from definition (module-level attr_def key-value cache;
+    -- keys are lowered for case-insensitive declared-name matching)
+    local attr_definition = attr_def:get(current_owner_type .. ":" .. field_name:lower(), data)
     local datatype = attr_definition and attr_definition.datatype or DT.STRING
 
     -- Cast value to typed columns
@@ -151,34 +135,68 @@ local function process_single_attribute(bq_blocks, attr_pos, field_name, next_at
     }
 end
 
----Process all attributes in a blockquote using O(n) indexed approach.
+---Process a blockquote under the CommonSpec disambiguation rule.
+---One blockquote declares ONE attribute: only the FIRST paragraph may open
+---it (`key: value`); every later block -- including lines that look like
+---`key: value` -- continues that attribute's value. The key must be a
+---DECLARED attribute of the owner's type (own or inherited, case-insensitive);
+---an undeclared key means the blockquote is plain prose (warned). Spec-level
+---metadata (owner is the specification) stays permissive with a warning for
+---keys not declared on the specification's type.
 ---@param blockquote table Pandoc BlockQuote block
 ---@param spec_id string Specification ID
 ---@param current_owner table Owner object
----@param current_owner_type string Owner type
+---@param current_owner_type string Owner type (heading-prefix fallback)
 ---@param data DataManager Database manager
----@return table attrs Array of attribute records
-local function process_blockquote_indexed(blockquote, spec_id, current_owner, current_owner_type, data)
+---@param diagnostics Diagnostics|nil
+---@param source_file string|nil Source path for diagnostics
+---@return table attrs Array of attribute records (0 or 1 entries)
+local function process_blockquote_indexed(blockquote, spec_id, current_owner, current_owner_type, data, diagnostics, source_file)
     local bq_blocks = attribute_para.extract_blocks_from_blockquote(blockquote)
     local num_blocks = #bq_blocks
     if num_blocks == 0 then return {} end
 
-    -- Phase 1: Single pass to identify all attribute positions - O(n)
-    local attr_index = index_attribute_positions(bq_blocks)
-    if #attr_index == 0 then return {} end
+    local first = bq_blocks[1]
+    if not first or first.t ~= "Para" then return {} end
+    local field_name = attribute_para.get_field_name(first)
+    if not field_name then return {} end
 
-    -- Phase 2: Process each attribute with pre-computed boundaries - O(n) total
-    local attrs = {}
-    for idx, entry in ipairs(attr_index) do
-        local next_pos = attr_index[idx + 1] and attr_index[idx + 1].pos or (num_blocks + 1)
-        local attr = process_single_attribute(
-            bq_blocks, entry.pos, entry.field_name, next_pos,
-            spec_id, current_owner, current_owner_type, data
-        )
-        attrs[#attrs + 1] = attr
+    -- The stored object's resolved type (covers implicit-alias typing) beats
+    -- the heading-prefix guess; spec-level pseudo-owners use the spec's type.
+    local is_spec_level = current_owner.id == nil
+    local owner_type = current_owner.type_ref or current_owner_type
+    if is_spec_level then
+        local spec_row = data:query_one(Queries.resolution.spec_type_by_id, { spec_id = spec_id })
+        owner_type = (spec_row and spec_row.type_ref) or owner_type
     end
 
-    return attrs
+    local definition = attr_def:get(owner_type .. ":" .. field_name:lower(), data)
+
+    if not definition then
+        if is_spec_level then
+            if diagnostics then
+                diagnostics:warn(source_file, current_owner.start_line or 0, "unknown_spec_attribute",
+                    string.format("Spec-level attribute '%s' is not declared for specification type %s; stored as ad-hoc metadata",
+                        field_name, tostring(owner_type)))
+            end
+        else
+            if diagnostics then
+                diagnostics:warn(source_file, current_owner.start_line or 0, "unknown_attribute",
+                    string.format("Blockquote key '%s' is not a declared attribute of type %s (object '%s'); treated as prose",
+                        field_name, tostring(owner_type), current_owner.title_text or ""))
+            end
+            return {}
+        end
+    end
+
+    -- Store under the canonical declared spelling when available
+    local canonical_name = (definition and definition.long_name) or field_name
+
+    local attr = process_single_attribute(
+        bq_blocks, 1, canonical_name, num_blocks + 1,
+        spec_id, current_owner, owner_type, data
+    )
+    return { attr }
 end
 
 ---Find the spec_object that owns a given block position by file_seq.
@@ -212,13 +230,15 @@ end
 ---Uses O(n) indexed approach for attribute extraction.
 ---@param ctx Context Document context
 ---@param data DataManager Data manager (for owner lookup only)
+---@param diagnostics Diagnostics|nil For unknown-attribute warnings
 ---@return table attrs Array of attribute records
 ---@return number count Number of attributes extracted
-local function extract_attributes_from_context(ctx, data)
+local function extract_attributes_from_context(ctx, data, diagnostics)
     local doc = ctx.doc
     if not doc then return {}, 0 end
 
     local spec_id = ctx.spec_id or "default"
+    local source_file = ctx.source_path
     local blocks = doc.blocks or (doc.doc and doc.doc.blocks) or {}
     local default_type = default_object_type:get(data)
 
@@ -256,8 +276,7 @@ local function extract_attributes_from_context(ctx, data)
 
         elseif (inner_block.t == "BlockQuote" or block.t == "BlockQuote") and current_owner then
             local blockquote = inner_block.t == "BlockQuote" and inner_block or block
-            -- Use O(n) indexed processing
-            local bq_attrs = process_blockquote_indexed(blockquote, spec_id, current_owner, current_owner_type, data)
+            local bq_attrs = process_blockquote_indexed(blockquote, spec_id, current_owner, current_owner_type, data, diagnostics, source_file)
             for _, attr in ipairs(bq_attrs) do
                 attrs[#attrs + 1] = attr
             end
@@ -269,8 +288,7 @@ local function extract_attributes_from_context(ctx, data)
             end
             for _, inner in ipairs(div_content) do
                 if inner.t == "BlockQuote" then
-                    -- Use O(n) indexed processing
-                    local bq_attrs = process_blockquote_indexed(inner, spec_id, current_owner, current_owner_type, data)
+                    local bq_attrs = process_blockquote_indexed(inner, spec_id, current_owner, current_owner_type, data, diagnostics, source_file)
                     for _, attr in ipairs(bq_attrs) do
                         attrs[#attrs + 1] = attr
                     end
@@ -329,7 +347,7 @@ function M.on_initialize(data, contexts, diagnostics)
             local spec_id = ctx.spec_id or "default"
             table.insert(spec_ids, spec_id)
 
-            local attrs, count = extract_attributes_from_context(ctx, data)
+            local attrs, count = extract_attributes_from_context(ctx, data, diagnostics)
             for _, attr in ipairs(attrs) do
                 table.insert(all_attrs, attr)
             end

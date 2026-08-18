@@ -173,19 +173,37 @@ end
 
 local function insert_object(data, schema)
     local aliases_str = aliases_csv(schema.aliases)
-    -- The container/numbering FLAGS below are LEAF-LOCAL by design: unlike
+    -- PID policy: pid_scheme = "sequential" (default) | "hierarchical".
+    -- Hierarchical types get per-type dotted PIDs (prefix defaults to "sec");
+    -- the scheme is stored in the legacy is_composite column, and the legacy
+    -- boolean stays accepted as a deprecated alias for "hierarchical".
+    local scheme = schema.pid_scheme
+    if scheme ~= nil and scheme ~= "sequential" and scheme ~= "hierarchical" then
+        error(("host:register(object/%s): invalid pid_scheme '%s' "
+            .. '(expected "sequential" or "hierarchical")')
+            :format(schema.id, tostring(scheme)), 0)
+    end
+    if scheme ~= nil and schema.is_composite ~= nil
+        and (scheme == "hierarchical") ~= (schema.is_composite and true or false) then
+        error(("host:register(object/%s): pid_scheme '%s' conflicts with legacy "
+            .. "is_composite=%s -- declare only pid_scheme")
+            :format(schema.id, scheme, tostring(schema.is_composite)), 0)
+    end
+    local hierarchical = scheme == "hierarchical"
+        or (scheme == nil and (schema.is_composite and true or false))
+    -- The PID/numbering FLAGS below are LEAF-LOCAL by design: unlike
     -- attributes (which propagate_inherited_attributes walks down the extends
-    -- chain), is_composite/is_default/numbered/pid_prefix/pid_format are read
+    -- chain), pid_scheme/is_default/numbered/pid_prefix/pid_format are read
     -- only from the type's OWN schema and are NOT inherited from a base type. A
     -- subtype routinely needs different container semantics than its base -- e.g.
-    -- TRACEABLE extends SECTION (is_composite=true) but is a leaf, so HLR/VC must
-    -- stay is_composite=false. Declare these on the concrete type that needs them.
+    -- TRACEABLE extends SECTION (hierarchical) but is a leaf, so HLR/VC must
+    -- stay sequential. Declare these on the concrete type that needs them.
     data:execute(Queries.types.insert_object_type, {
         identifier = schema.id,
         long_name = schema.long_name or schema.id,
         description = schema.description or "",
         extends = schema.extends,
-        is_composite = schema.is_composite and 1 or 0,
+        is_composite = hierarchical and 1 or 0,
         is_required = schema.is_required and 1 or 0,
         is_default = schema.is_default and 1 or 0,
         pid_prefix = schema.pid_prefix,
@@ -839,11 +857,28 @@ function Host:_assert_required_hooks()
     end
 end
 
+---Assert that every captured `extends` names a registered type of the same
+---kind. A dangling parent used to be a silent no-op: attribute inheritance
+---matched nothing and the hook chain just stopped. Checked at finalize so
+---cross-model chains (parent in an earlier-loaded model) resolve.
+function Host:_assert_extends_targets()
+    for kind, map in pairs(self._extends) do
+        local registered = self._descriptors[kind] or {}
+        for id, parent in pairs(map) do
+            if parent and not registered[parent] then
+                error(("host:finalize: %s '%s' extends '%s', but no %s type "
+                    .. "with that id is registered"):format(kind, id, parent, kind), 2)
+            end
+        end
+    end
+end
+
 ---Finalize the host once all models are loaded: propagate inherited attributes
 ---through the extends chain, create the verification SQL views, and assert that
 ---every kind's required hooks are present.
 ---@return table host
 function Host:finalize()
+    self:_assert_extends_targets()
     propagate_inherited_attributes(self.data)
     self:create_analyze_queries(self.data)
     self:_assert_required_hooks()

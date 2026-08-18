@@ -32,18 +32,28 @@ M.spec_pid_by_id = [[
     SELECT pid FROM specifications WHERE identifier = :spec_id
 ]]
 
--- Check if a type uses hierarchical PID generation (composite types)
-M.type_is_composite = [[
-    SELECT is_composite FROM spec_object_types WHERE identifier = :type_ref
+-- Get a type's PID generation settings (scheme + prefix + format).
+-- is_composite = 1 means the hierarchical scheme (pid_scheme storage).
+M.type_pid_settings = [[
+    SELECT is_composite, pid_prefix, pid_format FROM spec_object_types
+    WHERE identifier = :type_ref
 ]]
 
--- Get composite-type objects ordered by file_seq for hierarchical numbering
-M.composites_by_spec = [[
+-- Get one hierarchical type's objects ordered by file_seq for numbering.
+-- Each hierarchical type keeps its own counter chain.
+M.hierarchical_objects_by_spec_type = [[
     SELECT o.id, o.pid, o.level, o.title_text, o.from_file, o.start_line
     FROM spec_objects o
-    JOIN spec_object_types t ON o.type_ref = t.identifier
-    WHERE o.specification_ref = :spec_id AND t.is_composite = 1
+    WHERE o.specification_ref = :spec_id AND o.type_ref = :type_ref
     ORDER BY o.file_seq
+]]
+
+-- Collision probe: does any object in this spec already carry this PID
+-- (explicit or generated earlier in the run)?
+M.object_pid_exists = [[
+    SELECT 1 FROM spec_objects
+    WHERE specification_ref = :spec_id AND pid = :pid
+    LIMIT 1
 ]]
 
 -- Update object with auto-generated PID
@@ -61,12 +71,6 @@ M.update_object_pid = [[
 M.distinct_types_by_spec = [[
     SELECT DISTINCT type_ref FROM spec_objects
     WHERE specification_ref = :spec_id
-]]
-
--- Get type's PID generation settings (prefix and format)
-M.type_pid_info = [[
-    SELECT pid_prefix, pid_format FROM spec_object_types
-    WHERE identifier = :type_ref
 ]]
 
 -- Get max PID sequence for a type within a specification

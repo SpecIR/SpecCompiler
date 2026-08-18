@@ -36,6 +36,19 @@
 #                                                   roots at `##`/`###` normalize;
 #                                                   relative gaps remain invalid;
 #                                                   levels 7+ remain distinct
+#   vc_out_012_01_section_attribute_card -> VC-OUT-012  hook-less objects (SECTION)
+#                                                   get the default render: heading
+#                                                   at -1 with PID anchor, attribute
+#                                                   card, no raw blockquote leakage
+#   vc_out_012_02_include_composite_child -> VC-OUT-012  included composite stays a
+#                                                   child of the including object:
+#                                                   heading depth and PID depth anchor
+#                                                   to level 2 = depth 1, not to the
+#                                                   observed composite minimum
+#   vc_out_012_03_hierarchical_pid_per_type -> VC-OUT-012  hierarchical PIDs respect
+#                                                   the type's pid_prefix, keep one
+#                                                   counter chain per type, and bump
+#                                                   past explicit-PID collisions
 
 project:
   code: TEST_ASSEMBLY

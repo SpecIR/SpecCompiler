@@ -8,26 +8,14 @@ return function(actual_doc, helpers)
     local errors = {}
     local function err(msg) table.insert(errors, msg) end
 
-    -- Find all Link elements in the document
+    -- Find all Link elements in the document (attribute values now render
+    -- inside spec-object-attributes DefinitionList cards, so use a full walk)
     local links = {}
-    local function walk_inlines(inlines)
-        for _, inl in ipairs(inlines or {}) do
-            if inl.t == "Link" then
-                table.insert(links, inl)
-            end
-        end
-    end
-
-    local function walk_blocks(blocks)
-        for _, block in ipairs(blocks or {}) do
-            if block.t == "Para" or block.t == "Plain" then
-                walk_inlines(block.content)
-            elseif block.t == "BlockQuote" or block.t == "Div" then
-                walk_blocks(block.content)
-            end
-        end
-    end
-    walk_blocks(actual_doc.blocks)
+    actual_doc:walk{
+        Link = function(link)
+            table.insert(links, link)
+        end,
+    }
 
     -- Should have at least 2 traceability links
     if #links < 2 then

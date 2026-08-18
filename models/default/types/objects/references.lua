@@ -11,7 +11,8 @@ return {
         id = "REFERENCES",
         long_name = "References",
         description = "Bibliography / references section",
-        is_composite = true,
+        pid_scheme = "hierarchical",
+        pid_prefix = "ref",  -- own chain: MAN-ref1, not a slot in the sec chain
         numbered = false,
         implicit_aliases = { "references", "bibliography", "works cited" },
         unnumbered = true,

@@ -1,5 +1,8 @@
 -- Test oracle for VC-INT-026: Attribute Paragraph Parsing
--- Verifies blockquote attributes are correctly parsed.
+-- The fixture's keys (simple_key, multi_word, numeric_key) are NOT declared
+-- for the enclosing type (SECTION), so under the declared-names rule these
+-- blockquotes are PROSE: preserved in the output, never extracted, never
+-- rendered as attribute cards.
 
 return function(actual_doc, helpers)
     helpers.strip_tracking_spans(actual_doc)
@@ -8,39 +11,36 @@ return function(actual_doc, helpers)
     local errors = {}
     local function err(msg) table.insert(errors, msg) end
 
-    -- Find all BlockQuote elements
-    local blockquotes = {}
-    local function walk(blocks)
-        for _, block in ipairs(blocks or {}) do
-            if block.t == "BlockQuote" then
-                table.insert(blockquotes, block)
-            elseif block.t == "Div" then
-                walk(block.content)
+    local blockquotes, cards = {}, 0
+    actual_doc:walk{
+        BlockQuote = function(b)
+            table.insert(blockquotes, pandoc.utils.stringify(b.content))
+        end,
+        Div = function(d)
+            if d.attr.classes:includes("spec-object-attributes") then
+                cards = cards + 1
             end
+        end,
+    }
+
+    -- All three undeclared-key blockquotes survive as prose
+    if #blockquotes ~= 3 then
+        err(string.format("Expected 3 surviving prose blockquotes, got %d", #blockquotes))
+    end
+    local all = table.concat(blockquotes, "\n")
+    for _, needle in ipairs({
+        "simple_key: Simple string value",
+        "multi_word: A longer value with multiple words",
+        "numeric_key: 42",
+    }) do
+        if not all:find(needle, 1, true) then
+            err("Missing surviving prose blockquote: " .. needle)
         end
     end
-    walk(actual_doc.blocks)
 
-    -- Should have at least 3 attribute blockquotes
-    if #blockquotes < 3 then
-        err(string.format("Expected at least 3 BlockQuotes, got %d", #blockquotes))
-    end
-
-    -- Check each blockquote has attribute pattern (key: value)
-    local attr_keys = {}
-    for _, bq in ipairs(blockquotes) do
-        local text = pandoc.utils.stringify(bq)
-        local key = text:match("^([%w_]+):")
-        if key then
-            attr_keys[key] = true
-        end
-    end
-
-    local expected_keys = { "simple_key", "multi_word", "numeric_key" }
-    for _, key in ipairs(expected_keys) do
-        if not attr_keys[key] then
-            err(string.format("Missing attribute key: '%s'", key))
-        end
+    -- No attribute card is rendered for undeclared keys
+    if cards ~= 0 then
+        err(string.format("Expected 0 attribute cards, got %d", cards))
     end
 
     if #errors > 0 then

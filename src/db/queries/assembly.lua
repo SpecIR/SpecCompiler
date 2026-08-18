@@ -36,11 +36,15 @@ M.select_objects_by_spec = [[
 -- ============================================================================
 
 -- Get all attribute values for a specification (for document metadata)
+-- Spec-level attributes only: object/float-owned attributes belong to their
+-- owner's attribute card and must not leak into document metadata.
 M.select_attributes_by_spec = [[
     SELECT name, raw_value, datatype,
            COALESCE(string_value, int_value, real_value, bool_value, date_value) AS typed_value
     FROM spec_attribute_values
     WHERE specification_ref = :spec_id
+      AND owner_object_id IS NULL
+      AND owner_float_id IS NULL
 ]]
 
 return M

@@ -22,7 +22,10 @@ return function(actual_doc, helpers)
         return pandoc.utils.stringify(val)
     end
 
-    -- 1. Verify document structure
+    -- 1. Verify document structure. The section-owned keys in this fixture
+    -- (count/enabled/ratio/created/...) are NOT declared for SECTION, so
+    -- under the declared-names rule their blockquotes stay PROSE in the
+    -- output; spec-level metadata blockquotes are consumed permissively.
     local expected_blocks = 21
     if #actual_doc.blocks ~= expected_blocks then
         err(string.format("Block count: expected %d, got %d", expected_blocks, #actual_doc.blocks))
@@ -79,19 +82,14 @@ return function(actual_doc, helpers)
         err(string.format("Header count: expected %d, got %d", #expected_headers, header_idx - 1))
     end
 
-    -- 5. Verify section-level metadata was extracted
-    -- The Type Casting (FIX) section has separate attributes
-    local section_meta = {
-        count = "100",
-        enabled = "false",
-        ratio = "0.75",
-        created = "2024-12-01",
-    }
-
-    for key, expected_val in pairs(section_meta) do
+    -- 5. Verify section-owned attributes do NOT leak into document metadata
+    -- (they belong to their object and render in its attribute card; only
+    -- spec-level attributes become metadata)
+    local object_owned = { "count", "enabled", "ratio", "created" }
+    for _, key in ipairs(object_owned) do
         local actual_val = meta_str(key)
-        if actual_val ~= expected_val then
-            err(string.format("Section meta '%s': expected '%s', got '%s'", key, expected_val, actual_val or "nil"))
+        if actual_val ~= nil then
+            err(string.format("Object attribute '%s' leaked into metadata: '%s'", key, actual_val))
         end
     end
 

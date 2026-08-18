@@ -10,12 +10,14 @@ return {
         long_name = "Section",
         description = "Standard document section",
         is_default = true,  -- Default type for headers without explicit TYPE: prefix
-        is_composite = true,  -- Container type for hierarchical PID generation
+        pid_scheme = "hierarchical",  -- Container type: dotted PIDs (sec1.2.3)
         numbered = true,
         style_id = "SECTION",
         attributes = {
             -- Sections have optional description (rich text)
             { name = "description", type = "XHTML" },
+            -- Universal traceability links: > traceability: [PID](@)
+            { name = "traceability", type = "XHTML" },
         },
     },
 }

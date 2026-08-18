@@ -342,6 +342,7 @@ Usage:
 ## HLR: User Authentication @HLR-001
 
 > priority: High
+
 > rationale: Required by security policy section 4.2
 
 The system shall authenticate users via username and password.
@@ -491,7 +492,7 @@ sequence diagram content here
 ```
 ````
 
-An internally rendered float can declare a `transform` data hook. The hook reads `ctx.subject.raw_content` and `ctx.subject.float`. It returns a resolved-AST string. See [External renderers](#external-renderers) for process-based rendering.
+An internally rendered float can declare a `transform` data hook. The hook reads `ctx.subject.raw_content` and `ctx.subject.float`. It returns a resolved-AST string. See [section:external-renderers](#) for process-based rendering.
 
 ### Specification type
 
@@ -657,7 +658,7 @@ The following tables define common schema fields. Some model hooks also read add
 * - `needs_external_render`
   - boolean
   - false
-  - See [External renderers](#external-renderers).
+  - See [section:external-renderers](#).
 ```
 
 ### Relation schema
@@ -745,7 +746,7 @@ When multiple relation types match a link, the resolver scores each candidate. A
 * - `needs_external_render`
   - boolean
   - false
-  - See [External renderers](#external-renderers).
+  - See [section:external-renderers](#).
 ```
 
 ## Extension checklist

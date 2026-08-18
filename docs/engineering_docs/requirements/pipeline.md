@@ -117,7 +117,7 @@ The system shall parse [dic:commonspec](#) documents during the [dic:initialize-
 >
 > 1. **H1 headers** register as [dic:specification](#) records with optional `TYPE:` prefix and `@PID` suffix
 > 2. **H2-H6 headers** register as [dic:spec-object](#) records with type inference (explicit `TYPE:` prefix, implicit alias lookup, or default type fallback)
-> 3. **Blockquote lines** (`> key: value`) register as [dic:attribute](#) records attached to the enclosing spec object
+> 3. **Blockquotes** whose first paragraph matches `key: value` AND whose key is a declared [dic:attribute](#) of the enclosing object's type (own or inherited, case-insensitive) register as attribute records attached to that object — one blockquote per attribute, with every later line or paragraph of the same blockquote continuing the value. A `key:`-shaped blockquote with an undeclared key stays plain prose and raises an `unknown_attribute` warning. Blockquotes under the H1 (specification level) are permissive: any key is stored, with an `unknown_spec_attribute` warning when the key is not declared for the specification's type
 > 4. **Fenced code blocks** with `TypeRef:Label` class register as [dic:spec-float](#) records
 > 5. **Markdown links** with `(@)` or `(#)` targets register as [dic:spec-relation](#) records
 > 6. **Inline code** with `TypeRef: content` syntax registers as [dic:spec-view](#) records

@@ -11,7 +11,8 @@ return {
         id = "EXEC_SUMMARY",
         long_name = "Executive Summary",
         description = "Executive summary section",
-        is_composite = true,
+        pid_scheme = "hierarchical",
+        pid_prefix = "exec",  -- own chain: MAN-exec1, not a slot in the sec chain
         numbered = false,
         implicit_aliases = { "executive summary", "exec summary" },
         unnumbered = true,

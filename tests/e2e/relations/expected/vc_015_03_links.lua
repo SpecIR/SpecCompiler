@@ -35,22 +35,15 @@ return function(actual_doc, helpers)
         err(string.format("Expected %d headers, got %d", #expected_ids, #found_ids))
     end
 
-    -- 3. Check for Link elements (traceability links should be converted)
+    -- 3. Check for Link elements (traceability links should be converted).
+    -- Attribute values now render inside spec-object-attributes DefinitionList
+    -- cards, so use a full walk.
     local link_count = 0
-    local function count_links(blocks)
-        for _, block in ipairs(blocks) do
-            if block.t == "Div" or block.t == "BlockQuote" then
-                count_links(block.content or {})
-            elseif block.t == "Para" or block.t == "Plain" then
-                for _, inline in ipairs(block.content or {}) do
-                    if inline.t == "Link" then
-                        link_count = link_count + 1
-                    end
-                end
-            end
-        end
-    end
-    count_links(actual_doc.blocks)
+    actual_doc:walk{
+        Link = function()
+            link_count = link_count + 1
+        end,
+    }
 
     if link_count < 5 then
         err(string.format("Expected at least 5 traceability links, got %d", link_count))
