@@ -4,9 +4,6 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="description" content="Purpose: Marks positions in the assembled Pandoc document where floats and views will be substituted during the TERM-23 phase.
-Mechanism: During assembly, CSU-034 inserts CodeBlock elements at the correct file_seq positions. Downstream handlers (CSU-035 for floats, CSU-036 for views) match these placeholders by label and replace them with rendered content.
-Lifecycle: Created during assembly, consumed during float/view emission, never present in final output." />
   <title>srs_html5</title>
   <style>
 html {
@@ -215,7 +212,7 @@ of parsing is to <em>lower</em> Markdown annotations into a set of typed
 content tables that the <a href="#TERM-15" data-pos="5:242-5:259">&lt;Pipeline&gt;</a> can analyze, transform,
 verify, and emit. The entries below define each of these six content
 tables as a formal tuple specifying the Markdown syntax that produces
-it.</p>
+it..</p>
 </div>
 <div class="spec-object">
 <section id="SpecIR-01" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
@@ -806,8 +803,16 @@ inference (explicit <code data-pos="119:95-119:102">TYPE:</code> prefix,
 implicit alias lookup, or default type fallback)
 </div></li>
 <li><div data-pos="120:3-121:1">
-<strong>Blockquote lines</strong> (<code data-pos="120:28-120:42">&gt; key: value</code>) register as <a href="#SpecIR-04" data-pos="120:56-120:74">&lt;Attribute&gt;</a> records
-attached to the enclosing spec object
+<strong>Blockquotes</strong> whose first paragraph matches <code data-pos="120:52-120:64">key: value</code> AND whose key is a declared
+<a href="#SpecIR-04" data-pos="120:93-120:111">&lt;Attribute&gt;</a> of
+the enclosing object’s type (own or inherited, case-insensitive)
+register as attribute records attached to that object — one blockquote
+per attribute, with every later line or paragraph of the same blockquote
+continuing the value. A <code data-pos="120:348-120:354">key:</code>-shaped blockquote with an
+undeclared key stays plain prose and raises an <code data-pos="120:428-120:447">unknown_attribute</code> warning. Blockquotes
+under the H1 (specification level) are permissive: any key is stored,
+with an <code data-pos="120:547-120:571">unknown_spec_attribute</code>
+warning when the key is not declared for the specification’s type
 </div></li>
 <li><div data-pos="121:3-122:1">
 <strong>Fenced code blocks</strong> with <code data-pos="121:34-121:49">TypeRef:Label</code> class register as <a href="#SpecIR-03" data-pos="121:68-121:87">&lt;Spec Float&gt;</a>
