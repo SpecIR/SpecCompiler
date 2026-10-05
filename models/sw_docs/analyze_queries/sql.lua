@@ -175,11 +175,9 @@ WHERE hlr.type_ref = 'HLR'
     SELECT 1
     FROM spec_relations r_belongs
     JOIN spec_objects sf ON sf.id = r_belongs.target_object_id
-      AND sf.type_ref = 'SF'
     JOIN spec_relations r_realizes ON r_realizes.target_object_id = sf.id
       AND r_realizes.type_ref = 'REALIZES'
     JOIN spec_objects fd ON fd.id = r_realizes.source_object_id
-      AND fd.type_ref = 'FD'
     JOIN spec_relations r_fd_csc ON r_fd_csc.source_object_id = fd.id
     JOIN spec_objects csc ON csc.id = r_fd_csc.target_object_id
       AND csc.type_ref = 'CSC'

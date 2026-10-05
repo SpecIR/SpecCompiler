@@ -73,8 +73,7 @@ SELECT
 FROM spec_floats sf
 JOIN spec_float_types ft ON ft.identifier = sf.type_ref
 WHERE ft.needs_external_render = 1
-  AND sf.resolved_ast IS NULL
-  AND sf.raw_content IS NOT NULL;
+  AND sf.resolved_ast IS NULL;
 ]]
 
 -- ============================================================================
@@ -143,9 +142,7 @@ FROM spec_attribute_values av
 JOIN spec_objects so ON av.owner_object_id = so.id
 LEFT JOIN spec_attribute_types sat
   ON sat.owner_type_ref = so.type_ref AND sat.long_name = av.name
-WHERE av.raw_value IS NOT NULL
-  AND av.datatype NOT IN ('XHTML')
-  AND (
+WHERE (
     (av.datatype = 'STRING'  AND av.string_value IS NULL) OR
     (av.datatype = 'INTEGER' AND av.int_value IS NULL) OR
     (av.datatype = 'REAL'    AND av.real_value IS NULL) OR
@@ -168,8 +165,6 @@ FROM spec_attribute_values av
 JOIN specifications s ON av.specification_ref = s.identifier
 WHERE av.owner_object_id IS NULL
   AND av.owner_float_id IS NULL
-  AND av.raw_value IS NOT NULL
-  AND av.datatype NOT IN ('XHTML')
   AND (
     (av.datatype = 'STRING'  AND av.string_value IS NULL) OR
     (av.datatype = 'INTEGER' AND av.int_value IS NULL) OR
@@ -211,7 +206,6 @@ SELECT
 FROM spec_attribute_values av
 JOIN spec_objects so ON av.owner_object_id = so.id
 WHERE av.datatype = 'DATE'
-  AND av.date_value IS NOT NULL
   AND av.date_value NOT GLOB '[0-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9]';
 ]]
 
@@ -361,7 +355,7 @@ SELECT
   r.target_text,
   r.from_file,
   COALESCE(so.title_text, '(unknown source)') AS source_title,
-  CASE WHEN r.link_line > 0 THEN r.link_line ELSE COALESCE(so.start_line, 0) END AS start_line
+  COALESCE(NULLIF(r.link_line, 0), so.start_line, 0) AS start_line
 FROM spec_relations r
 LEFT JOIN spec_objects so ON r.source_object_id = so.id
 WHERE r.is_ambiguous = 1;
@@ -375,7 +369,7 @@ SELECT
   r.target_text,
   r.from_file,
   COALESCE(so.title_text, '(unknown source)') AS source_title,
-  CASE WHEN r.link_line > 0 THEN r.link_line ELSE COALESCE(so.start_line, 0) END AS start_line
+  COALESCE(NULLIF(r.link_line, 0), so.start_line, 0) AS start_line
 FROM spec_relations r
 LEFT JOIN spec_objects so ON r.source_object_id = so.id
 WHERE r.target_text IS NOT NULL

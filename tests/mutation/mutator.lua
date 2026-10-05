@@ -30,7 +30,8 @@ local config = {
     mode = "sql",
     target = nil,         -- Lua mutation target file
     verbose = false,
-    report_dir = "tests/reports/mutation",
+    report_dir = os.getenv("MUTATION_REPORT_DIR") or "tests/reports/mutation",
+    equivalents_file = "tests/mutation/sql_equivalents.lua",
     timeout = 30,         -- seconds per mutant (wall clock estimate)
 }
 
@@ -154,6 +155,14 @@ local function build_test_project(suite_dir, test_file)
     -- Clean stale output to defeat incremental cache (each mutant must reprocess)
     os.remove(build_dir .. "/" .. test_name .. ".json")
 
+    -- Clean cached external renders. A failed render can leave an output file
+    -- behind (PlantUML draws its error), and the render handler treats an
+    -- existing output as a cache hit, so a run after the first would resolve a
+    -- float that the first run reported as failed. Every run must be cold.
+    if not os.getenv("MUTATION_KEEP_RENDER_CACHE") then
+        os.execute("rm -rf " .. build_dir .. "/diagrams")
+    end
+
     -- Clean stale DB files
     os.remove(db_file)
     os.remove(db_file .. "-wal")
@@ -185,9 +194,9 @@ local function shallow_clone(t)
     return copy
 end
 
----Collect the set of policy_key codes from diagnostics.
+---Collect the set of policy_key codes from diagnostics (used by Lua mode).
 ---@param diag table|nil Diagnostics object
----@return table Set of policy_key codes {code=true}
+---@return table Set of policy_key codes {code=count}
 local function collect_diagnostic_codes(diag)
     local codes = {}
     if not diag then return codes end
@@ -200,8 +209,87 @@ local function collect_diagnostic_codes(diag)
     return codes
 end
 
+---Collect a diagnostic signature for the SQL oracle.
+---`codes` is the per-policy_key count (reporting); `locs` is the multiset of
+---(policy_key, file, line) triples that the oracle compares; `failed` marks
+---policy_keys whose analyze query itself failed to execute (invalid SQL).
+---@param diag table|nil Diagnostics object
+---@return table signature {codes={}, locs={}, failed={}}
+local function collect_diagnostic_signature(diag)
+    local sig = { codes = {}, locs = {}, failed = {} }
+    if not diag then return sig end
+    local function add(e)
+        if not e.code then return end
+        sig.codes[e.code] = (sig.codes[e.code] or 0) + 1
+        local key = e.code .. "|" .. tostring(e.file) .. "|" .. tostring(e.line)
+        sig.locs[key] = (sig.locs[key] or 0) + 1
+        if e.message and e.message:find("Validation query failed", 1, true) then
+            sig.failed[e.code] = true
+        end
+    end
+    for _, e in ipairs(diag.errors or {}) do add(e) end
+    for _, w in ipairs(diag.warnings or {}) do add(w) end
+    return sig
+end
+
+---Diff two location multisets, ignoring codes flagged as unstable.
+---@return table[] diffs Array of {key, base, mutant}
+local function diff_locs(base, mut, unstable)
+    local diffs = {}
+    local function code_of(key) return key:match("^([^|]*)") end
+    for key, count in pairs(base) do
+        if not unstable[code_of(key)] and (mut[key] or 0) ~= count then
+            table.insert(diffs, { key = key, base = count, mutant = mut[key] or 0 })
+        end
+    end
+    for key, count in pairs(mut) do
+        if not unstable[code_of(key)] and base[key] == nil then
+            table.insert(diffs, { key = key, base = 0, mutant = count })
+        end
+    end
+    table.sort(diffs, function(a, b) return a.key < b.key end)
+    return diffs
+end
+
+---Load the annotated equivalent-mutant catalogue (tests/mutation/sql_equivalents.lua).
+---Each entry is {view=, operator=, desc=, reason=}; a surviving mutant matching
+---(view, operator, desc) is reported as "equivalent" and removed from the score
+---denominator. The catalogue never affects killed mutants.
+---@return table index keyed by view.."\0"..operator.."\0"..desc
+local function load_equivalents()
+    local path = speccompiler_home .. "/" .. config.equivalents_file
+    if not file_exists(path) then return {} end
+    local ok, list = pcall(dofile, path)
+    if not ok or type(list) ~= "table" then
+        print("  WARNING: could not load " .. path .. ": " .. tostring(list))
+        return {}
+    end
+    local index = {}
+    for _, e in ipairs(list) do
+        -- Entries may carry `position` (byte offset of the mutation site) to
+        -- distinguish same-description mutants, e.g. one per UNION branch.
+        local key = e.view .. "\0" .. e.operator .. "\0" .. e.desc
+        if e.position then key = key .. "\0" .. tostring(e.position) end
+        index[key] = e
+    end
+    return index
+end
+
+---Find the equivalence entry for a mutant: position-specific first, then generic.
+local function find_equivalent(index, view, mutation)
+    local key = view .. "\0" .. mutation.operator .. "\0" .. mutation.desc
+    return index[key .. "\0" .. tostring(mutation.position)] or index[key]
+end
+
+local function sorted_keys(t)
+    local keys = {}
+    for k in pairs(t) do table.insert(keys, k) end
+    table.sort(keys)
+    return keys
+end
+
 ---Run all SQL verification view mutations.
----@return table report {total, killed, survived, skipped, views={...}}
+---@return table report
 local function run_sql_mutations()
     print("\nSQL Verification View Mutations")
     print(string.rep("=", 60))
@@ -234,8 +322,6 @@ local function run_sql_mutations()
     os.execute("rm -rf " .. verify_suite .. "/build/mutation")
     os.execute("rm -rf " .. casting_neg_suite .. "/build/mutation")
 
-    -- Build baseline: run each verify test once to get expected diagnostic codes
-    local baseline_codes = {}  -- test_file → {code = count}
     local test_files = {}
 
     local function discover_md_files(dir)
@@ -261,52 +347,131 @@ local function run_sql_mutations()
         end
     end
 
-    print(string.format("\n  Establishing baseline (%d test files)...", #test_files))
+    -- Baseline: run every fixture twice and keep the second signature. The first
+    -- pass warms caches that persist across runs inside build/mutation (external
+    -- renders, for instance), so that the baseline is taken under the same
+    -- conditions as every mutant run. Any policy_key whose count differs between
+    -- the two passes is unstable and is excluded from the oracle.
+    print(string.format("\n  Establishing baseline (%d test files, 2 passes)...", #test_files))
+    local baseline = {}        -- test_file -> signature
+    local first_pass = {}      -- test_file -> signature (pass 1)
+    local unstable_codes = {}  -- test_file -> { code -> true }
+    local unstable_detail = {} -- test_file -> { code = {pass1=n, pass2=n} }
+    for pass = 1, 2 do
+        for _, tf in ipairs(test_files) do
+            local project_info = build_test_project(tf.suite, tf.file)
+            local ok, diag_or_err = pcall(function()
+                return engine.run_project(project_info)
+            end)
+            local sig = collect_diagnostic_signature(ok and diag_or_err or nil)
+            if pass == 1 then first_pass[tf.file] = sig else baseline[tf.file] = sig end
+        end
+    end
     for _, tf in ipairs(test_files) do
-        local project_info = build_test_project(tf.suite, tf.file)
-        local ok, diag_or_err = pcall(function()
-            return engine.run_project(project_info)
-        end)
-        if ok and diag_or_err then
-            baseline_codes[tf.file] = collect_diagnostic_codes(diag_or_err)
-        else
-            baseline_codes[tf.file] = {}
+        local c1, c2 = first_pass[tf.file].codes, baseline[tf.file].codes
+        for code in pairs(c1) do
+            if c1[code] ~= c2[code] then
+                unstable_codes[tf.file] = unstable_codes[tf.file] or {}
+                unstable_codes[tf.file][code] = true
+                unstable_detail[tf.file] = unstable_detail[tf.file] or {}
+                unstable_detail[tf.file][code] = { pass1 = c1[code], pass2 = c2[code] or 0 }
+            end
+        end
+        for code in pairs(c2) do
+            if c1[code] == nil then
+                unstable_codes[tf.file] = unstable_codes[tf.file] or {}
+                unstable_codes[tf.file][code] = true
+                unstable_detail[tf.file] = unstable_detail[tf.file] or {}
+                unstable_detail[tf.file][code] = { pass1 = 0, pass2 = c2[code] }
+            end
+        end
+    end
+    for _, f in ipairs(sorted_keys(unstable_detail)) do
+        for _, code in ipairs(sorted_keys(unstable_detail[f])) do
+            local d = unstable_detail[f][code]
+            print(string.format("  ! unstable baseline %s: %s pass1=%d pass2=%d (excluded from oracle)",
+                f, code, d.pass1, d.pass2))
         end
     end
 
-    -- Now run mutations
+    local equivalents = load_equivalents()
+
     local report = {
-        total = 0,
+        total = 0,        -- unique, valid mutants (denominator before equivalents)
         killed = 0,
-        survived = 0,
-        skipped = 0,
+        survived = 0,     -- unclassified survivors
+        equivalent = 0,   -- survivors listed in sql_equivalents.lua
+        stillborn = 0,    -- mutants whose SQL does not execute (excluded from total)
+        duplicates = 0,   -- identical SQL generated by two operators (excluded)
+        score = 0,        -- killed / (total - equivalent)
+        kill_reasons = { crash = 0, diagnostics = 0 },
+        equivalent_by_category = {},   -- category -> count (from sql_equivalents.lua)
+        dead_views = {},               -- views with no kill and no survivor: every mutant equivalent
+        unstable_codes = unstable_codes,
+        unstable_detail = unstable_detail,
+        baseline = {},
+        test_files = {},
+        per_operator = {},
+        per_view = {},
         views = {},
+        survivors = {},
+        equivalents = {},
+        stillborns = {},
+        duplicate_list = {},
+        kills = {},
     }
+    for _, tf in ipairs(test_files) do
+        table.insert(report.test_files, tf.file)
+        report.baseline[tf.file] = baseline[tf.file].codes
+    end
+
+    local function bump(tbl, key, field)
+        tbl[key] = tbl[key] or { total = 0, killed = 0, survived = 0, equivalent = 0, stillborn = 0 }
+        tbl[key][field] = tbl[key][field] + 1
+    end
 
     for _, msm in ipairs(model_sql_modules) do
         if not msm.sql_module then goto next_model end
 
         local orig_sql_module = msm.sql_module
-
+        local view_names = {}
         for view_name, view_sql in pairs(orig_sql_module) do
-            if type(view_sql) ~= "string" then goto next_view end
+            if type(view_sql) == "string" then table.insert(view_names, view_name) end
+        end
+        table.sort(view_names)
 
-            local mutations = sql_operators.generate_mutations(view_name, view_sql)
-            if #mutations == 0 then goto next_view end
+        for _, view_name in ipairs(view_names) do
+            local view_sql = orig_sql_module[view_name]
+            local generated = sql_operators.generate_mutations(view_name, view_sql)
+            if #generated == 0 then goto next_view end
+
+            -- Drop duplicates: two operators can produce the same mutant text
+            -- (e.g. "> N" -> ">= N" from flip_comparison and change_aggregate).
+            local mutations, seen_sql = {}, {}
+            for _, m in ipairs(generated) do
+                if seen_sql[m.sql] then
+                    report.duplicates = report.duplicates + 1
+                    table.insert(report.duplicate_list, {
+                        view = view_name, operator = m.operator, desc = m.desc, same_as = seen_sql[m.sql]
+                    })
+                else
+                    seen_sql[m.sql] = m.operator .. ": " .. m.desc
+                    table.insert(mutations, m)
+                end
+            end
 
             local view_report = {
                 mutations = #mutations,
                 killed = 0,
                 survived = 0,
-                skipped = 0,
+                equivalent = 0,
+                stillborn = 0,
                 survivors = {},
             }
 
             print(string.format("\n  %s (%d mutations)", view_name, #mutations))
 
             for _, mutation in ipairs(mutations) do
-                report.total = report.total + 1
-
                 -- 1. Create mutated SQL module clone
                 local mutated_sql = shallow_clone(orig_sql_module)
                 mutated_sql[view_name] = mutation.sql
@@ -317,8 +482,9 @@ local function run_sql_mutations()
                 clear_analyze_query_modules(msm.model)
                 package.loaded[msm.require_path] = mutated_sql
 
-                -- 3. Run each test file and compare diagnostics to baseline
-                local mutant_killed = false
+                -- 3. Run each test file and compare diagnostics to baseline.
+                -- Stops at the first fixture that distinguishes the mutant.
+                local status, killed_by, reason, diffs, err = "survived", nil, nil, nil, nil
                 for _, tf in ipairs(test_files) do
                     local project_info = build_test_project(tf.suite, tf.file)
                     local ok, diag_or_err = pcall(function()
@@ -326,32 +492,29 @@ local function run_sql_mutations()
                     end)
 
                     if not ok then
-                        -- Pipeline crash = mutant killed (crash is detectable)
-                        mutant_killed = true
+                        err = tostring(diag_or_err)
+                        if err:find("Failed to execute SQL", 1, true) then
+                            -- The mutant is not a valid view definition: it cannot
+                            -- be exercised by the oracle and is excluded from the score.
+                            status = "stillborn"
+                        else
+                            status, reason = "killed", "crash"
+                        end
+                        killed_by = tf.file
                         break
                     end
 
-                    local mutant_codes = collect_diagnostic_codes(diag_or_err)
-                    local baseline = baseline_codes[tf.file] or {}
-
-                    -- Compare: if diagnostic codes differ, mutant is killed
-                    -- Check baseline codes missing in mutant
-                    for code, count in pairs(baseline) do
-                        if not mutant_codes[code] or mutant_codes[code] ~= count then
-                            mutant_killed = true
-                            break
-                        end
+                    local sig = collect_diagnostic_signature(diag_or_err)
+                    if next(sig.failed) then
+                        status, killed_by = "stillborn", tf.file
+                        err = "analyze query failed at execution"
+                        break
                     end
-                    if mutant_killed then break end
-
-                    -- Check mutant codes not in baseline
-                    for code, count in pairs(mutant_codes) do
-                        if not baseline[code] or baseline[code] ~= count then
-                            mutant_killed = true
-                            break
-                        end
+                    local d = diff_locs(baseline[tf.file].locs, sig.locs, unstable_codes[tf.file] or {})
+                    if #d > 0 then
+                        status, reason, killed_by, diffs = "killed", "diagnostics", tf.file, d
+                        break
                     end
-                    if mutant_killed then break end
                 end
 
                 -- 4. Restore original (clear first, then set — same order as inject)
@@ -359,29 +522,91 @@ local function run_sql_mutations()
                 package.loaded[msm.require_path] = orig_sql_module
 
                 -- 5. Record result
-                if mutant_killed then
+                local record = {
+                    model = msm.model,
+                    view = view_name,
+                    operator = mutation.operator,
+                    desc = mutation.desc,
+                    position = mutation.position,
+                }
+                if status == "stillborn" then
+                    report.stillborn = report.stillborn + 1
+                    view_report.stillborn = view_report.stillborn + 1
+                    bump(report.per_operator, mutation.operator, "stillborn")
+                    record.error = err
+                    table.insert(report.stillborns, record)
+                    print(string.format("    - stillborn %s: %s (%s)", mutation.operator, mutation.desc,
+                        tostring(err):sub(1, 80)))
+                    goto next_mutation
+                end
+
+                report.total = report.total + 1
+                bump(report.per_operator, mutation.operator, "total")
+
+                if status == "killed" then
                     report.killed = report.killed + 1
                     view_report.killed = view_report.killed + 1
+                    bump(report.per_operator, mutation.operator, "killed")
+                    report.kill_reasons[reason] = (report.kill_reasons[reason] or 0) + 1
+                    record.killed_by = killed_by
+                    record.reason = reason
+                    record.diffs = diffs
+                    record.error = err
+                    table.insert(report.kills, record)
                     if config.verbose then
-                        print(string.format("    ✓ killed    %s: %s", mutation.operator, mutation.desc))
+                        print(string.format("    ✓ killed[%s]  %s: %s  <- %s", reason,
+                            mutation.operator, mutation.desc, killed_by))
                     end
                 else
-                    report.survived = report.survived + 1
-                    view_report.survived = view_report.survived + 1
-                    print(string.format("    ✗ SURVIVED  %s: %s", mutation.operator, mutation.desc))
-                    table.insert(view_report.survivors, {
-                        operator = mutation.operator,
-                        desc = mutation.desc,
-                        position = mutation.position,
-                    })
+                    local eq = find_equivalent(equivalents, view_name, mutation)
+                    record.sql = mutation.sql
+                    if eq then
+                        report.equivalent = report.equivalent + 1
+                        view_report.equivalent = view_report.equivalent + 1
+                        bump(report.per_operator, mutation.operator, "equivalent")
+                        local cat = eq.category or "unclassified"
+                        report.equivalent_by_category[cat] = (report.equivalent_by_category[cat] or 0) + 1
+                        local po = report.per_operator[mutation.operator]
+                        po.equivalent_by_category = po.equivalent_by_category or {}
+                        po.equivalent_by_category[cat] = (po.equivalent_by_category[cat] or 0) + 1
+                        record.reason = eq.reason
+                        record.category = eq.category
+                        table.insert(report.equivalents, record)
+                        print(string.format("    = equivalent %s: %s", mutation.operator, mutation.desc))
+                    else
+                        report.survived = report.survived + 1
+                        view_report.survived = view_report.survived + 1
+                        bump(report.per_operator, mutation.operator, "survived")
+                        table.insert(report.survivors, record)
+                        table.insert(view_report.survivors, {
+                            operator = mutation.operator,
+                            desc = mutation.desc,
+                            position = mutation.position,
+                        })
+                        print(string.format("    ✗ SURVIVED  %s: %s", mutation.operator, mutation.desc))
+                    end
                 end
+                ::next_mutation::
             end
 
-            local score = view_report.mutations > 0
-                and (view_report.killed / view_report.mutations * 100) or 0
-            print(string.format("  Score: %d/%d killed (%.1f%%)",
-                view_report.killed, view_report.mutations, score))
+            local denom = view_report.mutations - view_report.equivalent - view_report.stillborn
+            local score = denom > 0 and (view_report.killed / denom * 100) or 0
+            print(string.format("  Score: %d/%d killed (%.1f%%)%s%s",
+                view_report.killed, denom, score,
+                view_report.equivalent > 0 and string.format(", %d equivalent", view_report.equivalent) or "",
+                view_report.stillborn > 0 and string.format(", %d stillborn", view_report.stillborn) or ""))
             report.views[view_name] = view_report
+            report.per_view[view_name] = {
+                total = view_report.mutations - view_report.stillborn,
+                killed = view_report.killed,
+                survived = view_report.survived,
+                equivalent = view_report.equivalent,
+                stillborn = view_report.stillborn,
+            }
+            if view_report.killed == 0 and view_report.survived == 0 and view_report.equivalent > 0 then
+                table.insert(report.dead_views, view_name)
+                print("  ! every mutant of this view is equivalent: the query is unreachable with the shipped models")
+            end
 
             ::next_view::
         end
@@ -390,12 +615,44 @@ local function run_sql_mutations()
     end
 
     -- Summary
+    local denom = report.total - report.equivalent
+    report.score = denom > 0 and (report.killed / denom * 100) or 0
     print(string.rep("=", 60))
-    local total_score = report.total > 0
-        and (report.killed / report.total * 100) or 0
-    print(string.format("TOTAL SQL: %d/%d killed (%.1f%%), %d survived, %d skipped",
-        report.killed, report.total, total_score,
-        report.survived, report.skipped))
+    print(string.format("%-18s %6s %6s %6s %6s %7s", "operator", "total", "killed", "surv", "equiv", "score"))
+    for _, op in ipairs(sorted_keys(report.per_operator)) do
+        local s = report.per_operator[op]
+        local d = s.total - s.equivalent
+        print(string.format("%-18s %6d %6d %6d %6d %6.1f%%", op, s.total, s.killed, s.survived, s.equivalent,
+            d > 0 and (s.killed / d * 100) or 0))
+    end
+    print(string.format("TOTAL SQL: %d/%d killed (%.1f%%), %d survived, %d equivalent, %d stillborn, %d duplicates",
+        report.killed, denom, report.score, report.survived, report.equivalent,
+        report.stillborn, report.duplicates))
+    print(string.format("  kill signals: diagnostics=%d, crash=%d",
+        report.kill_reasons.diagnostics or 0, report.kill_reasons.crash or 0))
+    if report.equivalent > 0 then
+        local parts = {}
+        for _, cat in ipairs(sorted_keys(report.equivalent_by_category)) do
+            table.insert(parts, string.format("%s=%d", cat, report.equivalent_by_category[cat]))
+        end
+        print("  equivalents by category: " .. table.concat(parts, ", "))
+        local by_view = {}
+        for _, e in ipairs(report.equivalents) do
+            by_view[e.view] = by_view[e.view] or {}
+            table.insert(by_view[e.view], string.format("%s: %s [%s]", e.operator, e.desc:sub(1, 50), e.category or "?"))
+        end
+        for _, v in ipairs(sorted_keys(by_view)) do
+            print("    " .. v)
+            for _, line in ipairs(by_view[v]) do print("      = " .. line) end
+        end
+    end
+    if #report.dead_views > 0 then
+        print("  unreachable queries (all mutants equivalent): " .. table.concat(report.dead_views, ", "))
+    end
+    if report.survived > 0 then
+        print(string.format("  %d unclassified survivor(s): add a fixture that distinguishes them, or an entry to %s",
+            report.survived, config.equivalents_file))
+    end
 
     return report
 end
@@ -723,8 +980,11 @@ function Meta(meta)
     print(string.format("\n%s", string.rep("=", 60)))
     print("MUTATION TESTING COMPLETE")
     if sql_report then
-        local s = sql_report.total > 0 and (sql_report.killed / sql_report.total * 100) or 0
-        print(string.format("  SQL:  %d/%d killed (%.1f%%)", sql_report.killed, sql_report.total, s))
+        local denom = sql_report.total - (sql_report.equivalent or 0)
+        local s = denom > 0 and (sql_report.killed / denom * 100) or 0
+        print(string.format("  SQL:  %d/%d killed (%.1f%%), %d survived, %d equivalent, %d stillborn, %d duplicates",
+            sql_report.killed, denom, s, sql_report.survived, sql_report.equivalent or 0,
+            sql_report.stillborn or 0, sql_report.duplicates or 0))
     end
     if lua_report then
         local s = lua_report.total > 0 and (lua_report.killed / lua_report.total * 100) or 0

@@ -241,24 +241,39 @@ table.insert(M.operators, {
     end
 })
 
---- 6. Drop WHERE predicate: remove one AND-connected predicate at a time
+--- 6. Drop WHERE predicate: remove one AND-connected predicate at a time.
+--- A predicate starts at an indented "AND ..." line. When that line opens a
+--- parenthesised group (e.g. "AND NOT EXISTS (" or "AND ("), the whole group up
+--- to the matching close paren is removed, so every mutant stays valid SQL.
 table.insert(M.operators, {
     name = "drop_predicate",
-    description = "Remove one AND predicate from WHERE",
+    description = "Remove one AND predicate from WHERE (paren-balanced)",
     apply = function(sql)
         local mutations = {}
-        -- Find AND-delimited predicates in WHERE clauses and remove one at a time
-        -- Match "  AND <predicate>" blocks (indented, multi-line aware)
         local search_start = 1
         while true do
-            -- Match a full AND-prefixed predicate line
             local s, e = sql:find("\n%s+AND [^\n]+", search_start)
             if not s then break end
-            local removed_text = sql:sub(s, e):match("^%s*(.-)%s*$")
-            local mutated = sql:sub(1, s - 1) .. sql:sub(e + 1)
+            local line = sql:sub(s, e)
+            local depth = 0
+            for ch in line:gmatch("[()]") do
+                depth = depth + (ch == "(" and 1 or -1)
+            end
+            local stop = e
+            if depth > 0 then
+                local i = e + 1
+                while i <= #sql and depth > 0 do
+                    local ch = sql:sub(i, i)
+                    if ch == "(" then depth = depth + 1 elseif ch == ")" then depth = depth - 1 end
+                    i = i + 1
+                end
+                stop = i - 1
+            end
+            local removed = sql:sub(s, stop):gsub("%s+", " "):match("^%s*(.-)%s*$")
+            local mutated = sql:sub(1, s - 1) .. sql:sub(stop + 1)
             table.insert(mutations, {
                 sql = mutated,
-                desc = "dropped: " .. removed_text:sub(1, 60),
+                desc = "dropped: " .. removed:sub(1, 60),
                 position = s
             })
             search_start = e + 1
