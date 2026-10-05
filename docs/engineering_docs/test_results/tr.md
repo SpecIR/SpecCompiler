@@ -6,9 +6,9 @@
 
 > test_file: tests/e2e/pipeline/vc_002_01_handler_registration.md
 
-> duration_ms: 63
+> duration_ms: 100
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -20,9 +20,9 @@
 
 > test_file: tests/e2e/pipeline/vc_006_01_context_propagation.md
 
-> duration_ms: 22
+> duration_ms: 47
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -34,9 +34,9 @@
 
 > test_file: tests/e2e/internals/vc_pipe_007_01_sourcepos_compat.md
 
-> duration_ms: 31
+> duration_ms: 37
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -48,9 +48,9 @@
 
 > test_file: tests/e2e/pipeline/vc_pipe_012_01_prereq_not_found.md
 
-> duration_ms: 64
+> duration_ms: 29
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -62,9 +62,9 @@
 
 > test_file: tests/e2e/pipeline/vc_pipe_013_01_stale_relation_rebind.md
 
-> duration_ms: 272
+> duration_ms: 246
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -76,9 +76,9 @@
 
 > test_file: tests/e2e/pipeline/vc_pipe_014_01_stale_view_cross_doc.md
 
-> duration_ms: 401
+> duration_ms: 362
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -90,9 +90,9 @@
 
 > test_file: tests/e2e/pipeline/vc_pipe_014_02_stale_allocation_view.md
 
-> duration_ms: 401
+> duration_ms: 333
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -104,9 +104,9 @@
 
 > test_file: tests/e2e/database/vc_007_01_db_persistence.md
 
-> duration_ms: 83
+> duration_ms: 90
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -118,9 +118,9 @@
 
 > test_file: tests/e2e/casting/vc_008_01_cast_datatype_matrix.md
 
-> duration_ms: 65
+> duration_ms: 71
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -132,9 +132,9 @@
 
 > test_file: tests/e2e/casting_negative/vc_008_02_cast_negative.md
 
-> duration_ms: 62
+> duration_ms: 68
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -146,9 +146,9 @@
 
 > test_file: tests/e2e/pipeline/vc_009_01_incremental_cache.md
 
-> duration_ms: 414
+> duration_ms: 404
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -160,9 +160,9 @@
 
 > test_file: tests/e2e/pipeline/vc_010_01_incremental_multi_emit.md
 
-> duration_ms: 1167
+> duration_ms: 1039
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -174,9 +174,9 @@
 
 > test_file: tests/e2e/pivot/vc_033_01_eav_views.md
 
-> duration_ms: 165
+> duration_ms: 217
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -188,9 +188,9 @@
 
 > test_file: tests/e2e/internals/vc_013_01_document_walker.md
 
-> duration_ms: 69
+> duration_ms: 70
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -202,9 +202,23 @@
 
 > test_file: tests/e2e/syntax/vc_013_02_syntax_parsing.md
 
-> duration_ms: 92
+> duration_ms: 112
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: 013 03 Blockquote Disambiguation @TR-013-03
+
+> result: Pass
+
+> traceability: [VC-013](@)
+
+> test_file: tests/e2e/syntax/vc_013_03_blockquote_disambiguation.md
+
+> duration_ms: 59
+
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -216,9 +230,9 @@
 
 > test_file: tests/e2e/floats/vc_014_01_float_syntax.md
 
-> duration_ms: 75
+> duration_ms: 96
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -230,9 +244,9 @@
 
 > test_file: tests/e2e/floats/vc_014_02_float_tables.md
 
-> duration_ms: 52
+> duration_ms: 110
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -244,9 +258,9 @@
 
 > test_file: tests/e2e/floats/vc_014_03_float_figures.md
 
-> duration_ms: 31
+> duration_ms: 52
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -258,9 +272,9 @@
 
 > test_file: tests/e2e/internals/vc_014_04_float_base.md
 
-> duration_ms: 32
+> duration_ms: 33
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -272,9 +286,9 @@
 
 > test_file: tests/e2e/internals/vc_014_05_spec_floats.md
 
-> duration_ms: 29
+> duration_ms: 31
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -286,9 +300,9 @@
 
 > test_file: tests/e2e/internals/vc_014_06_float_utilities.md
 
-> duration_ms: 42
+> duration_ms: 49
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -300,9 +314,9 @@
 
 > test_file: tests/e2e/internals/vc_014_07_emit_float.md
 
-> duration_ms: 39
+> duration_ms: 42
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -316,7 +330,7 @@
 
 > duration_ms: 25
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -330,7 +344,7 @@
 
 > duration_ms: 29
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -342,9 +356,9 @@
 
 > test_file: tests/e2e/floats/vc_014_10_figure_include_from_file.md
 
-> duration_ms: 36
+> duration_ms: 35
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -356,9 +370,9 @@
 
 > test_file: tests/e2e/internals/vc_015_01_relation_resolver.md
 
-> duration_ms: 38
+> duration_ms: 42
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -370,9 +384,9 @@
 
 > test_file: tests/e2e/internals/vc_015_02_relation_edges.md
 
-> duration_ms: 43
+> duration_ms: 76
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -384,9 +398,9 @@
 
 > test_file: tests/e2e/relations/vc_015_03_links.md
 
-> duration_ms: 81
+> duration_ms: 90
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -398,9 +412,9 @@
 
 > test_file: tests/e2e/relations/vc_015_04_xref.md
 
-> duration_ms: 44
+> duration_ms: 45
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -412,9 +426,9 @@
 
 > test_file: tests/e2e/relations/vc_015_05_citations.md
 
-> duration_ms: 36
+> duration_ms: 38
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -426,9 +440,9 @@
 
 > test_file: tests/e2e/relations/vc_015_06_scoped_resolution.md
 
-> duration_ms: 38
+> duration_ms: 39
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -442,7 +456,7 @@
 
 > duration_ms: 43
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -454,9 +468,9 @@
 
 > test_file: tests/e2e/relations/vc_015_08_scoped_label_resolution.md
 
-> duration_ms: 43
+> duration_ms: 50
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -468,9 +482,9 @@
 
 > test_file: tests/e2e/relations/vc_015_09_section_xrefs.md
 
-> duration_ms: 35
+> duration_ms: 59
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -482,9 +496,9 @@
 
 > test_file: tests/e2e/relations/vc_015_10_type_inference.md
 
-> duration_ms: 60
+> duration_ms: 56
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -496,9 +510,9 @@
 
 > test_file: tests/e2e/internals/vc_016_01_view_render.md
 
-> duration_ms: 31
+> duration_ms: 39
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -510,9 +524,9 @@
 
 > test_file: tests/e2e/internals/vc_016_02_view_utils.md
 
-> duration_ms: 27
+> duration_ms: 40
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -524,9 +538,9 @@
 
 > test_file: tests/e2e/views/vc_016_03_inline_views.md
 
-> duration_ms: 74
+> duration_ms: 80
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -538,9 +552,9 @@
 
 > test_file: tests/e2e/views/vc_016_04_view_render_characterization.md
 
-> duration_ms: 35
+> duration_ms: 33
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -554,7 +568,7 @@
 
 > duration_ms: 28
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -566,9 +580,9 @@
 
 > test_file: tests/e2e/internals/vc_017_01_attribute_caster.md
 
-> duration_ms: 45
+> duration_ms: 36
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -580,9 +594,9 @@
 
 > test_file: tests/e2e/internals/vc_017_02_attribute_para_utils.md
 
-> duration_ms: 30
+> duration_ms: 37
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -594,9 +608,9 @@
 
 > test_file: tests/e2e/sw_docs_types/vc_017_03_attr_dedup.md
 
-> duration_ms: 129
+> duration_ms: 127
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -608,9 +622,23 @@
 
 > test_file: tests/e2e/syntax/vc_017_04_syntax_attributes.md
 
-> duration_ms: 93
+> duration_ms: 163
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: 017 05 Adjacent Attribute Lines @TR-017-05
+
+> result: Pass
+
+> traceability: [VC-017](@)
+
+> test_file: tests/e2e/internals/vc_017_05_adjacent_attribute_lines.md
+
+> duration_ms: 48
+
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -622,9 +650,9 @@
 
 > test_file: tests/e2e/database/vc_018_01_db_validation.md
 
-> duration_ms: 40
+> duration_ms: 50
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -636,9 +664,9 @@
 
 > test_file: tests/e2e/verify/vc_018_02_verify_object_attrs.md
 
-> duration_ms: 123
+> duration_ms: 139
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -650,9 +678,9 @@
 
 > test_file: tests/e2e/verify/vc_018_03_verify_floats.md
 
-> duration_ms: 91
+> duration_ms: 94
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -664,9 +692,9 @@
 
 > test_file: tests/e2e/verify/vc_018_04_verify_relations.md
 
-> duration_ms: 81
+> duration_ms: 91
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -678,9 +706,9 @@
 
 > test_file: tests/e2e/verify/vc_018_05_verify_views.md
 
-> duration_ms: 55
+> duration_ms: 82
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -692,9 +720,9 @@
 
 > test_file: tests/e2e/verify/vc_018_07_verify_invalid_spec_type.md
 
-> duration_ms: 31
+> duration_ms: 37
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -706,9 +734,9 @@
 
 > test_file: tests/e2e/verify/vc_018_09_verify_inherited_enum.md
 
-> duration_ms: 33
+> duration_ms: 35
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -720,9 +748,9 @@
 
 > test_file: tests/e2e/verify/vc_018_10_verify_cast_failures.md
 
-> duration_ms: 34
+> duration_ms: 40
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -734,9 +762,9 @@
 
 > test_file: tests/e2e/verify/vc_018_11_verify_duplicate_pid.md
 
-> duration_ms: 40
+> duration_ms: 49
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -748,9 +776,9 @@
 
 > test_file: tests/e2e/verify/vc_018_12_verify_traceability_csu_fd.md
 
-> duration_ms: 48
+> duration_ms: 75
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -762,9 +790,9 @@
 
 > test_file: tests/e2e/verify/vc_018_13_verify_cast_multitype.md
 
-> duration_ms: 64
+> duration_ms: 69
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -776,9 +804,79 @@
 
 > test_file: tests/e2e/verify/vc_018_14_verify_float_last_section.md
 
-> duration_ms: 59
+> duration_ms: 66
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: 018 15 Verify Allocation Chain @TR-018-15
+
+> result: Pass
+
+> traceability: [VC-018](@)
+
+> test_file: tests/e2e/verify/vc_018_15_verify_allocation_chain.md
+
+> duration_ms: 105
+
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: 018 16 Verify Coverage Matrix @TR-018-16
+
+> result: Pass
+
+> traceability: [VC-018](@)
+
+> test_file: tests/e2e/verify/vc_018_16_verify_coverage_matrix.md
+
+> duration_ms: 134
+
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: 018 17 Verify Hierarchy Cardinality @TR-018-17
+
+> result: Pass
+
+> traceability: [VC-018](@)
+
+> test_file: tests/e2e/verify/vc_018_17_verify_hierarchy_cardinality.md
+
+> duration_ms: 62
+
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: 018 18 Verify Unresolved Citation @TR-018-18
+
+> result: Pass
+
+> traceability: [VC-018](@)
+
+> test_file: tests/e2e/verify/vc_018_18_verify_unresolved_citation.md
+
+> duration_ms: 42
+
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: 018 19 Verify Float Orphan Multifile @TR-018-19
+
+> result: Pass
+
+> traceability: [VC-018](@)
+
+> test_file: tests/e2e/verify/vc_018_19_verify_float_orphan_multifile.md
+
+> duration_ms: 38
+
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -790,9 +888,9 @@
 
 > test_file: tests/e2e/preset/vc_019_01_preset_load_chain.md
 
-> duration_ms: 69
+> duration_ms: 82
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -804,9 +902,9 @@
 
 > test_file: tests/e2e/sw_docs_types/vc_019_02_sf_type.md
 
-> duration_ms: 91
+> duration_ms: 73
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -818,9 +916,9 @@
 
 > test_file: tests/e2e/sw_docs_types/vc_019_03_nfr_type.md
 
-> duration_ms: 117
+> duration_ms: 102
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -832,9 +930,9 @@
 
 > test_file: tests/e2e/sw_docs_types/vc_019_04_realizes_relation.md
 
-> duration_ms: 79
+> duration_ms: 75
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -846,9 +944,9 @@
 
 > test_file: tests/e2e/sw_docs_types/vc_019_05_xref_decomposition.md
 
-> duration_ms: 56
+> duration_ms: 63
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -860,9 +958,9 @@
 
 > test_file: tests/e2e/sw_docs_types/vc_019_06_xref_dic.md
 
-> duration_ms: 60
+> duration_ms: 68
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -874,9 +972,9 @@
 
 > test_file: tests/e2e/extension/vc_020_01_model_directory_structure.md
 
-> duration_ms: 60
+> duration_ms: 63
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -888,9 +986,9 @@
 
 > test_file: tests/e2e/extension/vc_021_01_handler_registration_interface.md
 
-> duration_ms: 26
+> duration_ms: 24
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -902,9 +1000,9 @@
 
 > test_file: tests/e2e/extension/vc_022_01_type_definition_schema.md
 
-> duration_ms: 33
+> duration_ms: 28
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -916,9 +1014,9 @@
 
 > test_file: tests/e2e/extension/vc_023_01_model_path_resolution.md
 
-> duration_ms: 23
+> duration_ms: 27
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -930,9 +1028,9 @@
 
 > test_file: tests/e2e/floats/vc_024_01_plantuml.md
 
-> duration_ms: 61
+> duration_ms: 52
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -944,9 +1042,9 @@
 
 > test_file: tests/e2e/abnt-tests/vc_024_02_charts.md
 
-> duration_ms: 165
+> duration_ms: 157
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -958,9 +1056,9 @@
 
 > test_file: tests/e2e/abnt-tests/vc_025_01_data_views.md
 
-> duration_ms: 138
+> duration_ms: 97
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -972,9 +1070,9 @@
 
 > test_file: tests/e2e/views/vc_025_02_view_registration.md
 
-> duration_ms: 47
+> duration_ms: 52
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -986,9 +1084,9 @@
 
 > test_file: tests/e2e/sw_docs-tests/vc_025_03_traceability_matrix.md
 
-> duration_ms: 131
+> duration_ms: 133
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1000,9 +1098,9 @@
 
 > test_file: tests/e2e/sw_docs-tests/vc_025_04_test_results_matrix.md
 
-> duration_ms: 67
+> duration_ms: 64
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1014,9 +1112,9 @@
 
 > test_file: tests/e2e/sw_docs-tests/vc_025_05_traceability_matrix_block_empty.md
 
-> duration_ms: 35
+> duration_ms: 36
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1028,9 +1126,9 @@
 
 > test_file: tests/e2e/sw_docs-tests/vc_025_06_traceability_matrix_textblock_empty.md
 
-> duration_ms: 42
+> duration_ms: 46
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1042,9 +1140,9 @@
 
 > test_file: tests/e2e/sw_docs-tests/vc_025_07_test_results_matrix_block_empty.md
 
-> duration_ms: 43
+> duration_ms: 44
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1058,7 +1156,7 @@
 
 > duration_ms: 40
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1070,9 +1168,9 @@
 
 > test_file: tests/e2e/sw_docs-tests/vc_025_09_test_execution_matrix.md
 
-> duration_ms: 59
+> duration_ms: 49
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1084,9 +1182,9 @@
 
 > test_file: tests/e2e/sw_docs-tests/vc_025_10_allocation_matrix_param.md
 
-> duration_ms: 110
+> duration_ms: 100
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1098,9 +1196,9 @@
 
 > test_file: tests/e2e/internals/vc_ext_009_01_canonical_ctx.md
 
-> duration_ms: 25
+> duration_ms: 32
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1112,9 +1210,9 @@
 
 > test_file: tests/e2e/extension/vc_ext_011_01_host_registry.md
 
-> duration_ms: 25
+> duration_ms: 30
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1126,9 +1224,9 @@
 
 > test_file: tests/e2e/extension/vc_ext_011_02_inherited_card_render.md
 
-> duration_ms: 30
+> duration_ms: 33
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1140,9 +1238,9 @@
 
 > test_file: tests/e2e/extension/vc_ext_011_03_float_render_index.md
 
-> duration_ms: 33
+> duration_ms: 35
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1154,9 +1252,9 @@
 
 > test_file: tests/e2e/extension/vc_ext_011_04_external_float_hooks.md
 
-> duration_ms: 37
+> duration_ms: 49
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1168,9 +1266,9 @@
 
 > test_file: tests/e2e/extension/vc_ext_011_05_hook_return_contracts.md
 
-> duration_ms: 37
+> duration_ms: 42
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1182,9 +1280,37 @@
 
 > test_file: tests/e2e/extension/vc_ext_012_01_verification_descriptor.md
 
-> duration_ms: 30
+> duration_ms: 28
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: Ext 013 01 Pid Scheme Validation @TR-EXT-013-01
+
+> result: Pass
+
+> traceability: [VC-EXT-013](@)
+
+> test_file: tests/e2e/extension/vc_ext_013_01_pid_scheme_validation.md
+
+> duration_ms: 28
+
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: Ext 014 01 Dangling Extends @TR-EXT-014-01
+
+> result: Pass
+
+> traceability: [VC-EXT-014](@)
+
+> test_file: tests/e2e/extension/vc_ext_014_01_dangling_extends.md
+
+> duration_ms: 33
+
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1196,9 +1322,9 @@
 
 > test_file: tests/e2e/internals/vc_027_01_float_numbering.md
 
-> duration_ms: 37
+> duration_ms: 43
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1210,9 +1336,9 @@
 
 > test_file: tests/e2e/output/vc_028_01_output_formats.md
 
-> duration_ms: 86
+> duration_ms: 104
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1224,9 +1350,9 @@
 
 > test_file: tests/e2e/output/vc_028_02_bibliography.md
 
-> duration_ms: 40
+> duration_ms: 46
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1238,9 +1364,9 @@
 
 > test_file: tests/e2e/ooxml/vc_029_01_ooxml_schema_validation.md
 
-> duration_ms: 241
+> duration_ms: 266
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1252,9 +1378,9 @@
 
 > test_file: tests/e2e/ooxml/vc_029_02_ooxml_validator_selftest.md
 
-> duration_ms: 165
+> duration_ms: 190
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1266,9 +1392,9 @@
 
 > test_file: tests/e2e/ooxml/vc_029_03_caption_seq_cache.md
 
-> duration_ms: 154
+> duration_ms: 171
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1280,9 +1406,9 @@
 
 > test_file: tests/e2e/ooxml/vc_029_04_bookmark_resolution.md
 
-> duration_ms: 190
+> duration_ms: 199
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1294,9 +1420,51 @@
 
 > test_file: tests/e2e/ooxml/vc_029_05_libreoffice_roundtrip.md
 
-> duration_ms: 170
+> duration_ms: 187
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: 029 06 Reference Cache Chain @TR-029-06
+
+> result: Pass
+
+> traceability: [VC-029](@)
+
+> test_file: tests/e2e/preset/vc_029_06_reference_cache_chain.md
+
+> duration_ms: 25
+
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: 029 07 Reference Table Header @TR-029-07
+
+> result: Pass
+
+> traceability: [VC-029](@)
+
+> test_file: tests/e2e/ooxml/vc_029_07_reference_table_header.md
+
+> duration_ms: 148
+
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: 029 08 Body Sectpr Self Closing @TR-029-08
+
+> result: Pass
+
+> traceability: [VC-029](@)
+
+> test_file: tests/e2e/ooxml/vc_029_08_body_sectpr_self_closing.md
+
+> duration_ms: 58
+
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1308,9 +1476,9 @@
 
 > test_file: tests/e2e/output/vc_030_01_html_options.md
 
-> duration_ms: 27
+> duration_ms: 35
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1324,7 +1492,7 @@
 
 > duration_ms: 71
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1336,9 +1504,9 @@
 
 > test_file: tests/e2e/webapp/vc_030_03_web_search.md
 
-> duration_ms: 38
+> duration_ms: 44
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1350,9 +1518,9 @@
 
 > test_file: tests/e2e/internals/vc_031_01_assembler.md
 
-> duration_ms: 29
+> duration_ms: 34
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1364,9 +1532,9 @@
 
 > test_file: tests/e2e/floats/vc_032_01_caption_structure.md
 
-> duration_ms: 93
+> duration_ms: 75
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1378,9 +1546,9 @@
 
 > test_file: tests/e2e/assembly/vc_out_001_01_assembly_order.md
 
-> duration_ms: 76
+> duration_ms: 113
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1392,9 +1560,9 @@
 
 > test_file: tests/e2e/internals/vc_out_004_01_render_utils.md
 
-> duration_ms: 30
+> duration_ms: 37
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1406,9 +1574,9 @@
 
 > test_file: tests/e2e/internals/vc_out_005_01_render_handler.md
 
-> duration_ms: 41
+> duration_ms: 55
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1420,9 +1588,9 @@
 
 > test_file: tests/e2e/assembly/vc_out_008_01_heading_hierarchy.md
 
-> duration_ms: 133
+> duration_ms: 158
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1434,9 +1602,9 @@
 
 > test_file: tests/e2e/assembly/vc_out_008_02_broken_hierarchy.md
 
-> duration_ms: 202
+> duration_ms: 217
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1448,9 +1616,9 @@
 
 > test_file: tests/e2e/assembly/vc_out_009_01_section_close.md
 
-> duration_ms: 111
+> duration_ms: 121
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1462,9 +1630,9 @@
 
 > test_file: tests/e2e/assembly/vc_out_010_01_cross_format_levels.md
 
-> duration_ms: 192
+> duration_ms: 170
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1476,9 +1644,9 @@
 
 > test_file: tests/e2e/assembly/vc_out_011_01_include_level_shift.md
 
-> duration_ms: 228
+> duration_ms: 194
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1490,9 +1658,9 @@
 
 > test_file: tests/e2e/assembly/vc_out_011_02_include_level_combos.md
 
-> duration_ms: 286
+> duration_ms: 291
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1504,23 +1672,51 @@
 
 > test_file: tests/e2e/assembly/vc_out_011_03_include_level_guards.md
 
-> duration_ms: 351
+> duration_ms: 346
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
-# TR: Int 016 01 Label Slugify @TR-INT-016-01
+# TR: Out 012 01 Section Attribute Card @TR-OUT-012-01
 
 > result: Pass
 
-> traceability: [VC-INT-016](@)
+> traceability: [VC-OUT-012](@)
 
-> test_file: tests/e2e/internals/vc_int_016_01_label_slugify.md
+> test_file: tests/e2e/assembly/vc_out_012_01_section_attribute_card.md
 
-> duration_ms: 31
+> duration_ms: 60
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: Out 012 02 Include Composite Child @TR-OUT-012-02
+
+> result: Pass
+
+> traceability: [VC-OUT-012](@)
+
+> test_file: tests/e2e/assembly/vc_out_012_02_include_composite_child.md
+
+> duration_ms: 92
+
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: Out 012 03 Hierarchical Pid Per Type @TR-OUT-012-03
+
+> result: Pass
+
+> traceability: [VC-OUT-012](@)
+
+> test_file: tests/e2e/assembly/vc_out_012_03_hierarchical_pid_per_type.md
+
+> duration_ms: 88
+
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner
 
@@ -1532,8 +1728,22 @@
 
 > test_file: tests/e2e/internals/vc_cfg_001_01_manifest_over_env.md
 
-> duration_ms: 26
+> duration_ms: 31
 
-> execution_date: 2026-08-02
+> execution_date: 2026-10-05
+
+> executed_by: E2E Test Runner
+
+# TR: Int 016 01 Label Slugify @TR-INT-016-01
+
+> result: Pass
+
+> traceability: [VC-INT-016](@)
+
+> test_file: tests/e2e/internals/vc_int_016_01_label_slugify.md
+
+> duration_ms: 35
+
+> execution_date: 2026-10-05
 
 > executed_by: E2E Test Runner

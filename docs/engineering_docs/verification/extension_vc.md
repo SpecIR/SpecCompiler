@@ -270,6 +270,47 @@ Verify that a `kind = "analyze"` descriptor enters the ordered policy registry.
 > traceability: [HLR-EXT-012](@)
 
 
+### VC: PID Scheme Declaration @VC-EXT-013
+
+Verify the `pid_scheme` registration contract for object types.
+
+> objective: Confirm that an object schema declares its PID policy with `pid_scheme = "sequential" | "hierarchical"`, that the hierarchical scheme maps onto the legacy `is_composite` storage flag (still accepted as a deprecated alias), and that an invalid scheme or a declaration conflicting with the legacy flag is a register-time error.
+
+> verification_method: Test
+
+> approach:
+> - Register object descriptors with `pid_scheme = "hierarchical"`, `pid_scheme = "sequential"`, and the legacy `is_composite = true`; capture the `object_types` insert parameters
+> - Register a descriptor with an unknown scheme value
+> - Register a descriptor declaring `pid_scheme = "sequential"` together with `is_composite = true`
+
+> pass_criteria:
+> - `pid_scheme = "hierarchical"` stores `is_composite = 1`; `pid_scheme = "sequential"` stores `is_composite = 0`
+> - The legacy `is_composite = true` alias still stores `is_composite = 1`
+> - An unknown scheme value aborts at registration with a message naming `pid_scheme`
+> - A scheme that conflicts with the legacy flag aborts at registration with a message naming `pid_scheme`
+
+> traceability: [HLR-EXT-004](@), [HLR-EXT-011](@), [HLR-PIPE-009](@)
+
+
+### VC: Dangling Extends Target @VC-EXT-014
+
+Verify that `host:finalize()` rejects a descriptor whose `extends` names an unregistered type.
+
+> objective: Confirm that a type whose `extends` chain points at a type never registered for its kind is a loud finalize-time error naming the kind, the child type, and the missing parent, while legitimate chains, including cross-model ones resolved only at finalize time, continue to pass.
+
+> verification_method: Test
+
+> approach:
+> - Register an object descriptor with `extends` naming a type that no model registers, then call `finalize()`
+> - Load the `default` and `sw_docs` models into a fresh host and call `finalize()`
+
+> pass_criteria:
+> - `finalize()` fails for the dangling `extends` and the message names the kind (`object`), the child type, and the missing parent
+> - `finalize()` succeeds for the real model chain, including cross-model `extends`
+
+> traceability: [HLR-EXT-004](@), [HLR-EXT-008](@), [HLR-EXT-011](@)
+
+
 ### VC: Manifest-Only Configuration @VC-CFG-001
 
 Verify that build options come from the frozen project configuration.

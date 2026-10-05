@@ -324,3 +324,25 @@ Verify that include expansion places the shallowest included heading one level b
 > - Computed levels 7 and 8 remain distinct in SpecIR; whole-document normalization preserves their relative depths and DOCX renders the deepest result with `Heading7` rather than clamping it to `Heading6`
 
 > traceability: [HLR-OUT-001](@), [HLR-PIPE-008](@), [LLR-071](@)
+
+
+### VC: Structural Level Anchoring @VC-OUT-012
+
+Verify that heading depth, hierarchical PID depth, and the attribute card anchor to the structural constant (level 2 = depth 1) rather than to the observed minimum level of the document.
+
+> objective: Confirm that a hook-less composite object receives the default object render (heading at the constant shift with its PID as anchor, attribute blockquote promoted to the attribute card, body preserved), that an included composite stored at level 3 renders and numbers as a child of the level-2 object that includes it, and that hierarchical PIDs keep one counter chain per type using the type's own `pid_prefix`.
+
+> verification_method: Test
+
+> approach:
+> - Build a document whose only object is a level-2 SECTION with a `> description:` blockquote and a body paragraph; inspect the rendered headings, attribute cards, and surviving blockquotes
+> - Build a document whose level-2 CSU includes a standalone file starting at `#` and no other level-2 composite exists; inspect the included section's heading level and PID anchor
+> - Build a document interleaving SECTIONs with an EXEC_SUMMARY (own `exec` prefix, `unnumbered = true`), a nested subsection, and an explicit `@…-sec3` PID occupying a generated slot; inspect every heading anchor
+
+> pass_criteria:
+> - The SECTION renders as a single level-1 heading anchored by its generated PID (`SRS-AC-sec1`), its description appears in a `spec-object-attributes` card, and no raw `> key: value` blockquote survives in the output
+> - The included section renders one level below the including CSU and is numbered `SDD-CC-sec1.1`, not promoted to a sibling
+> - The EXEC_SUMMARY numbers in its own `exec` chain (`MAN-PIDS-exec1`) without consuming a `sec` slot, and carries the unnumbered class
+> - SECTION PIDs run `sec1`, `sec2`, `sec2.1`, `sec3`, `sec4` in document order; the generated counter skips the slot taken by the explicit `MAN-PIDS-sec3`
+
+> traceability: [HLR-OUT-001](@), [HLR-PIPE-008](@), [HLR-PIPE-009](@)
