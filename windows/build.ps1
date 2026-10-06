@@ -159,7 +159,10 @@ if (-not (Test-Path -LiteralPath "$Work\amath")) {
     Run git @('clone', '-q', 'https://github.com/camoy/amath.git', "$Work\amath")
     Run git @('-C', "$Work\amath", 'checkout', '-q', $Pins.AMATH_COMMIT)
 }
-if (-not (Test-Path -LiteralPath "$Work\amath\src\amath.leg.c")) { Run $Leg @('-o', "$Work\amath\src\amath.leg.c", "$Work\amath\src\amath.leg") }
+if (-not (Test-Path -LiteralPath "$Work\amath\src\amath.leg.c")) {
+    # Forward slashes: leg copies these paths into #line directives, where backslashes are C escapes.
+    Run $Leg @('-o', (Fwd "$Work\amath\src\amath.leg.c"), (Fwd "$Work\amath\src\amath.leg"))
+}
 Fetch "https://zlib.net/fossils/zlib-$($Pins.ZLIB_WIN_VERSION).tar.gz" "$Work\zlib.tar.gz"
 Extract "$Work\zlib.tar.gz" "$Work\zlib-$($Pins.ZLIB_WIN_VERSION)"
 Fetch "https://libzip.org/download/libzip-$($Pins.LIBZIP_WIN_VERSION).tar.gz" "$Work\libzip.tar.gz"

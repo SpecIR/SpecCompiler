@@ -23,14 +23,27 @@ specc test --junit
 specc pandoc --version
 ```
 
-Optional tools, found on PATH when present: a Java runtime for PlantUML
-diagrams (`plantuml.jar` is bundled), and LibreOffice for DOCX field update
-and PDF export. Both can be installed with winget:
+## Optional tools
+
+Everything below is found on PATH (or its standard install folder) when
+present. Without it the feature reports a clear message and the rest still works.
+
+| Tool | Needed for | Windows status |
+|------|-----------|----------------|
+| Java runtime | PlantUML diagrams (`puml` floats) | `plantuml.jar` is bundled; install Java yourself |
+| LibreOffice | DOCX field update and PDF export | Found in `Program Files`; uses LibreOffice's own Python |
+| Graphviz | Some PlantUML diagram types | Not bundled; install it if a diagram asks for `dot` |
+| Deno | Model-owned charts (for example the ABNT model) | Not bundled; the core does not use it |
 
 ```powershell
 winget install EclipseAdoptium.Temurin.21.JRE
 winget install TheDocumentFoundation.LibreOffice
+winget install Graphviz.Graphviz
 ```
+
+The Linux image also ships Poppler and the Microsoft core fonts. Windows already
+has the fonts, and nothing in the core needs Poppler. The ReqIF converter
+(`python -m reqif.specir`) is a separate Python tool and is not bundled.
 
 ## Runtime
 
