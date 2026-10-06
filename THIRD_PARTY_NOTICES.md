@@ -54,3 +54,26 @@ SpecCompiler Core includes, bundles, and/or invokes third-party software.
 | Component | Version | Source | License | Purpose |
 |-----------|---------|--------|---------|---------|
 | luacov | 0.15.0 | https://github.com/keplerproject/luacov | MIT | Test coverage |
+
+### Windows Distribution
+
+The Windows zip includes source-built Pandoc and a shared Lua runtime. Native
+Lua modules load directly into Pandoc. Dependency license files and the exact
+Pandoc build plan (`pandoc-build.freeze`, listing every Haskell package and
+version compiled in) are shipped under `licenses/`.
+
+| Component | Version | Source | License |
+|-----------|---------|--------|---------|
+| Pandoc | 3.11 | https://github.com/jgm/pandoc | GPL-2.0-or-later |
+| Lua | 5.4.7 | https://www.lua.org | MIT |
+| SQLite | 3470200 | https://sqlite.org | Public Domain |
+| lsqlite3 | v0.9.6 | https://lua.sqlite.org | MIT |
+| luv / libuv | 1.48.0-2 | https://github.com/luvit/luv | Apache-2.0 / MIT |
+| luaamath | 1b9e2f1ae313 | https://github.com/camoy/amath | MIT |
+| brimworks/lua-zip | v0.2.0 | https://github.com/brimworks/lua-zip | MIT |
+| libzip | 1.11.4 | https://libzip.org | BSD-3-Clause |
+| zlib | 1.3.1 | https://zlib.net | Zlib |
+
+The MIT build of PlantUML 1.2024.8 is bundled (`vendor/plantuml/plantuml.jar`) and
+verified by SHA-256 at build time; it needs a Java runtime, which is not bundled.
+The compiler runtime libraries retain their upstream licenses.

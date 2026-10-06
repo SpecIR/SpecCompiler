@@ -522,44 +522,59 @@ is installed):</p>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Container install (Windows PowerShell)</figcaption>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">irm</span> https://raw.githubusercontent.com/SpecIR/SpecCompiler/main/scripts/install.ps1 <span class="kw">|</span> <span class="ex">iex</span></span></code></pre></div>
 <div data-pos="160:1-161:1">
-<p><code data-pos="160:1-160:13">install.sh</code> installs the <code data-pos="160:27-160:34">specc</code> Command-Line Interface (CLI)
-wrapper at <code data-pos="160:85-160:105">~/.local/bin/specc</code> and
-writes the engine and image reference to <code data-pos="160:151-160:179">~/.config/speccompiler/env</code>; the
-Windows installer places <code data-pos="160:210-160:217">specc</code>
-under <code data-pos="160:224-160:257">%LOCALAPPDATA%\SpecCompiler\bin</code> and
+<p>Natively on Windows 10/11 (no container engine), download <code data-pos="160:59-160:99">SpecCompiler-&lt;version&gt;-windows-x64.zip</code>
+from the GitHub release and extract it anywhere, for example <code data-pos="160:161-160:199">%LOCALAPPDATA%\Programs\SpecCompiler</code>;
+optionally add its <code data-pos="160:220-160:225">bin</code> folder to
+PATH. The zip bundles source-built Pandoc with a shared Lua runtime, the
+native DLL modules and PlantUML, and <code data-pos="160:346-160:361">bin\specc.cmd</code> invokes Pandoc directly.
+A Java runtime enables PlantUML diagrams and LibreOffice enables DOCX
+field update and PDF export; both are used when found on PATH. The same
+<code data-pos="160:529-160:536">specc</code> commands then work from
+cmd or PowerShell:</p>
+</div>
+<a id="listing-src-install-windows-native" class="bookmark"></a>
+<figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Native Windows usage (cmd or PowerShell)</figcaption>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build project.yaml</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> test</span></code></pre></div>
+<div data-pos="167:1-168:1">
+<p><code data-pos="167:1-167:13">install.sh</code> installs the <code data-pos="167:27-167:34">specc</code> Command-Line Interface (CLI)
+wrapper at <code data-pos="167:85-167:105">~/.local/bin/specc</code> and
+writes the engine and image reference to <code data-pos="167:151-167:179">~/.config/speccompiler/env</code>; the
+Windows installer places <code data-pos="167:210-167:217">specc</code>
+under <code data-pos="167:224-167:257">%LOCALAPPDATA%\SpecCompiler\bin</code> and
 adds it to the user PATH. If a local image exists it is used
 automatically; otherwise, the GHCR image is pulled on first use.</p>
 </div>
-<h2 data-number="2.3" data-pos="162:1-163:1" id="MANUAL-sec3.3"><span class="header-section-number">2.3</span> Building the Image</h2>
-<div data-pos="164:1-165:1">
-<p>There is a single image, built on Ubuntu 24.04 (<code data-pos="164:49-164:61">Dockerfile</code>): the stock apt pandoc, the
+<h2 data-number="2.3" data-pos="169:1-170:1" id="MANUAL-sec3.3"><span class="header-section-number">2.3</span> Building the Image</h2>
+<div data-pos="171:1-172:1">
+<p>There is a single image, built on Ubuntu 24.04 (<code data-pos="171:49-171:61">Dockerfile</code>): the stock apt pandoc, the
 four compiled Lua C extensions, the SpecCompiler Lua source, and the
-optional renderers (deno for model-owned <code data-pos="164:200-164:208">chart:</code> floats, PlantUML for <code data-pos="164:230-164:237">puml:</code> diagrams, python/reqif for ReqIF
+optional renderers (deno for model-owned <code data-pos="171:200-171:208">chart:</code> floats, PlantUML for <code data-pos="171:230-171:237">puml:</code> diagrams, python/reqif for ReqIF
 interop). No compiler toolchain, no pandoc build. To build it locally
 instead of pulling from GHCR, from the repository root:</p>
 </div>
 <a id="listing-src-build-image" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Build and install via Docker</figcaption>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> speccompiler-core:latest .</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/install.sh</span></code></pre></div>
-<h2 data-number="2.4" data-pos="171:1-172:1" id="MANUAL-sec3.4"><span class="header-section-number">2.4</span> Verifying Installation</h2>
-<div data-pos="173:1-174:1">
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> speccompiler-core:latest .</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/install.sh</span></code></pre></div>
+<h2 data-number="2.4" data-pos="178:1-179:1" id="MANUAL-sec3.4"><span class="header-section-number">2.4</span> Verifying Installation</h2>
+<div data-pos="180:1-181:1">
 <p>After building, verify the image is available:</p>
 </div>
 <a id="listing-src-verify-image" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Verify Docker image availability</figcaption>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> images speccompiler-core</span></code></pre></div>
-<div data-pos="179:1-180:1">
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> images speccompiler-core</span></code></pre></div>
+<div data-pos="186:1-187:1">
 <p>To verify the tool runs correctly, navigate to a directory containing
-a <code data-pos="179:73-179:87">project.yaml</code> file and run:</p>
+a <code data-pos="186:73-186:87">project.yaml</code> file and run:</p>
 </div>
 <a id="listing-src-run-wrapper" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Run wrapper command</figcaption>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build</span></code></pre></div>
-<h2 data-number="2.5" data-pos="185:1-186:1" id="MANUAL-sec3.5"><span class="header-section-number">2.5</span> The specc Wrapper</h2>
-<div data-pos="187:1-188:1">
-<p>The <code data-pos="187:5-187:12">specc</code> command is a single
-wrapper shared by every install mode. Its mode is read from <code data-pos="187:93-187:121">~/.config/speccompiler/env</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build</span></code></pre></div>
+<h2 data-number="2.5" data-pos="192:1-193:1" id="MANUAL-sec3.5"><span class="header-section-number">2.5</span> The specc Wrapper</h2>
+<div data-pos="194:1-195:1">
+<p>The <code data-pos="194:5-194:12">specc</code> command is a single
+wrapper shared by every install mode. Its mode is read from <code data-pos="194:93-194:121">~/.config/speccompiler/env</code>:</p>
 </div>
 <a id="csv-tbl-wrapper-modes" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Wrapper modes</figcaption>
@@ -583,119 +598,119 @@ extensions (written by <code>install-native.sh</code>)</td>
 </tr>
 </tbody>
 </table>
-<div data-pos="201:1-202:1">
-<p>The command surface is <code data-pos="201:24-201:52">specc build [project.yaml]</code> (default
-file: <code data-pos="201:68-201:82">project.yaml</code>).</p>
+<div data-pos="208:1-209:1">
+<p>The command surface is <code data-pos="208:24-208:52">specc build [project.yaml]</code> (default
+file: <code data-pos="208:68-208:82">project.yaml</code>).</p>
 </div>
-<div data-pos="203:1-204:1">
-<p>In image mode, the wrapper runs <code data-pos="203:33-203:50">docker run --rm</code> (or <code data-pos="203:55-203:72">podman run --rm</code>) with:</p>
+<div data-pos="210:1-211:1">
+<p>In image mode, the wrapper runs <code data-pos="210:33-210:50">docker run --rm</code> (or <code data-pos="210:55-210:72">podman run --rm</code>) with:</p>
 </div>
-<div data-pos="205:1-210:1">
+<div data-pos="212:1-217:1">
 <ul>
-<li><div data-pos="205:1-206:1">
-<code data-pos="205:3-205:31">--user &quot;$(id -u):$(id -g)&quot;</code> –
-Preserves host UID/GID (docker; rootless podman uses <code data-pos="205:88-205:106">--userns=keep-id</code> instead).
+<li><div data-pos="212:1-213:1">
+<code data-pos="212:3-212:31">--user &quot;$(id -u):$(id -g)&quot;</code> –
+Preserves host UID/GID (docker; rootless podman uses <code data-pos="212:88-212:106">--userns=keep-id</code> instead).
 </div></li>
-<li><div data-pos="206:1-207:1">
-<code data-pos="206:3-206:27">-v &quot;$(pwd):/workspace&quot;</code> – Mounts
+<li><div data-pos="213:1-214:1">
+<code data-pos="213:3-213:27">-v &quot;$(pwd):/workspace&quot;</code> – Mounts
 current directory.
 </div></li>
-<li><div data-pos="207:1-209:1">
-<code data-pos="207:3-207:64">-e &quot;SPECCOMPILER_LOG_LEVEL=${SPECCOMPILER_LOG_LEVEL:-INFO}&quot;</code>
+<li><div data-pos="214:1-216:1">
+<code data-pos="214:3-214:64">-e &quot;SPECCOMPILER_LOG_LEVEL=${SPECCOMPILER_LOG_LEVEL:-INFO}&quot;</code>
 – Passes log level.
 </div></li>
 </ul>
 </div>
-<div data-pos="209:1-210:1">
+<div data-pos="216:1-217:1">
 <p>Inside the container, the same wrapper runs in native mode and
-invokes Pandoc with the SpecCompiler Lua filter. The <code data-pos="209:117-209:131">-o /dev/null</code> Pandoc flag is
+invokes Pandoc with the SpecCompiler Lua filter. The <code data-pos="216:117-216:131">-o /dev/null</code> Pandoc flag is
 intentional – actual output files are generated by the EMIT phase.</p>
 </div>
-<h1 data-number="3" data-pos="211:1-212:1" id="MANUAL-sec4"><span class="header-section-number">3</span> Project Configuration</h1>
-<div data-pos="213:1-214:1">
-<p>All project configuration is specified in a <code data-pos="213:45-213:59">project.yaml</code> file located in the project
+<h1 data-number="3" data-pos="218:1-219:1" id="MANUAL-sec4"><span class="header-section-number">3</span> Project Configuration</h1>
+<div data-pos="220:1-221:1">
+<p>All project configuration is specified in a <code data-pos="220:45-220:59">project.yaml</code> file located in the project
 root directory.</p>
 </div>
-<h2 data-number="3.1" data-pos="215:1-216:1" id="MANUAL-sec4.1"><span class="header-section-number">3.1</span> Complete Configuration
+<h2 data-number="3.1" data-pos="222:1-223:1" id="MANUAL-sec4.1"><span class="header-section-number">3.1</span> Complete Configuration
 Reference</h2>
 <a id="listing-src-project-yaml" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> project.yaml reference</figcaption>
-<div class="sourceCode" id="cb7"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Project Identification (REQUIRED)</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">project</span><span class="kw">:</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">code</span><span class="kw">:</span><span class="at"> MYPROJ</span><span class="co">          # Project code identifier (string, required)</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> My Project SRS</span><span class="co">  # Human-readable project name (string, required)</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Type Model (REQUIRED)</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">template</span><span class="kw">:</span><span class="at"> default</span><span class="co">        # Type model name (string, default: &quot;default&quot;)</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">                         # Must match a directory under models/</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Logging Configuration (OPTIONAL)</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="fu">logging</span><span class="kw">:</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">level</span><span class="kw">:</span><span class="at"> info</span><span class="co">            # DEBUG | INFO | WARN | ERROR (default: &quot;INFO&quot;)</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">format</span><span class="kw">:</span><span class="at"> auto</span><span class="co">           # auto | json | text (default: &quot;auto&quot;)</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">color</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">            # ANSI color codes (default: true)</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Validation Policy (OPTIONAL)</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="fu">validation</span><span class="kw">:</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">missing_required</span><span class="kw">:</span><span class="at"> ignore</span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">cardinality_over</span><span class="kw">:</span><span class="at"> ignore</span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">invalid_cast</span><span class="kw">:</span><span class="at"> ignore</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">invalid_enum</span><span class="kw">:</span><span class="at"> ignore</span></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">invalid_date</span><span class="kw">:</span><span class="at"> ignore</span></span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">bounds_violation</span><span class="kw">:</span><span class="at"> ignore</span></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">dangling_relation</span><span class="kw">:</span><span class="at"> ignore</span></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">unresolved_relation</span><span class="kw">:</span><span class="at"> ignore</span></span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Input Files (REQUIRED)</span></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="fu">output_dir</span><span class="kw">:</span><span class="at"> build/</span><span class="co">       # Base output directory (default: &quot;build&quot;)</span></span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a><span class="fu">doc_files</span><span class="kw">:</span><span class="co">               # Markdown files to process, in order</span></span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> srs.md</span></span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> sdd.md</span></span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Output Format Configurations (OPTIONAL)</span></span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a><span class="fu">outputs</span><span class="kw">:</span></span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">format</span><span class="kw">:</span><span class="at"> docx</span></span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">path</span><span class="kw">:</span><span class="at"> docx/{spec_id}.docx</span></span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">format</span><span class="kw">:</span><span class="at"> html5</span></span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">path</span><span class="kw">:</span><span class="at"> www/{spec_id}.html</span></span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a><span class="co"># DOCX Configuration (OPTIONAL)</span></span>
-<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a><span class="fu">docx</span><span class="kw">:</span></span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">preset</span><span class="kw">:</span><span class="at"> </span><span class="ch">null</span><span class="co">           # Style preset name (models/{template}/presets/)</span></span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a><span class="co">  # reference_doc: assets/reference.docx  # Custom Word reference</span></span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a><span class="co"># HTML5 Configuration (OPTIONAL)</span></span>
-<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a><span class="fu">html5</span><span class="kw">:</span></span>
-<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">number_sections</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">table_of_contents</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">toc_depth</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
-<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">standalone</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">embed_resources</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">resource_path</span><span class="kw">:</span><span class="at"> build</span></span>
-<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a><span class="co"># Bibliography and Citations (OPTIONAL)</span></span>
-<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
-<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a><span class="fu">bibliography</span><span class="kw">:</span><span class="at"> refs.bib</span></span>
-<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a><span class="fu">csl</span><span class="kw">:</span><span class="at"> ieee.csl</span></span></code></pre></div>
-<h2 data-number="3.2" data-pos="295:1-296:1" id="MANUAL-sec4.2"><span class="header-section-number">3.2</span> Required Fields</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Project Identification (REQUIRED)</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">project</span><span class="kw">:</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">code</span><span class="kw">:</span><span class="at"> MYPROJ</span><span class="co">          # Project code identifier (string, required)</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> My Project SRS</span><span class="co">  # Human-readable project name (string, required)</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Type Model (REQUIRED)</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="fu">template</span><span class="kw">:</span><span class="at"> default</span><span class="co">        # Type model name (string, default: &quot;default&quot;)</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">                         # Must match a directory under models/</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Logging Configuration (OPTIONAL)</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="fu">logging</span><span class="kw">:</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">level</span><span class="kw">:</span><span class="at"> info</span><span class="co">            # DEBUG | INFO | WARN | ERROR (default: &quot;INFO&quot;)</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">format</span><span class="kw">:</span><span class="at"> auto</span><span class="co">           # auto | json | text (default: &quot;auto&quot;)</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">color</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">            # ANSI color codes (default: true)</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Validation Policy (OPTIONAL)</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="fu">validation</span><span class="kw">:</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">missing_required</span><span class="kw">:</span><span class="at"> ignore</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">cardinality_over</span><span class="kw">:</span><span class="at"> ignore</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">invalid_cast</span><span class="kw">:</span><span class="at"> ignore</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">invalid_enum</span><span class="kw">:</span><span class="at"> ignore</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">invalid_date</span><span class="kw">:</span><span class="at"> ignore</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">bounds_violation</span><span class="kw">:</span><span class="at"> ignore</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">dangling_relation</span><span class="kw">:</span><span class="at"> ignore</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">unresolved_relation</span><span class="kw">:</span><span class="at"> ignore</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Input Files (REQUIRED)</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="fu">output_dir</span><span class="kw">:</span><span class="at"> build/</span><span class="co">       # Base output directory (default: &quot;build&quot;)</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="fu">doc_files</span><span class="kw">:</span><span class="co">               # Markdown files to process, in order</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> srs.md</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> sdd.md</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Output Format Configurations (OPTIONAL)</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="fu">outputs</span><span class="kw">:</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">format</span><span class="kw">:</span><span class="at"> docx</span></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">path</span><span class="kw">:</span><span class="at"> docx/{spec_id}.docx</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">format</span><span class="kw">:</span><span class="at"> html5</span></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">path</span><span class="kw">:</span><span class="at"> www/{spec_id}.html</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a><span class="co"># DOCX Configuration (OPTIONAL)</span></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a><span class="fu">docx</span><span class="kw">:</span></span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">preset</span><span class="kw">:</span><span class="at"> </span><span class="ch">null</span><span class="co">           # Style preset name (models/{template}/presets/)</span></span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a><span class="co">  # reference_doc: assets/reference.docx  # Custom Word reference</span></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a><span class="co"># HTML5 Configuration (OPTIONAL)</span></span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a><span class="fu">html5</span><span class="kw">:</span></span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">number_sections</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">table_of_contents</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">toc_depth</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">standalone</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">embed_resources</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">resource_path</span><span class="kw">:</span><span class="at"> build</span></span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a><span class="co"># Bibliography and Citations (OPTIONAL)</span></span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================================</span></span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a><span class="fu">bibliography</span><span class="kw">:</span><span class="at"> refs.bib</span></span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a><span class="fu">csl</span><span class="kw">:</span><span class="at"> ieee.csl</span></span></code></pre></div>
+<h2 data-number="3.2" data-pos="302:1-303:1" id="MANUAL-sec4.2"><span class="header-section-number">3.2</span> Required Fields</h2>
 <a id="csv-tbl-required-fields" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Required project fields</figcaption>
 <table>
@@ -725,7 +740,7 @@ process</td>
 </tr>
 </tbody>
 </table>
-<h2 data-number="3.3" data-pos="315:1-316:1" id="MANUAL-sec4.3"><span class="header-section-number">3.3</span> Default Values</h2>
+<h2 data-number="3.3" data-pos="322:1-323:1" id="MANUAL-sec4.3"><span class="header-section-number">3.3</span> Default Values</h2>
 <a id="csv-tbl-default-values" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Default configuration values</figcaption>
 <table>
@@ -755,212 +770,212 @@ process</td>
 </tr>
 </tbody>
 </table>
-<h1 data-number="4" data-pos="335:1-336:1" id="MANUAL-sec5"><span class="header-section-number">4</span> Document Authoring</h1>
-<div data-pos="337:1-338:1">
+<h1 data-number="4" data-pos="342:1-343:1" id="MANUAL-sec5"><span class="header-section-number">4</span> Document Authoring</h1>
+<div data-pos="344:1-345:1">
 <p>CommonSpec extends standard Markdown with six constructs for
 specification documents. The syntax uses existing Markdown constructs
 (headers, blockquotes, code blocks, links) with specific patterns that
 the pipeline recognizes. See the CommonSpec Language Specification for
 the formal definition.</p>
 </div>
-<h2 data-number="4.1" data-pos="339:1-340:1" id="MANUAL-sec5.1"><span class="header-section-number">4.1</span> Specifications</h2>
-<div data-pos="341:1-342:1">
+<h2 data-number="4.1" data-pos="346:1-347:1" id="MANUAL-sec5.1"><span class="header-section-number">4.1</span> Specifications</h2>
+<div data-pos="348:1-349:1">
 <p>Level 1 headers declare the top-level document container.</p>
 </div>
-<div data-pos="343:1-344:1">
-<p><strong>Pattern:</strong> <code data-pos="343:14-343:34"># type: Title @PID</code></p>
+<div data-pos="350:1-351:1">
+<p><strong>Pattern:</strong> <code data-pos="350:14-350:34"># type: Title @PID</code></p>
 </div>
 <a id="listing-src-specification-pattern" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Specification declaration</figcaption>
-<div class="sourceCode" id="cb8"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># srs: Software Requirements Specification @SRS-001</span></span></code></pre></div>
-<h2 data-number="4.2" data-pos="349:1-350:1" id="MANUAL-sec5.2"><span class="header-section-number">4.2</span> Spec Objects</h2>
-<div data-pos="351:1-352:1">
+<div class="sourceCode" id="cb9"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># srs: Software Requirements Specification @SRS-001</span></span></code></pre></div>
+<h2 data-number="4.2" data-pos="356:1-357:1" id="MANUAL-sec5.2"><span class="header-section-number">4.2</span> Spec Objects</h2>
+<div data-pos="358:1-359:1">
 <p>Level 2-6 headers declare requirements, design elements, sections, or
 any typed element.</p>
 </div>
-<div data-pos="353:1-354:1">
-<p><strong>Pattern:</strong> <code data-pos="353:14-353:35">## type: Title @PID</code></p>
+<div data-pos="360:1-361:1">
+<p><strong>Pattern:</strong> <code data-pos="360:14-360:35">## type: Title @PID</code></p>
 </div>
 <a id="listing-src-object-pattern" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Spec object declaration</figcaption>
-<div class="sourceCode" id="cb9"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">## hlr: User Authentication @HLR-001</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">### llr: Password Validation @LLR-001</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">#### section: Implementation Notes</span></span></code></pre></div>
-<div data-pos="361:1-362:1">
-<p>If <code data-pos="361:4-361:10">@PID</code> is omitted, a PID is
-auto-generated using the type’s <code data-pos="361:64-361:76">pid_prefix</code> and <code data-pos="361:81-361:93">pid_format</code>.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">## hlr: User Authentication @HLR-001</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">### llr: Password Validation @LLR-001</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">#### section: Implementation Notes</span></span></code></pre></div>
+<div data-pos="368:1-369:1">
+<p>If <code data-pos="368:4-368:10">@PID</code> is omitted, a PID is
+auto-generated using the type’s <code data-pos="368:64-368:76">pid_prefix</code> and <code data-pos="368:81-368:93">pid_format</code>.</p>
 </div>
-<div data-pos="363:1-364:1">
+<div data-pos="370:1-371:1">
 <p>A spec object owns the content that follows it until the section is
 closed. A section closes automatically at the next header of equal or
 shallower level, and child headers must go exactly one level deeper
-(jumping from <code data-pos="363:221-363:225">##</code> to <code data-pos="363:229-363:235">####</code> is reported as a broken
+(jumping from <code data-pos="370:221-370:225">##</code> to <code data-pos="370:229-370:235">####</code> is reported as a broken
 hierarchy). To close a section <strong>without</strong> opening a new
-heading – so that the next paragraphs or <code data-pos="363:359-363:368">include</code>d sections belong to the parent
-– end it with a <code data-pos="363:417-363:423">----</code> thematic
+heading – so that the next paragraphs or <code data-pos="370:359-370:368">include</code>d sections belong to the parent
+– end it with a <code data-pos="370:417-370:423">----</code> thematic
 break:</p>
 </div>
 <a id="listing-src-section-close" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Closing a section with ----</figcaption>
-<div class="sourceCode" id="cb10"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">## Pesquisa-Ação @SEC-PA</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">### Considerações Iniciais</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>Intro that belongs to &quot;Considerações Iniciais&quot;.</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>----</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>This paragraph belongs to the chapter, not the section above.</span></code></pre></div>
-<div data-pos="377:1-378:1">
-<p>The <code data-pos="377:5-377:11">----</code> is consumed (it never
-renders as a horizontal rule). Do not use an empty <code data-pos="377:85-377:89">##</code> as a “section reset”: an empty
+<div class="sourceCode" id="cb11"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">## Pesquisa-Ação @SEC-PA</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">### Considerações Iniciais</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>Intro that belongs to &quot;Considerações Iniciais&quot;.</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>----</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>This paragraph belongs to the chapter, not the section above.</span></code></pre></div>
+<div data-pos="384:1-385:1">
+<p>The <code data-pos="384:5-384:11">----</code> is consumed (it never
+renders as a horizontal rule). Do not use an empty <code data-pos="384:85-384:89">##</code> as a “section reset”: an empty
 heading is rejected because it would render as a blank numbered chapter
 and shift all later numbering.</p>
 </div>
-<h2 data-number="4.3" data-pos="379:1-380:1" id="MANUAL-sec5.3"><span class="header-section-number">4.3</span> Attributes</h2>
-<div data-pos="381:1-382:1">
-<p>Blockquotes declare attributes using the <code data-pos="381:42-381:54">key: value</code> pattern. They belong to the
+<h2 data-number="4.3" data-pos="386:1-387:1" id="MANUAL-sec5.3"><span class="header-section-number">4.3</span> Attributes</h2>
+<div data-pos="388:1-389:1">
+<p>Blockquotes declare attributes using the <code data-pos="388:42-388:54">key: value</code> pattern. They belong to the
 most recently opened Specification or SpecObject header and do not need
 to appear immediately after it:</p>
 </div>
 <a id="listing-src-attribute-pattern" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Attribute declaration</figcaption>
-<div class="sourceCode" id="cb11"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">## hlr: User Authentication @HLR-001</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; priority: High</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; status: Draft</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; rationale: Required by security policy</span></span></code></pre></div>
-<div data-pos="393:1-394:1">
+<div class="sourceCode" id="cb12"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">## hlr: User Authentication @HLR-001</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; priority: High</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; status: Draft</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; rationale: Required by security policy</span></span></code></pre></div>
+<div data-pos="400:1-401:1">
 <p>Rules:</p>
 </div>
-<div data-pos="395:1-402:1">
+<div data-pos="402:1-409:1">
 <ul>
-<li><div data-pos="395:1-396:1">
+<li><div data-pos="402:1-403:1">
 One blockquote declares ONE attribute. Distinct attributes are separate
 blockquotes, separated by a blank line.
 </div></li>
-<li><div data-pos="396:1-397:1">
-The first line must match <code data-pos="396:29-396:41">key: value</code> (where <code data-pos="396:49-396:54">key</code> is <code data-pos="396:58-396:73">[A-Za-z0-9_]+</code>) AND <code data-pos="396:79-396:84">key</code> must be a declared attribute of the
-enclosing object’s type (its own schema or one inherited through <code data-pos="396:186-396:195">extends</code>; matching is
+<li><div data-pos="403:1-404:1">
+The first line must match <code data-pos="403:29-403:41">key: value</code> (where <code data-pos="403:49-403:54">key</code> is <code data-pos="403:58-403:73">[A-Za-z0-9_]+</code>) AND <code data-pos="403:79-403:84">key</code> must be a declared attribute of the
+enclosing object’s type (its own schema or one inherited through <code data-pos="403:186-403:195">extends</code>; matching is
 case-insensitive). Otherwise the blockquote is plain prose — so quotes
-like <code data-pos="396:285-396:308">&gt; Note: remember this</code>
-are safe. An undeclared <code data-pos="396:333-396:339">key:</code>-shaped blockquote raises an <code data-pos="396:368-396:387">unknown_attribute</code> warning to make
+like <code data-pos="403:285-403:308">&gt; Note: remember this</code>
+are safe. An undeclared <code data-pos="403:333-403:339">key:</code>-shaped blockquote raises an <code data-pos="403:368-403:387">unknown_attribute</code> warning to make
 typos visible.
 </div></li>
-<li><div data-pos="397:1-398:1">
-Multi-line values are supported: every later <code data-pos="397:48-397:52">&gt; </code> line or <code data-pos="397:61-397:64">&gt;</code>-separated paragraph of the same
-blockquote continues the value, even when it looks like <code data-pos="397:153-397:165">key: value</code> itself.
+<li><div data-pos="404:1-405:1">
+Multi-line values are supported: every later <code data-pos="404:48-404:52">&gt; </code> line or <code data-pos="404:61-404:64">&gt;</code>-separated paragraph of the same
+blockquote continues the value, even when it looks like <code data-pos="404:153-404:165">key: value</code> itself.
 </div></li>
-<li><div data-pos="398:1-399:1">
-Specification-level metadata (blockquotes under the <code data-pos="398:55-398:58">#</code> title, e.g. <code data-pos="398:71-398:78">title</code>, <code data-pos="398:80-398:88">author</code>, <code data-pos="398:90-398:99">version</code>) is permissive: any key is
-stored, with an <code data-pos="398:143-398:167">unknown_spec_attribute</code> warning when
+<li><div data-pos="405:1-406:1">
+Specification-level metadata (blockquotes under the <code data-pos="405:55-405:58">#</code> title, e.g. <code data-pos="405:71-405:78">title</code>, <code data-pos="405:80-405:88">author</code>, <code data-pos="405:90-405:99">version</code>) is permissive: any key is
+stored, with an <code data-pos="405:143-405:167">unknown_spec_attribute</code> warning when
 the key is not declared for the specification’s type.
 </div></li>
-<li><div data-pos="399:1-401:1">
-Supported datatypes: <code data-pos="399:24-399:32">STRING</code>, <code data-pos="399:34-399:43">INTEGER</code>, <code data-pos="399:45-399:51">REAL</code>, <code data-pos="399:53-399:62">BOOLEAN</code>, <code data-pos="399:64-399:70">DATE</code> (YYYY-MM-DD), <code data-pos="399:85-399:91">ENUM</code>, <code data-pos="399:93-399:100">XHTML</code>.
+<li><div data-pos="406:1-408:1">
+Supported datatypes: <code data-pos="406:24-406:32">STRING</code>, <code data-pos="406:34-406:43">INTEGER</code>, <code data-pos="406:45-406:51">REAL</code>, <code data-pos="406:53-406:62">BOOLEAN</code>, <code data-pos="406:64-406:70">DATE</code> (YYYY-MM-DD), <code data-pos="406:85-406:91">ENUM</code>, <code data-pos="406:93-406:100">XHTML</code>.
 </div></li>
 </ul>
 </div>
-<h2 data-number="4.4" data-pos="401:1-402:1" id="MANUAL-sec5.4"><span class="header-section-number">4.4</span> Floats</h2>
-<div data-pos="403:1-404:1">
+<h2 data-number="4.4" data-pos="408:1-409:1" id="MANUAL-sec5.4"><span class="header-section-number">4.4</span> Floats</h2>
+<div data-pos="410:1-411:1">
 <p>Fenced code blocks with a typed first class declare numbered
 elements.</p>
 </div>
-<div data-pos="405:1-406:1">
-<p><strong>Pattern:</strong> <code data-pos="405:14-405:49">```type.lang:label{key=&quot;val&quot;}</code></p>
+<div data-pos="412:1-413:1">
+<p><strong>Pattern:</strong> <code data-pos="412:14-412:49">```type.lang:label{key=&quot;val&quot;}</code></p>
 </div>
-<h3 data-number="4.4.1" data-pos="407:1-408:1" id="MANUAL-sec5.4.1"><span class="header-section-number">4.4.1</span>
+<h3 data-number="4.4.1" data-pos="414:1-415:1" id="MANUAL-sec5.4.1"><span class="header-section-number">4.4.1</span>
 PlantUML Diagram</h3>
 <a id="listing-src-plantuml-float-syntax" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> PlantUML float syntax</figcaption>
-<div class="sourceCode" id="cb12"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="in">```plantuml:diag-state{caption=&quot;State Machine&quot;}</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="in">@startuml</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="in">[*] --&gt; Active</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="in">Active --&gt; Inactive</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="in">@enduml</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<h3 data-number="4.4.2" data-pos="418:1-419:1" id="MANUAL-sec5.4.2"><span class="header-section-number">4.4.2</span>
+<div class="sourceCode" id="cb13"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="in">```plantuml:diag-state{caption=&quot;State Machine&quot;}</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="in">@startuml</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="in">[*] --&gt; Active</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="in">Active --&gt; Inactive</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="in">@enduml</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<h3 data-number="4.4.2" data-pos="425:1-426:1" id="MANUAL-sec5.4.2"><span class="header-section-number">4.4.2</span>
 Table</h3>
 <a id="listing-src-table-float-syntax" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Table float syntax</figcaption>
-<div class="sourceCode" id="cb13"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="in">```list-table:tbl-interfaces{caption=&quot;External Interfaces&quot;}</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="in">&gt; header-rows: 1</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="in">&gt; aligns: l,l,l</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="in">* - Interface</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="in">  - Protocol</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="in">  - Direction</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="in">* - GPS</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="in">  - ARINC-429</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="in">  - Input</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<h3 data-number="4.4.3" data-pos="434:1-435:1" id="MANUAL-sec5.4.3"><span class="header-section-number">4.4.3</span>
+<div class="sourceCode" id="cb14"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="in">```list-table:tbl-interfaces{caption=&quot;External Interfaces&quot;}</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="in">&gt; header-rows: 1</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="in">&gt; aligns: l,l,l</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="in">* - Interface</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="in">  - Protocol</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="in">  - Direction</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="in">* - GPS</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="in">  - ARINC-429</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="in">  - Input</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<h3 data-number="4.4.3" data-pos="441:1-442:1" id="MANUAL-sec5.4.3"><span class="header-section-number">4.4.3</span>
 CSV Table</h3>
-<div data-pos="436:1-437:1">
+<div data-pos="443:1-444:1">
 <p>The Comma-Separated Values (CSV) float alias provides a compact
 syntax for tabular data:</p>
 </div>
 <a id="listing-src-csv-float-syntax" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> CSV float syntax</figcaption>
-<div class="sourceCode" id="cb14"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="in">```csv:tbl-data{caption=&quot;Sample Data&quot;}</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="in">Name,Value,Unit</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="in">Temperature,72.5,F</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="in">Pressure,1013.25,hPa</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<div data-pos="446:1-447:1">
-<p>Both <code data-pos="446:6-446:11">csv</code> and <code data-pos="446:16-446:28">list-table</code> produce TABLE floats. Use
-<code data-pos="446:55-446:60">csv</code> for simple tabular data and
-<code data-pos="446:89-446:101">list-table</code> for tables with rich
-Markdown content in cells. See <a href="#MANUAL-sec6.2" data-pos="446:154-446:185">6.2 Floats in Practice</a> for live examples
+<div class="sourceCode" id="cb15"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="in">```csv:tbl-data{caption=&quot;Sample Data&quot;}</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="in">Name,Value,Unit</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="in">Temperature,72.5,F</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="in">Pressure,1013.25,hPa</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<div data-pos="453:1-454:1">
+<p>Both <code data-pos="453:6-453:11">csv</code> and <code data-pos="453:16-453:28">list-table</code> produce TABLE floats. Use
+<code data-pos="453:55-453:60">csv</code> for simple tabular data and
+<code data-pos="453:89-453:101">list-table</code> for tables with rich
+Markdown content in cells. See <a href="#MANUAL-sec6.2" data-pos="453:154-453:185">6.2 Floats in Practice</a> for live examples
 of each.</p>
 </div>
-<h3 data-number="4.4.4" data-pos="448:1-449:1" id="MANUAL-sec5.4.4"><span class="header-section-number">4.4.4</span>
+<h3 data-number="4.4.4" data-pos="455:1-456:1" id="MANUAL-sec5.4.4"><span class="header-section-number">4.4.4</span>
 Listing (Code)</h3>
 <a id="listing-src-listing-float-syntax" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Listing float syntax</figcaption>
-<div class="sourceCode" id="cb15"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="in">```listing.c:lst-init{caption=&quot;Initialization Routine&quot;}</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="in">void init(void) {</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="in">    setup_hardware();</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<h3 data-number="4.4.5" data-pos="458:1-459:1" id="MANUAL-sec5.4.5"><span class="header-section-number">4.4.5</span>
+<div class="sourceCode" id="cb16"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="in">```listing.c:lst-init{caption=&quot;Initialization Routine&quot;}</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="in">void init(void) {</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="in">    setup_hardware();</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<h3 data-number="4.4.5" data-pos="465:1-466:1" id="MANUAL-sec5.4.5"><span class="header-section-number">4.4.5</span>
 Chart (ECharts)</h3>
-<div data-pos="460:1-461:1">
-<p>The <code data-pos="460:5-460:14">default</code> model does not
-define the <code data-pos="460:41-460:48">CHART</code> float. Use an
-overlay model that defines <code data-pos="460:90-460:97">CHART</code>
+<div data-pos="467:1-468:1">
+<p>The <code data-pos="467:5-467:14">default</code> model does not
+define the <code data-pos="467:41-467:48">CHART</code> float. Use an
+overlay model that defines <code data-pos="467:90-467:97">CHART</code>
 and its renderer. Install any external tool required by that model.</p>
 </div>
 <a id="listing-src-chart-float-syntax" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Chart float syntax</figcaption>
-<div class="sourceCode" id="cb16"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="in">```chart:chart-coverage{caption=&quot;Test Coverage&quot;}</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;xAxis&quot;: { &quot;data&quot;: [&quot;Module A&quot;, &quot;Module B&quot;] },</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;series&quot;: [{ &quot;type&quot;: &quot;bar&quot;, &quot;data&quot;: [95, 87] }]</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<div data-pos="471:1-472:1">
-<p>Charts support data injection via view modules. Add <code data-pos="471:53-471:67">view=&quot;gauss&quot;</code> and <code data-pos="471:72-471:97">params=&quot;mean=0,sigma=1&quot;</code> to the code
+<div class="sourceCode" id="cb17"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="in">```chart:chart-coverage{caption=&quot;Test Coverage&quot;}</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;xAxis&quot;: { &quot;data&quot;: [&quot;Module A&quot;, &quot;Module B&quot;] },</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;series&quot;: [{ &quot;type&quot;: &quot;bar&quot;, &quot;data&quot;: [95, 87] }]</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<div data-pos="478:1-479:1">
+<p>Charts support data injection via view modules. Add <code data-pos="478:53-478:67">view=&quot;gauss&quot;</code> and <code data-pos="478:72-478:97">params=&quot;mean=0,sigma=1&quot;</code> to the code
 fence attributes to inject generated data into the ECharts configuration
 at render time. The <em>Chart with Data View Injection</em> example
-below shows the syntax (the <code data-pos="471:272-471:279">gauss</code> view ships with the overlay
+below shows the syntax (the <code data-pos="478:272-478:279">gauss</code> view ships with the overlay
 model that provides charts).</p>
 </div>
-<h3 data-number="4.4.6" data-pos="473:1-474:1" id="MANUAL-sec5.4.6"><span class="header-section-number">4.4.6</span>
+<h3 data-number="4.4.6" data-pos="480:1-481:1" id="MANUAL-sec5.4.6"><span class="header-section-number">4.4.6</span>
 Math</h3>
 <a id="listing-src-math-float-syntax" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Math float syntax</figcaption>
-<div class="sourceCode" id="cb17"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="in">```math:eq-force{caption=&quot;Newton&#39;s Second Law&quot;}</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="in">F = ma</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<div data-pos="481:1-482:1">
+<div class="sourceCode" id="cb18"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="in">```math:eq-force{caption=&quot;Newton&#39;s Second Law&quot;}</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="in">F = ma</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<div data-pos="488:1-489:1">
 <p>Math floats use AsciiMath notation and are rendered to MathML for
-HTML5 output and OMML for DOCX. See <a href="#math-eq-specificity" data-pos="481:103-481:127">Equation 1</a> and <a href="#math-eq-latency" data-pos="481:132-481:152">Equation 2</a> for live examples in this
+HTML5 output and OMML for DOCX. See <a href="#math-eq-specificity" data-pos="488:103-488:127">Equation 1</a> and <a href="#math-eq-latency" data-pos="488:132-488:152">Equation 2</a> for live examples in this
 manual.</p>
 </div>
-<h3 data-number="4.4.7" data-pos="483:1-484:1" id="MANUAL-sec5.4.7"><span class="header-section-number">4.4.7</span>
+<h3 data-number="4.4.7" data-pos="490:1-491:1" id="MANUAL-sec5.4.7"><span class="header-section-number">4.4.7</span>
 Float Syntax Summary</h3>
 <a id="csv-tbl-float-syntax" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Float syntax components</figcaption>
@@ -996,12 +1011,12 @@ unique within the specification</td>
 </tr>
 </tbody>
 </table>
-<h2 data-number="4.5" data-pos="501:1-502:1" id="MANUAL-sec5.5"><span class="header-section-number">4.5</span> Relations (Links)</h2>
-<div data-pos="503:1-504:1">
-<p>Links use the pattern <code data-pos="503:23-503:44">[content](selector)</code>. Selectors are
+<h2 data-number="4.5" data-pos="508:1-509:1" id="MANUAL-sec5.5"><span class="header-section-number">4.5</span> Relations (Links)</h2>
+<div data-pos="510:1-511:1">
+<p>Links use the pattern <code data-pos="510:23-510:44">[content](selector)</code>. Selectors are
 <strong>not hardcoded</strong> – they are registered by relation types
-in the model’s type system. Each relation type declares a <code data-pos="503:177-503:192">link_selector</code> field, and the pipeline
-uses it for resolution and type inference. The <code data-pos="503:264-503:273">default</code> model registers the following
+in the model’s type system. Each relation type declares a <code data-pos="510:177-510:192">link_selector</code> field, and the pipeline
+uses it for resolution and type inference. The <code data-pos="510:264-510:273">default</code> model registers the following
 selectors:</p>
 </div>
 <a id="csv-tbl-selectors" class="bookmark"></a>
@@ -1043,9 +1058,9 @@ same-spec, then global</td>
 </tr>
 </tbody>
 </table>
-<div data-pos="526:1-527:1">
+<div data-pos="533:1-534:1">
 <p>Custom models can register additional selectors by defining relation
-types with new <code data-pos="526:85-526:100">link_selector</code>
+types with new <code data-pos="533:85-533:100">link_selector</code>
 values.</p>
 </div>
 <a id="csv-tbl-relation-syntax" class="bookmark"></a>
@@ -1086,9 +1101,9 @@ values.</p>
 </tr>
 </tbody>
 </table>
-<h3 data-number="4.5.1" data-pos="552:1-553:1" id="MANUAL-sec5.5.1"><span class="header-section-number">4.5.1</span>
+<h3 data-number="4.5.1" data-pos="559:1-560:1" id="MANUAL-sec5.5.1"><span class="header-section-number">4.5.1</span>
 Type Inference</h3>
-<div data-pos="554:1-555:1">
+<div data-pos="561:1-562:1">
 <p>After a link is resolved, the inference algorithm scores it against
 all registered relation types using 4 unweighted dimensions. Each
 matching dimension adds +1 to the specificity score. A constraint
@@ -1099,13 +1114,13 @@ candidate is computed as:</p>
   <div class="equation-content"><p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>=</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>4</mn></munderover><msub><mi>d</mi><mi>i</mi></msub><mo>,</mo><mo>  </mo><msub><mi>d</mi><mi>i</mi></msub><mo>∈</mo><mrow><mo stretchy="true" form="prefix">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="true" form="postfix">}</mo></mrow></mrow><annotation encoding="application/x-tex">S = \sum\limits_{i = 1}^{4}d_{i},\operatorname{~~}d_{i} \in \left\{ 0,1 \right\}</annotation></semantics></math></p></div>
   <div class="equation-number">(1)</div>
 </div>
-<div data-pos="560:1-561:1">
+<div data-pos="567:1-568:1">
 <p>The four dimensions
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mn>1</mn></msub><annotation encoding="application/x-tex">d_{1}</annotation></semantics></math>
 through
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>d</mi><mn>4</mn></msub><annotation encoding="application/x-tex">d_{4}</annotation></semantics></math>)
 correspond to selector, source attribute, source type, and target type
-as shown in <a href="#csv-tbl-inference-scoring" data-pos="560:134-560:171">Table 8</a>:</p>
+as shown in <a href="#csv-tbl-inference-scoring" data-pos="567:134-567:171">Table 8</a>:</p>
 </div>
 <a id="csv-tbl-inference-scoring" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Type inference scoring dimensions</figcaption>
@@ -1146,23 +1161,23 @@ as shown in <a href="#csv-tbl-inference-scoring" data-pos="560:134-560:171">Tabl
 </tr>
 </tbody>
 </table>
-<div data-pos="588:1-589:1">
+<div data-pos="595:1-596:1">
 <p>The highest-scoring candidate wins. If two candidates tie, the
-relation is marked ambiguous. For example, <code data-pos="588:107-588:125">[fig:diagram](#)</code> resolving to a FIGURE
-float will match XREF_FIGURE (selector <code data-pos="588:187-588:190">#</code> + target type FIGURE = specificity
+relation is marked ambiguous. For example, <code data-pos="595:107-595:125">[fig:diagram](#)</code> resolving to a FIGURE
+float will match XREF_FIGURE (selector <code data-pos="595:187-595:190">#</code> + target type FIGURE = specificity
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">S = 2</annotation></semantics></math>)
-over the generic <code data-pos="588:256-588:267">LABEL_REF</code> base
-(selector <code data-pos="588:283-588:286">#</code> only = specificity
+over the generic <code data-pos="595:256-595:267">LABEL_REF</code> base
+(selector <code data-pos="595:283-595:286">#</code> only = specificity
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">S = 1</annotation></semantics></math>).</p>
 </div>
-<h2 data-number="4.6" data-pos="590:1-591:1" id="MANUAL-sec5.6"><span class="header-section-number">4.6</span> Views</h2>
-<div data-pos="592:1-593:1">
+<h2 data-number="4.6" data-pos="597:1-598:1" id="MANUAL-sec5.6"><span class="header-section-number">4.6</span> Views</h2>
+<div data-pos="599:1-600:1">
 <p>Inline code with a specific prefix declares view placeholders:</p>
 </div>
 <a id="listing-src-inline-view" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Inline view placeholder</figcaption>
-<div class="sourceCode" id="cb18"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="in">`toc:`</span></span></code></pre></div>
-<div data-pos="598:1-599:1">
+<div class="sourceCode" id="cb19"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="in">`toc:`</span></span></code></pre></div>
+<div data-pos="605:1-606:1">
 <p>Default model view types:</p>
 </div>
 <a id="csv-tbl-view-types" class="bookmark"></a>
@@ -1217,118 +1232,118 @@ chart floats</td>
 </tr>
 </tbody>
 </table>
-<h2 data-number="4.7" data-pos="627:1-628:1" id="MANUAL-sec5.7"><span class="header-section-number">4.7</span> Body Content</h2>
-<div data-pos="629:1-630:1">
+<h2 data-number="4.7" data-pos="634:1-635:1" id="MANUAL-sec5.7"><span class="header-section-number">4.7</span> Body Content</h2>
+<div data-pos="636:1-637:1">
 <p>Prose paragraphs, lists, and tables between headers accumulate to the
 most recently opened Specification or Spec Object.</p>
 </div>
-<h2 data-number="4.8" data-pos="631:1-632:1" id="MANUAL-sec5.8"><span class="header-section-number">4.8</span> File Includes</h2>
-<div data-pos="633:1-634:1">
+<h2 data-number="4.8" data-pos="638:1-639:1" id="MANUAL-sec5.8"><span class="header-section-number">4.8</span> File Includes</h2>
+<div data-pos="640:1-641:1">
 <p>Split large documents into multiple files using fenced code blocks
-with the <code data-pos="633:77-633:86">include</code> class:</p>
+with the <code data-pos="640:77-640:86">include</code> class:</p>
 </div>
 <a id="listing-src-file-include" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Include directive syntax</figcaption>
-<div class="sourceCode" id="cb19"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="in">```include</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="in">path/to/chapter1.md</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="in">path/to/chapter2.md</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<div data-pos="642:1-643:1">
+<div class="sourceCode" id="cb20"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="in">```include</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="in">path/to/chapter1.md</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="in">path/to/chapter2.md</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<div data-pos="649:1-650:1">
 <p>Each line is a file path relative to the including document’s
-directory. Absolute paths are also supported. Lines starting with <code data-pos="642:129-642:132">#</code> are treated as comments and
+directory. Absolute paths are also supported. Lines starting with <code data-pos="649:129-649:132">#</code> are treated as comments and
 ignored.</p>
 </div>
-<div data-pos="644:1-645:1">
+<div data-pos="651:1-652:1">
 <p>Include blocks are expanded recursively before the pipeline runs.
 Circular includes are detected and produce an error. The maximum nesting
 depth is 100 levels.</p>
 </div>
-<div data-pos="646:1-647:1">
+<div data-pos="653:1-654:1">
 <p>During expansion, SpecCompiler shifts all headings in an included
 file by the same amount. The shallowest heading becomes a child of the
-active heading. For example, an include under <code data-pos="646:184-646:188">##</code> changes an included <code data-pos="646:209-646:212">#</code> to <code data-pos="646:216-646:221">###</code>. It changes the included <code data-pos="646:247-646:251">##</code> to <code data-pos="646:255-646:261">####</code>. SpecCompiler preserves relative
+active heading. For example, an include under <code data-pos="653:184-653:188">##</code> changes an included <code data-pos="653:209-653:212">#</code> to <code data-pos="653:216-653:221">###</code>. It changes the included <code data-pos="653:247-653:251">##</code> to <code data-pos="653:255-653:261">####</code>. SpecCompiler preserves relative
 depths and reports skipped levels. Nested includes combine these shifts.
-A <code data-pos="646:370-646:376">----</code> marker before the
+A <code data-pos="653:370-653:376">----</code> marker before the
 directive reduces the active level by one:</p>
 </div>
 <a id="listing-src-include-level-shift" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Include heading levels are relative to the include point</figcaption>
-<div class="sourceCode" id="cb20"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">## Design</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>Content of Design. The include below nests under Design: the included</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>file&#39;s <span class="in">`#`</span> becomes <span class="in">`###`</span>.</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="in">```include</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="in">design_details.md</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>----</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>The <span class="in">`----`</span> closed Design, so this include becomes a sibling <span class="in">`##`</span> section:</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="in">```include</span></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="in">next_chapter.md</span></span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<div data-pos="667:1-668:1">
+<div class="sourceCode" id="cb21"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">## Design</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>Content of Design. The include below nests under Design: the included</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>file&#39;s <span class="in">`#`</span> becomes <span class="in">`###`</span>.</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="in">```include</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="in">design_details.md</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>----</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>The <span class="in">`----`</span> closed Design, so this include becomes a sibling <span class="in">`##`</span> section:</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="in">```include</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="in">next_chapter.md</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<div data-pos="674:1-675:1">
 <p>SpecCompiler positions an included file relative to its shallowest
 heading. The first heading can have any level. Nested includes can
 produce Pandoc heading levels greater than 6. SpecCompiler preserves
 these levels. Each output format renders them according to its
 capabilities.</p>
 </div>
-<div data-pos="669:1-670:1">
+<div data-pos="676:1-677:1">
 <p>Included files are tracked in the build graph for incremental builds
 – a change to any included file triggers a rebuild.</p>
 </div>
-<h1 data-number="5" data-pos="671:1-672:1" id="MANUAL-sec6"><span class="header-section-number">5</span> Using the Default Model</h1>
-<h2 data-number="5.1" data-pos="673:1-674:1" id="MANUAL-sec6.1"><span class="header-section-number">5.1</span> Rationale</h2>
-<div data-pos="675:1-676:1">
-<p>The <code data-pos="675:5-675:14">default</code> model ships a
+<h1 data-number="5" data-pos="678:1-679:1" id="MANUAL-sec6"><span class="header-section-number">5</span> Using the Default Model</h1>
+<h2 data-number="5.1" data-pos="680:1-681:1" id="MANUAL-sec6.1"><span class="header-section-number">5.1</span> Rationale</h2>
+<div data-pos="682:1-683:1">
+<p>The <code data-pos="682:5-682:14">default</code> model ships a
 complete document authoring toolkit so that authors can write structured
 technical documents without defining custom types. It provides:</p>
 </div>
-<div data-pos="677:1-683:1">
+<div data-pos="684:1-690:1">
 <ul>
-<li><div data-pos="677:1-678:1">
+<li><div data-pos="684:1-685:1">
 <strong>Numbered floats</strong> – figures, tables, code listings, math
 equations, and PlantUML diagrams, each with automatic numbering and
 captions.
 </div></li>
-<li><div data-pos="678:1-679:1">
+<li><div data-pos="685:1-686:1">
 <strong>Typed cross-references</strong> – relation types that resolve
-<code data-pos="678:61-678:64">@</code> and <code data-pos="678:69-678:72">#</code> links to specific float and object
+<code data-pos="685:61-685:64">@</code> and <code data-pos="685:69-685:72">#</code> links to specific float and object
 categories, enabling the pipeline to render appropriate display text
 (for example, “Figure 3” or “Table 1”).
 </div></li>
-<li><div data-pos="679:1-680:1">
+<li><div data-pos="686:1-687:1">
 <strong>Bibliography citations</strong> – integration with Pandoc’s
 citeproc for parenthetical and in-text citation rendering from BibTeX
 files.
 </div></li>
-<li><div data-pos="680:1-682:1">
+<li><div data-pos="687:1-689:1">
 <strong>Content views</strong> – generated content blocks such as TOC,
 list of figures, abbreviation tables, and inline math.
 </div></li>
 </ul>
 </div>
-<div data-pos="682:1-683:1">
+<div data-pos="689:1-690:1">
 <p>The following subsections demonstrate these features with live floats
 and cross-references. Every float, view, and link shown below is
 processed by SpecCompiler when this manual is built.</p>
 </div>
-<h2 data-number="5.2" data-pos="684:1-685:1" id="MANUAL-sec6.2"><span class="header-section-number">5.2</span> Floats in Practice</h2>
-<div data-pos="686:1-687:1">
+<h2 data-number="5.2" data-pos="691:1-692:1" id="MANUAL-sec6.2"><span class="header-section-number">5.2</span> Floats in Practice</h2>
+<div data-pos="693:1-694:1">
 <p>A SpecCompiler document can use all default float types. Each float
 has a type prefix, a label for cross-referencing, and a caption. The
 examples below are live – they are rendered when this manual is
 processed.</p>
 </div>
-<h3 data-number="5.2.1" data-pos="688:1-689:1" id="MANUAL-sec6.2.1"><span class="header-section-number">5.2.1</span>
+<h3 data-number="5.2.1" data-pos="695:1-696:1" id="MANUAL-sec6.2.1"><span class="header-section-number">5.2.1</span>
 Architecture Diagram (PlantUML)</h3>
 <a id="puml-diag-layers" class="bookmark"></a>
 <figcaption class="caption caption-plantuml"><span class="caption-label">Figure <span class="caption-num" data-counter="figure"></span>–</span> Layered Architecture</figcaption>
 <p><img src="data:image/png;base64,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" /></p>
-<h3 data-number="5.2.2" data-pos="713:1-714:1" id="MANUAL-sec6.2.2"><span class="header-section-number">5.2.2</span>
+<h3 data-number="5.2.2" data-pos="720:1-721:1" id="MANUAL-sec6.2.2"><span class="header-section-number">5.2.2</span>
 Component Table (list-table)</h3>
 <a id="csv-tbl-components" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> System Components</figcaption>
@@ -1363,7 +1378,7 @@ Component Table (list-table)</h3>
 </tr>
 </tbody>
 </table>
-<h3 data-number="5.2.3" data-pos="736:1-737:1" id="MANUAL-sec6.2.3"><span class="header-section-number">5.2.3</span>
+<h3 data-number="5.2.3" data-pos="743:1-744:1" id="MANUAL-sec6.2.3"><span class="header-section-number">5.2.3</span>
 Performance Metrics (CSV)</h3>
 <a id="csv-tbl-metrics" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Performance Metrics</figcaption>
@@ -1403,50 +1418,50 @@ Performance Metrics (CSV)</h3>
 </tr>
 </tbody>
 </table>
-<h3 data-number="5.2.4" data-pos="746:1-747:1" id="MANUAL-sec6.2.4"><span class="header-section-number">5.2.4</span>
+<h3 data-number="5.2.4" data-pos="753:1-754:1" id="MANUAL-sec6.2.4"><span class="header-section-number">5.2.4</span>
 Initialization Code (Listing)</h3>
 <a id="listing-lst-init" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Service Initialization</figcaption>
-<div class="sourceCode" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> initialize(config):</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    db <span class="op">=</span> <span class="ex">connect</span>(config.db_url)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    auth <span class="op">=</span> AuthService(db)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Application(auth, db)</span></code></pre></div>
-<h3 data-number="5.2.5" data-pos="755:1-756:1" id="MANUAL-sec6.2.5"><span class="header-section-number">5.2.5</span>
+<div class="sourceCode" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> initialize(config):</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    db <span class="op">=</span> <span class="ex">connect</span>(config.db_url)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    auth <span class="op">=</span> AuthService(db)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> Application(auth, db)</span></code></pre></div>
+<h3 data-number="5.2.5" data-pos="762:1-763:1" id="MANUAL-sec6.2.5"><span class="header-section-number">5.2.5</span>
 Latency Model (Math)</h3>
 <div class="equation-container" id="math-eq-latency">
   <div class="equation-content"><p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><msub><mi>T</mi><mrow><mo>≠</mo><mi>t</mi><mi>w</mi><mo>or</mo><mi>k</mi></mrow></msub><mo>+</mo><msub><mi>T</mi><mrow><mi>p</mi><mi>r</mi><mi>o</mi><mi>c</mi><mi>e</mi><mi>s</mi><mo>sin</mo><mi>g</mi></mrow></msub><mo>+</mo><msub><mi>T</mi><mrow><mi>d</mi><mi>b</mi></mrow></msub></mrow><annotation encoding="application/x-tex">L = T_{\neq tw\operatorname{or}k} + T_{proces\sin g} + T_{db}</annotation></semantics></math></p></div>
   <div class="equation-number">(2)</div>
 </div>
-<h3 data-number="5.2.6" data-pos="761:1-762:1" id="MANUAL-sec6.2.6"><span class="header-section-number">5.2.6</span>
+<h3 data-number="5.2.6" data-pos="768:1-769:1" id="MANUAL-sec6.2.6"><span class="header-section-number">5.2.6</span>
 Throughput Chart (ECharts)</h3>
-<div class="sourceCode" id="cb22" data-pos="763:1-770:1"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;xAxis&quot;</span><span class="fu">:</span> <span class="fu">{</span> <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;category&quot;</span><span class="fu">,</span> <span class="dt">&quot;data&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;Auth&quot;</span><span class="ot">,</span> <span class="st">&quot;Data&quot;</span><span class="ot">,</span> <span class="st">&quot;Search&quot;</span><span class="ot">,</span> <span class="st">&quot;Notify&quot;</span><span class="ot">]</span> <span class="fu">},</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;yAxis&quot;</span><span class="fu">:</span> <span class="fu">{</span> <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;value&quot;</span><span class="fu">,</span> <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;req/s&quot;</span> <span class="fu">},</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;series&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span> <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;bar&quot;</span><span class="fu">,</span> <span class="dt">&quot;data&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1200</span><span class="ot">,</span> <span class="dv">3400</span><span class="ot">,</span> <span class="dv">890</span><span class="ot">,</span> <span class="dv">2100</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;itemStyle&quot;</span><span class="fu">:</span> <span class="fu">{</span> <span class="dt">&quot;color&quot;</span><span class="fu">:</span> <span class="st">&quot;#91cc75&quot;</span> <span class="fu">}</span> <span class="fu">}</span><span class="ot">]</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
-<h2 data-number="5.3" data-pos="771:1-772:1" id="MANUAL-sec6.3"><span class="header-section-number">5.3</span> Cross-References</h2>
-<div data-pos="773:1-774:1">
+<div class="sourceCode" id="cb23" data-pos="770:1-777:1"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;xAxis&quot;</span><span class="fu">:</span> <span class="fu">{</span> <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;category&quot;</span><span class="fu">,</span> <span class="dt">&quot;data&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;Auth&quot;</span><span class="ot">,</span> <span class="st">&quot;Data&quot;</span><span class="ot">,</span> <span class="st">&quot;Search&quot;</span><span class="ot">,</span> <span class="st">&quot;Notify&quot;</span><span class="ot">]</span> <span class="fu">},</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;yAxis&quot;</span><span class="fu">:</span> <span class="fu">{</span> <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;value&quot;</span><span class="fu">,</span> <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;req/s&quot;</span> <span class="fu">},</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;series&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="fu">{</span> <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;bar&quot;</span><span class="fu">,</span> <span class="dt">&quot;data&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1200</span><span class="ot">,</span> <span class="dv">3400</span><span class="ot">,</span> <span class="dv">890</span><span class="ot">,</span> <span class="dv">2100</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;itemStyle&quot;</span><span class="fu">:</span> <span class="fu">{</span> <span class="dt">&quot;color&quot;</span><span class="fu">:</span> <span class="st">&quot;#91cc75&quot;</span> <span class="fu">}</span> <span class="fu">}</span><span class="ot">]</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h2 data-number="5.3" data-pos="778:1-779:1" id="MANUAL-sec6.3"><span class="header-section-number">5.3</span> Cross-References</h2>
+<div data-pos="780:1-781:1">
 <p>Every float and object defined above can be referenced from prose.
 The following paragraph demonstrates cross-reference resolution using
-the <code data-pos="773:142-773:145">#</code> selector.</p>
+the <code data-pos="780:142-780:145">#</code> selector.</p>
 </div>
-<div data-pos="775:1-776:1">
-<p>The system architecture is depicted in <a href="#puml-diag-layers" data-pos="775:40-775:65">Figure 2</a>. Component details, including the
-technology stack for each layer, are listed in <a href="#csv-tbl-components" data-pos="775:147-775:177">Table 10</a>.
-Performance targets and actuals are compared in <a href="#csv-tbl-metrics" data-pos="775:227-775:247">Table 11</a> – all
+<div data-pos="782:1-783:1">
+<p>The system architecture is depicted in <a href="#puml-diag-layers" data-pos="782:40-782:65">Figure 2</a>. Component details, including the
+technology stack for each layer, are listed in <a href="#csv-tbl-components" data-pos="782:147-782:177">Table 10</a>.
+Performance targets and actuals are compared in <a href="#csv-tbl-metrics" data-pos="782:227-782:247">Table 11</a> – all
 four metrics pass their thresholds. The initialization logic is shown in
-<a href="#listing-lst-init" data-pos="775:328-775:349">Listing 20</a>,
-and the latency model driving performance requirements is defined by <a href="#math-eq-latency" data-pos="775:420-775:440">Equation 2</a>.
+<a href="#listing-lst-init" data-pos="782:328-782:349">Listing 21</a>,
+and the latency model driving performance requirements is defined by <a href="#math-eq-latency" data-pos="782:420-782:440">Equation 2</a>.
 Finally, throughput measurements by module are described by the chart
 config shown above, which renders as a chart under overlay models that
-provide the <code data-pos="775:595-775:603">chart:</code> float.</p>
+provide the <code data-pos="782:595-782:603">chart:</code> float.</p>
 </div>
-<div data-pos="777:1-778:1">
-<p>The <code data-pos="777:5-777:8">@</code> selector resolves by PID
+<div data-pos="784:1-785:1">
+<p>The <code data-pos="784:5-784:8">@</code> selector resolves by PID
 and works across documents. For example, this sentence references the
-introduction of this manual: <a href="#MANUAL-sec2" data-pos="777:133-777:149">2 Introduction</a>. Cross-document references
-to the companion guides also work; see <a href="creating-a-model.html#SPEC-sec5" data-pos="777:216-777:251">creating-a-model: 5 Model directory
-layout</a> for the model directory layout and <a href="docx-customization.html#SPEC-2-sec3" data-pos="777:287-777:313">docx-customization: 3 Style Presets</a> for
+introduction of this manual: <a href="#MANUAL-sec2" data-pos="784:133-784:149">2 Introduction</a>. Cross-document references
+to the companion guides also work; see <a href="creating-a-model.html#SPEC-sec5" data-pos="784:216-784:251">creating-a-model: 5 Model directory
+layout</a> for the model directory layout and <a href="docx-customization.html#SPEC-2-sec3" data-pos="784:287-784:313">docx-customization: 3 Style Presets</a> for
 DOCX style presets.</p>
 </div>
 <a id="csv-tbl-xref-selectors" class="bookmark"></a>
@@ -1475,235 +1490,235 @@ same scope level.</td>
 </tr>
 </tbody>
 </table>
-<h2 data-number="5.4" data-pos="794:1-795:1" id="MANUAL-sec6.4"><span class="header-section-number">5.4</span> Section References</h2>
-<div data-pos="796:1-797:1">
-<p>Headers without an explicit <code data-pos="796:29-796:36">TYPE:</code> prefix default to the SECTION
+<h2 data-number="5.4" data-pos="801:1-802:1" id="MANUAL-sec6.4"><span class="header-section-number">5.4</span> Section References</h2>
+<div data-pos="803:1-804:1">
+<p>Headers without an explicit <code data-pos="803:29-803:36">TYPE:</code> prefix default to the SECTION
 type. Sections receive auto-generated PIDs and labels that can be used
 for cross-referencing:</p>
 </div>
-<div data-pos="798:1-802:1">
+<div data-pos="805:1-809:1">
 <ul>
-<li><div data-pos="798:1-799:1">
-<strong>PID format</strong>: <code data-pos="798:19-798:50">{spec_pid}-sec{depth.numbers}</code> – for
-example, <code data-pos="798:67-798:77">SRS-sec1</code>, <code data-pos="798:79-798:91">SRS-sec1.2</code>, <code data-pos="798:93-798:107">SRS-sec2.3.1</code>. Use the <code data-pos="798:117-798:120">@</code> selector: <code data-pos="798:131-798:148">[SRS-sec1.2](@)</code>.
+<li><div data-pos="805:1-806:1">
+<strong>PID format</strong>: <code data-pos="805:19-805:50">{spec_pid}-sec{depth.numbers}</code> – for
+example, <code data-pos="805:67-805:77">SRS-sec1</code>, <code data-pos="805:79-805:91">SRS-sec1.2</code>, <code data-pos="805:93-805:107">SRS-sec2.3.1</code>. Use the <code data-pos="805:117-805:120">@</code> selector: <code data-pos="805:131-805:148">[SRS-sec1.2](@)</code>.
 </div></li>
-<li><div data-pos="799:1-801:1">
-<strong>Label format</strong>: <code data-pos="799:21-799:43">section:{title-slug}</code> – for example,
-<code data-pos="799:60-799:77">## Introduction</code> produces the label
-<code data-pos="799:97-799:119">section:introduction</code>. Use the
-<code data-pos="799:129-799:132">#</code> selector: <code data-pos="799:143-799:170">[section:introduction](#)</code>.
+<li><div data-pos="806:1-808:1">
+<strong>Label format</strong>: <code data-pos="806:21-806:43">section:{title-slug}</code> – for example,
+<code data-pos="806:60-806:77">## Introduction</code> produces the label
+<code data-pos="806:97-806:119">section:introduction</code>. Use the
+<code data-pos="806:129-806:132">#</code> selector: <code data-pos="806:143-806:170">[section:introduction](#)</code>.
 </div></li>
 </ul>
 </div>
-<div data-pos="801:1-802:1">
-<p>The <code data-pos="801:5-801:8">@</code> selector performs an exact
-PID lookup and is never ambiguous. The <code data-pos="801:75-801:78">#</code> selector uses scoped resolution
+<div data-pos="808:1-809:1">
+<p>The <code data-pos="808:5-808:8">@</code> selector performs an exact
+PID lookup and is never ambiguous. The <code data-pos="808:75-808:78">#</code> selector uses scoped resolution
 (closest scope wins), which is useful when multiple specifications have
 sections with similar names.</p>
 </div>
-<div data-pos="803:1-804:1">
-<p>For cross-document section references with the <code data-pos="803:48-803:51">#</code> selector, use the explicit scope
-syntax: <code data-pos="803:93-803:121">[SPEC-A:section:design](#)</code> to target a
-section labeled “design” within the specification whose PID is <code data-pos="803:197-803:205">SPEC-A</code>.</p>
+<div data-pos="810:1-811:1">
+<p>For cross-document section references with the <code data-pos="810:48-810:51">#</code> selector, use the explicit scope
+syntax: <code data-pos="810:93-810:121">[SPEC-A:section:design](#)</code> to target a
+section labeled “design” within the specification whose PID is <code data-pos="810:197-810:205">SPEC-A</code>.</p>
 </div>
-<div data-pos="805:1-806:1">
+<div data-pos="812:1-813:1">
 <p>This manual references its own sections using both selectors. Here
 are examples that resolve within this document:</p>
 </div>
-<div data-pos="807:1-811:1">
+<div data-pos="814:1-818:1">
 <ul>
-<li><div data-pos="807:1-808:1">
-By PID: <a href="#MANUAL-sec3" data-pos="807:11-807:27">3
-Installation</a> links to Installation, <a href="#MANUAL-sec5" data-pos="807:51-807:67">5 Document Authoring</a> links to Document
+<li><div data-pos="814:1-815:1">
+By PID: <a href="#MANUAL-sec3" data-pos="814:11-814:27">3
+Installation</a> links to Installation, <a href="#MANUAL-sec5" data-pos="814:51-814:67">5 Document Authoring</a> links to Document
 Authoring.
 </div></li>
-<li><div data-pos="808:1-810:1">
-By label: <a href="#MANUAL-sec2.3" data-pos="808:13-808:42">2.3 Pipeline
-Summary</a> links to Pipeline Summary, <a href="#MANUAL-sec12" data-pos="808:70-808:98">12 Troubleshooting</a> links to
+<li><div data-pos="815:1-817:1">
+By label: <a href="#MANUAL-sec2.3" data-pos="815:13-815:42">2.3 Pipeline
+Summary</a> links to Pipeline Summary, <a href="#MANUAL-sec12" data-pos="815:70-815:98">12 Troubleshooting</a> links to
 Troubleshooting.
 </div></li>
 </ul>
 </div>
-<div data-pos="810:1-811:1">
+<div data-pos="817:1-818:1">
 <p>Cross-document references work identically. Because the companion
-guides are listed in the same <code data-pos="810:97-810:111">project.yaml</code>, these links resolve at
+guides are listed in the same <code data-pos="817:97-817:111">project.yaml</code>, these links resolve at
 build time:</p>
 </div>
-<div data-pos="812:1-817:1">
+<div data-pos="819:1-824:1">
 <ul>
-<li><div data-pos="812:1-813:1">
-<a href="creating-a-model.html#SPEC-sec8.4" data-pos="812:3-812:45">creating-a-model: 8.4 Walkthrough custom float
+<li><div data-pos="819:1-820:1">
+<a href="creating-a-model.html#SPEC-sec8.4" data-pos="819:3-819:45">creating-a-model: 8.4 Walkthrough custom float
 type</a> links to the float walkthrough in the model guide.
 </div></li>
-<li><div data-pos="813:1-814:1">
-<a href="docx-customization.html#SPEC-2-sec4" data-pos="813:3-813:30">docx-customization: 4 Postprocessors</a> links
+<li><div data-pos="820:1-821:1">
+<a href="docx-customization.html#SPEC-2-sec4" data-pos="820:3-820:30">docx-customization: 4 Postprocessors</a> links
 to the DOCX customization guide.
 </div></li>
-<li><div data-pos="814:1-816:1">
-<a href="docx-customization.html#SPEC-2-sec3.6" data-pos="814:3-814:34">docx-customization: 3.6 Preset Inheritance</a>
+<li><div data-pos="821:1-823:1">
+<a href="docx-customization.html#SPEC-2-sec3.6" data-pos="821:3-821:34">docx-customization: 3.6 Preset Inheritance</a>
 links to preset inheritance in the DOCX guide.
 </div></li>
 </ul>
 </div>
-<h2 data-number="5.5" data-pos="816:1-817:1" id="MANUAL-sec6.5"><span class="header-section-number">5.5</span> Citations and Bibliography</h2>
-<div data-pos="818:1-819:1">
+<h2 data-number="5.5" data-pos="823:1-824:1" id="MANUAL-sec6.5"><span class="header-section-number">5.5</span> Citations and Bibliography</h2>
+<div data-pos="825:1-826:1">
 <p>SpecCompiler integrates with Pandoc’s citeproc processor for
 scholarly citations.</p>
 </div>
-<div data-pos="820:1-821:1">
-<p><strong>Step 1.</strong> Add bibliography configuration to <code data-pos="820:47-820:61">project.yaml</code>:</p>
+<div data-pos="827:1-828:1">
+<p><strong>Step 1.</strong> Add bibliography configuration to <code data-pos="827:47-827:61">project.yaml</code>:</p>
 </div>
 <a id="listing-src-bib-config" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Bibliography configuration in project.yaml</figcaption>
-<div class="sourceCode" id="cb23"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bibliography</span><span class="kw">:</span><span class="at"> refs.bib</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">csl</span><span class="kw">:</span><span class="at"> ieee.csl</span></span></code></pre></div>
-<div data-pos="827:1-828:1">
-<p><strong>Step 2.</strong> Create a BibTeX file (<code data-pos="827:35-827:45">refs.bib</code>):</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bibliography</span><span class="kw">:</span><span class="at"> refs.bib</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">csl</span><span class="kw">:</span><span class="at"> ieee.csl</span></span></code></pre></div>
+<div data-pos="834:1-835:1">
+<p><strong>Step 2.</strong> Create a BibTeX file (<code data-pos="834:35-834:45">refs.bib</code>):</p>
 </div>
 <a id="listing-src-bib-file" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Example BibTeX file</figcaption>
-<div class="sourceCode" id="cb24"><pre class="sourceCode bib"><code class="sourceCode bibtex"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="va">@article</span>{<span class="ot">smith2024</span>,</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>  = {Smith, John},</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>   = {Advances in Systems Engineering},</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">journal</span> = {IEEE Transactions},</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>    = {2024}</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="va">@book</span>{<span class="ot">jones2023</span>,</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>    = {Jones, Alice},</span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>     = {Software Architecture Patterns},</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">publisher</span> = {O&#39;Reilly},</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>      = {2023}</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<div data-pos="844:1-845:1">
+<div class="sourceCode" id="cb25"><pre class="sourceCode bib"><code class="sourceCode bibtex"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="va">@article</span>{<span class="ot">smith2024</span>,</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>  = {Smith, John},</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>   = {Advances in Systems Engineering},</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">journal</span> = {IEEE Transactions},</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>    = {2024}</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="va">@book</span>{<span class="ot">jones2023</span>,</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">author</span>    = {Jones, Alice},</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">title</span>     = {Software Architecture Patterns},</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">publisher</span> = {O&#39;Reilly},</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">year</span>      = {2023}</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div data-pos="851:1-852:1">
 <p><strong>Step 3.</strong> Use citation syntax in your document:</p>
 </div>
 <a id="listing-src-citation-syntax" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Citation syntax examples</figcaption>
-<div class="sourceCode" id="cb25"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>Recent work <span class="co">[</span><span class="ot">smith2024</span><span class="co">](@cite)</span> demonstrates the approach.</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>As Smith <span class="co">[</span><span class="ot">smith2024</span><span class="co">](@citep)</span> argues, the method is effective.</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>Multiple sources support this <span class="co">[</span><span class="ot">smith2024;jones2023</span><span class="co">](@cite)</span>.</span></code></pre></div>
-<div data-pos="854:1-859:1">
+<div class="sourceCode" id="cb26"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>Recent work <span class="co">[</span><span class="ot">smith2024</span><span class="co">](@cite)</span> demonstrates the approach.</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>As Smith <span class="co">[</span><span class="ot">smith2024</span><span class="co">](@citep)</span> argues, the method is effective.</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>Multiple sources support this <span class="co">[</span><span class="ot">smith2024;jones2023</span><span class="co">](@cite)</span>.</span></code></pre></div>
+<div data-pos="861:1-866:1">
 <ul>
-<li><div data-pos="854:1-855:1">
-<code data-pos="854:3-854:17">[key](@cite)</code> produces a
+<li><div data-pos="861:1-862:1">
+<code data-pos="861:3-861:17">[key](@cite)</code> produces a
 <strong>parenthetical</strong> citation – for example, “(Smith, 2024)”
 in author-date styles or “[1]” in numeric styles.
 </div></li>
-<li><div data-pos="855:1-856:1">
-<code data-pos="855:3-855:18">[key](@citep)</code> produces an
+<li><div data-pos="862:1-863:1">
+<code data-pos="862:3-862:18">[key](@citep)</code> produces an
 <strong>in-text</strong> citation – for example, “Smith (2024)” or
 “Smith [1]”.
 </div></li>
-<li><div data-pos="856:1-858:1">
-Multiple keys separated by <code data-pos="856:30-856:33">;</code>
+<li><div data-pos="863:1-865:1">
+Multiple keys separated by <code data-pos="863:30-863:33">;</code>
 produce a grouped citation.
 </div></li>
 </ul>
 </div>
-<div data-pos="858:1-859:1">
+<div data-pos="865:1-866:1">
 <p><strong>Processing pipeline</strong>: During the TRANSFORM phase,
-citation links are rewritten to Pandoc <code data-pos="858:93-858:99">Cite</code> elements. During EMIT, Pandoc’s
+citation links are rewritten to Pandoc <code data-pos="865:93-865:99">Cite</code> elements. During EMIT, Pandoc’s
 citeproc processor formats citations and appends a bibliography list to
 the document according to the configured CSL style.</p>
 </div>
-<h2 data-number="5.6" data-pos="860:1-861:1" id="MANUAL-sec6.6"><span class="header-section-number">5.6</span> Views in Practice</h2>
-<div data-pos="862:1-863:1">
+<h2 data-number="5.6" data-pos="867:1-868:1" id="MANUAL-sec6.6"><span class="header-section-number">5.6</span> Views in Practice</h2>
+<div data-pos="869:1-870:1">
 <p>Views generate content blocks from the SpecIR.</p>
 </div>
-<h3 data-number="5.6.1" data-pos="864:1-865:1" id="MANUAL-sec6.6.1"><span class="header-section-number">5.6.1</span>
+<h3 data-number="5.6.1" data-pos="871:1-872:1" id="MANUAL-sec6.6.1"><span class="header-section-number">5.6.1</span>
 Abbreviations</h3>
-<div data-pos="866:1-867:1">
-<p>The <code data-pos="866:5-866:14">abbrev:</code> view defines
+<div data-pos="873:1-874:1">
+<p>The <code data-pos="873:5-873:14">abbrev:</code> view defines
 abbreviations inline. On first use, the full meaning is displayed
-alongside the abbreviation. All definitions are collected for the <code data-pos="866:160-866:173">abbrev_list</code> view shown in the <a href="#MANUAL-sec17" data-pos="866:192-866:226">17 List of
+alongside the abbreviation. All definitions are collected for the <code data-pos="873:160-873:173">abbrev_list</code> view shown in the <a href="#MANUAL-sec17" data-pos="873:192-873:226">17 List of
 Abbreviations</a> appendix.</p>
 </div>
-<div data-pos="868:1-869:1">
+<div data-pos="875:1-876:1">
 <p>This manual defines abbreviations on first use throughout the text.
 For example, Entity-Attribute-Value (EAV) is the database pattern used
 for flexible attributes, and Newline-Delimited JSON (NDJSON) is the
 format used for diagnostic output.</p>
 </div>
-<div data-pos="870:1-871:1">
-<p>The syntax is: <code data-pos="870:16-870:64">`abbrev: Full Meaning Text (ABBREVIATION)`</code>.
+<div data-pos="877:1-878:1">
+<p>The syntax is: <code data-pos="877:16-877:64">`abbrev: Full Meaning Text (ABBREVIATION)`</code>.
 The abbreviation goes in parentheses at the end.</p>
 </div>
-<h3 data-number="5.6.2" data-pos="872:1-873:1" id="MANUAL-sec6.6.2"><span class="header-section-number">5.6.2</span>
+<h3 data-number="5.6.2" data-pos="879:1-880:1" id="MANUAL-sec6.6.2"><span class="header-section-number">5.6.2</span>
 Inline Math</h3>
-<div data-pos="874:1-875:1">
-<p>The <code data-pos="874:5-874:10">eq:</code> prefix renders inline
+<div data-pos="881:1-882:1">
+<p>The <code data-pos="881:5-881:10">eq:</code> prefix renders inline
 math expressions using AsciiMath notation. For example, the quadratic
 formula is
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>=</mo><mfrac><mrow><mo>−</mo><mi>b</mi><mo>±</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mo>−</mo><mn>4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">x = \frac{- b \pm \sqrt{b^{2} - 4ac}}{2a}</annotation></semantics></math>,
 and Euler’s identity is
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>e</mi><mrow><mi>i</mi><mi>π</mi></mrow></msup><mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">e^{i\pi} + 1 = 0</annotation></semantics></math>.</p>
 </div>
-<div data-pos="876:1-877:1">
+<div data-pos="883:1-884:1">
 <p>Inline math is useful for formulas within prose paragraphs, while
-block <code data-pos="876:73-876:80">math:</code> floats (like <a href="#math-eq-specificity" data-pos="876:94-876:118">Equation 1</a> and
-<a href="#math-eq-latency" data-pos="876:123-876:143">Equation 2</a>)
+block <code data-pos="883:73-883:80">math:</code> floats (like <a href="#math-eq-specificity" data-pos="883:94-883:118">Equation 1</a> and
+<a href="#math-eq-latency" data-pos="883:123-883:143">Equation 2</a>)
 provide numbered equations with captions.</p>
 </div>
-<h3 data-number="5.6.3" data-pos="878:1-879:1" id="MANUAL-sec6.6.3"><span class="header-section-number">5.6.3</span>
+<h3 data-number="5.6.3" data-pos="885:1-886:1" id="MANUAL-sec6.6.3"><span class="header-section-number">5.6.3</span>
 Chart with Data View Injection (Gauss)</h3>
-<div data-pos="880:1-881:1">
-<p>Charts can load data dynamically from view modules using the <code data-pos="880:62-880:68">view</code> attribute. The <code data-pos="880:84-880:91">gauss</code> view generates a Gaussian
+<div data-pos="887:1-888:1">
+<p>Charts can load data dynamically from view modules using the <code data-pos="887:62-887:68">view</code> attribute. The <code data-pos="887:84-887:91">gauss</code> view generates a Gaussian
 probability density function and injects it into the ECharts dataset.
-The syntax below shows this – the <code data-pos="880:223-880:237">view=&quot;gauss&quot;</code> attribute triggers the
+The syntax below shows this – the <code data-pos="887:223-887:237">view=&quot;gauss&quot;</code> attribute triggers the
 data injection pipeline in models that provide the chart float:</p>
 </div>
 <a id="listing-src-chart-gauss-syntax" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Chart with gauss data injection</figcaption>
-<div class="sourceCode" id="cb26"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="in">```chart:chart-gauss{caption=&quot;Standard Normal Distribution&quot; view=&quot;gauss&quot; params=&quot;mean=0,sigma=1,xmin=-3,xmax=3,points=61&quot;}</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;xAxis&quot;: { &quot;type&quot;: &quot;value&quot;, &quot;name&quot;: &quot;x&quot; },</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;yAxis&quot;: { &quot;type&quot;: &quot;value&quot;, &quot;name&quot;: &quot;f(x)&quot; },</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;series&quot;: [{ &quot;type&quot;: &quot;line&quot;, &quot;smooth&quot;: true }]</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<div data-pos="892:1-893:1">
-<p>The <code data-pos="892:5-892:13">params</code> attribute passes
-<code data-pos="892:31-892:37">mean</code>, <code data-pos="892:39-892:46">sigma</code>, <code data-pos="892:48-892:54">xmin</code>, <code data-pos="892:56-892:62">xmax</code>, and <code data-pos="892:68-892:76">points</code> to the Gauss view’s <code data-pos="892:97-892:106">dataset</code> data hook. The hook returns an
+<div class="sourceCode" id="cb27"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="in">```chart:chart-gauss{caption=&quot;Standard Normal Distribution&quot; view=&quot;gauss&quot; params=&quot;mean=0,sigma=1,xmin=-3,xmax=3,points=61&quot;}</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="in">{</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;xAxis&quot;: { &quot;type&quot;: &quot;value&quot;, &quot;name&quot;: &quot;x&quot; },</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;yAxis&quot;: { &quot;type&quot;: &quot;value&quot;, &quot;name&quot;: &quot;f(x)&quot; },</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;series&quot;: [{ &quot;type&quot;: &quot;line&quot;, &quot;smooth&quot;: true }]</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
+<div data-pos="899:1-900:1">
+<p>The <code data-pos="899:5-899:13">params</code> attribute passes
+<code data-pos="899:31-899:37">mean</code>, <code data-pos="899:39-899:46">sigma</code>, <code data-pos="899:48-899:54">xmin</code>, <code data-pos="899:56-899:62">xmax</code>, and <code data-pos="899:68-899:76">points</code> to the Gauss view’s <code data-pos="899:97-899:106">dataset</code> data hook. The hook returns an
 ECharts dataset that replaces the chart’s placeholder data at render
 time. This same mechanism supports custom data views that query the
-SpecIR database; see <a href="creating-a-model.html#SPEC-sec8.3" data-pos="892:296-892:332">creating-a-model: 8.3 Walkthrough custom
+SpecIR database; see <a href="creating-a-model.html#SPEC-sec8.3" data-pos="899:296-899:332">creating-a-model: 8.3 Walkthrough custom
 view</a> in the model guide for details on creating view types.</p>
 </div>
-<h3 data-number="5.6.4" data-pos="894:1-895:1" id="MANUAL-sec6.6.4"><span class="header-section-number">5.6.4</span>
+<h3 data-number="5.6.4" data-pos="901:1-902:1" id="MANUAL-sec6.6.4"><span class="header-section-number">5.6.4</span>
 Generated Lists</h3>
-<div data-pos="896:1-897:1">
+<div data-pos="903:1-904:1">
 <p>The [LOF] and [LOT] views produce navigable lists of figures and
 tables. These are rendered in the appendices of this manual:</p>
 </div>
-<div data-pos="898:1-903:1">
+<div data-pos="905:1-910:1">
 <ul>
-<li><div data-pos="898:1-899:1">
-<a href="#MANUAL-sec14" data-pos="898:3-898:31">14 List of Figures</a> –
+<li><div data-pos="905:1-906:1">
+<a href="#MANUAL-sec14" data-pos="905:3-905:31">14 List of Figures</a> –
 generated by [LOF]
 </div></li>
-<li><div data-pos="899:1-900:1">
-<a href="#MANUAL-sec15" data-pos="899:3-899:30">15 List of Tables</a> –
+<li><div data-pos="906:1-907:1">
+<a href="#MANUAL-sec15" data-pos="906:3-906:30">15 List of Tables</a> –
 generated by [LOT]
 </div></li>
-<li><div data-pos="900:1-902:1">
-<a href="#MANUAL-sec17" data-pos="900:3-900:37">17 List of
-Abbreviations</a> – generated by <code data-pos="900:54-900:67">abbrev_list</code>
+<li><div data-pos="907:1-909:1">
+<a href="#MANUAL-sec17" data-pos="907:3-907:37">17 List of
+Abbreviations</a> – generated by <code data-pos="907:54-907:67">abbrev_list</code>
 </div></li>
 </ul>
 </div>
-<h1 data-number="6" data-pos="902:1-903:1" id="MANUAL-sec7"><span class="header-section-number">6</span> Invocation</h1>
-<h2 data-number="6.1" data-pos="904:1-905:1" id="MANUAL-sec7.1"><span class="header-section-number">6.1</span> Basic Usage</h2>
+<h1 data-number="6" data-pos="909:1-910:1" id="MANUAL-sec7"><span class="header-section-number">6</span> Invocation</h1>
+<h2 data-number="6.1" data-pos="911:1-912:1" id="MANUAL-sec7.1"><span class="header-section-number">6.1</span> Basic Usage</h2>
 <a id="listing-src-basic-usage" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Basic invocation</figcaption>
-<div class="sourceCode" id="cb27"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build</span></code></pre></div>
-<div data-pos="910:1-911:1">
-<p>Processes all files from <code data-pos="910:26-910:37">doc_files</code> in the current directory’s
-<code data-pos="910:65-910:79">project.yaml</code>. An alternative
-project file can be specified: <code data-pos="910:127-910:156">specc build my-project.yaml</code>.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build</span></code></pre></div>
+<div data-pos="917:1-918:1">
+<p>Processes all files from <code data-pos="917:26-917:37">doc_files</code> in the current directory’s
+<code data-pos="917:65-917:79">project.yaml</code>. An alternative
+project file can be specified: <code data-pos="917:127-917:156">specc build my-project.yaml</code>.</p>
 </div>
-<h2 data-number="6.2" data-pos="912:1-913:1" id="MANUAL-sec7.2"><span class="header-section-number">6.2</span> Environment Variables</h2>
+<h2 data-number="6.2" data-pos="919:1-920:1" id="MANUAL-sec7.2"><span class="header-section-number">6.2</span> Environment Variables</h2>
 <a id="csv-tbl-env-vars" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Environment variables</figcaption>
 <table>
@@ -1746,7 +1761,7 @@ in wrapper)</td>
 </tr>
 </tbody>
 </table>
-<h2 data-number="6.3" data-pos="938:1-939:1" id="MANUAL-sec7.3"><span class="header-section-number">6.3</span> Exit Codes</h2>
+<h2 data-number="6.3" data-pos="945:1-946:1" id="MANUAL-sec7.3"><span class="header-section-number">6.3</span> Exit Codes</h2>
 <a id="csv-tbl-exit-codes" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Exit Codes</figcaption>
 <table>
@@ -1771,30 +1786,30 @@ in wrapper)</td>
 </tr>
 </tbody>
 </table>
-<h1 data-number="7" data-pos="947:1-948:1" id="MANUAL-sec8"><span class="header-section-number">7</span> Output Formats</h1>
-<div data-pos="949:1-950:1">
+<h1 data-number="7" data-pos="954:1-955:1" id="MANUAL-sec8"><span class="header-section-number">7</span> Output Formats</h1>
+<div data-pos="956:1-957:1">
 <p>Four output formats are supported. Multiple formats can be generated
 in a single run.</p>
 </div>
-<h2 data-number="7.1" data-pos="951:1-952:1" id="MANUAL-sec8.1"><span class="header-section-number">7.1</span> DOCX (Microsoft Word)</h2>
-<div data-pos="953:1-957:1">
+<h2 data-number="7.1" data-pos="958:1-959:1" id="MANUAL-sec8.1"><span class="header-section-number">7.1</span> DOCX (Microsoft Word)</h2>
+<div data-pos="960:1-964:1">
 <ul>
-<li><div data-pos="953:1-954:1">
-Style presets via <code data-pos="953:21-953:34">docx.preset</code> or
-custom <code data-pos="953:45-953:65">docx.reference_doc</code>.
+<li><div data-pos="960:1-961:1">
+Style presets via <code data-pos="960:21-960:34">docx.preset</code> or
+custom <code data-pos="960:45-960:65">docx.reference_doc</code>.
 </div></li>
-<li><div data-pos="954:1-956:1">
+<li><div data-pos="961:1-963:1">
 Model-specific postprocessors for format transformations.
 </div></li>
 </ul>
 </div>
-<div data-pos="956:1-957:1">
+<div data-pos="963:1-964:1">
 <p>For a complete guide on customizing DOCX output – including paragraph
-styles, table styles, caption configuration, and postprocessors – see <a href="docx-customization.html#SPEC-2-sec3" data-pos="956:143-956:169">docx-customization: 3 Style Presets</a> and
-<a href="docx-customization.html#SPEC-2-sec4" data-pos="956:174-956:201">docx-customization: 4 Postprocessors</a> in
+styles, table styles, caption configuration, and postprocessors – see <a href="docx-customization.html#SPEC-2-sec3" data-pos="963:143-963:169">docx-customization: 3 Style Presets</a> and
+<a href="docx-customization.html#SPEC-2-sec4" data-pos="963:174-963:201">docx-customization: 4 Postprocessors</a> in
 the companion <em>DOCX Customization</em> guide.</p>
 </div>
-<h2 data-number="7.2" data-pos="958:1-959:1" id="MANUAL-sec8.2"><span class="header-section-number">7.2</span> HTML5</h2>
+<h2 data-number="7.2" data-pos="965:1-966:1" id="MANUAL-sec8.2"><span class="header-section-number">7.2</span> HTML5</h2>
 <a id="csv-tbl-html5-options" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> HTML5 output options</figcaption>
 <table>
@@ -1839,25 +1854,25 @@ the companion <em>DOCX Customization</em> guide.</p>
 </tr>
 </tbody>
 </table>
-<h2 data-number="7.3" data-pos="990:1-991:1" id="MANUAL-sec8.3"><span class="header-section-number">7.3</span> Markdown (GitHub-Flavored
+<h2 data-number="7.3" data-pos="997:1-998:1" id="MANUAL-sec8.3"><span class="header-section-number">7.3</span> Markdown (GitHub-Flavored
 Markdown (GFM))</h2>
-<div data-pos="992:1-993:1">
+<div data-pos="999:1-1000:1">
 <p>GitHub-Flavored Markdown. Useful for review platforms and static site
 generators.</p>
 </div>
-<h2 data-number="7.4" data-pos="994:1-995:1" id="MANUAL-sec8.4"><span class="header-section-number">7.4</span> JSON (Pandoc AST)</h2>
-<div data-pos="996:1-997:1">
+<h2 data-number="7.4" data-pos="1001:1-1002:1" id="MANUAL-sec8.4"><span class="header-section-number">7.4</span> JSON (Pandoc AST)</h2>
+<div data-pos="1003:1-1004:1">
 <p>Full Pandoc AST for programmatic integration with other tools.</p>
 </div>
-<h1 data-number="8" data-pos="998:1-999:1" id="MANUAL-sec9"><span class="header-section-number">8</span> Verification and Diagnostics</h1>
-<h2 data-number="8.1" data-pos="1000:1-1001:1" id="MANUAL-sec9.1"><span class="header-section-number">8.1</span> Diagnostic Output</h2>
-<div data-pos="1002:1-1003:1">
+<h1 data-number="8" data-pos="1005:1-1006:1" id="MANUAL-sec9"><span class="header-section-number">8</span> Verification and Diagnostics</h1>
+<h2 data-number="8.1" data-pos="1007:1-1008:1" id="MANUAL-sec9.1"><span class="header-section-number">8.1</span> Diagnostic Output</h2>
+<div data-pos="1009:1-1010:1">
 <p>Diagnostics are emitted in NDJSON format to stderr:</p>
 </div>
 <a id="listing-src-diagnostic-ndjson" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Diagnostic NDJSON example</figcaption>
-<div class="sourceCode" id="cb28"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="dt">&quot;level&quot;</span><span class="fu">:</span><span class="st">&quot;error&quot;</span><span class="fu">,</span><span class="dt">&quot;message&quot;</span><span class="fu">:</span><span class="st">&quot;[missing_required] Object missing required attribute &#39;priority&#39; on HLR-001&quot;</span><span class="fu">,</span><span class="dt">&quot;file&quot;</span><span class="fu">:</span><span class="st">&quot;srs.md&quot;</span><span class="fu">,</span><span class="dt">&quot;line&quot;</span><span class="fu">:</span><span class="dv">42</span><span class="fu">}</span></span></code></pre></div>
-<h2 data-number="8.2" data-pos="1008:1-1009:1" id="MANUAL-sec9.2"><span class="header-section-number">8.2</span> Diagnostic Reference</h2>
+<div class="sourceCode" id="cb29"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="dt">&quot;level&quot;</span><span class="fu">:</span><span class="st">&quot;error&quot;</span><span class="fu">,</span><span class="dt">&quot;message&quot;</span><span class="fu">:</span><span class="st">&quot;[missing_required] Object missing required attribute &#39;priority&#39; on HLR-001&quot;</span><span class="fu">,</span><span class="dt">&quot;file&quot;</span><span class="fu">:</span><span class="st">&quot;srs.md&quot;</span><span class="fu">,</span><span class="dt">&quot;line&quot;</span><span class="fu">:</span><span class="dv">42</span><span class="fu">}</span></span></code></pre></div>
+<h2 data-number="8.2" data-pos="1015:1-1016:1" id="MANUAL-sec9.2"><span class="header-section-number">8.2</span> Diagnostic Reference</h2>
 <a id="csv-tbl-error-codes" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Validation diagnostics</figcaption>
 <table>
@@ -1943,186 +1958,186 @@ case-sensitive)</td>
 </tr>
 </tbody>
 </table>
-<h2 data-number="8.3" data-pos="1052:1-1053:1" id="MANUAL-sec9.3"><span class="header-section-number">8.3</span> Suppressing Validation
+<h2 data-number="8.3" data-pos="1059:1-1060:1" id="MANUAL-sec9.3"><span class="header-section-number">8.3</span> Suppressing Validation
 Rules</h2>
-<div data-pos="1054:1-1055:1">
-<p>Every diagnostic listed in <a href="#csv-tbl-error-codes" data-pos="1054:28-1054:59">Table 16</a> can be suppressed or downgraded
-in <code data-pos="1054:95-1054:109">project.yaml</code> using its
+<div data-pos="1061:1-1062:1">
+<p>Every diagnostic listed in <a href="#csv-tbl-error-codes" data-pos="1061:28-1061:59">Table 16</a> can be suppressed or downgraded
+in <code data-pos="1061:95-1061:109">project.yaml</code> using its
 policy key:</p>
 </div>
 <a id="listing-src-suppress-example" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Suppressing a validation rule</figcaption>
-<div class="sourceCode" id="cb29"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validation</span><span class="kw">:</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">float_orphan</span><span class="kw">:</span><span class="at"> ignore</span><span class="co">              # suppress entirely</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">unresolved_relation</span><span class="kw">:</span><span class="at"> warn</span><span class="co">         # downgrade to warning</span></span></code></pre></div>
-<div data-pos="1062:1-1063:1">
-<p>Analyze-query diagnostics default to <code data-pos="1062:38-1062:45">error</code>. Set a key to <code data-pos="1062:60-1062:66">warn</code> to continue the build with a
-warning. Set it to <code data-pos="1062:115-1062:123">ignore</code> to
+<div class="sourceCode" id="cb30"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validation</span><span class="kw">:</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">float_orphan</span><span class="kw">:</span><span class="at"> ignore</span><span class="co">              # suppress entirely</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">unresolved_relation</span><span class="kw">:</span><span class="at"> warn</span><span class="co">         # downgrade to warning</span></span></code></pre></div>
+<div data-pos="1069:1-1070:1">
+<p>Analyze-query diagnostics default to <code data-pos="1069:38-1069:45">error</code>. Set a key to <code data-pos="1069:60-1069:66">warn</code> to continue the build with a
+warning. Set it to <code data-pos="1069:115-1069:123">ignore</code> to
 suppress the diagnostic. Custom analyze queries can define policy
 keys.</p>
 </div>
-<h1 data-number="9" data-pos="1064:1-1065:1" id="MANUAL-sec10"><span class="header-section-number">9</span> Incremental Builds</h1>
-<h2 data-number="9.1" data-pos="1066:1-1067:1" id="MANUAL-sec10.1"><span class="header-section-number">9.1</span> Build Cache Mechanism</h2>
-<div data-pos="1068:1-1074:1">
+<h1 data-number="9" data-pos="1071:1-1072:1" id="MANUAL-sec10"><span class="header-section-number">9</span> Incremental Builds</h1>
+<h2 data-number="9.1" data-pos="1073:1-1074:1" id="MANUAL-sec10.1"><span class="header-section-number">9.1</span> Build Cache Mechanism</h2>
+<div data-pos="1075:1-1081:1">
 <ol type="1">
-<li><div data-pos="1068:1-1069:1">
+<li><div data-pos="1075:1-1076:1">
 <strong>File hashing</strong> – SHA-1 hash of each input file.
 </div></li>
-<li><div data-pos="1069:1-1070:1">
-<strong>Include dependency tracking</strong> – Tracked in <code data-pos="1069:50-1069:63">build_graph</code> table.
+<li><div data-pos="1076:1-1077:1">
+<strong>Include dependency tracking</strong> – Tracked in <code data-pos="1076:50-1076:63">build_graph</code> table.
 </div></li>
-<li><div data-pos="1070:1-1071:1">
-<strong>Cache comparison</strong> – Current hashes vs <code data-pos="1070:46-1070:59">build_cache</code> table.
+<li><div data-pos="1077:1-1078:1">
+<strong>Cache comparison</strong> – Current hashes vs <code data-pos="1077:46-1077:59">build_cache</code> table.
 </div></li>
-<li><div data-pos="1071:1-1073:1">
+<li><div data-pos="1078:1-1080:1">
 <strong>Skip decision</strong> – Unchanged documents reuse cached SpecIR
 data.
 </div></li>
 </ol>
 </div>
-<h2 data-number="9.2" data-pos="1073:1-1074:1" id="MANUAL-sec10.2"><span class="header-section-number">9.2</span> Forcing a Full Rebuild</h2>
+<h2 data-number="9.2" data-pos="1080:1-1081:1" id="MANUAL-sec10.2"><span class="header-section-number">9.2</span> Forcing a Full Rebuild</h2>
 <a id="listing-src-force-rebuild" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Force full rebuild</figcaption>
-<div class="sourceCode" id="cb30"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> clean</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build</span></code></pre></div>
-<h1 data-number="10" data-pos="1080:1-1081:1" id="MANUAL-sec11"><span class="header-section-number">10</span> Type System and Models</h1>
-<h2 data-number="10.1" data-pos="1082:1-1083:1" id="MANUAL-sec11.1"><span class="header-section-number">10.1</span>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> clean</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build</span></code></pre></div>
+<h1 data-number="10" data-pos="1087:1-1088:1" id="MANUAL-sec11"><span class="header-section-number">10</span> Type System and Models</h1>
+<h2 data-number="10.1" data-pos="1089:1-1090:1" id="MANUAL-sec11.1"><span class="header-section-number">10.1</span>
 Built-in Models</h2>
-<div data-pos="1084:1-1085:1">
-<p>SpecCompiler includes the <code data-pos="1084:27-1084:36">default</code> and <code data-pos="1084:41-1084:50">sw_docs</code> models. The <code data-pos="1084:63-1084:72">default</code> model provides general-purpose
-types. The <code data-pos="1084:115-1084:124">sw_docs</code> model adds
+<div data-pos="1091:1-1092:1">
+<p>SpecCompiler includes the <code data-pos="1091:27-1091:36">default</code> and <code data-pos="1091:41-1091:50">sw_docs</code> models. The <code data-pos="1091:63-1091:72">default</code> model provides general-purpose
+types. The <code data-pos="1091:115-1091:124">sw_docs</code> model adds
 requirements-engineering and traceability types:</p>
 </div>
-<div data-pos="1086:1-1094:1">
+<div data-pos="1093:1-1101:1">
 <ul>
-<li><div data-pos="1086:1-1087:1">
+<li><div data-pos="1093:1-1094:1">
 <strong>Object types</strong>: HLR, LLR, NFR, VC, TR, FD, CSC, CSU, DIC,
-DD, SF (all extend a common TRACEABLE base with <code data-pos="1086:111-1086:119">status</code> attribute and PID
+DD, SF (all extend a common TRACEABLE base with <code data-pos="1093:111-1093:119">status</code> attribute and PID
 auto-generation)
 </div></li>
-<li><div data-pos="1087:1-1088:1">
+<li><div data-pos="1094:1-1095:1">
 <strong>Specification types</strong>: SRS, SDD, SVC, SUM, TRR (document
 templates with version, status, date)
 </div></li>
-<li><div data-pos="1088:1-1089:1">
+<li><div data-pos="1095:1-1096:1">
 <strong>Relation types</strong>: TRACES_TO, BELONGS, REALIZES, VERIFIES,
 XREF_DECOMPOSITION, XREF_DIC (traceability links with specificity-based
 inference)
 </div></li>
-<li><div data-pos="1089:1-1090:1">
+<li><div data-pos="1096:1-1097:1">
 <strong>View types</strong>: TRACEABILITY_MATRIX, TEST_RESULTS_MATRIX,
 TEST_EXECUTION_MATRIX, COVERAGE_SUMMARY, REQUIREMENTS_SUMMARY
 (query-based tables materialized from the SpecIR)
 </div></li>
-<li><div data-pos="1090:1-1091:1">
+<li><div data-pos="1097:1-1098:1">
 <strong>Analyze queries</strong>: Traceability-chain validation for
 VC-HLR, TR-VC, and FD-CSC/CSU coverage
 </div></li>
-<li><div data-pos="1091:1-1093:1">
+<li><div data-pos="1098:1-1100:1">
 <strong>Postprocessor</strong>: Interactive single-file HTML5 web
 application
 </div></li>
 </ul>
 </div>
-<div data-pos="1093:1-1094:1">
-<p>The <code data-pos="1093:5-1093:29">docs/engineering_docs/</code>
-project uses <code data-pos="1093:43-1093:52">sw_docs</code>.</p>
+<div data-pos="1100:1-1101:1">
+<p>The <code data-pos="1100:5-1100:29">docs/engineering_docs/</code>
+project uses <code data-pos="1100:43-1100:52">sw_docs</code>.</p>
 </div>
-<h2 data-number="10.2" data-pos="1095:1-1096:1" id="MANUAL-sec11.2"><span class="header-section-number">10.2</span>
+<h2 data-number="10.2" data-pos="1102:1-1103:1" id="MANUAL-sec11.2"><span class="header-section-number">10.2</span>
 Custom Models</h2>
-<div data-pos="1097:1-1098:1">
-<p>Set <code data-pos="1097:5-1097:24">template: mymodel</code> in <code data-pos="1097:28-1097:42">project.yaml</code>. Custom types layer as
-overlays on top of <code data-pos="1097:85-1097:94">default</code>
-(types with matching <code data-pos="1097:116-1097:120">id</code>
-replace the default; new <code data-pos="1097:146-1097:150">id</code>s
+<div data-pos="1104:1-1105:1">
+<p>Set <code data-pos="1104:5-1104:24">template: mymodel</code> in <code data-pos="1104:28-1104:42">project.yaml</code>. Custom types layer as
+overlays on top of <code data-pos="1104:85-1104:94">default</code>
+(types with matching <code data-pos="1104:116-1104:120">id</code>
+replace the default; new <code data-pos="1104:146-1104:150">id</code>s
 add). The model directory is resolved under the SpecCompiler
-installation (<code data-pos="1097:227-1097:244">models/mymodel/</code>)
+installation (<code data-pos="1104:227-1104:244">models/mymodel/</code>)
 first, then under the project directory itself — so a project can ship
 its own model alongside its documents.</p>
 </div>
-<div data-pos="1099:1-1100:1">
+<div data-pos="1106:1-1107:1">
 <p>Each extension module returns one Lua descriptor table. The
-descriptor contains a <code data-pos="1099:83-1099:89">kind</code>, a
-<code data-pos="1099:93-1099:101">schema</code>, and optional <code data-pos="1099:116-1099:123">hooks</code>. Supported kinds are <code data-pos="1099:145-1099:153">object</code>, <code data-pos="1099:155-1099:162">float</code>, <code data-pos="1099:164-1099:170">view</code>, <code data-pos="1099:172-1099:182">relation</code>, <code data-pos="1099:184-1099:199">specification</code>, and <code data-pos="1099:205-1099:214">analyze</code>. The <code data-pos="1099:220-1099:231">schema.id</code> field is the authoritative
+descriptor contains a <code data-pos="1106:83-1106:89">kind</code>, a
+<code data-pos="1106:93-1106:101">schema</code>, and optional <code data-pos="1106:116-1106:123">hooks</code>. Supported kinds are <code data-pos="1106:145-1106:153">object</code>, <code data-pos="1106:155-1106:162">float</code>, <code data-pos="1106:164-1106:170">view</code>, <code data-pos="1106:172-1106:182">relation</code>, <code data-pos="1106:184-1106:199">specification</code>, and <code data-pos="1106:205-1106:214">analyze</code>. The <code data-pos="1106:220-1106:231">schema.id</code> field is the authoritative
 identifier. Each hook name determines its context and return type. A
-descriptor can inherit shared behavior through <code data-pos="1099:375-1099:391">schema.extends</code>.</p>
+descriptor can inherit shared behavior through <code data-pos="1106:375-1106:391">schema.extends</code>.</p>
 </div>
-<div data-pos="1101:1-1102:1">
-<p>The <a href="guides/creating-a-model.md" data-pos="1101:5-1101:58">Creating a Custom Model</a> guide defines the
+<div data-pos="1108:1-1109:1">
+<p>The <a href="guides/creating-a-model.md" data-pos="1108:5-1108:58">Creating a Custom Model</a> guide defines the
 directory layout, hook contract, schema fields, analyze queries, and
 external renderers.</p>
 </div>
-<h1 data-number="11" data-pos="1103:1-1104:1" id="MANUAL-sec12"><span class="header-section-number">11</span> Troubleshooting</h1>
-<h2 data-number="11.1" data-pos="1105:1-1106:1" id="MANUAL-sec12.1"><span class="header-section-number">11.1</span>
+<h1 data-number="11" data-pos="1110:1-1111:1" id="MANUAL-sec12"><span class="header-section-number">11</span> Troubleshooting</h1>
+<h2 data-number="11.1" data-pos="1112:1-1113:1" id="MANUAL-sec12.1"><span class="header-section-number">11.1</span>
 Docker Not Running</h2>
-<div data-pos="1107:1-1108:1">
-<p><code data-pos="1107:1-1107:31">Error: Docker is not running</code> –
-Start Docker daemon, verify with <code data-pos="1107:68-1107:81">docker info</code>.</p>
+<div data-pos="1114:1-1115:1">
+<p><code data-pos="1114:1-1114:31">Error: Docker is not running</code> –
+Start Docker daemon, verify with <code data-pos="1114:68-1114:81">docker info</code>.</p>
 </div>
-<h2 data-number="11.2" data-pos="1109:1-1110:1" id="MANUAL-sec12.2"><span class="header-section-number">11.2</span> No
+<h2 data-number="11.2" data-pos="1116:1-1117:1" id="MANUAL-sec12.2"><span class="header-section-number">11.2</span> No
 project.yaml Found</h2>
-<div data-pos="1111:1-1112:1">
-<p>Run <code data-pos="1111:5-1111:18">specc build</code> from the
-directory containing <code data-pos="1111:49-1111:63">project.yaml</code>.</p>
+<div data-pos="1118:1-1119:1">
+<p>Run <code data-pos="1118:5-1118:18">specc build</code> from the
+directory containing <code data-pos="1118:49-1118:63">project.yaml</code>.</p>
 </div>
-<h2 data-number="11.3" data-pos="1113:1-1114:1" id="MANUAL-sec12.3"><span class="header-section-number">11.3</span>
+<h2 data-number="11.3" data-pos="1120:1-1121:1" id="MANUAL-sec12.3"><span class="header-section-number">11.3</span>
 PlantUML Render Failure</h2>
-<div data-pos="1115:1-1116:1">
-<p>Verify PlantUML syntax, ensure Docker image has Java JRE, check <code data-pos="1115:65-1115:76">@startuml</code>/<code data-pos="1115:77-1115:86">@enduml</code> markers.</p>
+<div data-pos="1122:1-1123:1">
+<p>Verify PlantUML syntax, ensure Docker image has Java JRE, check <code data-pos="1122:65-1122:76">@startuml</code>/<code data-pos="1122:77-1122:86">@enduml</code> markers.</p>
 </div>
-<h2 data-number="11.4" data-pos="1117:1-1118:1" id="MANUAL-sec12.4"><span class="header-section-number">11.4</span>
+<h2 data-number="11.4" data-pos="1124:1-1125:1" id="MANUAL-sec12.4"><span class="header-section-number">11.4</span>
 Unresolved Relations</h2>
-<div data-pos="1119:1-1120:1">
+<div data-pos="1126:1-1127:1">
 <p>PIDs are <strong>case-sensitive</strong>. Verify target PID exists in
-<code data-pos="1119:58-1119:69">doc_files</code>. For cross-document
-references, ensure both documents are listed in the same <code data-pos="1119:147-1119:161">project.yaml</code>.</p>
+<code data-pos="1126:58-1126:69">doc_files</code>. For cross-document
+references, ensure both documents are listed in the same <code data-pos="1126:147-1126:161">project.yaml</code>.</p>
 </div>
-<h2 data-number="11.5" data-pos="1121:1-1122:1" id="MANUAL-sec12.5"><span class="header-section-number">11.5</span>
+<h2 data-number="11.5" data-pos="1128:1-1129:1" id="MANUAL-sec12.5"><span class="header-section-number">11.5</span>
 Build Seems Stale</h2>
 <a id="listing-src-clean-stale-build" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Clean stale build cache</figcaption>
-<div class="sourceCode" id="cb31"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> clean</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build</span></code></pre></div>
-<h2 data-number="11.6" data-pos="1128:1-1129:1" id="MANUAL-sec12.6"><span class="header-section-number">11.6</span>
+<div class="sourceCode" id="cb32"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> clean</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build</span></code></pre></div>
+<h2 data-number="11.6" data-pos="1135:1-1136:1" id="MANUAL-sec12.6"><span class="header-section-number">11.6</span>
 Debugging</h2>
 <a id="listing-src-debug-log-level" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Enable debug logging</figcaption>
-<div class="sourceCode" id="cb32"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="va">SPECCOMPILER_LOG_LEVEL</span><span class="op">=</span>DEBUG <span class="ex">specc</span> build</span></code></pre></div>
-<h1 data-number="12" data-pos="1134:1-1135:1" id="MANUAL-sec13"><span class="header-section-number">12</span> Known Limitations</h1>
-<div data-pos="1136:1-1143:1">
+<div class="sourceCode" id="cb33"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="va">SPECCOMPILER_LOG_LEVEL</span><span class="op">=</span>DEBUG <span class="ex">specc</span> build</span></code></pre></div>
+<h1 data-number="12" data-pos="1141:1-1142:1" id="MANUAL-sec13"><span class="header-section-number">12</span> Known Limitations</h1>
+<div data-pos="1143:1-1150:1">
 <ul>
-<li><div data-pos="1136:1-1137:1">
+<li><div data-pos="1143:1-1144:1">
 <strong>No interactive validation</strong> – Batch mode only, no LSP or
 watch mode.
 </div></li>
-<li><div data-pos="1137:1-1138:1">
-<strong>Native install is Ubuntu-first</strong> – <code data-pos="1137:41-1137:68">scripts/install-native.sh</code> automates
+<li><div data-pos="1144:1-1145:1">
+<strong>Native install is Ubuntu-first</strong> – <code data-pos="1144:41-1144:68">scripts/install-native.sh</code> automates
 Ubuntu 24.04 (apt); other distros must install the documented package
 equivalents manually before running it.
 </div></li>
-<li><div data-pos="1138:1-1139:1">
+<li><div data-pos="1145:1-1146:1">
 <strong>Single-writer SQLite</strong> – Concurrent builds cause locking
 errors; use separate output directories.
 </div></li>
-<li><div data-pos="1139:1-1140:1">
+<li><div data-pos="1146:1-1147:1">
 <strong>Float labels per-specification</strong> – Same label can exist
 across specs; use scoped syntax for cross-spec references.
 </div></li>
-<li><div data-pos="1140:1-1142:1">
-<strong>PID case sensitivity</strong> – <code data-pos="1140:31-1140:45">[hlr-001](@)</code> will not match <code data-pos="1140:61-1140:71">@HLR-001</code>.
+<li><div data-pos="1147:1-1149:1">
+<strong>PID case sensitivity</strong> – <code data-pos="1147:31-1147:45">[hlr-001](@)</code> will not match <code data-pos="1147:61-1147:71">@HLR-001</code>.
 </div></li>
 </ul>
 </div>
-<h1 data-number="13" data-pos="1142:1-1143:1" id="MANUAL-sec14"><span class="header-section-number">13</span> List of Figures</h1>
-<div data-pos="1144:1-1145:1">
+<h1 data-number="13" data-pos="1149:1-1150:1" id="MANUAL-sec14"><span class="header-section-number">13</span> List of Figures</h1>
+<div data-pos="1151:1-1152:1">
 <ul>
 <li><a href="#puml-diag-pipeline">Figure 1 - Processing
 Pipeline</a></li>
 <li><a href="#puml-diag-layers">Figure 2 - Layered Architecture</a></li>
 </ul>
 </div>
-<h1 data-number="14" data-pos="1146:1-1147:1" id="MANUAL-sec15"><span class="header-section-number">14</span> List of Tables</h1>
-<div data-pos="1148:1-1149:1">
+<h1 data-number="14" data-pos="1153:1-1154:1" id="MANUAL-sec15"><span class="header-section-number">14</span> List of Tables</h1>
+<div data-pos="1155:1-1156:1">
 <ul>
 <li><a href="#csv-tbl-prerequisites">Table 1 - Runtime
 prerequisites</a></li>
@@ -2153,73 +2168,75 @@ options</a></li>
 diagnostics</a></li>
 </ul>
 </div>
-<h1 data-number="15" data-pos="1150:1-1151:1" id="MANUAL-sec16"><span class="header-section-number">15</span> List of Listings</h1>
-<div data-pos="1152:1-1153:1">
+<h1 data-number="15" data-pos="1157:1-1158:1" id="MANUAL-sec16"><span class="header-section-number">15</span> List of Listings</h1>
+<div data-pos="1159:1-1160:1">
 <ul>
 <li><a href="#listing-src-install-oneliner">Listing 1 - Container
 install (Linux/macOS/WSL2)</a></li>
 <li><a href="#listing-src-install-windows">Listing 2 - Container install
 (Windows PowerShell)</a></li>
-<li><a href="#listing-src-build-image">Listing 3 - Build and install via
+<li><a href="#listing-src-install-windows-native">Listing 3 - Native
+Windows usage (cmd or PowerShell)</a></li>
+<li><a href="#listing-src-build-image">Listing 4 - Build and install via
 Docker</a></li>
-<li><a href="#listing-src-verify-image">Listing 4 - Verify Docker image
+<li><a href="#listing-src-verify-image">Listing 5 - Verify Docker image
 availability</a></li>
-<li><a href="#listing-src-run-wrapper">Listing 5 - Run wrapper
+<li><a href="#listing-src-run-wrapper">Listing 6 - Run wrapper
 command</a></li>
-<li><a href="#listing-src-project-yaml">Listing 6 - project.yaml
+<li><a href="#listing-src-project-yaml">Listing 7 - project.yaml
 reference</a></li>
-<li><a href="#listing-src-specification-pattern">Listing 7 -
+<li><a href="#listing-src-specification-pattern">Listing 8 -
 Specification declaration</a></li>
-<li><a href="#listing-src-object-pattern">Listing 8 - Spec object
+<li><a href="#listing-src-object-pattern">Listing 9 - Spec object
 declaration</a></li>
-<li><a href="#listing-src-section-close">Listing 9 - Closing a section
+<li><a href="#listing-src-section-close">Listing 10 - Closing a section
 with ----</a></li>
-<li><a href="#listing-src-attribute-pattern">Listing 10 - Attribute
+<li><a href="#listing-src-attribute-pattern">Listing 11 - Attribute
 declaration</a></li>
-<li><a href="#listing-src-plantuml-float-syntax">Listing 11 - PlantUML
+<li><a href="#listing-src-plantuml-float-syntax">Listing 12 - PlantUML
 float syntax</a></li>
-<li><a href="#listing-src-table-float-syntax">Listing 12 - Table float
+<li><a href="#listing-src-table-float-syntax">Listing 13 - Table float
 syntax</a></li>
-<li><a href="#listing-src-csv-float-syntax">Listing 13 - CSV float
+<li><a href="#listing-src-csv-float-syntax">Listing 14 - CSV float
 syntax</a></li>
-<li><a href="#listing-src-listing-float-syntax">Listing 14 - Listing
+<li><a href="#listing-src-listing-float-syntax">Listing 15 - Listing
 float syntax</a></li>
-<li><a href="#listing-src-chart-float-syntax">Listing 15 - Chart float
+<li><a href="#listing-src-chart-float-syntax">Listing 16 - Chart float
 syntax</a></li>
-<li><a href="#listing-src-math-float-syntax">Listing 16 - Math float
+<li><a href="#listing-src-math-float-syntax">Listing 17 - Math float
 syntax</a></li>
-<li><a href="#listing-src-inline-view">Listing 17 - Inline view
+<li><a href="#listing-src-inline-view">Listing 18 - Inline view
 placeholder</a></li>
-<li><a href="#listing-src-file-include">Listing 18 - Include directive
+<li><a href="#listing-src-file-include">Listing 19 - Include directive
 syntax</a></li>
-<li><a href="#listing-src-include-level-shift">Listing 19 - Include
+<li><a href="#listing-src-include-level-shift">Listing 20 - Include
 heading levels are relative to the include point</a></li>
-<li><a href="#listing-lst-init">Listing 20 - Service
+<li><a href="#listing-lst-init">Listing 21 - Service
 Initialization</a></li>
-<li><a href="#listing-src-bib-config">Listing 21 - Bibliography
+<li><a href="#listing-src-bib-config">Listing 22 - Bibliography
 configuration in project.yaml</a></li>
-<li><a href="#listing-src-bib-file">Listing 22 - Example BibTeX
+<li><a href="#listing-src-bib-file">Listing 23 - Example BibTeX
 file</a></li>
-<li><a href="#listing-src-citation-syntax">Listing 23 - Citation syntax
+<li><a href="#listing-src-citation-syntax">Listing 24 - Citation syntax
 examples</a></li>
-<li><a href="#listing-src-chart-gauss-syntax">Listing 24 - Chart with
+<li><a href="#listing-src-chart-gauss-syntax">Listing 25 - Chart with
 gauss data injection</a></li>
-<li><a href="#listing-src-basic-usage">Listing 25 - Basic
+<li><a href="#listing-src-basic-usage">Listing 26 - Basic
 invocation</a></li>
-<li><a href="#listing-src-diagnostic-ndjson">Listing 26 - Diagnostic
+<li><a href="#listing-src-diagnostic-ndjson">Listing 27 - Diagnostic
 NDJSON example</a></li>
-<li><a href="#listing-src-suppress-example">Listing 27 - Suppressing a
+<li><a href="#listing-src-suppress-example">Listing 28 - Suppressing a
 validation rule</a></li>
-<li><a href="#listing-src-force-rebuild">Listing 28 - Force full
+<li><a href="#listing-src-force-rebuild">Listing 29 - Force full
 rebuild</a></li>
-<li><a href="#listing-src-clean-stale-build">Listing 29 - Clean stale
+<li><a href="#listing-src-clean-stale-build">Listing 30 - Clean stale
 build cache</a></li>
-<li><a href="#listing-src-debug-log-level">Listing 30 - Enable debug
+<li><a href="#listing-src-debug-log-level">Listing 31 - Enable debug
 logging</a></li>
 </ul>
 </div>
-<h1 data-number="16" data-pos="1154:1-1155:1" id="MANUAL-sec17"><span class="header-section-number">16</span> List of Abbreviations</h1>
-<div data-pos="1156:1-1157:1">
+<h1 data-number="16" data-pos="1161:1-1162:1" id="MANUAL-sec17"><span class="header-section-number">16</span> List of Abbreviations</h1>
+<div data-pos="1163:1-1164:1">
 <table>
 <tbody>
 <tr class="odd">

@@ -296,8 +296,15 @@ format Pandoc can target.</p>
 or podman (Linux/macOS/WSL2):</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-fsSL</span> https://raw.githubusercontent.com/SpecIR/SpecCompiler/main/scripts/install.sh <span class="kw">|</span> <span class="fu">bash</span></span></code></pre></div>
-<p><strong>Windows.</strong> One command in PowerShell, after Docker
-Desktop or Podman is installed:</p>
+<p><strong>Windows (native).</strong> Download
+<code>SpecCompiler-&lt;version&gt;-windows-x64.zip</code> from the <a
+href="https://github.com/SpecIR/SpecCompiler/releases">latest
+release</a>, extract it anywhere and run <code>bin\specc.cmd</code> — no
+container engine or installer needed. It bundles source-built Pandoc
+with native Lua module support; see <a
+href="windows/README.md">windows/README.md</a>.</p>
+<p><strong>Windows (container).</strong> One command in PowerShell,
+after Docker Desktop or Podman is installed:</p>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">irm</span> https<span class="op">://</span>raw<span class="op">.</span><span class="fu">githubusercontent</span><span class="op">.</span><span class="fu">com</span><span class="op">/</span>SpecIR<span class="op">/</span>SpecCompiler<span class="op">/</span>main<span class="op">/</span>scripts<span class="op">/</span>install<span class="op">.</span><span class="fu">ps1</span> <span class="op">|</span> <span class="fu">iex</span></span></code></pre></div>
 <p><strong>Native — Ubuntu 24.04</strong> (stock apt pandoc + compiled
