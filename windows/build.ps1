@@ -151,8 +151,10 @@ $UvDir = "$Work\luv\deps\libuv"
 # Debian's archived copy of the upstream peg tarball (piumarta.com is often unreachable)
 Fetch "https://deb.debian.org/debian/pool/main/p/peg/peg_$($Pins.PEG_VERSION).orig.tar.gz" "$Work\peg.tgz"
 Extract "$Work\peg.tgz" "$Work\peg-$($Pins.PEG_VERSION)"
-$Leg = "$Work\peg-$($Pins.PEG_VERSION)\leg.exe"
-if (-not (Test-Path -LiteralPath $Leg)) { Run $Make @('-s', '-C', "$Work\peg-$($Pins.PEG_VERSION)", 'CC=gcc', 'leg') }
+$PegDir = "$Work\peg-$($Pins.PEG_VERSION)"
+$Leg = "$PegDir\leg.exe"
+# Not peg's Makefile: it ends with `mv leg-new leg`, but gcc names the output leg-new.exe.
+if (-not (Test-Path -LiteralPath $Leg)) { Run gcc @('-w', '-O2', '-DNDEBUG', "-I$PegDir\src", '-o', $Leg, "$PegDir\src\leg.c", "$PegDir\src\tree.c", "$PegDir\src\compile.c") }
 if (-not (Test-Path -LiteralPath "$Work\amath")) {
     Run git @('clone', '-q', 'https://github.com/camoy/amath.git', "$Work\amath")
     Run git @('-C', "$Work\amath", 'checkout', '-q', $Pins.AMATH_COMMIT)
