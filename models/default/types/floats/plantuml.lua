@@ -18,6 +18,8 @@ local task_runner = require("infra.process.task_runner")
 
 local DIAGRAMS_DIR = "diagrams"
 
+local is_windows = package.config:sub(1, 1) == "\\"
+
 ---Normalize a path: strip trailing slashes and collapse multiple slashes.
 ---@param path string Path to normalize
 ---@return string Normalized path
@@ -127,15 +129,22 @@ return {
 
             log.debug("Preparing PlantUML: %s", hash:sub(1, 12))
 
+            -- Force headless mode to avoid X11 dependency in CI/headless environments.
+            -- Windows has no `env` and launchers there are .cmd/.bat shims, which
+            -- only cmd.exe can run.
+            local cmd, args = "env", {
+                "JAVA_TOOL_OPTIONS=-Djava.awt.headless=true",
+                "plantuml",
+                "-tpng",
+                hash .. ".puml"
+            }
+            if is_windows then
+                cmd, args = "cmd", { "/d", "/c", "plantuml", "-tpng", hash .. ".puml" }
+            end
+
             return {
-                -- Force headless mode to avoid X11 dependency in CI/headless environments.
-                cmd = "env",
-                args = {
-                    "JAVA_TOOL_OPTIONS=-Djava.awt.headless=true",
-                    "plantuml",
-                    "-tpng",
-                    hash .. ".puml"
-                },
+                cmd = cmd,
+                args = args,
                 opts = { cwd = diagrams_path, timeout = 30000 },
                 output_path = png_file,
                 context = {

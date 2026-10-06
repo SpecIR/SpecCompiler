@@ -9,6 +9,11 @@ M.current_suite = nil
 M.report_dir = "tests/reports/coverage"
 M._line_filter_cache = {}
 
+-- Locate genhtml (lcov) without POSIX-only `which` on Windows.
+local GENHTML_PROBE = package.config:sub(1, 1) == "\\"
+    and "where genhtml 2>NUL"
+    or "which genhtml 2>/dev/null"
+
 --- Check if luacov is available
 ---@return boolean available
 function M.is_available()
@@ -51,7 +56,7 @@ function M.start(suite_name, options)
     }
 
     -- Ensure report directory exists
-    os.execute("mkdir -p " .. M.report_dir)
+    pcall(pandoc.system.make_directory, M.report_dir, true)
 
     -- Initialize luacov
     local ok, runner = pcall(require, "luacov.runner")
@@ -337,13 +342,13 @@ end
 ---@return table lcov_files Array of LCOV file paths
 function M.get_lcov_files()
     local files = {}
-    local handle = io.popen("ls " .. M.report_dir .. "/*.lcov 2>/dev/null")
-    if handle then
-        for file in handle:lines() do
-            table.insert(files, file)
+    local ok, names = pcall(pandoc.system.list_directory, M.report_dir)
+    for _, name in ipairs(ok and names or {}) do
+        if name:match("%.lcov$") then
+            table.insert(files, M.report_dir .. "/" .. name)
         end
-        handle:close()
     end
+    table.sort(files)
     return files
 end
 
@@ -367,12 +372,12 @@ function M.generate_html(suite_name, output_dir)
     output_dir = output_dir or string.format("%s/html/%s", M.report_dir, safe_name)
 
     -- Prefer genhtml for detailed line-by-line coverage
-    local handle = io.popen("which genhtml 2>/dev/null")
+    local handle = io.popen(GENHTML_PROBE)
     if handle then
         local result = handle:read("*a")
         handle:close()
         if result and result ~= "" then
-            os.execute("mkdir -p " .. output_dir)
+            pcall(pandoc.system.make_directory, output_dir, true)
             local cmd = string.format(
                 'genhtml "%s" --output-directory "%s" --title "Coverage: %s" --legend --ignore-errors empty --quiet 2>/dev/null',
                 lcov_file, output_dir, suite_name
@@ -423,12 +428,12 @@ function M.generate_html_merged(output_dir, title)
     end
 
     -- Prefer genhtml for detailed line-by-line coverage
-    local handle = io.popen("which genhtml 2>/dev/null")
+    local handle = io.popen(GENHTML_PROBE)
     if handle then
         local result = handle:read("*a")
         handle:close()
         if result and result ~= "" then
-            os.execute("mkdir -p " .. output_dir)
+            pcall(pandoc.system.make_directory, output_dir, true)
             local cmd = string.format(
                 'genhtml "%s" --output-directory "%s" --title "%s" --legend --ignore-errors empty --quiet 2>/dev/null',
                 merged_lcov, output_dir, title

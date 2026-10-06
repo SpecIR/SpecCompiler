@@ -408,7 +408,7 @@ function M.write_parts(temp_dir, parts, log)
         -- Write part relationship file if provided
         if part.rels then
             local rels_dir = word_dir .. "/_rels"
-            os.execute('mkdir -p "' .. rels_dir .. '"')
+            pcall(pandoc.system.make_directory, rels_dir, true)
             local rels_path = rels_dir .. "/" .. part.file .. ".rels"
             local rf = io.open(rels_path, "w")
             if rf then
@@ -421,7 +421,7 @@ function M.write_parts(temp_dir, parts, log)
         -- Copy media files if specified
         if part.media then
             local media_dir = word_dir .. "/media"
-            os.execute('mkdir -p "' .. media_dir .. '"')
+            pcall(pandoc.system.make_directory, media_dir, true)
             for _, m in ipairs(part.media) do
                 local src = io.open(m.source, "rb")
                 if src then

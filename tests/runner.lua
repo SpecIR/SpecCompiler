@@ -15,6 +15,7 @@ local domain_helpers = require("domain_helpers")
 
 -- Load SpecCompiler engine for in-process execution (enables coverage)
 local engine = require("core.engine")
+local uv = require("luv")
 
 -- Lazy-loaded reporters (only loaded when enabled)
 local junit = nil
@@ -45,6 +46,10 @@ local chart_renderer_reason = nil
 -- File System Helpers
 -- ============================================
 
+local function basename_of(path)
+    return path:match("([^/]+)$")
+end
+
 local function file_exists(path)
     local f = io.open(path, "r")
     if f then
@@ -71,32 +76,45 @@ local function write_file(path, content)
 end
 
 local function mkdir_p(path)
-    os.execute("mkdir -p " .. path)
+    pcall(pandoc.system.make_directory, path, true)
+end
+
+local function rm_rf(path)
+    pcall(pandoc.system.remove_directory, path, true)
+end
+
+---List direct children of `path` of the given type ("directory"|"file"),
+---following symlinks, sorted, as "path/name".
+local function list_entries(path, want_type)
+    local entries = {}
+    local req = uv.fs_scandir(path)
+    while req do
+        local name, entry_type = uv.fs_scandir_next(req)
+        if not name then break end
+        local full = path .. "/" .. name
+        if entry_type ~= "directory" and entry_type ~= "file" then
+            local stat = uv.fs_stat(full)
+            entry_type = stat and stat.type
+        end
+        if entry_type == want_type then
+            table.insert(entries, full)
+        end
+    end
+    table.sort(entries)
+    return entries
 end
 
 local function list_dirs(path)
-    local dirs = {}
-    local handle = io.popen("find -L " .. path .. " -maxdepth 1 -type d 2>/dev/null | sort")
-    if handle then
-        for line in handle:lines() do
-            if line ~= path then
-                table.insert(dirs, line)
-            end
-        end
-        handle:close()
-    end
-    return dirs
+    return list_entries(path, "directory")
 end
 
 local function list_files(path, pattern)
+    local lua_pattern = "^" .. pattern:gsub("[%.%-%+%?%(%)%[%]%^%$%%]", "%%%0"):gsub("%*", ".*") .. "$"
     local files = {}
-    local cmd = "find " .. path .. " -maxdepth 1 -type f -name '" .. pattern .. "' 2>/dev/null | sort"
-    local handle = io.popen(cmd)
-    if handle then
-        for line in handle:lines() do
-            table.insert(files, line)
+    for _, file in ipairs(list_entries(path, "file")) do
+        if basename_of(file):match(lua_pattern) then
+            table.insert(files, file)
         end
-        handle:close()
     end
     return files
 end
@@ -179,9 +197,10 @@ local function is_chart_renderer_available()
 
     local root = speccompiler_home or "."
     local ts_renderer = root .. "/models/abnt/tools/echarts-render.ts"
-    local has_deno = command_succeeds("command -v deno >/dev/null 2>&1")
+    local has_deno = file_exists(ts_renderer)
+        and command_succeeds("command -v deno >/dev/null 2>&1")
 
-    if has_deno and file_exists(ts_renderer) then
+    if has_deno then
         local ts_cmd = string.format(
             "deno run --allow-read --allow-write --allow-env --allow-net --allow-ffi --allow-sys %q --help >/dev/null 2>&1",
             ts_renderer
@@ -224,7 +243,7 @@ local function clean_build_dirs()
     local suites = list_dirs(e2e_dir)
     for _, suite_dir in ipairs(suites) do
         local build_dir = suite_dir .. "/build"
-        os.execute("rm -rf " .. build_dir .. " 2>/dev/null")
+        rm_rf(build_dir)
     end
 
     -- Also clean model-defined test suite build directories
@@ -232,7 +251,7 @@ local function clean_build_dirs()
     local model_dirs = list_dirs(models_dir)
     for _, model_dir in ipairs(model_dirs) do
         local model_build_dir = model_dir .. "/tests/build"
-        os.execute("rm -rf " .. model_build_dir .. " 2>/dev/null")
+        rm_rf(model_build_dir)
     end
 end
 
@@ -292,9 +311,9 @@ end
 -- Resolve tmpdir once for DB files (avoids ZFS CoW pressure on near-full pools)
 local test_db_dir = os.getenv("SPECCOMPILER_TEST_DB_DIR")
 if not test_db_dir then
-    local tmpdir = os.getenv("TMPDIR") or os.getenv("XDG_RUNTIME_DIR") or "/tmp"
-    test_db_dir = tmpdir .. "/speccompiler_test_dbs"
-    os.execute("mkdir -p " .. test_db_dir)
+    local tmpdir = os.getenv("TMPDIR") or os.getenv("XDG_RUNTIME_DIR") or os.getenv("TEMP") or "/tmp"
+    test_db_dir = tmpdir:gsub("\\", "/") .. "/speccompiler_test_dbs"
+    mkdir_p(test_db_dir)
 end
 
 local function run_speccompiler(input_file, suite_dir, test_name, output_format)
@@ -488,6 +507,10 @@ local function normalize_html(html)
     html = html:gsub(' data%-wrapper="[^"]*"', "")
     html = html:gsub(' wrapper="[^"]*"', "")
     html = html:gsub(' data%-pos="[^"]*"', "")
+    -- Template details that vary by Pandoc version: the generator version
+    -- string and the empty lang attributes older templates emit.
+    html = html:gsub('<meta name="generator" content="pandoc[^"]*" />', "")
+    html = html:gsub(' lang xml:lang>', ">")
     -- Normalize whitespace for stable comparison
     html = html:gsub("%s+", " ")
     html = html:gsub("> <", "><")

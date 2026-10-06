@@ -238,7 +238,12 @@ function M.generate(lcov_path, output_dir, title)
     )
 
     -- Write to file
-    os.execute("mkdir -p " .. output_dir)
+    -- Also runs under plain lua5.4 (run.sh merged-report fallback): no pandoc there.
+    if pandoc then
+        pcall(pandoc.system.make_directory, output_dir, true)
+    else
+        os.execute("mkdir -p " .. output_dir)
+    end
     local out_path = output_dir .. "/index.html"
     local out = io.open(out_path, "w")
     if not out then

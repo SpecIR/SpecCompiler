@@ -28,6 +28,25 @@ local function read_file(path)
     return content
 end
 
+local B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+
+---Base64-encode binary data (pure Lua; no external `base64` command).
+---@param data string
+---@return string
+local function base64_encode(data)
+    local out = {}
+    for i = 1, #data, 3 do
+        local a, b, c = data:byte(i, i + 2)
+        local n = a * 65536 + (b or 0) * 256 + (c or 0)
+        local c1, c2 = n >> 18, (n >> 12) & 63
+        local c3, c4 = (n >> 6) & 63, n & 63
+        out[#out + 1] = B64:sub(c1 + 1, c1 + 1) .. B64:sub(c2 + 1, c2 + 1)
+            .. (b and B64:sub(c3 + 1, c3 + 1) or "=")
+            .. (c and B64:sub(c4 + 1, c4 + 1) or "=")
+    end
+    return table.concat(out)
+end
+
 ---Get SPECCOMPILER_HOME directory.
 ---@return string Path to speccompiler-core directory
 local function get_speccompiler_home()
@@ -349,7 +368,7 @@ local function encode_database(db_path)
     file:close()
 
     local ok, encoded = pcall(function()
-        return pandoc.pipe("base64", {"-w0"}, content)
+        return base64_encode(content)
     end)
 
     if ok then
@@ -374,12 +393,10 @@ end
 ---@return table Sorted list of HTML filenames
 local function list_html_files(dir)
     local files = {}
-    local ok, result = pcall(function()
-        return pandoc.pipe("ls", {"-1", dir}, "")
-    end)
+    local ok, result = pcall(pandoc.system.list_directory, dir)
 
     if ok and result then
-        for file in result:gmatch("[^\n]+") do
+        for _, file in ipairs(result) do
             if file:match("%.html$") and file ~= "index.html" then
                 table.insert(files, file)
             end
@@ -542,7 +559,7 @@ function M.finalize(output_paths, config, log)
         local wasm_binary = read_file(wasm_bin_path)
         if wasm_binary then
             local ok, encoded = pcall(function()
-                return pandoc.pipe("base64", {"-w0"}, wasm_binary)
+                return base64_encode(wasm_binary)
             end)
             if ok then
                 wasm_base64 = encoded:gsub("%s+", "")

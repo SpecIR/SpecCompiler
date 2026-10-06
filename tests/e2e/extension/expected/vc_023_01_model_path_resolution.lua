@@ -8,7 +8,8 @@ return function(_, _)
     local uv = require("luv")
 
     local root = uv.cwd()
-    local home_root = "/tmp/" .. utils.unique_name("vc023_home")
+    local tmp_root = (os.getenv("TMPDIR") or os.getenv("TEMP") or "/tmp"):gsub("\\", "/")
+    local home_root = tmp_root .. "/" .. utils.unique_name("vc023_home")
 
     local prefer_model = utils.unique_name("vc023_prefer")
     local fallback_model = utils.unique_name("vc023_fallback")

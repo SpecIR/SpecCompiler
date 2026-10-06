@@ -6,10 +6,6 @@ local M = {}
 
 math.randomseed(tonumber(uv.hrtime() % 2147483647))
 
-local function shell_quote(value)
-    return "'" .. tostring(value):gsub("'", "'\\''") .. "'"
-end
-
 local function escape_lua_pattern(value)
     return tostring(value):gsub("([^%w])", "%%%1")
 end
@@ -19,11 +15,13 @@ function M.unique_name(prefix)
 end
 
 function M.ensure_dir(path)
-    os.execute("mkdir -p " .. shell_quote(path))
+    pcall(pandoc.system.make_directory, path, true)
 end
 
 function M.remove_path(path)
-    os.execute("rm -rf " .. shell_quote(path))
+    if not pcall(pandoc.system.remove_directory, path, true) then
+        os.remove(path)
+    end
 end
 
 function M.write_file(path, content)

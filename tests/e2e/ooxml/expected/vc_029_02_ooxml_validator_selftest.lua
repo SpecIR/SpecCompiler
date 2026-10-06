@@ -6,8 +6,21 @@ return function(_, helpers)
     local errors = {}
     local function err(msg) table.insert(errors, msg) end
 
-    -- Resolve all paths to absolute to avoid issues with os.execute('cd ...')
-    local cwd = io.popen("pwd"):read("*l") .. "/"
+    -- Resolve all paths to absolute
+    local cwd = pandoc.system.get_working_directory():gsub("[/\\]$", "") .. "/"
+
+    local function read_bytes(path)
+        local f = io.open(path, "rb")
+        if not f then return nil end
+        local data = f:read("*a")
+        f:close()
+        return data
+    end
+    local function write_archive(path, entries)
+        local f = assert(io.open(path, "wb"))
+        f:write(pandoc.zip.Archive(entries):bytestring())
+        f:close()
+    end
 
     local build_dir = helpers.build_dir .. "/"
     local suite_dir = helpers.suite_dir .. "/"
@@ -52,12 +65,17 @@ return function(_, helpers)
     -- ================================================================
     -- Create a corrupted copy with broken XML in document.xml
     local corrupt_path = cwd .. build_dir .. "corrupt_wellformed.docx"
-    os.execute(string.format('cp "%s" "%s"', docx_path, corrupt_path))
 
     -- Extract document.xml, corrupt it, and re-inject
-    local h = io.popen(string.format('unzip -p "%s" "word/document.xml" 2>/dev/null', corrupt_path))
-    local doc_xml = h and h:read("*a") or ""
-    if h then h:close() end
+    local kept_entries = {}
+    local doc_xml = ""
+    for _, entry in ipairs(pandoc.zip.Archive(read_bytes(docx_path) or "").entries) do
+        if entry.path == "word/document.xml" then
+            doc_xml = entry:contents()
+        else
+            table.insert(kept_entries, entry)
+        end
+    end
 
     if doc_xml ~= "" then
         -- Inject unescaped ampersand (the original EMB corruption pattern)
@@ -65,19 +83,9 @@ return function(_, helpers)
             "</w:body>",
             "<w:p><w:r><w:t>R&D Test</w:t></w:r></w:p></w:body>")
 
-        -- Write corrupted XML, then use zip to replace it in the archive
-        -- zip requires the replacement file at the same relative path
-        local staging = cwd .. build_dir .. "staging_corrupt"
-        os.execute(string.format('mkdir -p "%s/word"', staging))
-        local f = io.open(staging .. "/word/document.xml", "w")
-        if f then
-            f:write(corrupted_xml)
-            f:close()
-            os.execute(string.format(
-                'cd "%s" && zip -q "%s" word/document.xml',
-                staging, corrupt_path))
-        end
-        os.execute(string.format('rm -rf "%s"', staging))
+        -- Replace document.xml in a copy of the archive
+        table.insert(kept_entries, pandoc.zip.Entry("word/document.xml", corrupted_xml))
+        write_archive(corrupt_path, kept_entries)
 
         local wf_ok = validator.validate_wellformedness(corrupt_path)
         if wf_ok then
@@ -91,23 +99,14 @@ return function(_, helpers)
     -- Test 3: Missing required parts detection
     -- ================================================================
     local incomplete_path = cwd .. build_dir .. "incomplete.docx"
-    local staging3 = cwd .. build_dir .. "staging_incomplete"
-    os.execute(string.format('mkdir -p "%s"', staging3))
 
-    -- Write a minimal [Content_Types].xml
-    local ct_f = io.open(staging3 .. "/ct.xml", "w")
-    if ct_f then
-        ct_f:write('<?xml version="1.0" encoding="UTF-8"?>'
+    -- An archive holding only a minimal [Content_Types].xml
+    write_archive(incomplete_path, {
+        pandoc.zip.Entry("[Content_Types].xml", '<?xml version="1.0" encoding="UTF-8"?>'
             .. '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
             .. '<Default Extension="xml" ContentType="application/xml"/>'
             .. '</Types>')
-        ct_f:close()
-        -- Create zip with renamed content types (must escape brackets for zip)
-        os.execute(string.format(
-            'cd "%s" && mv ct.xml "[Content_Types].xml" && zip -q "%s" "[Content_Types].xml"',
-            staging3, incomplete_path))
-    end
-    os.execute(string.format('rm -rf "%s"', staging3))
+    })
 
     local rp_ok, rp_errors = validator.validate_required_parts(incomplete_path)
     if rp_ok then

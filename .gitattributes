@@ -1,2 +1,10 @@
 # PowerShell scripts must keep CRLF line endings on checkout
 *.ps1 text eol=crlf
+
+# Shell scripts and files they source must keep LF (bash, Docker builds)
+*.sh text eol=lf
+scripts/specc text eol=lf
+scripts/versions.env text eol=lf
+
+# Windows batch files must keep CRLF line endings
+*.cmd text eol=crlf

@@ -205,7 +205,7 @@ function M.write_report(path)
     -- Ensure directory exists
     local dir = path:match("(.*/)")
     if dir then
-        os.execute("mkdir -p " .. dir)
+        pcall(pandoc.system.make_directory, dir, true)
     end
 
     local xml = M.generate_xml()
@@ -225,7 +225,7 @@ function M.write_partial(path)
     -- Ensure directory exists
     local dir = path:match("(.*/)")
     if dir then
-        os.execute("mkdir -p " .. dir)
+        pcall(pandoc.system.make_directory, dir, true)
     end
 
     -- Write current suites as partial JSON-like format for later merge

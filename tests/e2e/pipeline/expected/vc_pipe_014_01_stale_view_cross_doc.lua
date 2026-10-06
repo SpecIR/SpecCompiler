@@ -135,7 +135,7 @@ Authentication must validate credentials.
         return fail("Run 1 matrix in doc_b missing TR result from doc_a")
     end
 
-    os.execute("sleep 1")
+    require("luv").sleep(1000)
 
     -- Run 2: flip the TR result in doc_a; doc_b is cache-clean but its
     -- matrix content changed, so its output must be regenerated.
@@ -165,7 +165,7 @@ Authentication must validate credentials.
     local t2 = output_cache_time(db_path, "doc_b", out_b)
     if not t2 then return fail("Run 2 missing output_cache row for doc_b") end
 
-    os.execute("sleep 1")
+    require("luv").sleep(1000)
 
     -- Run 3: no changes; both outputs must be cache hits (deterministic hash)
     local run3 = run_project(project_info)

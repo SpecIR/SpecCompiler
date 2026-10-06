@@ -1,0 +1,132 @@
+# Build the portable Windows distribution (zip), use it exactly like a user
+# would, and prove it passes the E2E suite and builds all documentation.
+#
+# Pandoc is built from source so that it shares bin\lua54.dll with the native
+# Lua modules. Releases: docker-publish.yml calls this workflow on v* tags and
+# attaches the zip to the same GitHub Release as the Docker image. Every step is PowerShell/cmd; the product needs only Windows.
+name: Windows Distribution
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'models/**'
+      - 'tests/**'
+      - 'docs/**'
+      - 'windows/**'
+      - 'scripts/versions.env'
+      - '.github/workflows/windows-installer.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'models/**'
+      - 'tests/**'
+      - 'docs/**'
+      - 'windows/**'
+      - 'scripts/versions.env'
+      - '.github/workflows/windows-installer.yml'
+  workflow_dispatch:
+  # Called by docker-publish.yml on v* tags, which attaches the zip to the release.
+  workflow_call:
+
+env:
+  W64DEVKIT_VERSION: "2.10.0"
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        run: |
+          $v = if ($env:GITHUB_REF -like 'refs/tags/v*') { $env:GITHUB_REF_NAME.Substring(1) } else { "0.0.0-$($env:GITHUB_SHA.Substring(0, 7))" }
+          "VERSION=$v" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+
+      - name: Check command launcher (Windows PowerShell 5.1)
+        shell: powershell
+        run: ./windows/tests/launcher.ps1
+
+      - name: Cache third-party sources and Pandoc build
+        uses: actions/cache@v4
+        with:
+          path: dist/.windows-build
+          key: windows-build-${{ hashFiles('scripts/versions.env', 'windows/build.ps1', 'src/tools/amath/**') }}
+
+      - name: Install Haskell toolchain
+        id: haskell
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: '9.6.7'
+          cabal-version: '3.12.1.0'
+
+      - name: Cache cabal store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.haskell.outputs.cabal-store }}
+          key: windows-cabal-store-${{ hashFiles('scripts/versions.env') }}
+
+      - name: Install MinGW-w64 toolchain (w64devkit)
+        run: |
+          $t = $env:RUNNER_TEMP
+          Invoke-WebRequest -UseBasicParsing "https://github.com/skeeto/w64devkit/releases/download/v$env:W64DEVKIT_VERSION/w64devkit-x64-$env:W64DEVKIT_VERSION.7z.exe" -OutFile "$t\w64devkit.exe"
+          Start-Process "$t\w64devkit.exe" -ArgumentList "-o`"$t`"", '-y' -WindowStyle Hidden -Wait
+          "$t\w64devkit\bin" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+
+      - name: Build distribution (Pandoc, native modules, zip)
+        run: ./windows/build.ps1 -Version $env:VERSION
+
+      - name: Install like a user (unzip, add bin to PATH)
+        run: |
+          $dir = "$env:LOCALAPPDATA\Programs\SpecCompiler"
+          Expand-Archive "dist\SpecCompiler-$env:VERSION-windows-x64.zip" -DestinationPath $dir
+          foreach ($f in 'bin\pandoc.exe', 'bin\lua54.dll', 'bin\specc.cmd', 'vendor\lsqlite3.dll', 'vendor\brimworks\zip.dll') {
+            if (-not (Test-Path "$dir\$f")) { throw "missing from the distribution: $f" }
+          }
+          "$dir\bin" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+
+      - name: Verify installed native modules
+        shell: cmd
+        run: |
+          call specc --version || exit /b 1
+          call specc pandoc lua windows\tests\native-modules.lua || exit /b 1
+
+      - name: Run E2E tests with the installed specc
+        shell: cmd
+        run: call specc test --junit
+
+      - name: Build all documentation with the installed specc
+        shell: cmd
+        run: |
+          for %%p in (engineering_docs user_docs commonspec specir) do (
+            call specc build docs\%%p\project.yaml || exit /b 1
+          )
+
+      - name: Check documentation outputs
+        run: |
+          foreach ($p in 'engineering_docs', 'user_docs', 'commonspec', 'specir') {
+            if ((Get-Item "docs\$p\build\www\index.html").Length -eq 0) { throw "${p}: empty index.html" }
+            if (-not (Get-ChildItem "docs\$p\build\docx\*.docx")) { throw "${p}: no DOCX output" }
+          }
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-test-reports
+          path: ~/AppData/Local/Programs/SpecCompiler/tests/reports/
+          if-no-files-found: ignore
+
+      - name: Upload distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: speccompiler-windows-x64
+          path: dist/SpecCompiler-*-windows-x64.zip

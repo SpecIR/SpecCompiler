@@ -347,6 +347,15 @@ function M.cwd()
   return uv.cwd()
 end
 
+--- Unique scratch path under the system temp directory (not created).
+-- Replaces os.tmpname(), which crashes the official pandoc build on Windows.
+-- @param suffix string|nil - Appended to the generated name
+-- @return string path
+function M.temp_path(suffix)
+  local dir = (os.getenv("TMPDIR") or os.getenv("TEMP") or "/tmp"):gsub("\\", "/")
+  return string.format("%s/specc_%x_%06x%s", dir, uv.hrtime(), math.random(0, 0xffffff), suffix or "")
+end
+
 --- Delete directory recursively
 -- Exposed for cleanup after extract operations
 -- @param path string - Directory to delete

@@ -143,7 +143,7 @@ Body of B2.
             .. tostring(rel1.row.target_pid) .. ")")
     end
 
-    os.execute("sleep 1")
+    require("luv").sleep(1000)
 
     -- Run 2: edit doc_b so REQ-B-002 still exists but its rowid shifts
     -- (new object inserted before it). doc_a stays cached.
@@ -184,7 +184,7 @@ Body of B2.
             .. " resolved pid=" .. tostring(rel2.row.target_pid))
     end
 
-    os.execute("sleep 1")
+    require("luv").sleep(1000)
 
     -- Run 3: edit doc_b to REMOVE REQ-B-002 entirely. The doc_a relation must
     -- become unresolved — not stay bound to whatever object reuses the rowid.

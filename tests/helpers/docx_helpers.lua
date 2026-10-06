@@ -3,24 +3,35 @@
 
 local M = {}
 
+---Read a DOCX (ZIP) archive with pandoc's built-in zip module.
+---@param docx_path string Path to DOCX file
+---@return table|nil archive pandoc.zip.Archive, or nil if unreadable
+function M.open_archive(docx_path)
+    local f = io.open(docx_path, "rb")
+    if not f then return nil end
+    local data = f:read("*a")
+    f:close()
+    local ok, archive = pcall(pandoc.zip.Archive, data)
+    return ok and archive or nil
+end
+
 ---Extract a file from a DOCX (ZIP) archive.
 ---@param docx_path string Path to DOCX file
 ---@param inner_path string Path within the DOCX (e.g., "word/document.xml")
 ---@return string|nil content File contents
 ---@return string|nil error Error message
 function M.extract_from_docx(docx_path, inner_path)
-    -- Use unzip to extract to stdout
-    local cmd = string.format('unzip -p "%s" "%s" 2>/dev/null', docx_path, inner_path)
-    local handle = io.popen(cmd)
-    if not handle then
-        return nil, "Failed to run unzip"
+    local archive = M.open_archive(docx_path)
+    if not archive then
+        return nil, "Failed to read archive: " .. docx_path
     end
-    local content = handle:read("*a")
-    handle:close()
-    if content == "" then
-        return nil, "File not found in archive: " .. inner_path
+    for _, entry in ipairs(archive.entries) do
+        if entry.path == inner_path then
+            local content = entry:contents()
+            if content ~= "" then return content end
+        end
     end
-    return content
+    return nil, "File not found in archive: " .. inner_path
 end
 
 ---Check if a DOCX file exists and is valid.
@@ -36,12 +47,7 @@ function M.is_valid_docx(docx_path)
     f:close()
 
     -- Check it's a valid ZIP with required DOCX parts
-    -- Note: [Content_Types].xml needs glob escaping in unzip
-    local cmd = string.format('unzip -p "%s" "\\[Content_Types\\].xml" 2>/dev/null', docx_path)
-    local handle = io.popen(cmd)
-    local content_types = handle and handle:read("*a") or ""
-    if handle then handle:close() end
-    if content_types == "" then
+    if not M.extract_from_docx(docx_path, "[Content_Types].xml") then
         return false, "Missing [Content_Types].xml"
     end
 
@@ -153,19 +159,12 @@ end
 ---@param docx_path string Path to DOCX file
 ---@return table files Array of file paths
 function M.list_files(docx_path)
-    local cmd = string.format('unzip -l "%s" 2>/dev/null', docx_path)
-    local handle = io.popen(cmd)
-    if not handle then return {} end
-
-    local output = handle:read("*a")
-    handle:close()
+    local archive = M.open_archive(docx_path)
+    if not archive then return {} end
 
     local files = {}
-    for line in output:gmatch("[^\n]+") do
-        local path = line:match("(%S+)$")
-        if path and not path:match("^%-") and not path:match("^Name") and not path:match("^Length") then
-            table.insert(files, path)
-        end
+    for _, entry in ipairs(archive.entries) do
+        table.insert(files, entry.path)
     end
     return files
 end

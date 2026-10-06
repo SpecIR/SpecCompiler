@@ -10,13 +10,17 @@
 ---@module infra.process.libreoffice
 local M = {}
 
--- ============================================================================
--- Shell / Filesystem Helpers
--- ============================================================================
+local task_runner = require("infra.process.task_runner")
+local zip_utils = require("infra.format.zip_utils")
 
-local function shell_quote(path)
-    return "'" .. tostring(path):gsub("'", "'\\''") .. "'"
-end
+local is_windows = package.config:sub(1, 1) == "\\"
+
+-- LibreOffice can take a while to start, update fields and export.
+local RUN_TIMEOUT_MS = 300000
+
+-- ============================================================================
+-- Process / Filesystem Helpers (no shell: identical on POSIX and Windows)
+-- ============================================================================
 
 local function file_exists(path)
     local f = io.open(path, "rb")
@@ -43,37 +47,39 @@ local function write_binary(path, data)
     return true
 end
 
-local function command_output(cmd)
-    local pipe = io.popen(cmd .. " 2>/dev/null")
-    if not pipe then return nil end
-    local out = pipe:read("*l")
-    pipe:close()
-    if out and out ~= "" then return out end
+---Resolve a command name to its path via PATH (`command -v` / `where`).
+local function command_exists(name)
+    local ok, out
+    if is_windows then
+        ok, out = task_runner.spawn_sync("where", { name })
+    else
+        ok, out = task_runner.spawn_sync("sh", { "-c", 'command -v "$1"', "sh", name })
+    end
+    local path = ok and out:match("^%s*([^\r\n]+)")
+    if path and path ~= "" then return path end
     return nil
 end
 
-local function command_exists(name)
-    return command_output("command -v " .. shell_quote(name))
-end
-
 local function dirname(path)
-    return tostring(path):match("^(.*)/[^/]+$") or "."
+    return tostring(path):match("^(.*)[/\\][^/\\]+$") or "."
 end
 
 local function make_temp_dir()
-    return command_output("mktemp -d 2>/dev/null")
+    local dir = zip_utils.temp_path("_lo")
+    if zip_utils.mkdir_p(dir) then return dir end
+    return nil
 end
 
 local function remove_tree(path)
     if path and path ~= "" then
-        os.execute("rm -rf " .. shell_quote(path))
+        zip_utils.rmdir_r(path)
     end
 end
 
 local function ensure_parent_dir(path)
     local dir = dirname(path)
     if dir and dir ~= "." then
-        os.execute("mkdir -p " .. shell_quote(dir))
+        zip_utils.mkdir_p(dir)
     end
 end
 
@@ -88,14 +94,31 @@ end
 -- ============================================================================
 
 local function python_can_import_uno(python)
-    local ok = os.execute(shell_quote(python) .. " -c " .. shell_quote("import uno") .. " >/dev/null 2>&1")
-    return ok == true or ok == 0
+    return (task_runner.spawn_sync(python, { "-c", "import uno" }))
 end
 
-local function find_uno_python()
+---Locate soffice: PATH first, then the standard Windows install locations
+---(the Windows installer does not put LibreOffice on PATH).
+local function find_soffice()
+    local soffice = command_exists("libreoffice") or command_exists("soffice")
+    if soffice or not is_windows then return soffice end
+    for _, root in ipairs({ os.getenv("ProgramFiles"), os.getenv("ProgramFiles(x86)") }) do
+        local candidate = root .. "\\LibreOffice\\program\\soffice.exe"
+        if file_exists(candidate) then return candidate end
+    end
+    return nil
+end
+
+local function find_uno_python(soffice)
+    -- LibreOffice's own Python (Windows bundles one next to soffice.exe) and
     -- /usr/bin/python3 first: distro UNO bindings (python3-uno) live there,
     -- and a pyenv/venv python3 on PATH usually cannot import uno.
-    local candidates = {"/usr/bin/python3"}
+    local candidates = {}
+    if is_windows then
+        table.insert(candidates, dirname(soffice) .. "\\python.exe")
+    else
+        table.insert(candidates, "/usr/bin/python3")
+    end
     local path_python3 = command_exists("python3")
     if path_python3 then table.insert(candidates, path_python3) end
     local path_python = command_exists("python")
@@ -105,10 +128,8 @@ local function find_uno_python()
     for _, candidate in ipairs(candidates) do
         if candidate and not seen[candidate] then
             seen[candidate] = true
-            if candidate:match("^/") or command_exists(candidate) then
-                if python_can_import_uno(candidate) then
-                    return candidate
-                end
+            if file_exists(candidate) and python_can_import_uno(candidate) then
+                return candidate
             end
         end
     end
@@ -135,11 +156,11 @@ end
 ---@return string|nil soffice Path to the soffice/libreoffice binary
 ---@return string|nil python Path to a UNO-capable Python (or reason when soffice is nil)
 function M.available()
-    local soffice = command_exists("libreoffice") or command_exists("soffice")
+    local soffice = find_soffice()
     if not soffice then
         return nil, "LibreOffice not found on PATH"
     end
-    local python = find_uno_python()
+    local python = find_uno_python(soffice)
     if not python then
         return nil, "no Python executable with UNO support found"
     end
@@ -192,7 +213,7 @@ local function pdf_output_path(path, config)
     local docx = docx_config(config)
     local configured = docx.pdf_path or docx.export_pdf_path
     if configured and configured ~= "" then
-        if configured:match("^/") then return configured end
+        if configured:match("^/") or configured:match("^%a:[/\\]") then return configured end
         return ((config and config.project_root) or ".") .. "/" .. configured
     end
     return default_pdf_path(path)
@@ -247,19 +268,15 @@ function M.finalize(path, opts, log)
         ensure_parent_dir(target_pdf)
     end
 
-    local cmd = table.concat({
-        shell_quote(python),
-        shell_quote(script_path),
-        shell_quote(path),
-        shell_quote(target_docx),
-        shell_quote(target_pdf),
-        shell_quote(profile_dir),
-        shell_quote(port),
-        shell_quote(soffice),
-    }, " ")
-
-    local ok = os.execute(cmd)
-    local success = ok == true or ok == 0
+    local success = task_runner.spawn_sync(python, {
+        script_path,
+        path,
+        target_docx,
+        target_pdf,
+        profile_dir,
+        port,
+        soffice,
+    }, { timeout = RUN_TIMEOUT_MS })
 
     if success and opts.update_docx then
         if file_exists(updated_docx_path) and replace_file(updated_docx_path, path) then

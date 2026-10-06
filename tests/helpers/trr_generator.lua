@@ -140,16 +140,14 @@ local _model_dirs = nil
 local function get_model_dirs()
     if _model_dirs then return _model_dirs end
     _model_dirs = {}
-    local handle = io.popen("ls -1d " .. speccompiler_home .. "/models/*/tests 2>/dev/null")
-    if handle then
-        for line in handle:lines() do
-            local model = line:match("/models/([^/]+)/tests$")
-            if model then
-                table.insert(_model_dirs, model)
-            end
+    local models_dir = speccompiler_home .. "/models"
+    local ok, models = pcall(pandoc.system.list_directory, models_dir)
+    for _, model in ipairs(ok and models or {}) do
+        if pcall(pandoc.system.list_directory, models_dir .. "/" .. model .. "/tests") then
+            table.insert(_model_dirs, model)
         end
-        handle:close()
     end
+    table.sort(_model_dirs)
     return _model_dirs
 end
 
@@ -341,7 +339,7 @@ function Meta(meta)
     -- Write output
     local dir = output_path:match("(.*/)")
     if dir then
-        os.execute("mkdir -p " .. dir)
+        pcall(pandoc.system.make_directory, dir, true)
     end
 
     local f = io.open(output_path, "w")

@@ -157,6 +157,13 @@ One command on Windows, in PowerShell (after Docker Desktop or Podman is install
 irm https://raw.githubusercontent.com/SpecIR/SpecCompiler/main/scripts/install.ps1 | iex
 ```
 
+Natively on Windows 10/11 (no container engine), download `SpecCompiler-<version>-windows-x64.zip` from the GitHub release and extract it anywhere, for example `%LOCALAPPDATA%\Programs\SpecCompiler`; optionally add its `bin` folder to PATH. The zip bundles source-built Pandoc with a shared Lua runtime, the native DLL modules and PlantUML, and `bin\specc.cmd` invokes Pandoc directly. A Java runtime enables PlantUML diagrams and LibreOffice enables DOCX field update and PDF export; both are used when found on PATH. The same `specc` commands then work from cmd or PowerShell:
+
+```src.bash:src-install-windows-native{caption="Native Windows usage (cmd or PowerShell)"}
+specc build project.yaml
+specc test
+```
+
 `install.sh` installs the `specc` `abbrev: Command-Line Interface (CLI)` wrapper at `~/.local/bin/specc` and writes the engine and image reference to `~/.config/speccompiler/env`; the Windows installer places `specc` under `%LOCALAPPDATA%\SpecCompiler\bin` and adds it to the user PATH. If a local image exists it is used automatically; otherwise, the GHCR image is pulled on first use.
 
 ### Building the Image

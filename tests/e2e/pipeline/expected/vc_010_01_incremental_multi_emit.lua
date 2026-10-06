@@ -78,7 +78,7 @@ return function(_, _)
     end
 
     local function sleep_tick()
-        os.execute("sleep 1")
+        require("luv").sleep(1000)
     end
 
     -- ========================================================================

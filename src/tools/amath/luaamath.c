@@ -98,3 +98,8 @@ LUALIB_API int luaopen_amath(lua_State *L) {
     /* Return the module table */
     return 1;
 }
+
+/* Match require("luaamath") as well as the legacy explicit loadlib entry. */
+LUALIB_API int luaopen_luaamath(lua_State *L) {
+    return luaopen_amath(L);
+}

@@ -35,8 +35,8 @@ function M.get_speccompiler_home()
     if info and info.source and info.source:sub(1, 1) == "@" then
         local this_file = info.source:sub(2)
         -- Make path absolute if it isn't already
-        if not this_file:match("^/") then
-            local pwd = io.popen("pwd"):read("*l")
+        if not this_file:match("^/") and not this_file:match("^%a:[/\\]") then
+            local pwd = pandoc.system.get_working_directory()
             if pwd then
                 this_file = pwd .. "/" .. this_file
             end

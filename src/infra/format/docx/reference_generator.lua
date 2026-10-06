@@ -15,16 +15,10 @@ local M = {}
 ---@return string|nil data Binary data of reference.docx
 ---@return string|nil error Error message if failed
 function M.get_pandoc_default_reference()
-    -- Pipe binary data directly from pandoc stdout.
-    -- stderr is discarded to prevent linker warnings (e.g. liblua5.4.so version info)
-    -- from corrupting the binary output.
-    local handle = io.popen("pandoc --print-default-data-file reference.docx 2>/dev/null")
-    if not handle then
-        return nil, "Failed to execute pandoc"
-    end
-
-    local data = handle:read("*a")
-    local ok = handle:close()
+    -- Pipe binary data directly from pandoc stdout (no shell, binary-safe on
+    -- every platform). stderr is not captured, so linker warnings (e.g.
+    -- liblua5.4.so version info) cannot corrupt the binary output.
+    local ok, data = pcall(pandoc.pipe, "pandoc", { "--print-default-data-file", "reference.docx" }, "")
 
     if not ok or not data or #data == 0 then
         return nil, "Failed to get Pandoc default reference.docx"
@@ -240,7 +234,7 @@ function M.generate(options)
     log(string.format("  Got default reference.docx (%d bytes)", #default_docx))
 
     -- Create temp directory for work
-    local temp_dir = os.tmpname() .. "_ref"
+    local temp_dir = zip_utils.temp_path("_ref")
     local ok, mkdir_err = zip_utils.mkdir_p(temp_dir)
     if not ok then
         return false, "Failed to create temp directory: " .. (mkdir_err or "")

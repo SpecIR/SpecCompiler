@@ -84,7 +84,7 @@ end
 ---@param log table Logger instance
 ---@return string|nil Temp directory path, or nil on failure
 local function extract_docx(docx_path, log)
-    local temp_dir = os.tmpname() .. '_docx'
+    local temp_dir = zip_utils.temp_path('_docx')
 
     local ok, err = zip_utils.extract(docx_path, temp_dir)
     if not ok then

@@ -59,7 +59,9 @@ local fs = create_fs_adapter(uv)
 ---@param rel string Path relative to each base (e.g. "models/abnt/types")
 ---@return string|nil dir First existing directory, or nil
 local function probe_model_path(rel)
-    local home = os.getenv("SPECCOMPILER_HOME")
+    -- uv.os_getenv, not os.getenv: on Windows the C runtime keeps its own copy of
+    -- the environment that SetEnvironmentVariable (uv.os_setenv) does not update.
+    local home = uv.os_getenv("SPECCOMPILER_HOME")
     local candidates = {}
     if home then candidates[#candidates + 1] = home .. "/" .. rel end
     candidates[#candidates + 1] = fs.cwd() .. "/" .. rel

@@ -7,7 +7,7 @@ return function(actual_doc, helpers)
 
     -- Save original stderr and redirect to /dev/null to suppress noise
     local orig_stderr = io.stderr
-    local devnull = io.open("/dev/null", "w")
+    local devnull = io.open(package.config:sub(1, 1) == "\\" and "NUL" or "/dev/null", "w")
     if devnull then
         io.stderr = devnull
     end

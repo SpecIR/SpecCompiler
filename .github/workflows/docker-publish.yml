@@ -144,6 +144,15 @@ jobs:
           disable_search: true
           fail_ci_if_error: false
 
+  # Windows zip: built and tested by the reusable workflow, attached to the
+  # release below. Runs only for v* tags, alongside the image publish.
+  windows:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build-and-test
+    permissions:
+      contents: read
+    uses: ./.github/workflows/windows-installer.yml
+
   # Auto-deploy the docs to gh-pages on every `v*` release tag, using the image
   # just built/pushed by build-and-test (so no separate `docs*` tag is needed).
   deploy-docs:
@@ -160,7 +169,7 @@ jobs:
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: build-and-test
+    needs: [build-and-test, windows]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -203,12 +212,19 @@ jobs:
           cp docs/specir/build/docx/*.docx release-docs/ 2>/dev/null || true
           cp docs/specir/build/www/index.html release-docs/html5/specir.html 2>/dev/null || true
 
+      - name: Download Windows distribution
+        uses: actions/download-artifact@v4
+        with:
+          name: speccompiler-windows-x64
+          path: release-windows
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             release-docs/*.docx
             release-docs/html5/*.html
+            release-windows/*.zip
             THIRD_PARTY_NOTICES.md
           generate_release_notes: true
           body: |
@@ -223,6 +239,10 @@ jobs:
             ```powershell
             irm https://raw.githubusercontent.com/${{ github.repository }}/main/scripts/install.ps1 | iex
             ```
+
+            ## Install (native — Windows 10/11)
+
+            Download `SpecCompiler-<version>-windows-x64.zip` below, extract it anywhere and run `bin\specc.cmd`. No installer or container engine needed.
 
             ## Install (native — Ubuntu 24.04)
 

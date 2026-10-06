@@ -5,28 +5,17 @@
 local M = {}
 
 local xml = require("infra.format.xml")
+local docx_helpers = require("docx_helpers")
 
 -- ============================================================================
 -- Internal helpers
 -- ============================================================================
 
 ---List all files in a DOCX (ZIP) archive.
----Uses `unzip -Z1` for clean, one-per-line output.
 ---@param docx_path string Path to DOCX file
 ---@return table Array of file paths inside the archive
 local function list_archive_files(docx_path)
-    local cmd = string.format('unzip -Z1 "%s" 2>/dev/null', docx_path)
-    local handle = io.popen(cmd)
-    if not handle then return {} end
-    local files = {}
-    for line in handle:lines() do
-        local trimmed = line:match("^%s*(.-)%s*$")
-        if trimmed and trimmed ~= "" then
-            table.insert(files, trimmed)
-        end
-    end
-    handle:close()
-    return files
+    return docx_helpers.list_files(docx_path)
 end
 
 ---Extract a file from a DOCX (ZIP) archive.
@@ -34,15 +23,7 @@ end
 ---@param inner_path string Path within the DOCX
 ---@return string|nil content File contents or nil if not found
 local function extract(docx_path, inner_path)
-    -- Escape brackets for unzip glob interpretation
-    local escaped = inner_path:gsub("%[", "\\["):gsub("%]", "\\]")
-    local cmd = string.format('unzip -p "%s" "%s" 2>/dev/null', docx_path, escaped)
-    local handle = io.popen(cmd)
-    if not handle then return nil end
-    local content = handle:read("*a")
-    handle:close()
-    if content == "" then return nil end
-    return content
+    return (docx_helpers.extract_from_docx(docx_path, inner_path))
 end
 
 ---Build a set from an array for O(1) lookups.
