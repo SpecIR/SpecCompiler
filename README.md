@@ -64,7 +64,8 @@ specc build project.yaml
 specc test
 ```
 The zip bundles Pandoc built with native Lua module support and PlantUML.
-Optional, used when found on PATH: a Java runtime (PlantUML diagrams) and
+Optional, used when found on PATH: a Java runtime (PlantUML diagrams),
+the Mermaid CLI `mmdc` (Mermaid diagrams) and
 LibreOffice (DOCX field update and PDF export), e.g.
 `winget install EclipseAdoptium.Temurin.21.JRE TheDocumentFoundation.LibreOffice`.
 See [windows/README.md](windows/README.md).

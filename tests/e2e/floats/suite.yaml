@@ -17,4 +17,5 @@ extra_lua_paths: tests/e2e/floats
 # - vc_014_09_figure_copy.md -> VC-014 (Canonical figure image copy and fallbacks)
 # - vc_014_10_figure_include_from_file.md -> VC-014 (Included-file image resolution)
 # - vc_024_01_plantuml.md -> VC-024 (PlantUML processing)
+# - vc_024_03_mermaid.md -> VC-024 (Mermaid processing)
 # - vc_032_01_caption_structure.md -> VC-032 (Caption structure)

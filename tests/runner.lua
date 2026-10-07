@@ -555,6 +555,14 @@ local function run_test(suite_dir, input_file)
         end
     end
 
+    -- Tests naming "mermaid" drive the mermaid-cli (mmdc), optional on the host.
+    if test_name:find("mermaid", 1, true) then
+        local task_runner = require("infra.process.task_runner")
+        if not task_runner.command_exists("mmdc") then
+            return "skipped", "Mermaid CLI (mmdc) unavailable"
+        end
+    end
+
     -- Tests naming "libreoffice" drive soffice + a UNO-capable Python; both are
     -- optional on the host, so skip rather than fail when they are missing.
     if test_name:find("libreoffice", 1, true) then

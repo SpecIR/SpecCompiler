@@ -168,7 +168,7 @@ specc test
 
 ### Building the Image
 
-There is a single image, built on Ubuntu 24.04 (`Dockerfile`): the stock apt pandoc, the four compiled Lua C extensions, the SpecCompiler Lua source, and the optional renderers (deno for model-owned `chart:` floats, PlantUML for `puml:` diagrams, python/reqif for ReqIF interop). No compiler toolchain, no pandoc build. To build it locally instead of pulling from GHCR, from the repository root:
+There is a single image, built on Ubuntu 24.04 (`Dockerfile`): the stock apt pandoc, the four compiled Lua C extensions, the SpecCompiler Lua source, and the optional renderers (deno for model-owned `chart:` floats, PlantUML for `puml:` diagrams, Node + mermaid-cli for `mermaid:` diagrams, python/reqif for ReqIF interop). No compiler toolchain, no pandoc build. To build it locally instead of pulling from GHCR, from the repository root:
 
 ```src.bash:src-build-image{caption="Build and install via Docker"}
 docker build -t speccompiler-core:latest .
@@ -422,6 +422,18 @@ Active --> Inactive
 ```
 ````
 
+#### Mermaid Diagram
+
+````src.markdown:src-mermaid-float-syntax{caption="Mermaid float syntax"}
+```mermaid:diag-flow{caption="Build Flow"}
+flowchart LR
+    A[CommonSpec] --> B[SpecIR]
+    B --> C[DOCX]
+```
+````
+
+Rendering uses the Mermaid CLI (`mmdc`). The container image bundles it; native installs need the `@mermaid-js/mermaid-cli` npm package on PATH.
+
 #### Table
 
 ````src.markdown:src-table-float-syntax{caption="Table float syntax"}
@@ -496,7 +508,7 @@ Math floats use AsciiMath notation and are rendered to MathML for HTML5 output a
 * - Component
   - Description
 * - `type`
-  - Float type identifier (for example `figure`, `plantuml`, `csv`, `list-table`, `listing`, `chart`, `math`)
+  - Float type identifier (for example `figure`, `plantuml`, `mermaid`, `csv`, `list-table`, `listing`, `chart`, `math`)
 * - `.lang`
   - Optional language hint for syntax highlighting
 * - `:label`
@@ -681,7 +693,7 @@ Included files are tracked in the build graph for incremental builds -- a change
 
 The `default` model ships a complete document authoring toolkit so that authors can write structured technical documents without defining custom types. It provides:
 
-- **Numbered floats** -- figures, tables, code listings, math equations, and PlantUML diagrams, each with automatic numbering and captions.
+- **Numbered floats** -- figures, tables, code listings, math equations, PlantUML and Mermaid diagrams, each with automatic numbering and captions.
 - **Typed cross-references** -- relation types that resolve `@` and `#` links to specific float and object categories, enabling the pipeline to render appropriate display text (for example, "Figure 3" or "Table 1").
 - **Bibliography citations** -- integration with Pandoc's citeproc for parenthetical and in-text citation rendering from BibTeX files.
 - **Content views** -- generated content blocks such as TOC, list of figures, abbreviation tables, and inline math.
@@ -1120,6 +1132,10 @@ Run `specc build` from the directory containing `project.yaml`.
 ### PlantUML Render Failure
 
 Verify PlantUML syntax, ensure Docker image has Java JRE, check `@startuml`/`@enduml` markers.
+
+### Mermaid Render Failure
+
+Verify Mermaid syntax. The container image bundles `mmdc`; on native installs it must be on PATH (`npm install -g @mermaid-js/mermaid-cli`, Node 22 or newer).
 
 ### Unresolved Relations
 

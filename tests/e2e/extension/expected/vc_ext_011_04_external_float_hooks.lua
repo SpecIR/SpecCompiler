@@ -35,6 +35,17 @@ return function(actual_doc, helpers)  -- luacheck: ignore actual_doc helpers
         err("PLANTUML is external-only and must NOT have an internal render hook")
     end
 
+    -- MERMAID follows the same external contract.
+    if type(host:get_hook("float", "MERMAID", "prepare_task")) ~= "function" then
+        err("MERMAID should expose a prepare_task hook")
+    end
+    if type(host:get_hook("float", "MERMAID", "handle_result")) ~= "function" then
+        err("MERMAID should expose a handle_result hook")
+    end
+    if host:get_hook("float", "MERMAID", "render") ~= nil then
+        err("MERMAID is external-only and must NOT have an internal render hook")
+    end
+
     -- (CHART is abnt-model-owned; its hook contract is covered by the abnt suite.)
 
     -- Mutual exclusion: a float may not declare BOTH render and external hooks.

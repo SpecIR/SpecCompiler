@@ -232,6 +232,7 @@ The model defines which float types are available. Typical default-model types:
 - **CODE** (aliases: `listing`, `src`) --- code listings.
 - **MATH** (aliases: `math`) --- mathematical expressions.
 - **PLANTUML** (aliases: `plantuml`, `puml`) --- UML and other PlantUML diagrams.
+- **MERMAID** (aliases: `mermaid`, `mmd`) --- Mermaid diagrams.
 - **CHART** (aliases: `chart`) --- data-driven charts.
 - **DIAGRAM** (aliases: `diagram`) --- drawing diagrams.
 

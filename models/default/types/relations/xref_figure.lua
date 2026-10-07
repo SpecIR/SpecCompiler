@@ -1,5 +1,5 @@
 ---Cross-reference relation type for figures.
----Targets: FIGURE, PLANTUML, CHART float types.
+---Targets: FIGURE, PLANTUML, MERMAID, CHART float types.
 ---
 ---@module xref_figure
 
@@ -11,6 +11,6 @@ return {
         long_name = "Figure Reference",
         description = "Cross-reference to a figure",
         -- CHART is provided by overlay models (e.g. abnt); harmless/unmatched in a pure-default build.
-        target_type_ref = "FIGURE,PLANTUML,CHART",
+        target_type_ref = "FIGURE,PLANTUML,MERMAID,CHART",
     },
 }

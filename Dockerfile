@@ -4,7 +4,8 @@
 # Built on Ubuntu 24.04: the same stock apt pandoc + compiled Lua C extensions
 # the native install uses (scripts/install-native.sh), plus the optional
 # renderers — deno (model-owned charts), JRE + PlantUML + graphviz (puml
-# floats), python + reqif (ReqIF interop). One published tag:
+# floats), Node + mermaid-cli (mermaid floats), python + reqif (ReqIF
+# interop). One published tag:
 #
 #   ghcr.io/specir/speccompiler:latest
 #
@@ -16,7 +17,7 @@
 FROM ubuntu:24.04 AS build
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential cmake pkg-config git curl unzip ca-certificates \
+    build-essential cmake pkg-config git curl unzip xz-utils ca-certificates \
     liblua5.4-dev libsqlite3-dev libzip-dev peg \
     python3 python3-pip \
     && rm -rf /var/lib/apt/lists/*
@@ -39,6 +40,25 @@ RUN . ./scripts/versions.env \
     && curl -fsSL "https://github.com/plantuml/plantuml/releases/download/v${PLANTUML_VERSION}/plantuml-${PLANTUML_VERSION}.jar" \
          -o /opt/speccompiler/vendor/plantuml.jar
 
+# node + mermaid-cli (mmdc) for mermaid floats. Puppeteer downloads its Chrome
+# into vendor/puppeteer at install time, so the runtime stage gets node, the
+# CLI and the browser with the rest of vendor/.
+RUN . ./scripts/versions.env \
+    && case "$(uname -m)" in \
+         x86_64)  NODE_ARCH=x64 ;; \
+         aarch64) NODE_ARCH=arm64 ;; \
+         *) echo "unsupported arch: $(uname -m)" && exit 1 ;; \
+       esac \
+    && curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz" -o /tmp/node.tar.xz \
+    && mkdir -p /opt/speccompiler/vendor/node \
+    && tar -xJf /tmp/node.tar.xz -C /opt/speccompiler/vendor/node --strip-components=1 \
+    && rm /tmp/node.tar.xz \
+    && PATH="/opt/speccompiler/vendor/node/bin:$PATH" \
+       PUPPETEER_CACHE_DIR=/opt/speccompiler/vendor/puppeteer \
+       npm install -g --prefix /opt/speccompiler/vendor/mermaid \
+            "@mermaid-js/mermaid-cli@${MERMAID_CLI_VERSION}" "puppeteer@${PUPPETEER_VERSION}" \
+    && rm -rf /root/.npm
+
 # reqif (fork with the specir subpackage) for `python3 -m reqif.specir`
 RUN python3 -m pip install --break-system-packages --no-cache-dir \
       --target=/opt/speccompiler/vendor/python \
@@ -53,7 +73,8 @@ LABEL org.opencontainers.image.source="https://github.com/SpecIR/SpecCompiler" \
 # stock pandoc (links shared liblua5.4) + runtime libs for the extensions
 # + LibreOffice for DOCX field/PDF finalization + Microsoft core fonts used by
 # the official ABNT/USP templates. The fonts are downloaded by Ubuntu's
-# installer after accepting Microsoft's core-font EULA.
+# installer after accepting Microsoft's core-font EULA. The libnss3..libxshmfence1
+# group is what puppeteer's Chrome (mermaid-cli) needs at runtime.
 RUN apt-get update \
     && echo 'ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true' \
        | debconf-set-selections \
@@ -63,6 +84,9 @@ RUN apt-get update \
     python3 python3-uno libreoffice-writer libreoffice-math poppler-utils \
     default-jre-headless graphviz fonts-dejavu-core \
     fontconfig ttf-mscorefonts-installer \
+    libnss3 libnspr4 libatk1.0-0t64 libatk-bridge2.0-0t64 libcups2t64 libdrm2 \
+    libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 \
+    libasound2t64 libgtk-3-0t64 libxshmfence1 \
     zip unzip ca-certificates \
     && fc-cache -f \
     && rm -rf /var/lib/apt/lists/*
@@ -83,6 +107,14 @@ RUN ! grep -rq "deno" src/ models/default/ || (echo "core references deno" && ex
 # `plantuml` on PATH for the puml float
 RUN printf '#!/bin/sh\nexec java -jar /opt/speccompiler/vendor/plantuml.jar "$@"\n' \
       > /usr/local/bin/plantuml && chmod +x /usr/local/bin/plantuml
+
+# `mmdc` on PATH for the mermaid float. The image runs as root, where Chrome
+# refuses to start its sandbox, so the wrapper always passes a puppeteer
+# config that disables it.
+RUN printf '{"args":["--no-sandbox","--disable-gpu","--disable-dev-shm-usage"]}\n' \
+      > /opt/speccompiler/vendor/puppeteer-config.json \
+    && printf '#!/bin/sh\nexport PATH="/opt/speccompiler/vendor/node/bin:$PATH" PUPPETEER_CACHE_DIR=/opt/speccompiler/vendor/puppeteer\nexec /opt/speccompiler/vendor/mermaid/bin/mmdc -p /opt/speccompiler/vendor/puppeteer-config.json "$@"\n' \
+      > /usr/local/bin/mmdc && chmod +x /usr/local/bin/mmdc
 
 # the same unified wrapper the native install uses, running in native mode
 COPY scripts/specc /usr/local/bin/specc

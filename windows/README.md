@@ -33,6 +33,7 @@ present. Without it the feature reports a clear message and the rest still works
 | Java runtime | PlantUML diagrams (`puml` floats) | `plantuml.jar` is bundled; install Java yourself |
 | LibreOffice | DOCX field update and PDF export | Found in `Program Files`; uses LibreOffice's own Python |
 | Graphviz | Some PlantUML diagram types | Not bundled; install it if a diagram asks for `dot` |
+| Mermaid CLI (`mmdc`) | Mermaid diagrams (`mermaid` floats) | Not bundled; `npm install -g @mermaid-js/mermaid-cli` |
 | Deno | Model-owned charts (for example the ABNT model) | Not bundled; the core does not use it |
 
 ```powershell
