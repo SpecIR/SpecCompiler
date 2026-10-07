@@ -654,7 +654,7 @@ is the raw payload of the fenced code block.
 <p>The model defines which float types are available. Typical
 default-model types:</p>
 </div>
-<div data-pos="230:1-239:1">
+<div data-pos="230:1-240:1">
 <ul>
 <li><div data-pos="230:1-231:1">
 <strong>FIGURE</strong> (aliases: <code data-pos="230:24-230:29">fig</code>) — image references.
@@ -672,38 +672,41 @@ default-model types:</p>
 <strong>PLANTUML</strong> (aliases: <code data-pos="234:26-234:36">plantuml</code>, <code data-pos="234:38-234:44">puml</code>) — UML and other PlantUML diagrams.
 </div></li>
 <li><div data-pos="235:1-236:1">
-<strong>CHART</strong> (aliases: <code data-pos="235:23-235:30">chart</code>) — data-driven charts.
+<strong>MERMAID</strong> (aliases: <code data-pos="235:25-235:34">mermaid</code>, <code data-pos="235:36-235:41">mmd</code>) — Mermaid diagrams.
 </div></li>
-<li><div data-pos="236:1-238:1">
-<strong>DIAGRAM</strong> (aliases: <code data-pos="236:25-236:34">diagram</code>) — drawing diagrams.
+<li><div data-pos="236:1-237:1">
+<strong>CHART</strong> (aliases: <code data-pos="236:23-236:30">chart</code>) — data-driven charts.
+</div></li>
+<li><div data-pos="237:1-239:1">
+<strong>DIAGRAM</strong> (aliases: <code data-pos="237:25-237:34">diagram</code>) — drawing diagrams.
 </div></li>
 </ul>
 </div>
-<div data-pos="238:1-239:1">
-<p>Float types sharing a <code data-pos="238:23-238:38">counter_group</code> share a numbering
+<div data-pos="239:1-240:1">
+<p>Float types sharing a <code data-pos="239:23-239:38">counter_group</code> share a numbering
 sequence. For example, FIGURE, PLANTUML, CHART, and DIAGRAM may all
 share counter group FIGURE, producing Figure 1, Figure 2, Figure 3
 regardless of specific type.</p>
 </div>
-<h3 data-number="2.4.4" data-pos="240:1-241:1" id="SPEC-sec3.4.4"><span class="header-section-number">2.4.4</span> Examples</h3>
-<div data-pos="242:1-243:1">
+<h3 data-number="2.4.4" data-pos="241:1-242:1" id="SPEC-sec3.4.4"><span class="header-section-number">2.4.4</span> Examples</h3>
+<div data-pos="243:1-244:1">
 <p>A CSV table:</p>
 </div>
-<pre data-pos="244:1-251:1"><code>```csv:sales-data{caption=&quot;Quarterly Sales&quot;}
+<pre data-pos="245:1-252:1"><code>```csv:sales-data{caption=&quot;Quarterly Sales&quot;}
 Region,Q1,Q2,Q3
 North,100,120,150
 South,80,90,110
 ```</code></pre>
-<div data-pos="252:1-253:1">
+<div data-pos="253:1-254:1">
 <p>A figure:</p>
 </div>
-<pre data-pos="254:1-259:1"><code>```fig:arch-diagram{caption=&quot;System Architecture&quot; source=&quot;architecture.png&quot;}
+<pre data-pos="255:1-260:1"><code>```fig:arch-diagram{caption=&quot;System Architecture&quot; source=&quot;architecture.png&quot;}
 placeholder.png
 ```</code></pre>
-<div data-pos="260:1-261:1">
+<div data-pos="261:1-262:1">
 <p>A PlantUML diagram:</p>
 </div>
-<pre data-pos="262:1-272:1"><code>```plantuml:login-sequence{caption=&quot;Login Sequence Diagram&quot;}
+<pre data-pos="263:1-273:1"><code>```plantuml:login-sequence{caption=&quot;Login Sequence Diagram&quot;}
 @startuml
 User -&gt; System: Login Request
 System -&gt; Auth: Validate Credentials
@@ -711,161 +714,161 @@ Auth --&gt; System: Token
 System --&gt; User: Success
 @enduml
 ```</code></pre>
-<h2 data-number="2.5" data-pos="273:1-274:1" id="SPEC-sec3.5"><span class="header-section-number">2.5</span> Attribute</h2>
-<div data-pos="275:1-276:1">
+<h2 data-number="2.5" data-pos="274:1-275:1" id="SPEC-sec3.5"><span class="header-section-number">2.5</span> Attribute</h2>
+<div data-pos="276:1-277:1">
 <p>An <strong>Attribute</strong> stores metadata for specifications and
 spec objects using an Entity-Attribute-Value (EAV) pattern. Attributes
 are declared in blockquotes following headers and support seven
 datatypes.</p>
 </div>
-<h3 data-number="2.5.1" data-pos="277:1-278:1" id="SPEC-sec3.5.1"><span class="header-section-number">2.5.1</span> Formal Definition</h3>
-<div data-pos="279:1-280:1">
+<h3 data-number="2.5.1" data-pos="278:1-279:1" id="SPEC-sec3.5.1"><span class="header-section-number">2.5.1</span> Formal Definition</h3>
+<div data-pos="280:1-281:1">
 <p>A Spec Attribute is a triple
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo>,</mo><mi>β</mi><mo>,</mo><mi>ℛ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">A = \left( \tau,\beta,\mathcal{R} \right)</annotation></semantics></math>
 where:</p>
 </div>
-<div data-pos="281:1-286:1">
+<div data-pos="282:1-287:1">
 <ul>
-<li><div data-pos="281:1-282:1">
+<li><div data-pos="282:1-283:1">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>τ</mi><mo>∈</mo><mi>Γ</mi><mi>.</mi><msub><mi>⊤</mi><mi>A</mi></msub></mrow><annotation encoding="application/x-tex">\tau \in \Gamma.\top_{A}</annotation></semantics></math>
 is the attribute type (e.g. “status”, “priority”, “rationale”).
 </div></li>
-<li><div data-pos="282:1-283:1">
+<li><div data-pos="283:1-284:1">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
 is the nested blockquote content (block and inline elements).
 </div></li>
-<li><div data-pos="283:1-285:1">
+<li><div data-pos="284:1-286:1">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℛ</mi><mo>⊆</mo><mtext mathvariant="normal">SpecRelation</mtext></mrow><annotation encoding="application/x-tex">\mathcal{R} \subseteq \text{SpecRelation}</annotation></semantics></math>
 is the set of child relations extracted from
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>.
 </div></li>
 </ul>
 </div>
-<h3 data-number="2.5.2" data-pos="285:1-286:1" id="SPEC-sec3.5.2"><span class="header-section-number">2.5.2</span> Grammar</h3>
+<h3 data-number="2.5.2" data-pos="286:1-287:1" id="SPEC-sec3.5.2"><span class="header-section-number">2.5.2</span> Grammar</h3>
 <a id="puml-grammar-attribute" class="bookmark"></a>
 <figcaption class="caption caption-plantuml"><span class="caption-label">Figure <span class="caption-num" data-counter="figure"></span>–</span> Attribute production</figcaption>
 <p><img src="data:image/png;base64,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" /></p>
-<div data-pos="296:1-297:1">
-<p>Each <code data-pos="296:6-296:22">spec_attribute</code> corresponds
+<div data-pos="297:1-298:1">
+<p>Each <code data-pos="297:6-297:22">spec_attribute</code> corresponds
 to a single Markdown blockquote. Distinct attributes must be separated
 by a blank line. A multi-line attribute (e.g., XHTML type) uses
-consecutive <code data-pos="296:182-296:185">&gt;</code> lines within
+consecutive <code data-pos="297:182-297:185">&gt;</code> lines within
 the same blockquote.</p>
 </div>
-<h3 data-number="2.5.3" data-pos="298:1-299:1" id="SPEC-sec3.5.3"><span class="header-section-number">2.5.3</span> Datatypes</h3>
-<div data-pos="300:1-301:1">
+<h3 data-number="2.5.3" data-pos="299:1-300:1" id="SPEC-sec3.5.3"><span class="header-section-number">2.5.3</span> Datatypes</h3>
+<div data-pos="301:1-302:1">
 <p>Attributes are typed according to the model’s attribute definitions.
 Seven primitive datatypes are supported:</p>
 </div>
-<div data-pos="302:1-311:1">
+<div data-pos="303:1-312:1">
 <ul>
-<li><div data-pos="302:1-303:1">
+<li><div data-pos="303:1-304:1">
 <strong>STRING</strong> — plain text.
 </div></li>
-<li><div data-pos="303:1-304:1">
-<strong>INTEGER</strong> — whole numbers. Supports <code data-pos="303:43-303:54">min_value</code>/<code data-pos="303:55-303:66">max_value</code> bounds.
-</div></li>
 <li><div data-pos="304:1-305:1">
-<strong>REAL</strong> — floating-point numbers. Supports <code data-pos="304:49-304:60">min_value</code>/<code data-pos="304:61-304:72">max_value</code> bounds.
+<strong>INTEGER</strong> — whole numbers. Supports <code data-pos="304:43-304:54">min_value</code>/<code data-pos="304:55-304:66">max_value</code> bounds.
 </div></li>
 <li><div data-pos="305:1-306:1">
-<strong>BOOLEAN</strong> — <code data-pos="305:19-305:25">true</code> or
-<code data-pos="305:29-305:36">false</code>.
+<strong>REAL</strong> — floating-point numbers. Supports <code data-pos="305:49-305:60">min_value</code>/<code data-pos="305:61-305:72">max_value</code> bounds.
 </div></li>
 <li><div data-pos="306:1-307:1">
-<strong>DATE</strong> — ISO 8601 date (<code data-pos="306:31-306:43">YYYY-MM-DD</code>).
+<strong>BOOLEAN</strong> — <code data-pos="306:19-306:25">true</code> or
+<code data-pos="306:29-306:36">false</code>.
 </div></li>
 <li><div data-pos="307:1-308:1">
+<strong>DATE</strong> — ISO 8601 date (<code data-pos="307:31-307:43">YYYY-MM-DD</code>).
+</div></li>
+<li><div data-pos="308:1-309:1">
 <strong>ENUM</strong> — restricted set of values. Valid values defined
 in the model.
 </div></li>
-<li><div data-pos="308:1-310:1">
+<li><div data-pos="309:1-311:1">
 <strong>XHTML</strong> — rich text. Supports full Markdown formatting
 including links, bold, italic, and lists.
 </div></li>
 </ul>
 </div>
-<h3 data-number="2.5.4" data-pos="310:1-311:1" id="SPEC-sec3.5.4"><span class="header-section-number">2.5.4</span> Attribute Constraints</h3>
-<div data-pos="312:1-313:1">
+<h3 data-number="2.5.4" data-pos="311:1-312:1" id="SPEC-sec3.5.4"><span class="header-section-number">2.5.4</span> Attribute Constraints</h3>
+<div data-pos="313:1-314:1">
 <p>Models declare attribute schemas with the following constraints:</p>
 </div>
-<div data-pos="314:1-319:1">
+<div data-pos="315:1-320:1">
 <ul>
-<li><div data-pos="314:1-315:1">
-<code data-pos="314:3-314:15">min_occurs</code> — minimum number of
+<li><div data-pos="315:1-316:1">
+<code data-pos="315:3-315:15">min_occurs</code> — minimum number of
 values (0 = optional, 1+ = required).
 </div></li>
-<li><div data-pos="315:1-316:1">
-<code data-pos="315:3-315:15">max_occurs</code> — maximum number of
+<li><div data-pos="316:1-317:1">
+<code data-pos="316:3-316:15">max_occurs</code> — maximum number of
 values (1 = single value, &gt;1 = multi-value).
 </div></li>
-<li><div data-pos="316:1-318:1">
-<code data-pos="316:3-316:14">min_value</code>/<code data-pos="316:15-316:26">max_value</code> — bounds for INTEGER and REAL
+<li><div data-pos="317:1-319:1">
+<code data-pos="317:3-317:14">min_value</code>/<code data-pos="317:15-317:26">max_value</code> — bounds for INTEGER and REAL
 types.
 </div></li>
 </ul>
 </div>
-<div data-pos="318:1-319:1">
+<div data-pos="319:1-320:1">
 <p>These constraints are enforced by the type system during
 verification.</p>
 </div>
-<h3 data-number="2.5.5" data-pos="320:1-321:1" id="SPEC-sec3.5.5"><span class="header-section-number">2.5.5</span> Multi-Value Attributes</h3>
-<div data-pos="322:1-323:1">
-<p>When <code data-pos="322:6-322:22">max_occurs &gt; 1</code>, multiple
+<h3 data-number="2.5.5" data-pos="321:1-322:1" id="SPEC-sec3.5.5"><span class="header-section-number">2.5.5</span> Multi-Value Attributes</h3>
+<div data-pos="323:1-324:1">
+<p>When <code data-pos="323:6-323:22">max_occurs &gt; 1</code>, multiple
 values for the same attribute are written as repeated blockquote
 lines:</p>
 </div>
-<pre data-pos="324:1-329:1"><code>&gt; applicable_standard: DO-178C
+<pre data-pos="325:1-330:1"><code>&gt; applicable_standard: DO-178C
 
 &gt; applicable_standard: DO-254</code></pre>
-<h3 data-number="2.5.6" data-pos="330:1-331:1" id="SPEC-sec3.5.6"><span class="header-section-number">2.5.6</span> Examples</h3>
-<div data-pos="332:1-333:1">
+<h3 data-number="2.5.6" data-pos="331:1-332:1" id="SPEC-sec3.5.6"><span class="header-section-number">2.5.6</span> Examples</h3>
+<div data-pos="333:1-334:1">
 <p>Simple scalar attributes:</p>
 </div>
-<pre data-pos="334:1-341:1"><code>&gt; status: Draft
+<pre data-pos="335:1-342:1"><code>&gt; status: Draft
 
 &gt; priority: High
 
 &gt; version: 2.1</code></pre>
-<div data-pos="342:1-343:1">
+<div data-pos="343:1-344:1">
 <p>Rich text (XHTML) attribute:</p>
 </div>
-<pre data-pos="344:1-349:1"><code>&gt; rationale:
+<pre data-pos="345:1-350:1"><code>&gt; rationale:
 &gt; This component handles **critical** authentication logic.
 &gt; See [HLR-001](@) for the parent requirement.</code></pre>
-<div data-pos="350:1-351:1">
+<div data-pos="351:1-352:1">
 <p>Attribute with relation links:</p>
 </div>
-<pre data-pos="352:1-355:1"><code>&gt; traceability: [HLR-001](@) [HLR-002](@)</code></pre>
-<h2 data-number="2.6" data-pos="356:1-357:1" id="SPEC-sec3.6"><span class="header-section-number">2.6</span> Spec Relation</h2>
-<div data-pos="358:1-359:1">
+<pre data-pos="353:1-356:1"><code>&gt; traceability: [HLR-001](@) [HLR-002](@)</code></pre>
+<h2 data-number="2.6" data-pos="357:1-358:1" id="SPEC-sec3.6"><span class="header-section-number">2.6</span> Spec Relation</h2>
+<div data-pos="359:1-360:1">
 <p>A <strong>Spec Relation</strong> is a traceability link between
 specification elements. Relations are created from Markdown links where
 the URL acts as a <strong>selector</strong> that drives type inference.
 The relation type is not authored explicitly — it is inferred from the
 selector, the source context, and the resolved target.</p>
 </div>
-<h3 data-number="2.6.1" data-pos="360:1-361:1" id="SPEC-sec3.6.1"><span class="header-section-number">2.6.1</span> Formal Definition</h3>
-<div data-pos="362:1-363:1">
+<h3 data-number="2.6.1" data-pos="361:1-362:1" id="SPEC-sec3.6.1"><span class="header-section-number">2.6.1</span> Formal Definition</h3>
+<div data-pos="363:1-364:1">
 <p>A Spec Relation is a 4-tuple
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>s</mi><mo>,</mo><mi>t</mi><mo>,</mo><mi>σ</mi><mo>,</mo><mi>α</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">R = (s,t,\sigma,\alpha)</annotation></semantics></math>
 where:</p>
 </div>
-<div data-pos="364:1-370:1">
+<div data-pos="365:1-371:1">
 <ul>
-<li><div data-pos="364:1-365:1">
+<li><div data-pos="365:1-366:1">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>∈</mo><mi>𝒪</mi></mrow><annotation encoding="application/x-tex">s \in \mathcal{O}</annotation></semantics></math>
 is the source object.
 </div></li>
-<li><div data-pos="365:1-366:1">
+<li><div data-pos="366:1-367:1">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>∈</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>𝒪</mi><mo>∪</mo><mi>ℱ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">t \in \left( \mathcal{O} \cup \mathcal{F} \right)</annotation></semantics></math>
 is the target element (object or float).
 </div></li>
-<li><div data-pos="366:1-367:1">
+<li><div data-pos="367:1-368:1">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi><mo>∈</mo><mtext mathvariant="normal">String</mtext></mrow><annotation encoding="application/x-tex">\sigma \in \text{String}</annotation></semantics></math>
 is the link selector (the URL portion of the Markdown link).
 </div></li>
-<li><div data-pos="367:1-369:1">
+<li><div data-pos="368:1-370:1">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>∈</mo><mtext mathvariant="normal">String</mtext><mo>∪</mo><mrow><mo stretchy="true" form="prefix">{</mo><mi>⊥</mi><mo stretchy="true" form="postfix">}</mo></mrow></mrow><annotation encoding="application/x-tex">\alpha \in \text{String} \cup \left\{ \bot \right\}</annotation></semantics></math>
 is the source attribute containing the link, or
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>⊥</mi><annotation encoding="application/x-tex">\bot</annotation></semantics></math>
@@ -873,102 +876,102 @@ when the link appears in body text.
 </div></li>
 </ul>
 </div>
-<div data-pos="369:1-370:1">
+<div data-pos="370:1-371:1">
 <p>The relation type
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mo>∈</mo><mi>Γ</mi><mi>.</mi><msub><mi>⊤</mi><mi>R</mi></msub></mrow><annotation encoding="application/x-tex">\rho \in \Gamma.\top_{R}</annotation></semantics></math>
 is <strong>inferred</strong>:
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mo>=</mo><mtext mathvariant="normal">infer</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>σ</mi><mo>,</mo><mi>α</mi><mo>,</mo><msub><mi>τ</mi><mi>s</mi></msub><mo>,</mo><msub><mi>τ</mi><mi>t</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\rho = \text{infer}\left( \sigma,\alpha,\tau_{s},\tau_{t} \right)</annotation></semantics></math>.</p>
 </div>
-<h3 data-number="2.6.2" data-pos="371:1-372:1" id="SPEC-sec3.6.2"><span class="header-section-number">2.6.2</span> Grammar</h3>
+<h3 data-number="2.6.2" data-pos="372:1-373:1" id="SPEC-sec3.6.2"><span class="header-section-number">2.6.2</span> Grammar</h3>
 <a id="puml-grammar-spec-relation" class="bookmark"></a>
 <figcaption class="caption caption-plantuml"><span class="caption-label">Figure <span class="caption-num" data-counter="figure"></span>–</span> Spec Relation production</figcaption>
 <p><img src="data:image/png;base64,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" /></p>
-<h3 data-number="2.6.3" data-pos="383:1-384:1" id="SPEC-sec3.6.3"><span class="header-section-number">2.6.3</span> Link Selectors</h3>
-<div data-pos="385:1-386:1">
-<p>Any Markdown link whose URL starts with <code data-pos="385:41-385:44">@</code> or <code data-pos="385:48-385:51">#</code> is recognized as a spec relation. The
+<h3 data-number="2.6.3" data-pos="384:1-385:1" id="SPEC-sec3.6.3"><span class="header-section-number">2.6.3</span> Link Selectors</h3>
+<div data-pos="386:1-387:1">
+<p>Any Markdown link whose URL starts with <code data-pos="386:41-386:44">@</code> or <code data-pos="386:48-386:51">#</code> is recognized as a spec relation. The
 full URL string becomes the <strong>selector</strong> — selectors are
 not hardcoded but defined by relation types in the model. A base
 relation type registers a selector value and a resolver; concrete types
-inherit both via <code data-pos="385:303-385:312">extends</code>.</p>
+inherit both via <code data-pos="386:303-386:312">extends</code>.</p>
 </div>
-<div data-pos="387:1-388:1">
+<div data-pos="388:1-389:1">
 <p>The default model defines these base relation types (and therefore
 these selectors):</p>
 </div>
-<div data-pos="389:1-394:1">
+<div data-pos="390:1-395:1">
 <ul>
-<li><div data-pos="389:1-390:1">
-<strong><code data-pos="389:5-389:14">PID_REF</code></strong> (selector
-<code data-pos="389:27-389:30">@</code>) — resolves the link text as a
-PID against the set of declared PIDs. Example: <code data-pos="389:111-389:125">[HLR-001](@)</code>.
-</div></li>
 <li><div data-pos="390:1-391:1">
-<strong><code data-pos="390:5-390:16">LABEL_REF</code></strong>
-(selector <code data-pos="390:29-390:32">#</code>) — resolves the link
-text as a label against the set of declared object and float labels.
-Example: <code data-pos="390:134-390:157">[fig:architecture](#)</code>.
+<strong><code data-pos="390:5-390:14">PID_REF</code></strong> (selector
+<code data-pos="390:27-390:30">@</code>) — resolves the link text as a
+PID against the set of declared PIDs. Example: <code data-pos="390:111-390:125">[HLR-001](@)</code>.
 </div></li>
-<li><div data-pos="391:1-393:1">
-<strong><code data-pos="391:5-391:20">XREF_CITATION</code></strong>
-(selector <code data-pos="391:33-391:40">@cite</code>, <code data-pos="391:42-391:50">@citep</code>) — rewrites to a citation element
-for bibliography integration. Example: <code data-pos="391:126-391:146">[smith2024](@cite)</code>.
+<li><div data-pos="391:1-392:1">
+<strong><code data-pos="391:5-391:16">LABEL_REF</code></strong>
+(selector <code data-pos="391:29-391:32">#</code>) — resolves the link
+text as a label against the set of declared object and float labels.
+Example: <code data-pos="391:134-391:157">[fig:architecture](#)</code>.
+</div></li>
+<li><div data-pos="392:1-394:1">
+<strong><code data-pos="392:5-392:20">XREF_CITATION</code></strong>
+(selector <code data-pos="392:33-392:40">@cite</code>, <code data-pos="392:42-392:50">@citep</code>) — rewrites to a citation element
+for bibliography integration. Example: <code data-pos="392:126-392:146">[smith2024](@cite)</code>.
 </div></li>
 </ul>
 </div>
-<div data-pos="393:1-394:1">
+<div data-pos="394:1-395:1">
 <p>Concrete types extend these bases to add semantic constraints without
-reimplementing resolution. For example, <code data-pos="393:111-393:121">VERIFIES</code> extends <code data-pos="393:130-393:139">PID_REF</code> — it inherits the <code data-pos="393:160-393:163">@</code> selector and PID resolver, then adds
-constraints (<code data-pos="393:214-393:238">source_type_ref = &#39;VC&#39;</code>, <code data-pos="393:240-393:275">source_attribute = &#39;traceability&#39;</code>,
-<code data-pos="393:277-393:306">target_type_ref = &#39;HLR,LLR&#39;</code>) so
-that a <code data-pos="393:318-393:321">@</code> link from a VC’s
+reimplementing resolution. For example, <code data-pos="394:111-394:121">VERIFIES</code> extends <code data-pos="394:130-394:139">PID_REF</code> — it inherits the <code data-pos="394:160-394:163">@</code> selector and PID resolver, then adds
+constraints (<code data-pos="394:214-394:238">source_type_ref = &#39;VC&#39;</code>, <code data-pos="394:240-394:275">source_attribute = &#39;traceability&#39;</code>,
+<code data-pos="394:277-394:306">target_type_ref = &#39;HLR,LLR&#39;</code>) so
+that a <code data-pos="394:318-394:321">@</code> link from a VC’s
 traceability attribute to an HLR is inferred as a VERIFIES relation.</p>
 </div>
-<div data-pos="395:1-396:1">
+<div data-pos="396:1-397:1">
 <p>Models can define additional selectors (any string starting with
-<code data-pos="395:66-395:69">@</code> or <code data-pos="395:73-395:76">#</code>) by creating new relation types with
-their own <code data-pos="395:124-395:139">link_selector</code> and
+<code data-pos="396:66-396:69">@</code> or <code data-pos="396:73-396:76">#</code>) by creating new relation types with
+their own <code data-pos="396:124-396:139">link_selector</code> and
 optional resolver.</p>
 </div>
-<h3 data-number="2.6.4" data-pos="397:1-398:1" id="SPEC-sec3.6.4"><span class="header-section-number">2.6.4</span> Type Inference</h3>
-<div data-pos="399:1-400:1">
+<h3 data-number="2.6.4" data-pos="398:1-399:1" id="SPEC-sec3.6.4"><span class="header-section-number">2.6.4</span> Type Inference</h3>
+<div data-pos="400:1-401:1">
 <p>Relation types are inferred by <strong>constraint matching</strong>
 with most-specific-wins. Each relation type defines up to 4 optional
-constraints: <code data-pos="399:138-399:153">link_selector</code>,
-<code data-pos="399:155-399:173">source_attribute</code>, <code data-pos="399:175-399:192">source_type_ref</code>, <code data-pos="399:194-399:211">target_type_ref</code>. A <code data-pos="399:215-399:221">NULL</code> constraint is a wildcard — it
+constraints: <code data-pos="400:138-400:153">link_selector</code>,
+<code data-pos="400:155-400:173">source_attribute</code>, <code data-pos="400:175-400:192">source_type_ref</code>, <code data-pos="400:194-400:211">target_type_ref</code>. A <code data-pos="400:215-400:221">NULL</code> constraint is a wildcard — it
 matches anything but does not add specificity.</p>
 </div>
-<div data-pos="401:1-402:1">
+<div data-pos="402:1-403:1">
 <p>The algorithm:</p>
 </div>
-<div data-pos="403:1-409:1">
+<div data-pos="404:1-410:1">
 <ol type="1">
-<li><div data-pos="403:1-404:1">
-<strong>Filter</strong>: find all relation types whose non-<code data-pos="403:50-403:56">NULL</code> constraints are compatible with the
+<li><div data-pos="404:1-405:1">
+<strong>Filter</strong>: find all relation types whose non-<code data-pos="404:50-404:56">NULL</code> constraints are compatible with the
 current link’s values (selector, source attribute, source object type).
 </div></li>
-<li><div data-pos="404:1-405:1">
+<li><div data-pos="405:1-406:1">
 <strong>Resolve</strong>: call the resolver (determined by the type’s
-<code data-pos="404:61-404:70">extends</code> chain) to find the target
+<code data-pos="405:61-405:70">extends</code> chain) to find the target
 element.
 </div></li>
-<li><div data-pos="405:1-406:1">
+<li><div data-pos="406:1-407:1">
 <strong>Score</strong>: for each candidate, count the number of
-non-<code data-pos="405:59-405:65">NULL</code> constraints that matched
-across all 4 dimensions (adding <code data-pos="405:123-405:136">target_type</code> now that the target is
-known). Candidates whose <code data-pos="405:185-405:202">target_type_ref</code> constraint doesn’t
+non-<code data-pos="406:59-406:65">NULL</code> constraints that matched
+across all 4 dimensions (adding <code data-pos="406:123-406:136">target_type</code> now that the target is
+known). Candidates whose <code data-pos="406:185-406:202">target_type_ref</code> constraint doesn’t
 match are eliminated.
 </div></li>
-<li><div data-pos="406:1-408:1">
+<li><div data-pos="407:1-409:1">
 <strong>Pick</strong>: the highest-specificity candidate wins. If two
 candidates tie, the relation is marked ambiguous.
 </div></li>
 </ol>
 </div>
-<div data-pos="408:1-409:1">
-<p>For example, a link <code data-pos="408:21-408:35">[HLR-001](@)</code> in a VC object’s <code data-pos="408:53-408:67">traceability</code> attribute produces these
+<div data-pos="409:1-410:1">
+<p>For example, a link <code data-pos="409:21-409:35">[HLR-001](@)</code> in a VC object’s <code data-pos="409:53-409:67">traceability</code> attribute produces these
 candidates:</p>
 </div>
-<table data-pos="411:1-412:1;410:1-415:1">
+<table data-pos="412:1-413:1;411:1-416:1">
 <thead>
 <tr class="header">
 <th>Type</th>
@@ -982,15 +985,15 @@ candidates:</p>
 <tbody>
 <tr class="odd">
 <td>VERIFIES</td>
-<td><code data-pos="412:14-412:17">@</code></td>
-<td><code data-pos="412:20-412:34">traceability</code></td>
-<td><code data-pos="412:37-412:41">VC</code></td>
-<td><code data-pos="412:44-412:49">HLR</code></td>
+<td><code data-pos="413:14-413:17">@</code></td>
+<td><code data-pos="413:20-413:34">traceability</code></td>
+<td><code data-pos="413:37-413:41">VC</code></td>
+<td><code data-pos="413:44-413:49">HLR</code></td>
 <td><strong>4</strong></td>
 </tr>
 <tr class="even">
 <td>TRACES_TO</td>
-<td><code data-pos="413:16-413:19">@</code></td>
+<td><code data-pos="414:16-414:19">@</code></td>
 <td>—</td>
 <td>—</td>
 <td>—</td>
@@ -998,171 +1001,171 @@ candidates:</p>
 </tr>
 <tr class="odd">
 <td>XREF_SEC</td>
-<td><code data-pos="414:15-414:18">@</code></td>
+<td><code data-pos="415:15-415:18">@</code></td>
 <td>—</td>
 <td>—</td>
-<td><del><code data-pos="414:35-414:44">SECTION</code></del></td>
+<td><del><code data-pos="415:35-415:44">SECTION</code></del></td>
 <td>eliminated</td>
 </tr>
 </tbody>
 </table>
-<div data-pos="416:1-417:1">
+<div data-pos="417:1-418:1">
 <p>VERIFIES wins with the highest specificity (4 non-NULL constraints
 matched).</p>
 </div>
-<h3 data-number="2.6.5" data-pos="418:1-419:1" id="SPEC-sec3.6.5"><span class="header-section-number">2.6.5</span> Examples</h3>
-<div data-pos="420:1-421:1">
+<h3 data-number="2.6.5" data-pos="419:1-420:1" id="SPEC-sec3.6.5"><span class="header-section-number">2.6.5</span> Examples</h3>
+<div data-pos="421:1-422:1">
 <p>PID references in an attribute:</p>
 </div>
-<pre data-pos="422:1-425:1"><code>&gt; traceability: [HLR-001](@) [HLR-002](@)</code></pre>
-<div data-pos="426:1-427:1">
+<pre data-pos="423:1-426:1"><code>&gt; traceability: [HLR-001](@) [HLR-002](@)</code></pre>
+<div data-pos="427:1-428:1">
 <p>Float reference in body text:</p>
 </div>
-<pre data-pos="428:1-431:1"><code>The architecture is shown in [fig:architecture](#).</code></pre>
-<div data-pos="432:1-433:1">
+<pre data-pos="429:1-432:1"><code>The architecture is shown in [fig:architecture](#).</code></pre>
+<div data-pos="433:1-434:1">
 <p>Cross-document reference:</p>
 </div>
-<pre data-pos="434:1-437:1"><code>See [SRS-001](@) for the parent specification.</code></pre>
-<h2 data-number="2.7" data-pos="438:1-439:1" id="SPEC-sec3.7"><span class="header-section-number">2.7</span> Spec View</h2>
-<div data-pos="440:1-441:1">
+<pre data-pos="435:1-438:1"><code>See [SRS-001](@) for the parent specification.</code></pre>
+<h2 data-number="2.7" data-pos="439:1-440:1" id="SPEC-sec3.7"><span class="header-section-number">2.7</span> Spec View</h2>
+<div data-pos="441:1-442:1">
 <p>A <strong>Spec View</strong> is a dynamic query or generated content
 block. Views are materialized at processing time and produce content
 such as tables of contents, lists of figures, abbreviation expansions,
 and inline math.</p>
 </div>
-<h3 data-number="2.7.1" data-pos="442:1-443:1" id="SPEC-sec3.7.1"><span class="header-section-number">2.7.1</span> Formal Definition</h3>
-<div data-pos="444:1-445:1">
+<h3 data-number="2.7.1" data-pos="443:1-444:1" id="SPEC-sec3.7.1"><span class="header-section-number">2.7.1</span> Formal Definition</h3>
+<div data-pos="445:1-446:1">
 <p>A Spec View is a pair
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo>,</mo><mi>ω</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">V = (\tau,\omega)</annotation></semantics></math>
 where:</p>
 </div>
-<div data-pos="446:1-450:1">
+<div data-pos="447:1-451:1">
 <ul>
-<li><div data-pos="446:1-447:1">
+<li><div data-pos="447:1-448:1">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>τ</mi><mo>∈</mo><mi>Γ</mi><mi>.</mi><msub><mi>⊤</mi><mi>V</mi></msub></mrow><annotation encoding="application/x-tex">\tau \in \Gamma.\top_{V}</annotation></semantics></math>
 is the view type (e.g. TOC, LOF, TRACEABILITY_MATRIX, ABBREV,
 MATH_INLINE).
 </div></li>
-<li><div data-pos="447:1-449:1">
+<li><div data-pos="448:1-450:1">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ω</mi><mo>∈</mo><mtext mathvariant="normal">String</mtext></mrow><annotation encoding="application/x-tex">\omega \in \text{String}</annotation></semantics></math>
 is the raw parameter string.
 </div></li>
 </ul>
 </div>
-<h3 data-number="2.7.2" data-pos="449:1-450:1" id="SPEC-sec3.7.2"><span class="header-section-number">2.7.2</span> Grammar</h3>
+<h3 data-number="2.7.2" data-pos="450:1-451:1" id="SPEC-sec3.7.2"><span class="header-section-number">2.7.2</span> Grammar</h3>
 <a id="puml-grammar-spec-view" class="bookmark"></a>
 <figcaption class="caption caption-plantuml"><span class="caption-label">Figure <span class="caption-num" data-counter="figure"></span>–</span> Spec View production</figcaption>
 <p><img src="data:image/png;base64,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" /></p>
-<h3 data-number="2.7.3" data-pos="459:1-460:1" id="SPEC-sec3.7.3"><span class="header-section-number">2.7.3</span> View Types</h3>
-<div data-pos="461:1-462:1">
+<h3 data-number="2.7.3" data-pos="460:1-461:1" id="SPEC-sec3.7.3"><span class="header-section-number">2.7.3</span> View Types</h3>
+<div data-pos="462:1-463:1">
 <p>Views are defined by the model. Common view types include:</p>
 </div>
-<div data-pos="463:1-472:1">
+<div data-pos="464:1-473:1">
 <ul>
-<li><div data-pos="463:1-464:1">
+<li><div data-pos="464:1-465:1">
 <strong>TOC</strong> ([TOC]) — table of contents.
 </div></li>
-<li><div data-pos="464:1-465:1">
+<li><div data-pos="465:1-466:1">
 <strong>LOF</strong> ([LOF]) — list of figures.
 </div></li>
-<li><div data-pos="465:1-466:1">
+<li><div data-pos="466:1-467:1">
 <strong>LOT</strong> ([LOT]) — list of tables.
 </div></li>
-<li><div data-pos="466:1-467:1">
-<strong>ABBREV</strong> (<code data-pos="466:15-466:24">abbrev:</code>)
+<li><div data-pos="467:1-468:1">
+<strong>ABBREV</strong> (<code data-pos="467:15-467:24">abbrev:</code>)
 — abbreviation expansion (e.g., Project Identifier (PID)).
 </div></li>
-<li><div data-pos="467:1-468:1">
-<strong>MATH_INLINE</strong> (<code data-pos="467:20-467:34">math_inline:</code>) — inline math expression.
-</div></li>
 <li><div data-pos="468:1-469:1">
+<strong>MATH_INLINE</strong> (<code data-pos="468:20-468:34">math_inline:</code>) — inline math expression.
+</div></li>
+<li><div data-pos="469:1-470:1">
 <strong>TRACEABILITY_MATRIX</strong> — coverage matrix showing which
 objects trace to which.
 </div></li>
-<li><div data-pos="469:1-471:1">
+<li><div data-pos="470:1-472:1">
 <strong>REQUIREMENTS_SUMMARY</strong> — summary report of requirements
 by type and status.
 </div></li>
 </ul>
 </div>
-<h3 data-number="2.7.4" data-pos="471:1-472:1" id="SPEC-sec3.7.4"><span class="header-section-number">2.7.4</span> Examples</h3>
-<div data-pos="473:1-474:1">
+<h3 data-number="2.7.4" data-pos="472:1-473:1" id="SPEC-sec3.7.4"><span class="header-section-number">2.7.4</span> Examples</h3>
+<div data-pos="474:1-475:1">
 <p>Inline views:</p>
 </div>
-<pre data-pos="475:1-481:1"><code>`toc:`
+<pre data-pos="476:1-482:1"><code>`toc:`
 `lof:`
 `abbrev: HLR`
 `math_inline: x = \frac{-b}{2a}`</code></pre>
-<h2 data-number="2.8" data-pos="482:1-483:1" id="SPEC-sec3.8"><span class="header-section-number">2.8</span> Disambiguation Rules</h2>
-<div data-pos="484:1-485:1">
+<h2 data-number="2.8" data-pos="483:1-484:1" id="SPEC-sec3.8"><span class="header-section-number">2.8</span> Disambiguation Rules</h2>
+<div data-pos="485:1-486:1">
 <p>CommonSpec reuses standard Markdown syntax. The following rules
 determine when a Markdown element is interpreted as a CommonSpec
 construct versus plain Markdown:</p>
 </div>
-<div data-pos="486:1-487:1">
+<div data-pos="487:1-488:1">
 <p><strong>Blockquote as Attribute vs. plain blockquote.</strong> A
-blockquote (<code data-pos="486:65-486:72">&gt; ...</code>) is
+blockquote (<code data-pos="487:65-487:72">&gt; ...</code>) is
 recognized as an attribute if and only if:</p>
 </div>
-<div data-pos="488:1-492:1">
+<div data-pos="489:1-493:1">
 <ol type="1">
-<li><div data-pos="488:1-489:1">
-Its first line matches the pattern <code data-pos="488:39-488:57">AttrName &quot;:&quot; ...</code>, where AttrName is a
+<li><div data-pos="489:1-490:1">
+Its first line matches the pattern <code data-pos="489:39-489:57">AttrName &quot;:&quot; ...</code>, where AttrName is a
 declared attribute name for the enclosing object’s type (own or
-inherited through the type’s <code data-pos="488:172-488:181">extends</code> chain; matching is
+inherited through the type’s <code data-pos="489:172-489:181">extends</code> chain; matching is
 case-insensitive).
 </div></li>
-<li><div data-pos="489:1-491:1">
+<li><div data-pos="490:1-492:1">
 It belongs to the most recently opened Specification or Spec Object
 header (it need not appear immediately after it). Each attribute is a
 separate Markdown blockquote, so distinct attributes must be separated
 by a blank line; every later line or paragraph within the same
-blockquote — including lines that themselves look like <code data-pos="489:331-489:343">key: value</code> — continues the first
+blockquote — including lines that themselves look like <code data-pos="490:331-490:343">key: value</code> — continues the first
 attribute’s value.
 </div></li>
 </ol>
 </div>
-<div data-pos="491:1-492:1">
+<div data-pos="492:1-493:1">
 <p>If the first condition fails, the blockquote is treated as plain body
-content. For example, <code data-pos="491:93-491:120">&gt; Note: this is important</code> is a plain
+content. For example, <code data-pos="492:93-492:120">&gt; Note: this is important</code> is a plain
 blockquote unless the model declares an attribute named “Note” for the
-enclosing object type; the compiler emits an <code data-pos="491:248-491:267">unknown_attribute</code> warning so mistyped
+enclosing object type; the compiler emits an <code data-pos="492:248-492:267">unknown_attribute</code> warning so mistyped
 attribute names are visible.</p>
 </div>
-<div data-pos="493:1-494:1">
+<div data-pos="494:1-495:1">
 <p><em>Specification-level exception.</em> Blockquotes belonging to the
-H1 header (document metadata such as <code data-pos="493:100-493:107">title</code>, <code data-pos="493:109-493:117">author</code>, <code data-pos="493:119-493:128">version</code>) are permissive: any <code data-pos="493:150-493:162">key: value</code> blockquote is stored as
-specification metadata, with an <code data-pos="493:219-493:243">unknown_spec_attribute</code> warning when
+H1 header (document metadata such as <code data-pos="494:100-494:107">title</code>, <code data-pos="494:109-494:117">author</code>, <code data-pos="494:119-494:128">version</code>) are permissive: any <code data-pos="494:150-494:162">key: value</code> blockquote is stored as
+specification metadata, with an <code data-pos="494:219-494:243">unknown_spec_attribute</code> warning when
 the key is not declared for the specification’s type.</p>
 </div>
-<div data-pos="495:1-496:1">
+<div data-pos="496:1-497:1">
 <p><strong>Fenced code block as Float vs. plain code block.</strong> A
 fenced code block is recognized as a spec float if and only if its info
-string matches the pattern <code data-pos="495:155-495:174">TypeRef &quot;:&quot; Label</code>, where TypeRef (or
+string matches the pattern <code data-pos="496:155-496:174">TypeRef &quot;:&quot; Label</code>, where TypeRef (or
 one of its aliases) is a declared float type. A code block with an info
-string like <code data-pos="495:278-495:293">```python</code> (no colon
+string like <code data-pos="496:278-496:293">```python</code> (no colon
 and label) is treated as a plain code block.</p>
 </div>
-<div data-pos="497:1-498:1">
+<div data-pos="498:1-499:1">
 <p><strong>Inline code as View vs. plain inline code.</strong> An inline
 code span is recognized as a spec view if and only if its content
-matches the pattern <code data-pos="497:144-497:157">TypeRef &quot;:&quot;</code>,
-where TypeRef is a declared view type. For example, <code data-pos="497:211-497:223">`toc:`</code> is a view, but <code data-pos="497:239-497:252">`x = 5`</code> is plain inline code.</p>
+matches the pattern <code data-pos="498:144-498:157">TypeRef &quot;:&quot;</code>,
+where TypeRef is a declared view type. For example, <code data-pos="498:211-498:223">`toc:`</code> is a view, but <code data-pos="498:239-498:252">`x = 5`</code> is plain inline code.</p>
 </div>
-<div data-pos="499:1-500:1">
+<div data-pos="500:1-501:1">
 <p><strong>Link as Spec Relation vs. plain link.</strong> A Markdown
-link <code data-pos="499:59-499:72">[text](url)</code> is recognized as
-a spec relation if and only if the URL starts with <code data-pos="499:141-499:144">@</code> or <code data-pos="499:148-499:151">#</code> and matches a declared selector.
-Links with other URL schemes (e.g., <code data-pos="499:221-499:231">https://</code>, <code data-pos="499:233-499:237">./</code>) are plain Markdown links.</p>
+link <code data-pos="500:59-500:72">[text](url)</code> is recognized as
+a spec relation if and only if the URL starts with <code data-pos="500:141-500:144">@</code> or <code data-pos="500:148-500:151">#</code> and matches a declared selector.
+Links with other URL schemes (e.g., <code data-pos="500:221-500:231">https://</code>, <code data-pos="500:233-500:237">./</code>) are plain Markdown links.</p>
 </div>
-<div data-pos="501:1-502:1">
+<div data-pos="502:1-503:1">
 <p><strong>Heading level gaps.</strong> If a heading skips levels (e.g.,
 H2 followed by H4 with no intervening H3), the document is malformed.
 Processors should report an error; the missing intermediate level is not
 implicitly created.</p>
 </div>
-<h1 data-number="3" data-pos="503:1-504:1" id="SPEC-sec4"><span class="header-section-number">3</span> Type System</h1>
-<div data-pos="505:1-506:1">
+<h1 data-number="3" data-pos="504:1-505:1" id="SPEC-sec4"><span class="header-section-number">3</span> Type System</h1>
+<div data-pos="506:1-507:1">
 <p>CommonSpec is parameterized by a <strong>model</strong> — a type
 environment
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Γ</mi><annotation encoding="application/x-tex">\Gamma</annotation></semantics></math>
@@ -1171,172 +1174,172 @@ specification types, datatypes, and attributes exist. The language
 syntax is fixed; the model determines what types are valid and how they
 behave.</p>
 </div>
-<h2 data-number="3.1" data-pos="507:1-508:1" id="SPEC-sec4.1"><span class="header-section-number">3.1</span> Model Structure</h2>
-<div data-pos="509:1-510:1">
+<h2 data-number="3.1" data-pos="508:1-509:1" id="SPEC-sec4.1"><span class="header-section-number">3.1</span> Model Structure</h2>
+<div data-pos="510:1-511:1">
 <p>A model provides type definitions organized by category:</p>
 </div>
-<div data-pos="511:1-519:1">
+<div data-pos="512:1-520:1">
 <ul>
-<li><div data-pos="511:1-512:1">
+<li><div data-pos="512:1-513:1">
 <strong>Object types</strong> — spec object types (e.g., SECTION, HLR,
 LLR, VC).
 </div></li>
-<li><div data-pos="512:1-513:1">
+<li><div data-pos="513:1-514:1">
 <strong>Float types</strong> — float types with aliases and counter
 groups (e.g., FIGURE, TABLE, PLANTUML).
 </div></li>
-<li><div data-pos="513:1-514:1">
+<li><div data-pos="514:1-515:1">
 <strong>Relation types</strong> — relation types with selectors,
 resolvers, and constraints (e.g., PID_REF, VERIFIES).
 </div></li>
-<li><div data-pos="514:1-515:1">
+<li><div data-pos="515:1-516:1">
 <strong>View types</strong> — view types with parameters and
 materialization logic (e.g., TOC, LOF, ABBREV).
 </div></li>
-<li><div data-pos="515:1-516:1">
+<li><div data-pos="516:1-517:1">
 <strong>Specification types</strong> — document-level types (e.g., SRS,
 SDD, SVC).
 </div></li>
-<li><div data-pos="516:1-518:1">
+<li><div data-pos="517:1-519:1">
 <strong>Verification rules</strong> — constraint violation detectors
 that enforce model invariants (e.g., missing required attributes,
 invalid enum values, broken traceability).
 </div></li>
 </ul>
 </div>
-<h2 data-number="3.2" data-pos="518:1-519:1" id="SPEC-sec4.2"><span class="header-section-number">3.2</span> Type Definition Schema</h2>
-<div data-pos="520:1-521:1">
+<h2 data-number="3.2" data-pos="519:1-520:1" id="SPEC-sec4.2"><span class="header-section-number">3.2</span> Type Definition Schema</h2>
+<div data-pos="521:1-522:1">
 <p>Each type definition declares a schema with the following fields
 (using object types as an example):</p>
 </div>
-<div data-pos="522:1-530:1">
+<div data-pos="523:1-531:1">
 <ul>
-<li><div data-pos="522:1-523:1">
-<strong>id</strong> — the canonical type identifier (e.g., <code data-pos="522:51-522:56">HLR</code>).
-</div></li>
 <li><div data-pos="523:1-524:1">
+<strong>id</strong> — the canonical type identifier (e.g., <code data-pos="523:51-523:56">HLR</code>).
+</div></li>
+<li><div data-pos="524:1-525:1">
 <strong>long_name</strong> — human-readable name (e.g., “High-Level
 Requirement”).
 </div></li>
-<li><div data-pos="524:1-525:1">
-<strong>extends</strong> — parent type for single inheritance (e.g.,
-<code data-pos="524:61-524:72">TRACEABLE</code>).
-</div></li>
 <li><div data-pos="525:1-526:1">
-<strong>pid_prefix</strong> — prefix for auto-generated PIDs (e.g.,
-<code data-pos="525:60-525:65">HLR</code>).
+<strong>extends</strong> — parent type for single inheritance (e.g.,
+<code data-pos="525:61-525:72">TRACEABLE</code>).
 </div></li>
 <li><div data-pos="526:1-527:1">
-<strong>pid_format</strong> — format string for PID numbering (e.g.,
-<code data-pos="526:61-526:67">%03d</code>).
+<strong>pid_prefix</strong> — prefix for auto-generated PIDs (e.g.,
+<code data-pos="526:60-526:65">HLR</code>).
 </div></li>
-<li><div data-pos="527:1-529:1">
+<li><div data-pos="527:1-528:1">
+<strong>pid_format</strong> — format string for PID numbering (e.g.,
+<code data-pos="527:61-527:67">%03d</code>).
+</div></li>
+<li><div data-pos="528:1-530:1">
 <strong>attributes</strong> — list of attribute declarations, each with
-<code data-pos="527:64-527:70">name</code>, <code data-pos="527:72-527:78">type</code>, and optional constraints.
+<code data-pos="528:64-528:70">name</code>, <code data-pos="528:72-528:78">type</code>, and optional constraints.
 </div></li>
 </ul>
 </div>
-<div data-pos="529:1-530:1">
+<div data-pos="530:1-531:1">
 <p>Relation types additionally declare:</p>
 </div>
-<div data-pos="531:1-537:1">
+<div data-pos="532:1-538:1">
 <ul>
-<li><div data-pos="531:1-532:1">
-<strong>link_selector</strong> — the selector string that triggers this
-type (e.g., <code data-pos="531:76-531:79">@</code>).
-</div></li>
 <li><div data-pos="532:1-533:1">
+<strong>link_selector</strong> — the selector string that triggers this
+type (e.g., <code data-pos="532:76-532:79">@</code>).
+</div></li>
+<li><div data-pos="533:1-534:1">
 <strong>source_type_ref</strong> / <strong>target_type_ref</strong> —
 type constraints for inference.
 </div></li>
-<li><div data-pos="533:1-534:1">
+<li><div data-pos="534:1-535:1">
 <strong>source_attribute</strong> — attribute context constraint for
 inference.
 </div></li>
-<li><div data-pos="534:1-536:1">
+<li><div data-pos="535:1-537:1">
 <strong>resolve</strong> — the resolution strategy (inherited from the
-base type via <code data-pos="534:77-534:86">extends</code>).
+base type via <code data-pos="535:77-535:86">extends</code>).
 </div></li>
 </ul>
 </div>
-<h2 data-number="3.3" data-pos="536:1-537:1" id="SPEC-sec4.3"><span class="header-section-number">3.3</span> Type Inheritance</h2>
-<div data-pos="538:1-539:1">
-<p>Object types support single inheritance via <code data-pos="538:45-538:54">extends</code>. A child type inherits all
+<h2 data-number="3.3" data-pos="537:1-538:1" id="SPEC-sec4.3"><span class="header-section-number">3.3</span> Type Inheritance</h2>
+<div data-pos="539:1-540:1">
+<p>Object types support single inheritance via <code data-pos="539:45-539:54">extends</code>. A child type inherits all
 attributes from its parent. For example:</p>
 </div>
-<div data-pos="540:1-546:1">
+<div data-pos="541:1-547:1">
 <ul>
-<li><div data-pos="540:1-541:1">
+<li><div data-pos="541:1-542:1">
 <strong>SECTION</strong> — base structural container, no special
 attributes.
 </div></li>
-<li><div data-pos="541:1-542:1">
-<strong>TRACEABLE</strong> extends SECTION — adds <code data-pos="541:42-541:50">status</code> attribute (ENUM: Draft, Review,
+<li><div data-pos="542:1-543:1">
+<strong>TRACEABLE</strong> extends SECTION — adds <code data-pos="542:42-542:50">status</code> attribute (ENUM: Draft, Review,
 Approved, Implemented).
 </div></li>
-<li><div data-pos="542:1-543:1">
-<strong>HLR</strong> extends TRACEABLE — adds <code data-pos="542:38-542:49">rationale</code>, <code data-pos="542:51-542:61">priority</code>.
+<li><div data-pos="543:1-544:1">
+<strong>HLR</strong> extends TRACEABLE — adds <code data-pos="543:38-543:49">rationale</code>, <code data-pos="543:51-543:61">priority</code>.
 </div></li>
-<li><div data-pos="543:1-545:1">
-<strong>LLR</strong> extends TRACEABLE — adds <code data-pos="543:38-543:49">rationale</code>, <code data-pos="543:51-543:72">verification_method</code>, <code data-pos="543:74-543:88">traceability</code>.
+<li><div data-pos="544:1-546:1">
+<strong>LLR</strong> extends TRACEABLE — adds <code data-pos="544:38-544:49">rationale</code>, <code data-pos="544:51-544:72">verification_method</code>, <code data-pos="544:74-544:88">traceability</code>.
 </div></li>
 </ul>
 </div>
-<h2 data-number="3.4" data-pos="545:1-546:1" id="SPEC-sec4.4"><span class="header-section-number">3.4</span> Default Model</h2>
-<div data-pos="547:1-548:1">
+<h2 data-number="3.4" data-pos="546:1-547:1" id="SPEC-sec4.4"><span class="header-section-number">3.4</span> Default Model</h2>
+<div data-pos="548:1-549:1">
 <p>The default model provides basic types for general technical
 publishing:</p>
 </div>
-<div data-pos="549:1-555:1">
+<div data-pos="550:1-556:1">
 <ul>
-<li><div data-pos="549:1-550:1">
+<li><div data-pos="550:1-551:1">
 <strong>Objects:</strong> SECTION (default, composite), COVER,
 EXEC_SUMMARY, REFERENCES.
 </div></li>
-<li><div data-pos="550:1-551:1">
+<li><div data-pos="551:1-552:1">
 <strong>Floats:</strong> FIGURE, TABLE, CODE, MATH, PLANTUML, CHART,
 DIAGRAM.
 </div></li>
-<li><div data-pos="551:1-552:1">
+<li><div data-pos="552:1-553:1">
 <strong>Views:</strong> TOC, LOF, LOT, ABBREV, MATH_INLINE.
 </div></li>
-<li><div data-pos="552:1-554:1">
+<li><div data-pos="553:1-555:1">
 <strong>Specifications:</strong> A single default specification type.
 </div></li>
 </ul>
 </div>
-<h2 data-number="3.5" data-pos="554:1-555:1" id="SPEC-sec4.5"><span class="header-section-number">3.5</span> Domain Models</h2>
-<div data-pos="556:1-557:1">
+<h2 data-number="3.5" data-pos="555:1-556:1" id="SPEC-sec4.5"><span class="header-section-number">3.5</span> Domain Models</h2>
+<div data-pos="557:1-558:1">
 <p>Domain-specific models extend the default with specialized types. For
 example, a software documentation model may add:</p>
 </div>
-<div data-pos="558:1-565:1">
+<div data-pos="559:1-566:1">
 <ul>
-<li><div data-pos="558:1-559:1">
+<li><div data-pos="559:1-560:1">
 <strong>Objects:</strong> HLR, LLR, VC, NFR, FD, DD, CSC, CSU, TR — for
 software requirements, design, and verification.
 </div></li>
-<li><div data-pos="559:1-560:1">
+<li><div data-pos="560:1-561:1">
 <strong>Relations:</strong> VERIFIES, TRACES_TO, REALIZES, BELONGS — for
 traceability between requirements, design, and tests.
 </div></li>
-<li><div data-pos="560:1-561:1">
+<li><div data-pos="561:1-562:1">
 <strong>Specifications:</strong> SRS, SDD, SVC, TRR, SUM — for software
 documentation lifecycle.
 </div></li>
-<li><div data-pos="561:1-562:1">
+<li><div data-pos="562:1-563:1">
 <strong>Views:</strong> TRACEABILITY_MATRIX, REQUIREMENTS_SUMMARY,
 COVERAGE_SUMMARY — for analysis and reporting.
 </div></li>
-<li><div data-pos="562:1-564:1">
+<li><div data-pos="563:1-565:1">
 <strong>Verification views:</strong> Missing traceability coverage,
 invalid attribute values, duplicate PIDs.
 </div></li>
 </ul>
 </div>
-<h1 data-number="4" data-pos="564:1-565:1" id="SPEC-sec5"><span class="header-section-number">4</span> Datatypes</h1>
-<h2 data-number="4.1" data-pos="566:1-567:1" id="SPEC-sec5.1"><span class="header-section-number">4.1</span> Primitive Datatypes</h2>
-<div data-pos="568:1-569:1">
+<h1 data-number="4" data-pos="565:1-566:1" id="SPEC-sec5"><span class="header-section-number">4</span> Datatypes</h1>
+<h2 data-number="4.1" data-pos="567:1-568:1" id="SPEC-sec5.1"><span class="header-section-number">4.1</span> Primitive Datatypes</h2>
+<div data-pos="569:1-570:1">
 <p>CommonSpec defines seven primitive datatypes used for attribute
 values:</p>
 </div>
@@ -1388,77 +1391,77 @@ values:</p>
 </tr>
 </tbody>
 </table>
-<h2 data-number="4.2" data-pos="581:1-582:1" id="SPEC-sec5.2"><span class="header-section-number">4.2</span> Enum Definitions</h2>
-<div data-pos="583:1-584:1">
+<h2 data-number="4.2" data-pos="582:1-583:1" id="SPEC-sec5.2"><span class="header-section-number">4.2</span> Enum Definitions</h2>
+<div data-pos="584:1-585:1">
 <p>ENUM datatypes declare a fixed set of allowed values. Each value has
-a <code data-pos="583:72-583:77">key</code> (used in CommonSpec source)
-and a <code data-pos="583:112-583:122">sequence</code> (display order).
+a <code data-pos="584:72-584:77">key</code> (used in CommonSpec source)
+and a <code data-pos="584:112-584:122">sequence</code> (display order).
 For example, a status attribute might declare:</p>
 </div>
-<pre data-pos="585:1-588:1"><code>values: Draft, Review, Approved, Implemented</code></pre>
-<div data-pos="589:1-590:1">
+<pre data-pos="586:1-589:1"><code>values: Draft, Review, Approved, Implemented</code></pre>
+<div data-pos="590:1-591:1">
 <p>In CommonSpec source, the author writes:</p>
 </div>
-<pre data-pos="591:1-594:1"><code>&gt; status: Draft</code></pre>
-<div data-pos="595:1-596:1">
+<pre data-pos="592:1-595:1"><code>&gt; status: Draft</code></pre>
+<div data-pos="596:1-597:1">
 <p>An enum value that does not match one of the declared keys is a
 constraint violation.</p>
 </div>
-<h2 data-number="4.3" data-pos="597:1-598:1" id="SPEC-sec5.3"><span class="header-section-number">4.3</span> Attribute Type
+<h2 data-number="4.3" data-pos="598:1-599:1" id="SPEC-sec5.3"><span class="header-section-number">4.3</span> Attribute Type
 Declarations</h2>
-<div data-pos="599:1-600:1">
+<div data-pos="600:1-601:1">
 <p>Models declare which attributes each object type can have,
 including:</p>
 </div>
-<div data-pos="601:1-608:1">
+<div data-pos="602:1-609:1">
 <ul>
-<li><div data-pos="601:1-602:1">
+<li><div data-pos="602:1-603:1">
 <strong>name</strong> — the attribute key as written in CommonSpec
 (e.g., “status”, “rationale”).
 </div></li>
-<li><div data-pos="602:1-603:1">
+<li><div data-pos="603:1-604:1">
 <strong>type</strong> — one of the seven primitive datatypes.
 </div></li>
-<li><div data-pos="603:1-604:1">
+<li><div data-pos="604:1-605:1">
 <strong>min_occurs</strong> — 0 for optional, 1+ for required.
 </div></li>
-<li><div data-pos="604:1-605:1">
+<li><div data-pos="605:1-606:1">
 <strong>max_occurs</strong> — 1 for single-value, &gt;1 for multi-value.
 </div></li>
-<li><div data-pos="605:1-607:1">
+<li><div data-pos="606:1-608:1">
 <strong>min_value / max_value</strong> — bounds for INTEGER and REAL
 attributes.
 </div></li>
 </ul>
 </div>
-<h1 data-number="5" data-pos="607:1-608:1" id="SPEC-sec6"><span class="header-section-number">5</span> Summary</h1>
-<div data-pos="609:1-610:1">
+<h1 data-number="5" data-pos="608:1-609:1" id="SPEC-sec6"><span class="header-section-number">5</span> Summary</h1>
+<div data-pos="610:1-611:1">
 <p>CommonSpec is a six-construct extension of Markdown:</p>
 </div>
-<div data-pos="611:1-619:1">
+<div data-pos="612:1-620:1">
 <ol type="1">
-<li><div data-pos="611:1-612:1">
-<strong>Specification</strong> (<code data-pos="611:23-611:26">#</code>
+<li><div data-pos="612:1-613:1">
+<strong>Specification</strong> (<code data-pos="612:23-612:26">#</code>
 header) — root document container.
 </div></li>
-<li><div data-pos="612:1-613:1">
-<strong>Spec Object</strong> (<code data-pos="612:21-612:25">##</code>–<code data-pos="612:27-612:35">######</code> headers) — traceable elements.
-</div></li>
 <li><div data-pos="613:1-614:1">
-<strong>Spec Float</strong> (fenced code blocks with <code data-pos="613:44-613:56">type:label</code>) — numbered floats.
+<strong>Spec Object</strong> (<code data-pos="613:21-613:25">##</code>–<code data-pos="613:27-613:35">######</code> headers) — traceable elements.
 </div></li>
 <li><div data-pos="614:1-615:1">
-<strong>Attribute</strong> (blockquotes with <code data-pos="614:36-614:50">&gt; key: value</code>) — typed metadata.
+<strong>Spec Float</strong> (fenced code blocks with <code data-pos="614:44-614:56">type:label</code>) — numbered floats.
 </div></li>
 <li><div data-pos="615:1-616:1">
-<strong>Spec Relation</strong> (links with <code data-pos="615:34-615:47">[target](@)</code> or <code data-pos="615:51-615:64">[target](#)</code>) — traceability links.
+<strong>Attribute</strong> (blockquotes with <code data-pos="615:36-615:50">&gt; key: value</code>) — typed metadata.
 </div></li>
-<li><div data-pos="616:1-618:1">
-<strong>Spec View</strong> (inline code with <code data-pos="616:36-616:54">`type:param`</code>) — dynamic content.
+<li><div data-pos="616:1-617:1">
+<strong>Spec Relation</strong> (links with <code data-pos="616:34-616:47">[target](@)</code> or <code data-pos="616:51-616:64">[target](#)</code>) — traceability links.
+</div></li>
+<li><div data-pos="617:1-619:1">
+<strong>Spec View</strong> (inline code with <code data-pos="617:36-617:54">`type:param`</code>) — dynamic content.
 </div></li>
 </ol>
 </div>
-<div data-pos="618:1-619:1">
+<div data-pos="619:1-620:1">
 <p>The language is model-parameterized: the type environment determines
 what types, attributes, relations, and constraints are active. Any
 compliant processor that loads the same model will interpret the same

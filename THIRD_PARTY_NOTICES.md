@@ -42,7 +42,10 @@ SpecCompiler Core includes, bundles, and/or invokes third-party software.
 | Component | Version | Source | License | 
 |-----------|---------|--------|---------|
 | Pandoc CLI | 3.6.1 | https://github.com/jgm/pandoc | **GPL-2.0-or-later** |
-| PlantUML | 1.2024.8 | https://github.com/plantuml/plantuml | **GPL-3.0-or-later** |
+| PlantUML | 1.2026.8 | https://github.com/plantuml/plantuml | **GPL-3.0-or-later** |
+| Node.js (container only) | 22.23.3 | https://nodejs.org | MIT |
+| @mermaid-js/mermaid-cli (container only) | 12.0.0 | https://github.com/mermaid-js/mermaid-cli | MIT |
+| puppeteer + Chrome for Testing (container only) | 25.12.0 | https://github.com/puppeteer/puppeteer | Apache-2.0 / BSD-3-Clause |
 
 
 | Runtime Dependency | Source | License |
@@ -74,6 +77,6 @@ version compiled in) are shipped under `licenses/`.
 | libzip | 1.11.4 | https://libzip.org | BSD-3-Clause |
 | zlib | 1.3.1 | https://zlib.net | Zlib |
 
-The MIT build of PlantUML 1.2024.8 is bundled (`vendor/plantuml/plantuml.jar`) and
+The MIT build of PlantUML 1.2026.8 is bundled (`vendor/plantuml/plantuml.jar`) and
 verified by SHA-256 at build time; it needs a Java runtime, which is not bundled.
 The compiler runtime libraries retain their upstream licenses.

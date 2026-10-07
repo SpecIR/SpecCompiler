@@ -296,23 +296,30 @@ format Pandoc can target.</p>
 or podman (Linux/macOS/WSL2):</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-fsSL</span> https://raw.githubusercontent.com/SpecIR/SpecCompiler/main/scripts/install.sh <span class="kw">|</span> <span class="fu">bash</span></span></code></pre></div>
-<p><strong>Windows (native).</strong> Download
-<code>SpecCompiler-&lt;version&gt;-windows-x64.zip</code> from the <a
-href="https://github.com/SpecIR/SpecCompiler/releases">latest
-release</a>, extract it anywhere and run <code>bin\specc.cmd</code> — no
-container engine or installer needed. It bundles source-built Pandoc
-with native Lua module support; see <a
-href="windows/README.md">windows/README.md</a>.</p>
+<p><strong>Windows 10/11 (native, no container or installer).</strong>
+Download <code>SpecCompiler-&lt;version&gt;-windows-x64.zip</code> from
+the <a href="https://github.com/SpecIR/SpecCompiler/releases">latest
+release</a>, extract it anywhere and add its <code>bin</code> folder to
+your PATH. Then, in cmd or PowerShell:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>specc build project<span class="op">.</span><span class="fu">yaml</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>specc test</span></code></pre></div>
+<p>The zip bundles Pandoc built with native Lua module support and
+PlantUML. Optional, used when found on PATH: a Java runtime (PlantUML
+diagrams), the Mermaid CLI <code>mmdc</code> (Mermaid diagrams) and
+LibreOffice (DOCX field update and PDF export), e.g.
+<code>winget install EclipseAdoptium.Temurin.21.JRE TheDocumentFoundation.LibreOffice</code>.
+See <a href="windows/README.md">windows/README.md</a>.</p>
 <p><strong>Windows (container).</strong> One command in PowerShell,
 after Docker Desktop or Podman is installed:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">irm</span> https<span class="op">://</span>raw<span class="op">.</span><span class="fu">githubusercontent</span><span class="op">.</span><span class="fu">com</span><span class="op">/</span>SpecIR<span class="op">/</span>SpecCompiler<span class="op">/</span>main<span class="op">/</span>scripts<span class="op">/</span>install<span class="op">.</span><span class="fu">ps1</span> <span class="op">|</span> <span class="fu">iex</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">irm</span> https<span class="op">://</span>raw<span class="op">.</span><span class="fu">githubusercontent</span><span class="op">.</span><span class="fu">com</span><span class="op">/</span>SpecIR<span class="op">/</span>SpecCompiler<span class="op">/</span>main<span class="op">/</span>scripts<span class="op">/</span>install<span class="op">.</span><span class="fu">ps1</span> <span class="op">|</span> <span class="fu">iex</span></span></code></pre></div>
 <p><strong>Native — Ubuntu 24.04</strong> (stock apt pandoc + compiled
 Lua extensions):</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/SpecIR/SpecCompiler.git</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> SpecCompiler</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/install-native.sh</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/SpecIR/SpecCompiler.git</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> SpecCompiler</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/install-native.sh</span></code></pre></div>
 <p>Other Linux distros: install the equivalents of the packages below,
 then run <code>bash scripts/install-native.sh</code> (its apt step is
 skipped on non-apt systems):</p>
@@ -336,17 +343,17 @@ PlantUML floats; <code>libreoffice-writer</code>,
 update and PDF export</li>
 </ul>
 <p>To build the Docker image locally instead of pulling from GHCR:</p>
-<div class="sourceCode" id="cb4"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/SpecIR/SpecCompiler.git</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> SpecCompiler</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> speccompiler-core:latest .</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/install.sh</span></code></pre></div>
-<p>Build the docs.</p>
 <div class="sourceCode" id="cb5"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build docs/commonspec/project.yaml</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build docs/specir/project.yaml</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build docs/user_docs/project.yaml</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build docs/engineering_docs/project.yaml</span></code></pre></div>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/SpecIR/SpecCompiler.git</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> SpecCompiler</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> speccompiler-core:latest .</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/install.sh</span></code></pre></div>
+<p>Build the docs.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build docs/commonspec/project.yaml</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build docs/specir/project.yaml</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build docs/user_docs/project.yaml</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">specc</span> build docs/engineering_docs/project.yaml</span></code></pre></div>
 <h2 id="documentation">Documentation</h2>
 <p><a href="https://specir.github.io/SpecCompiler/"><strong>Published
 Documentation</strong></a> — generated HTML and DOCX documentation.</p>
@@ -376,27 +383,27 @@ HTML</a>.</p>
 <h2 id="how-it-works">How It Works</h2>
 <h3 id="a-minimal-spec">A Minimal Spec</h3>
 <p><strong>srs.md</strong> — a requirement in CommonSpec:</p>
-<div class="sourceCode" id="cb6"><pre
-class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># SRS: Login Service</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## HLR: Authenticate Users @0013</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>The system shall authenticate users via OAuth 2.0.</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; status: Draft</span></span></code></pre></div>
-<p><strong>svc.md</strong> — a verification case that covers it:</p>
 <div class="sourceCode" id="cb7"><pre
-class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># SVC: Login Verification</span></span>
+class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># SRS: Login Service</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## VC: Verify Authentication</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## HLR: Authenticate Users @0013</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>Verify the authentication flow works end to end.</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>The system shall authenticate users via OAuth 2.0.</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; objective: Confirm OAuth 2.0 login succeeds</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; verification_method: Test</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; traceability: </span><span class="co">[</span><span class="ot">0013</span><span class="co">](@)</span></span></code></pre></div>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; status: Draft</span></span></code></pre></div>
+<p><strong>svc.md</strong> — a verification case that covers it:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># SVC: Login Verification</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## VC: Verify Authentication</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>Verify the authentication flow works end to end.</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; objective: Confirm OAuth 2.0 login succeeds</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; verification_method: Test</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; traceability: </span><span class="co">[</span><span class="ot">0013</span><span class="co">](@)</span></span></code></pre></div>
 <h3 id="commonspec--specir--output">CommonSpec → SpecIR → Output</h3>
 <p>SpecCompiler runs as a Pandoc Lua filter and adds a SQLite middle-end
 between Pandoc's reader and writer:</p>
@@ -406,43 +413,43 @@ into SpecIR. A type defines what a spec object <em>is</em>: its
 identifier, display name, PID format, and typed attributes.</p>
 <p>For example, the HLR type
 (<code>models/sw_docs/types/objects/hlr.lua</code>):</p>
-<div class="sourceCode" id="cb8"><pre
-class="sourceCode lua"><code class="sourceCode lua"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cn">M</span><span class="op">.</span><span class="va">object</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;HLR&quot;</span><span class="op">,</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">long_name</span> <span class="op">=</span> <span class="st">&quot;High-Level Requirement&quot;</span><span class="op">,</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">extends</span> <span class="op">=</span> <span class="st">&quot;TRACEABLE&quot;</span><span class="op">,</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">attributes</span> <span class="op">=</span> <span class="op">{</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;rationale&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;XHTML&quot;</span> <span class="op">},</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>Loading this module produces:</p>
 <div class="sourceCode" id="cb9"><pre
-class="sourceCode sql"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> spec_object_types (<span class="kw">identifier</span>, long_name, <span class="op">..</span>.)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;HLR&#39;</span>, <span class="st">&#39;High-Level Requirement&#39;</span>, <span class="op">..</span>.);</span></code></pre></div>
+class="sourceCode lua"><code class="sourceCode lua"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cn">M</span><span class="op">.</span><span class="va">object</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">id</span> <span class="op">=</span> <span class="st">&quot;HLR&quot;</span><span class="op">,</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">long_name</span> <span class="op">=</span> <span class="st">&quot;High-Level Requirement&quot;</span><span class="op">,</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">extends</span> <span class="op">=</span> <span class="st">&quot;TRACEABLE&quot;</span><span class="op">,</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="va">attributes</span> <span class="op">=</span> <span class="op">{</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">{</span> <span class="va">name</span> <span class="op">=</span> <span class="st">&quot;rationale&quot;</span><span class="op">,</span> <span class="fu">type</span> <span class="op">=</span> <span class="st">&quot;XHTML&quot;</span> <span class="op">},</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Loading this module produces:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> spec_object_types (<span class="kw">identifier</span>, long_name, <span class="op">..</span>.)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;HLR&#39;</span>, <span class="st">&#39;High-Level Requirement&#39;</span>, <span class="op">..</span>.);</span></code></pre></div>
 <p><strong>1. Frontend (Pandoc reader).</strong> Parse CommonSpec
 (<code>commonmark_x</code>) into Pandoc AST.</p>
 <p><strong>2. Middle-end (SpecCompiler).</strong> Lower the AST into
 SpecIR (SQLite), apply type rules, and assemble the transformed AST. For
 the two-file spec above, the middle-end produces the following SpecIR
 entries:</p>
-<div class="sourceCode" id="cb10"><pre
-class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Specification (from the # heading)</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> specifications (<span class="kw">identifier</span>, long_name, type_ref)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;srs&#39;</span>, <span class="st">&#39;Login Service&#39;</span>, <span class="st">&#39;SRS&#39;</span>);</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- Object (from the ## heading)</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> spec_objects (specification_ref, type_ref, pid)</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;srs&#39;</span>, <span class="st">&#39;HLR&#39;</span>, <span class="st">&#39;0013&#39;</span>);</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- Attribute (from the &gt; blockquote)</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> spec_attribute_values</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  (specification_ref, owner_object_id, name, raw_value, enum_ref, datatype)</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;srs&#39;</span>, <span class="dv">1</span>, <span class="st">&#39;status&#39;</span>, <span class="st">&#39;Draft&#39;</span>, <span class="st">&#39;TRACEABLE_status_Draft&#39;</span>, <span class="st">&#39;ENUM&#39;</span>);</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- Relation (from [0013](@) in svc.md&#39;s traceability attribute → inferred as VERIFIES)</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> spec_relations</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  (specification_ref, source_object_id, target_text, type_ref, link_selector, source_attribute)</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;svc&#39;</span>, <span class="dv">2</span>, <span class="st">&#39;0013&#39;</span>, <span class="st">&#39;VERIFIES&#39;</span>, <span class="st">&#39;@&#39;</span>, <span class="st">&#39;traceability&#39;</span>);</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Specification (from the # heading)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> specifications (<span class="kw">identifier</span>, long_name, type_ref)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;srs&#39;</span>, <span class="st">&#39;Login Service&#39;</span>, <span class="st">&#39;SRS&#39;</span>);</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">-- Object (from the ## heading)</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> spec_objects (specification_ref, type_ref, pid)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;srs&#39;</span>, <span class="st">&#39;HLR&#39;</span>, <span class="st">&#39;0013&#39;</span>);</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">-- Attribute (from the &gt; blockquote)</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> spec_attribute_values</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  (specification_ref, owner_object_id, name, raw_value, enum_ref, datatype)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;srs&#39;</span>, <span class="dv">1</span>, <span class="st">&#39;status&#39;</span>, <span class="st">&#39;Draft&#39;</span>, <span class="st">&#39;TRACEABLE_status_Draft&#39;</span>, <span class="st">&#39;ENUM&#39;</span>);</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">-- Relation (from [0013](@) in svc.md&#39;s traceability attribute → inferred as VERIFIES)</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="kw">INSERT</span> <span class="kw">INTO</span> spec_relations</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  (specification_ref, source_object_id, target_text, type_ref, link_selector, source_attribute)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="kw">VALUES</span> (<span class="st">&#39;svc&#39;</span>, <span class="dv">2</span>, <span class="st">&#39;0013&#39;</span>, <span class="st">&#39;VERIFIES&#39;</span>, <span class="st">&#39;@&#39;</span>, <span class="st">&#39;traceability&#39;</span>);</span></code></pre></div>
 <p>Type-checking is then a query against SpecIR. For example, the
 verification view <code>invalid_cast</code> checks whether
 <code>'Pending'</code> is a legal value for
