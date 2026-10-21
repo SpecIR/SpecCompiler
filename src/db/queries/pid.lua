@@ -48,11 +48,12 @@ M.hierarchical_objects_by_spec_type = [[
     ORDER BY o.file_seq
 ]]
 
--- Collision probe: does any object in this spec already carry this PID
--- (explicit or generated earlier in the run)?
+-- Collision probe: does any object in ANY spec already carry this PID
+-- (explicit or generated earlier in the run)? PIDs are project-unique:
+-- cross-doc resolution and view_object_duplicate_pid key on pid alone.
 M.object_pid_exists = [[
     SELECT 1 FROM spec_objects
-    WHERE specification_ref = :spec_id AND pid = :pid
+    WHERE pid = :pid
     LIMIT 1
 ]]
 

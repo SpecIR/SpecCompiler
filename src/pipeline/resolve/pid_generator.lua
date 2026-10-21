@@ -113,7 +113,7 @@ local function generate_hierarchical_pids(data, spec_id, type_ref, settings)
         end
 
         -- Build the candidate PID; bump the counter past collisions with
-        -- explicit author PIDs (e.g. an author-claimed SRS-sec3).
+        -- any existing PID in the project (e.g. an author-claimed SRS-sec3).
         local auto_pid
         while true do
             local parts = {}
@@ -135,7 +135,7 @@ local function generate_hierarchical_pids(data, spec_id, type_ref, settings)
             auto_pid = spec_pid .. "-" .. formatted
 
             local existing = data:query_one(Queries.pid.object_pid_exists,
-                { spec_id = spec_id, pid = auto_pid })
+                { pid = auto_pid })
             if not existing then break end
             counters[depth] = counters[depth] + 1
         end
@@ -214,13 +214,14 @@ function M.on_resolve(data, contexts, diagnostics)
             local next_seq = (seq_row and seq_row.max_seq or 0) + 1
 
             -- Generate PIDs for objects without explicit PID; probe past
-            -- collisions with explicit author PIDs that carry no sequence.
+            -- collisions with PIDs anywhere in the project (explicit PIDs
+            -- without a sequence, or other specs' PIDs of the same type).
             for _, obj in ipairs(objects) do
                 local auto_pid
                 while true do
                     auto_pid = pid_utils.generate_next_pid(prefix, format_str, next_seq)
                     local existing = data:query_one(Queries.pid.object_pid_exists,
-                        { spec_id = spec_id, pid = auto_pid })
+                        { pid = auto_pid })
                     if not existing then break end
                     next_seq = next_seq + 1
                 end
