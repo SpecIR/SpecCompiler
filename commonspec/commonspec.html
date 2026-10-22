@@ -212,7 +212,8 @@ vertical-align: middle;
 <li><a href="#SPEC-sec3.6.2" id="toc-SPEC-sec3.6.2"><span class="toc-section-number">2.6.2</span> Grammar</a></li>
 <li><a href="#SPEC-sec3.6.3" id="toc-SPEC-sec3.6.3"><span class="toc-section-number">2.6.3</span> Link Selectors</a></li>
 <li><a href="#SPEC-sec3.6.4" id="toc-SPEC-sec3.6.4"><span class="toc-section-number">2.6.4</span> Type Inference</a></li>
-<li><a href="#SPEC-sec3.6.5" id="toc-SPEC-sec3.6.5"><span class="toc-section-number">2.6.5</span> Examples</a></li>
+<li><a href="#SPEC-sec3.6.5" id="toc-SPEC-sec3.6.5"><span class="toc-section-number">2.6.5</span> Links in Diagram Source</a></li>
+<li><a href="#SPEC-sec3.6.6" id="toc-SPEC-sec3.6.6"><span class="toc-section-number">2.6.6</span> Examples</a></li>
 </ul></li>
 <li><a href="#SPEC-sec3.7" id="toc-SPEC-sec3.7"><span class="toc-section-number">2.7</span> Spec View</a>
 <ul>
@@ -451,7 +452,7 @@ is the set of child spec objects.
 <h3 data-number="2.2.2" data-pos="80:1-81:1" id="SPEC-sec3.2.2"><span class="header-section-number">2.2.2</span> Grammar</h3>
 <a id="puml-grammar-spec" class="bookmark"></a>
 <figcaption class="caption caption-plantuml"><span class="caption-label">Figure <span class="caption-num" data-counter="figure"></span>–</span> Specification production</figcaption>
-<p><img src="data:image/png;base64,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" /></p>
+<p><svg class="speccompiler-diagram" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" data-diagram-type="EBNF" style="background:#FFFFFF;" width="687px" height="182px" viewBox="0 0 687 182" zoomAndPan="magnify" contentStyleType="text/css"><?plantuml 1.2026.8 ?><defs></defs><g font-family="sans-serif" lengthAdjust="spacing"><text x="10" y="22.995" fill="#000" font-size="14" textLength="102.409" font-weight="700">Specification</text><line x1="40" y1="61.445" x2="40" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="40" y="48.297" width="21.73" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="45" y="66.292" fill="#000" font-size="14">#</text><line x1="61.73" y1="61.445" x2="81.73" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="81.73" y1="61.445" x2="232.054" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M139.86,61.445 L139.86,58.445 L145.86,61.445 L139.86,64.445 L139.86,61.445" fill="#181818"></path><path d="M81.73,61.445 C90.73,61.445 93.73,64.02 93.73,73.02 C93.73,82.02 96.73,84.594 105.73,84.594" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><path d="M208.054,84.594 C217.054,84.594 220.054,82.02 220.054,73.02 C220.054,64.02 223.054,61.445 232.054,61.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="105.73" y1="84.594" x2="105.73" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><rect x="105.73" y="71.445" width="67.606" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="110.73" y="89.44" fill="#000" font-size="14" textLength="57.606">TypeRef</text><line x1="173.337" y1="84.594" x2="193.337" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><rect x="193.337" y="71.445" width="14.717" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="198.337" y="89.44" fill="#000" font-size="14">:</text><line x1="232.054" y1="61.445" x2="252.054" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="252.054" y="48.297" width="40.939" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="257.054" y="66.292" fill="#000" font-size="14" textLength="30.939">Text</text><line x1="292.993" y1="61.445" x2="312.993" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="312.993" y1="61.445" x2="438.345" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M361.134,61.445 L361.134,58.445 L367.134,61.445 L361.134,64.445 L361.134,61.445" fill="#181818"></path><path d="M312.993,61.445 C321.993,61.445 324.993,64.02 324.993,73.02 C324.993,82.02 327.993,84.594 336.993,84.594" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><path d="M414.345,84.594 C423.345,84.594 426.345,82.02 426.345,73.02 C426.345,64.02 429.345,61.445 438.345,61.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="336.993" y1="84.594" x2="336.993" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><rect x="336.993" y="71.445" width="24" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="341.993" y="89.44" fill="#000" font-size="14">@</text><line x1="360.993" y1="84.594" x2="380.993" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><rect x="380.993" y="71.445" width="33.352" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="385.993" y="89.44" fill="#000" font-size="14" textLength="23.352">PID</text><line x1="438.345" y1="61.445" x2="458.345" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M466.345,53.445 C466.345,59.445 468.345,61.445 474.345,61.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="466.345" y1="49.297" x2="466.345" y2="53.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M466.345,49.297 C466.345,43.297 468.345,41.297 474.345,41.297" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="473.345" y1="41.297" x2="631.901" y2="41.297" style="stroke:#181818;stroke-width:1.5;"></line><path d="M566.479,41.297 L566.479,38.297 L560.479,41.297 L566.479,44.297 L566.479,41.297" fill="#181818"></path><path d="M638.901,53.445 C638.901,59.445 636.901,61.445 630.901,61.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="638.901" y1="49.297" x2="638.901" y2="53.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M630.901,41.297 C636.901,41.297 638.901,43.297 638.901,49.297" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="458.345" y1="61.445" x2="473.345" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="631.901" y1="61.445" x2="646.901" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="497.345" y="48.297" width="110.557" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="502.345" y="66.292" fill="#000" font-size="14" textLength="100.557">spec_attribute</text><line x1="473.345" y1="61.445" x2="497.345" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="607.901" y1="61.445" x2="631.901" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="497.345" y="84.594" width="99.927" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="502.345" y="102.589" fill="#000" font-size="14" textLength="89.927">spec_objects</text><line x1="597.271" y1="97.742" x2="607.901" y2="97.742" style="stroke:#181818;stroke-width:1.5;"></line><path d="M485.345,85.742 C485.345,94.742 488.345,97.742 497.345,97.742" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="485.345" y1="73.445" x2="485.345" y2="85.742" style="stroke:#181818;stroke-width:1.5;"></line><path d="M473.345,61.445 C482.345,61.445 485.345,64.445 485.345,73.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><path d="M619.901,85.742 C619.901,94.742 616.901,97.742 607.901,97.742" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="619.901" y1="73.445" x2="619.901" y2="85.742" style="stroke:#181818;stroke-width:1.5;"></line><path d="M619.901,73.445 C619.901,64.445 622.901,61.445 631.901,61.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><ellipse cx="14" cy="61.445" rx="4" ry="4" fill="none" style="stroke:#181818;stroke-width:2;"></ellipse><ellipse cx="676.901" cy="61.445" rx="4" ry="4" fill="#181818" style="stroke:#181818;stroke-width:1;"></ellipse><line x1="18" y1="61.445" x2="40" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="646.901" y1="61.445" x2="672.901" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M657.901,61.445 L657.901,58.445 L663.901,61.445 L657.901,64.445 L657.901,61.445" fill="#181818"></path><path d="M10,130.891 L10,156.023 L360.075,156.023 L360.075,140.891 L350.075,130.891 L10,130.891" style="stroke:#181818;stroke-width:0.5;" fill="#FEFFDD"></path><path d="M350.075,130.891 L350.075,140.891 L360.075,140.891 L350.075,130.891" style="stroke:#181818;stroke-width:0.5;" fill="#FEFFDD"></path><text x="16" y="147.958" fill="#000" font-size="13" textLength="329.075">TypeRef checked against spec_specification_types</text><?plantuml-src JOwz2i8m58NtFCKXBbfYqGuY5Q63YvjeDv6IfhSQXRGqLr3KTxSb2AxV-SqywuwfTBKGXvQChQtHR1k7DUH8AXoHFrlQKwqWKucJGauF7hZCUdcttGpi1T-72ytSsVBEX7S0JNabmnwVwKg8SVJhWhcGkL45VTRMUGvc_xzVS6_rY2OY8rU5W_CucIMBUFa5 ?></g></svg></p>
 <h3 data-number="2.2.3" data-pos="91:1-92:1" id="SPEC-sec3.2.3"><span class="header-section-number">2.2.3</span> Examples</h3>
 <div data-pos="93:1-94:1">
 <p>A specification with an explicit type and PID:</p>
@@ -525,7 +526,7 @@ is the set of child objects (exactly one heading level deeper).
 <h3 data-number="2.3.2" data-pos="127:1-128:1" id="SPEC-sec3.3.2"><span class="header-section-number">2.3.2</span> Grammar</h3>
 <a id="puml-grammar-spec-object" class="bookmark"></a>
 <figcaption class="caption caption-plantuml"><span class="caption-label">Figure <span class="caption-num" data-counter="figure"></span>–</span> Spec Object production</figcaption>
-<p><img src="data:image/png;base64,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" /></p>
+<p><svg class="speccompiler-diagram" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" data-diagram-type="EBNF" style="background:#FFFFFF;" width="763px" height="372px" viewBox="0 0 763 372" zoomAndPan="magnify" contentStyleType="text/css"><?plantuml 1.2026.8 ?><defs></defs><g font-family="sans-serif" lengthAdjust="spacing"><text x="10" y="22.995" fill="#000" font-size="14" textLength="100.406" font-weight="700">spec_objects</text><line x1="40" y1="61.445" x2="40" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="40" y="48.297" width="98.177" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="45" y="66.292" fill="#000" font-size="14" textLength="88.177">HeaderLevel</text><line x1="138.177" y1="61.445" x2="158.177" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="158.177" y1="61.445" x2="308.5" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M216.306,61.445 L216.306,58.445 L222.306,61.445 L216.306,64.445 L216.306,61.445" fill="#181818"></path><path d="M158.177,61.445 C167.177,61.445 170.177,64.02 170.177,73.02 C170.177,82.02 173.177,84.594 182.177,84.594" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><path d="M284.5,84.594 C293.5,84.594 296.5,82.02 296.5,73.02 C296.5,64.02 299.5,61.445 308.5,61.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="182.177" y1="84.594" x2="182.177" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><rect x="182.177" y="71.445" width="67.606" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="187.177" y="89.44" fill="#000" font-size="14" textLength="57.606">TypeRef</text><line x1="249.783" y1="84.594" x2="269.783" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><rect x="269.783" y="71.445" width="14.717" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="274.783" y="89.44" fill="#000" font-size="14">:</text><line x1="308.5" y1="61.445" x2="328.5" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="328.5" y="48.297" width="40.434" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="333.5" y="66.292" fill="#000" font-size="14" textLength="30.434">Title</text><line x1="368.934" y1="61.445" x2="388.934" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="388.934" y1="61.445" x2="514.285" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M437.074,61.445 L437.074,58.445 L443.074,61.445 L437.074,64.445 L437.074,61.445" fill="#181818"></path><path d="M388.934,61.445 C397.934,61.445 400.934,64.02 400.934,73.02 C400.934,82.02 403.934,84.594 412.934,84.594" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><path d="M490.285,84.594 C499.285,84.594 502.285,82.02 502.285,73.02 C502.285,64.02 505.285,61.445 514.285,61.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="412.934" y1="84.594" x2="412.934" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><rect x="412.934" y="71.445" width="24" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="417.934" y="89.44" fill="#000" font-size="14">@</text><line x1="436.934" y1="84.594" x2="456.934" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><rect x="456.934" y="71.445" width="33.352" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="461.934" y="89.44" fill="#000" font-size="14" textLength="23.352">PID</text><line x1="514.285" y1="61.445" x2="534.285" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M542.285,53.445 C542.285,59.445 544.285,61.445 550.285,61.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="542.285" y1="49.297" x2="542.285" y2="53.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M542.285,49.297 C542.285,43.297 544.285,41.297 550.285,41.297" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="549.285" y1="41.297" x2="707.842" y2="41.297" style="stroke:#181818;stroke-width:1.5;"></line><path d="M642.419,41.297 L642.419,38.297 L636.419,41.297 L642.419,44.297 L642.419,41.297" fill="#181818"></path><path d="M714.842,53.445 C714.842,59.445 712.842,61.445 706.842,61.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="714.842" y1="49.297" x2="714.842" y2="53.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M706.842,41.297 C712.842,41.297 714.842,43.297 714.842,49.297" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="534.285" y1="61.445" x2="549.285" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="707.842" y1="61.445" x2="722.842" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="573.285" y="48.297" width="103.543" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="578.285" y="66.292" fill="#000" font-size="14" textLength="93.543">BlockContent</text><line x1="549.285" y1="61.445" x2="573.285" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="676.828" y1="61.445" x2="707.842" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="573.285" y="84.594" width="110.557" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="578.285" y="102.589" fill="#000" font-size="14" textLength="100.557">spec_attribute</text><path d="M561.285,85.742 C561.285,94.742 564.285,97.742 573.285,97.742" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="683.842" y1="97.742" x2="683.842" y2="97.742" style="stroke:#181818;stroke-width:1.5;"></line><path d="M695.842,85.742 C695.842,94.742 692.842,97.742 683.842,97.742" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><rect x="573.285" y="120.891" width="88.237" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="578.285" y="138.886" fill="#000" font-size="14" textLength="78.237">spec_floats</text><path d="M561.285,122.039 C561.285,131.039 564.285,134.039 573.285,134.039" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="661.522" y1="134.039" x2="683.842" y2="134.039" style="stroke:#181818;stroke-width:1.5;"></line><path d="M695.842,122.039 C695.842,131.039 692.842,134.039 683.842,134.039" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><rect x="573.285" y="157.188" width="89.023" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="578.285" y="175.183" fill="#000" font-size="14" textLength="79.023">spec_views</text><path d="M561.285,158.336 C561.285,167.336 564.285,170.336 573.285,170.336" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="662.309" y1="170.336" x2="683.842" y2="170.336" style="stroke:#181818;stroke-width:1.5;"></line><path d="M695.842,158.336 C695.842,167.336 692.842,170.336 683.842,170.336" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><rect x="573.285" y="193.484" width="110.44" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="578.285" y="211.479" fill="#000" font-size="14" textLength="100.44">spec_relations</text><path d="M561.285,194.633 C561.285,203.633 564.285,206.633 573.285,206.633" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="683.726" y1="206.633" x2="683.842" y2="206.633" style="stroke:#181818;stroke-width:1.5;"></line><path d="M695.842,194.633 C695.842,203.633 692.842,206.633 683.842,206.633" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><rect x="573.285" y="229.781" width="99.927" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="578.285" y="247.776" fill="#000" font-size="14" textLength="89.927">spec_objects</text><line x1="673.212" y1="242.93" x2="683.842" y2="242.93" style="stroke:#181818;stroke-width:1.5;"></line><path d="M561.285,230.93 C561.285,239.93 564.285,242.93 573.285,242.93" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="561.285" y1="73.445" x2="561.285" y2="230.93" style="stroke:#181818;stroke-width:1.5;"></line><path d="M549.285,61.445 C558.285,61.445 561.285,64.445 561.285,73.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><path d="M695.842,230.93 C695.842,239.93 692.842,242.93 683.842,242.93" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="695.842" y1="73.445" x2="695.842" y2="230.93" style="stroke:#181818;stroke-width:1.5;"></line><path d="M695.842,73.445 C695.842,64.445 698.842,61.445 707.842,61.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><ellipse cx="14" cy="61.445" rx="4" ry="4" fill="none" style="stroke:#181818;stroke-width:2;"></ellipse><ellipse cx="752.842" cy="61.445" rx="4" ry="4" fill="#181818" style="stroke:#181818;stroke-width:1;"></ellipse><line x1="18" y1="61.445" x2="40" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="722.842" y1="61.445" x2="748.842" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M733.842,61.445 L733.842,58.445 L739.842,61.445 L733.842,64.445 L733.842,61.445" fill="#181818"></path><path d="M10,276.078 L10,301.211 L318.149,301.211 L318.149,286.078 L308.149,276.078 L10,276.078" style="stroke:#181818;stroke-width:0.5;" fill="#FEFFDD"></path><path d="M308.149,276.078 L308.149,286.078 L318.149,286.078 L308.149,276.078" style="stroke:#181818;stroke-width:0.5;" fill="#FEFFDD"></path><text x="16" y="293.145" fill="#000" font-size="13" textLength="287.149">TypeRef checked against spec_object_types</text><path d="M10,321.211 L10,346.344 L428.16,346.344 L428.16,331.211 L418.16,321.211 L10,321.211" style="stroke:#181818;stroke-width:0.5;" fill="#FEFFDD"></path><path d="M418.16,321.211 L418.16,331.211 L428.16,331.211 L418.16,321.211" style="stroke:#181818;stroke-width:0.5;" fill="#FEFFDD"></path><text x="16" y="338.278" fill="#000" font-size="13" textLength="397.16">child spec_objects must be exactly one heading level deeper</text><?plantuml-src LP11ImCn58Jl-ok6FMbPY_OWeWYBUb3m8DARICaciztOc2p9QxMe_zsDkiKUPzx7l3UlJgAYiF5jKQIUUX6Q5sf9kCGjbM6yvuQkmXFcsvwFR2kKvoMUAyojEEP1MPSL7kvkilc1AnVqwZfueHTyuYTJYKJRh8MZqRgWXXr_QcFvjXEHJeaDVcUC1tqTNHJ5mMIy0xgZNj50BPNrIVx32ncOXCbXvdLddTcFUbqFV4FmNMbnMmHFT4DRwvTmkIyCsJFcX9hU_BxdP3exdfrEpxu1 ?></g></svg></p>
 <h3 data-number="2.3.3" data-pos="139:1-140:1" id="SPEC-sec3.3.3"><span class="header-section-number">2.3.3</span> Type Inference</h3>
 <div data-pos="141:1-142:1">
 <p>When a header has no explicit <code data-pos="141:31-141:41">TypeRef:</code> prefix, the type is
@@ -648,7 +649,7 @@ is the raw payload of the fenced code block.
 <h3 data-number="2.4.2" data-pos="216:1-217:1" id="SPEC-sec3.4.2"><span class="header-section-number">2.4.2</span> Grammar</h3>
 <a id="puml-grammar-spec-float" class="bookmark"></a>
 <figcaption class="caption caption-plantuml"><span class="caption-label">Figure <span class="caption-num" data-counter="figure"></span>–</span> Spec Float production</figcaption>
-<p><img src="data:image/png;base64,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" /></p>
+<p><svg class="speccompiler-diagram" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" data-diagram-type="EBNF" style="background:#FFFFFF;" width="761px" height="123px" viewBox="0 0 761 123" zoomAndPan="magnify" contentStyleType="text/css"><?plantuml 1.2026.8 ?><defs></defs><g font-family="sans-serif" lengthAdjust="spacing"><text x="10" y="22.995" fill="#000" font-size="14" textLength="88.129" font-weight="700">spec_floats</text><line x1="40" y1="49.445" x2="40" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="40" y="36.297" width="31" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="45" y="54.292" fill="#000" font-size="14" textLength="21">```</text><line x1="71" y1="49.445" x2="91" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="91" y="36.297" width="67.606" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="96" y="54.292" fill="#000" font-size="14" textLength="57.606">TypeRef</text><line x1="158.606" y1="49.445" x2="178.606" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="178.606" y="36.297" width="14.717" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="183.606" y="54.292" fill="#000" font-size="14">:</text><line x1="193.323" y1="49.445" x2="213.323" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="213.323" y="36.297" width="47.769" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="218.323" y="54.292" fill="#000" font-size="14" textLength="37.769">Label</text><line x1="261.092" y1="49.445" x2="281.092" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="281.092" y1="49.445" x2="584.248" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M400.354,49.445 L400.354,46.445 L406.354,49.445 L400.354,52.445 L400.354,49.445" fill="#181818"></path><path d="M281.092,49.445 C290.092,49.445 293.092,58.02 293.092,67.02 C293.092,76.02 296.092,84.594 305.092,84.594" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><path d="M560.248,84.594 C569.248,84.594 572.248,76.02 572.248,67.02 C572.248,58.02 575.248,49.445 584.248,49.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="305.092" y1="84.594" x2="305.092" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><rect x="305.092" y="71.445" width="18.907" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="310.092" y="89.44" fill="#000" font-size="14">{</text><line x1="323.999" y1="84.594" x2="343.999" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><path d="M351.999,76.594 C351.999,82.594 353.999,84.594 359.999,84.594" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="351.999" y1="72.445" x2="351.999" y2="76.594" style="stroke:#181818;stroke-width:1.5;"></line><path d="M351.999,72.445 C351.999,66.445 353.999,64.445 359.999,64.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="358.999" y1="64.445" x2="506.341" y2="64.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M445.404,64.445 L445.404,61.445 L439.404,64.445 L445.404,67.445 L445.404,64.445" fill="#181818"></path><path d="M513.341,76.594 C513.341,82.594 511.341,84.594 505.341,84.594" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="513.341" y1="72.445" x2="513.341" y2="76.594" style="stroke:#181818;stroke-width:1.5;"></line><path d="M505.341,64.445 C511.341,64.445 513.341,66.445 513.341,72.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="343.999" y1="84.594" x2="358.999" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><line x1="506.341" y1="84.594" x2="521.341" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><line x1="358.999" y1="84.594" x2="358.999" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><rect x="358.999" y="71.445" width="36.079" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="363.999" y="89.44" fill="#000" font-size="14" textLength="26.079">Key</text><line x1="395.078" y1="84.594" x2="415.078" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><rect x="415.078" y="71.445" width="21.73" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="420.078" y="89.44" fill="#000" font-size="14">=</text><line x1="436.809" y1="84.594" x2="456.809" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><rect x="456.809" y="71.445" width="49.532" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="461.809" y="89.44" fill="#000" font-size="14" textLength="39.532">Value</text><line x1="521.341" y1="84.594" x2="541.341" y2="84.594" style="stroke:#181818;stroke-width:1.5;"></line><rect x="541.341" y="71.445" width="18.907" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="546.341" y="89.44" fill="#000" font-size="14">}</text><line x1="584.248" y1="49.445" x2="604.248" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="604.248" y="36.297" width="65.679" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="609.248" y="54.292" fill="#000" font-size="14" textLength="55.679">Content</text><line x1="669.927" y1="49.445" x2="689.927" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="689.927" y="36.297" width="31" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="694.927" y="54.292" fill="#000" font-size="14" textLength="21">```</text><ellipse cx="14" cy="49.445" rx="4" ry="4" fill="none" style="stroke:#181818;stroke-width:2;"></ellipse><ellipse cx="750.927" cy="49.445" rx="4" ry="4" fill="#181818" style="stroke:#181818;stroke-width:1;"></ellipse><line x1="18" y1="49.445" x2="40" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="720.927" y1="49.445" x2="746.927" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M731.927,49.445 L731.927,46.445 L737.927,49.445 L731.927,52.445 L731.927,49.445" fill="#181818"></path><?plantuml-src SoWkIImgIKtAI-FYAYv8JOvFoybFB2bMi5LGIaX8KD9H2AaiI0rAJTDHKB82ydmIar9pT1IY5PIgWRng1U_KIg2CBP0TbfXJcgfGgmlarYefnEeeEEVdbQJcbUX03BBcud98pKk1M6IePsHWPAPd0G00 ?></g></svg></p>
 <h3 data-number="2.4.3" data-pos="226:1-227:1" id="SPEC-sec3.4.3"><span class="header-section-number">2.4.3</span> Float Types and Aliases</h3>
 <div data-pos="228:1-229:1">
 <p>The model defines which float types are available. Typical
@@ -747,7 +748,7 @@ is the set of child relations extracted from
 <h3 data-number="2.5.2" data-pos="286:1-287:1" id="SPEC-sec3.5.2"><span class="header-section-number">2.5.2</span> Grammar</h3>
 <a id="puml-grammar-attribute" class="bookmark"></a>
 <figcaption class="caption caption-plantuml"><span class="caption-label">Figure <span class="caption-num" data-counter="figure"></span>–</span> Attribute production</figcaption>
-<p><img src="data:image/png;base64,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" /></p>
+<p><svg class="speccompiler-diagram" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" data-diagram-type="EBNF" style="background:#FFFFFF;" width="622px" height="182px" viewBox="0 0 622 182" zoomAndPan="magnify" contentStyleType="text/css"><?plantuml 1.2026.8 ?><defs></defs><g font-family="sans-serif" lengthAdjust="spacing"><text x="10" y="22.995" fill="#000" font-size="14" textLength="113.859" font-weight="700">spec_attribute</text><line x1="40" y1="61.445" x2="40" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="40" y="48.297" width="21.73" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="45" y="66.292" fill="#000" font-size="14">&gt;</text><line x1="61.73" y1="61.445" x2="81.73" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="81.73" y="48.297" width="77.614" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="86.73" y="66.292" fill="#000" font-size="14" textLength="67.614">AttrName</text><line x1="159.345" y1="61.445" x2="179.345" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="179.345" y="48.297" width="14.717" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="184.345" y="66.292" fill="#000" font-size="14">:</text><line x1="194.062" y1="61.445" x2="214.062" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M222.062,53.445 C222.062,59.445 224.062,61.445 230.062,61.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="222.062" y1="49.297" x2="222.062" y2="53.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M222.062,49.297 C222.062,43.297 224.062,41.297 230.062,41.297" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="229.062" y1="41.297" x2="387.502" y2="41.297" style="stroke:#181818;stroke-width:1.5;"></line><path d="M322.126,41.297 L322.126,38.297 L316.126,41.297 L322.126,44.297 L322.126,41.297" fill="#181818"></path><path d="M394.502,53.445 C394.502,59.445 392.502,61.445 386.502,61.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="394.502" y1="49.297" x2="394.502" y2="53.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M386.502,41.297 C392.502,41.297 394.502,43.297 394.502,49.297" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="214.062" y1="61.445" x2="229.062" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="387.502" y1="61.445" x2="402.502" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="253.062" y="48.297" width="103.543" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="258.062" y="66.292" fill="#000" font-size="14" textLength="93.543">BlockContent</text><line x1="229.062" y1="61.445" x2="253.062" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="356.604" y1="61.445" x2="387.502" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="253.062" y="84.594" width="110.44" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="258.062" y="102.589" fill="#000" font-size="14" textLength="100.44">spec_relations</text><line x1="363.502" y1="97.742" x2="363.502" y2="97.742" style="stroke:#181818;stroke-width:1.5;"></line><path d="M241.062,85.742 C241.062,94.742 244.062,97.742 253.062,97.742" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="241.062" y1="73.445" x2="241.062" y2="85.742" style="stroke:#181818;stroke-width:1.5;"></line><path d="M229.062,61.445 C238.062,61.445 241.062,64.445 241.062,73.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><path d="M375.502,85.742 C375.502,94.742 372.502,97.742 363.502,97.742" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><line x1="375.502" y1="73.445" x2="375.502" y2="85.742" style="stroke:#181818;stroke-width:1.5;"></line><path d="M375.502,73.445 C375.502,64.445 378.502,61.445 387.502,61.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><ellipse cx="14" cy="61.445" rx="4" ry="4" fill="none" style="stroke:#181818;stroke-width:2;"></ellipse><ellipse cx="432.502" cy="61.445" rx="4" ry="4" fill="#181818" style="stroke:#181818;stroke-width:1;"></ellipse><line x1="18" y1="61.445" x2="40" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="402.502" y1="61.445" x2="428.502" y2="61.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M413.502,61.445 L413.502,58.445 L419.502,61.445 L413.502,64.445 L413.502,61.445" fill="#181818"></path><path d="M10,130.891 L10,156.023 L611.779,156.023 L611.779,140.891 L601.779,130.891 L10,130.891" style="stroke:#181818;stroke-width:0.5;" fill="#FEFFDD"></path><path d="M601.779,130.891 L601.779,140.891 L611.779,140.891 L601.779,130.891" style="stroke:#181818;stroke-width:0.5;" fill="#FEFFDD"></path><text x="16" y="147.958" fill="#000" font-size="13" textLength="580.779">each spec_attribute is a separate blockquote; distinct attributes are blank-line-separated</text><?plantuml-src NOv13e8m54JtFSM4bH8Xoi8OYGPrxnNCftnZ0xROVbRgtIqQNRYSoNkJgOAG5wxjMQdGipwHY3Vr88mDacqomouMHxho3CawnZlsdTFjmLbXAtZWRNdkI8op0S-iL6gIWabVyBTe0WY1U_8KKptkt0OdNA8nGOpLWXySKJyoPDkiCvQphzSWdQgARVCvlSYBUR7CLoy0 ?></g></svg></p>
 <div data-pos="297:1-298:1">
 <p>Each <code data-pos="297:6-297:22">spec_attribute</code> corresponds
 to a single Markdown blockquote. Distinct attributes must be separated
@@ -885,7 +886,7 @@ is <strong>inferred</strong>:
 <h3 data-number="2.6.2" data-pos="372:1-373:1" id="SPEC-sec3.6.2"><span class="header-section-number">2.6.2</span> Grammar</h3>
 <a id="puml-grammar-spec-relation" class="bookmark"></a>
 <figcaption class="caption caption-plantuml"><span class="caption-label">Figure <span class="caption-num" data-counter="figure"></span>–</span> Spec Relation production</figcaption>
-<p><img src="data:image/png;base64,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" /></p>
+<p><svg class="speccompiler-diagram" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" data-diagram-type="EBNF" style="background:#FFFFFF;" width="374px" height="133px" viewBox="0 0 374 133" zoomAndPan="magnify" contentStyleType="text/css"><?plantuml 1.2026.8 ?><defs></defs><g font-family="sans-serif" lengthAdjust="spacing"><text x="10" y="22.995" fill="#000" font-size="14" textLength="113.203" font-weight="700">spec_relations</text><line x1="40" y1="49.445" x2="40" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="40" y="36.297" width="15.462" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="45" y="54.292" fill="#000" font-size="14">[</text><line x1="55.462" y1="49.445" x2="75.462" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="75.462" y="36.297" width="55.876" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="80.462" y="54.292" fill="#000" font-size="14" textLength="45.876">Target</text><line x1="131.338" y1="49.445" x2="151.338" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="151.338" y="36.297" width="15.462" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="156.338" y="54.292" fill="#000" font-size="14">]</text><line x1="166.8" y1="49.445" x2="186.8" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="186.8" y="36.297" width="15.462" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="191.8" y="54.292" fill="#000" font-size="14">(</text><line x1="202.262" y1="49.445" x2="222.262" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="222.262" y="36.297" width="67.511" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="227.262" y="54.292" fill="#000" font-size="14" textLength="57.511">Selector</text><line x1="289.772" y1="49.445" x2="309.772" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="309.772" y="36.297" width="15.462" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="314.772" y="54.292" fill="#000" font-size="14">)</text><ellipse cx="14" cy="49.445" rx="4" ry="4" fill="none" style="stroke:#181818;stroke-width:2;"></ellipse><ellipse cx="355.234" cy="49.445" rx="4" ry="4" fill="#181818" style="stroke:#181818;stroke-width:1;"></ellipse><line x1="18" y1="49.445" x2="40" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="325.234" y1="49.445" x2="351.234" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M336.234,49.445 L336.234,46.445 L342.234,49.445 L336.234,52.445 L336.234,49.445" fill="#181818"></path><path d="M10,82.594 L10,107.727 L363.217,107.727 L363.217,92.594 L353.217,82.594 L10,82.594" style="stroke:#181818;stroke-width:0.5;" fill="#FEFFDD"></path><path d="M353.217,82.594 L353.217,92.594 L363.217,92.594 L353.217,82.594" style="stroke:#181818;stroke-width:0.5;" fill="#FEFFDD"></path><text x="16" y="99.661" fill="#000" font-size="13" textLength="332.217">Source Object and Attribute captured from context</text><?plantuml-src 9Ot12i8m40Nl-nMFdDfIYlOWWWZr2ppKcuWawLOgDIcR3VZv1hmC37EO8QaLPHTcehInVmglLfSO4iumTzFYPkN5si8yYfYgOEILlKOfMfiJKTLWZ5ayu-hUfS262HTLMLnMXhURPk49iyGFV0pANqLJ4mqSflzwt_Mx_j0TVm00 ?></g></svg></p>
 <h3 data-number="2.6.3" data-pos="384:1-385:1" id="SPEC-sec3.6.3"><span class="header-section-number">2.6.3</span> Link Selectors</h3>
 <div data-pos="386:1-387:1">
 <p>Any Markdown link whose URL starts with <code data-pos="386:41-386:44">@</code> or <code data-pos="386:48-386:51">#</code> is recognized as a spec relation. The
@@ -1013,159 +1014,275 @@ candidates:</p>
 <p>VERIFIES wins with the highest specificity (4 non-NULL constraints
 matched).</p>
 </div>
-<h3 data-number="2.6.5" data-pos="419:1-420:1" id="SPEC-sec3.6.5"><span class="header-section-number">2.6.5</span> Examples</h3>
+<h3 data-number="2.6.5" data-pos="419:1-420:1" id="SPEC-sec3.6.5"><span class="header-section-number">2.6.5</span> Links in Diagram Source</h3>
 <div data-pos="421:1-422:1">
+<p>A spec relation may also be written inside the content of a diagram
+float. This applies only to float types that declare a <code data-pos="421:124-421:137">format_link</code> hook. In the default
+model, that is <strong>PLANTUML</strong>. Other floats, such as
+listings, keep their content verbatim.</p>
+</div>
+<pre data-pos="423:1-431:1"><code>```puml:arch{caption=&quot;Architecture&quot;}
+@startuml
+Foo --&gt; Bar : see [SEC-2](@)
+note right of Bar : [fig:overview](#) and [SRS-001](@)
+@enduml
+```</code></pre>
+<div data-pos="432:1-433:1">
+<p>A diagram link forms the same 4-tuple as a body link:</p>
+</div>
+<div data-pos="434:1-439:1">
+<ul>
+<li><div data-pos="434:1-435:1">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
+is the spec object that encloses the float (the float’s parent object).
+A float outside any spec object contributes no relations.
+</div></li>
+<li><div data-pos="435:1-436:1">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mi>⊥</mi></mrow><annotation encoding="application/x-tex">\alpha = \bot</annotation></semantics></math>,
+because the link is not inside an attribute.
+</div></li>
+<li><div data-pos="436:1-438:1">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>σ</mi><annotation encoding="application/x-tex">\sigma</annotation></semantics></math>
+and the target are read from the link exactly as in body text.
+</div></li>
+</ul>
+</div>
+<div data-pos="438:1-439:1">
+<p>Resolution, type inference, display text, and diagnostics are
+therefore identical to body links. An unresolved <code data-pos="438:112-438:115">@</code> or <code data-pos="438:119-438:122">#</code> link is reported at its line in the
+source file. The processor rewrites each resolved link into the diagram
+tool’s hyperlink syntax before rendering, so the diagram shows the
+resolved display text (for example “Figure 2”). In HTML output the link
+navigates to its target. Where the diagram tool has no hyperlink syntax
+at a position, the link is not clickable.</p>
+</div>
+<div data-pos="440:1-441:1">
+<p>Citations (<code data-pos="440:12-440:19">@cite</code>, <code data-pos="440:21-440:29">@citep</code>) inside diagram source are
+registered but not rendered as citations. Their text stays verbatim in
+the diagram.</p>
+</div>
+<div data-pos="442:1-443:1">
+<p>Two further rules separate links from diagram text. A link preceded
+by <code data-pos="442:72-442:75">~</code>, the diagram tool’s escape
+character, is literal text and forms no relation. A float type may also
+declare a <code data-pos="442:185-442:200">mask_comments</code> hook;
+links inside the comments it blanks out (for PLANTUML, <code data-pos="442:262-442:269">&#39; ...</code> and <code data-pos="442:274-442:285">/&#39; ... &#39;/</code>) form no relation, just as
+links inside HTML comments in body text form none.</p>
+</div>
+<h3 data-number="2.6.6" data-pos="444:1-445:1" id="SPEC-sec3.6.6"><span class="header-section-number">2.6.6</span> Examples</h3>
+<div data-pos="446:1-447:1">
 <p>PID references in an attribute:</p>
 </div>
-<pre data-pos="423:1-426:1"><code>&gt; traceability: [HLR-001](@) [HLR-002](@)</code></pre>
-<div data-pos="427:1-428:1">
+<pre data-pos="448:1-451:1"><code>&gt; traceability: [HLR-001](@) [HLR-002](@)</code></pre>
+<div data-pos="452:1-453:1">
 <p>Float reference in body text:</p>
 </div>
-<pre data-pos="429:1-432:1"><code>The architecture is shown in [fig:architecture](#).</code></pre>
-<div data-pos="433:1-434:1">
+<pre data-pos="454:1-457:1"><code>The architecture is shown in [fig:architecture](#).</code></pre>
+<div data-pos="458:1-459:1">
 <p>Cross-document reference:</p>
 </div>
-<pre data-pos="435:1-438:1"><code>See [SRS-001](@) for the parent specification.</code></pre>
-<h2 data-number="2.7" data-pos="439:1-440:1" id="SPEC-sec3.7"><span class="header-section-number">2.7</span> Spec View</h2>
-<div data-pos="441:1-442:1">
+<pre data-pos="460:1-463:1"><code>See [SRS-001](@) for the parent specification.</code></pre>
+<h2 data-number="2.7" data-pos="464:1-465:1" id="SPEC-sec3.7"><span class="header-section-number">2.7</span> Spec View</h2>
+<div data-pos="466:1-467:1">
 <p>A <strong>Spec View</strong> is a dynamic query or generated content
 block. Views are materialized at processing time and produce content
 such as tables of contents, lists of figures, abbreviation expansions,
 and inline math.</p>
 </div>
-<h3 data-number="2.7.1" data-pos="443:1-444:1" id="SPEC-sec3.7.1"><span class="header-section-number">2.7.1</span> Formal Definition</h3>
-<div data-pos="445:1-446:1">
+<h3 data-number="2.7.1" data-pos="468:1-469:1" id="SPEC-sec3.7.1"><span class="header-section-number">2.7.1</span> Formal Definition</h3>
+<div data-pos="470:1-471:1">
 <p>A Spec View is a pair
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>τ</mi><mo>,</mo><mi>ω</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">V = (\tau,\omega)</annotation></semantics></math>
 where:</p>
 </div>
-<div data-pos="447:1-451:1">
+<div data-pos="472:1-476:1">
 <ul>
-<li><div data-pos="447:1-448:1">
+<li><div data-pos="472:1-473:1">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>τ</mi><mo>∈</mo><mi>Γ</mi><mi>.</mi><msub><mi>⊤</mi><mi>V</mi></msub></mrow><annotation encoding="application/x-tex">\tau \in \Gamma.\top_{V}</annotation></semantics></math>
 is the view type (e.g. TOC, LOF, TRACEABILITY_MATRIX, ABBREV,
 MATH_INLINE).
 </div></li>
-<li><div data-pos="448:1-450:1">
+<li><div data-pos="473:1-475:1">
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ω</mi><mo>∈</mo><mtext mathvariant="normal">String</mtext></mrow><annotation encoding="application/x-tex">\omega \in \text{String}</annotation></semantics></math>
 is the raw parameter string.
 </div></li>
 </ul>
 </div>
-<h3 data-number="2.7.2" data-pos="450:1-451:1" id="SPEC-sec3.7.2"><span class="header-section-number">2.7.2</span> Grammar</h3>
+<h3 data-number="2.7.2" data-pos="475:1-476:1" id="SPEC-sec3.7.2"><span class="header-section-number">2.7.2</span> Grammar</h3>
 <a id="puml-grammar-spec-view" class="bookmark"></a>
 <figcaption class="caption caption-plantuml"><span class="caption-label">Figure <span class="caption-num" data-counter="figure"></span>–</span> Spec View production</figcaption>
-<p><img src="data:image/png;base64,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" /></p>
-<h3 data-number="2.7.3" data-pos="460:1-461:1" id="SPEC-sec3.7.3"><span class="header-section-number">2.7.3</span> View Types</h3>
-<div data-pos="462:1-463:1">
+<p><svg class="speccompiler-diagram" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" data-diagram-type="EBNF" style="background:#FFFFFF;" width="413px" height="111px" viewBox="0 0 413 111" zoomAndPan="magnify" contentStyleType="text/css"><?plantuml 1.2026.8 ?><defs></defs><g font-family="sans-serif" lengthAdjust="spacing"><text x="10" y="22.995" fill="#000" font-size="14" textLength="38.063" font-weight="700">View</text><line x1="40" y1="49.445" x2="40" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="40" y="36.297" width="17" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="45" y="54.292" fill="#000" font-size="14">`</text><line x1="57" y1="49.445" x2="77" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="77" y="36.297" width="67.606" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="82" y="54.292" fill="#000" font-size="14" textLength="57.606">TypeRef</text><line x1="144.606" y1="49.445" x2="164.606" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="164.606" y="36.297" width="14.717" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="169.606" y="54.292" fill="#000" font-size="14">:</text><line x1="179.323" y1="49.445" x2="199.323" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="199.323" y1="49.445" x2="335.848" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M251.933,49.445 L251.933,46.445 L257.933,49.445 L251.933,52.445 L251.933,49.445" fill="#181818"></path><path d="M199.323,49.445 C208.323,49.445 211.323,52.02 211.323,61.02 C211.323,70.02 214.323,72.594 223.323,72.594" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><path d="M311.848,72.594 C320.848,72.594 323.848,70.02 323.848,61.02 C323.848,52.02 326.848,49.445 335.848,49.445" style="stroke:#181818;stroke-width:1.5;" fill="none"></path><rect x="223.323" y="59.445" width="88.524" height="26.297" fill="#F1F1F1" style="stroke:#181818;stroke-width:1.5;" rx="5" ry="5"></rect><text x="228.323" y="77.44" fill="#000" font-size="14" textLength="78.524">ViewParam</text><line x1="335.848" y1="49.445" x2="355.848" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><rect x="355.848" y="36.297" width="17" height="26.297" fill="none" style="stroke:#181818;stroke-width:0.5;"></rect><text x="360.848" y="54.292" fill="#000" font-size="14">`</text><ellipse cx="14" cy="49.445" rx="4" ry="4" fill="none" style="stroke:#181818;stroke-width:2;"></ellipse><ellipse cx="402.848" cy="49.445" rx="4" ry="4" fill="#181818" style="stroke:#181818;stroke-width:1;"></ellipse><line x1="18" y1="49.445" x2="40" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><line x1="372.848" y1="49.445" x2="398.848" y2="49.445" style="stroke:#181818;stroke-width:1.5;"></line><path d="M383.848,49.445 L383.848,46.445 L389.848,49.445 L383.848,52.445 L383.848,49.445" fill="#181818"></path><?plantuml-src SoWkIImgIKtAI-FY2ijCBLUmLL1AKD9H2AaiI0rAJTDHKB82yg8LG781YKM9kGgnEY0LrbnS3gbvAH2DXdf61aPcUXO0 ?></g></svg></p>
+<h3 data-number="2.7.3" data-pos="485:1-486:1" id="SPEC-sec3.7.3"><span class="header-section-number">2.7.3</span> View Types</h3>
+<div data-pos="487:1-488:1">
 <p>Views are defined by the model. Common view types include:</p>
 </div>
-<div data-pos="464:1-473:1">
+<div data-pos="489:1-498:1">
 <ul>
-<li><div data-pos="464:1-465:1">
+<li><div data-pos="489:1-490:1">
 <strong>TOC</strong> ([TOC]) — table of contents.
 </div></li>
-<li><div data-pos="465:1-466:1">
+<li><div data-pos="490:1-491:1">
 <strong>LOF</strong> ([LOF]) — list of figures.
 </div></li>
-<li><div data-pos="466:1-467:1">
+<li><div data-pos="491:1-492:1">
 <strong>LOT</strong> ([LOT]) — list of tables.
 </div></li>
-<li><div data-pos="467:1-468:1">
-<strong>ABBREV</strong> (<code data-pos="467:15-467:24">abbrev:</code>)
+<li><div data-pos="492:1-493:1">
+<strong>ABBREV</strong> (<code data-pos="492:15-492:24">abbrev:</code>)
 — abbreviation expansion (e.g., Project Identifier (PID)).
 </div></li>
-<li><div data-pos="468:1-469:1">
-<strong>MATH_INLINE</strong> (<code data-pos="468:20-468:34">math_inline:</code>) — inline math expression.
+<li><div data-pos="493:1-494:1">
+<strong>MATH_INLINE</strong> (<code data-pos="493:20-493:34">math_inline:</code>) — inline math expression.
 </div></li>
-<li><div data-pos="469:1-470:1">
+<li><div data-pos="494:1-495:1">
 <strong>TRACEABILITY_MATRIX</strong> — coverage matrix showing which
 objects trace to which.
 </div></li>
-<li><div data-pos="470:1-472:1">
+<li><div data-pos="495:1-497:1">
 <strong>REQUIREMENTS_SUMMARY</strong> — summary report of requirements
 by type and status.
 </div></li>
 </ul>
 </div>
-<h3 data-number="2.7.4" data-pos="472:1-473:1" id="SPEC-sec3.7.4"><span class="header-section-number">2.7.4</span> Examples</h3>
-<div data-pos="474:1-475:1">
+<h3 data-number="2.7.4" data-pos="497:1-498:1" id="SPEC-sec3.7.4"><span class="header-section-number">2.7.4</span> Examples</h3>
+<div data-pos="499:1-500:1">
 <p>Inline views:</p>
 </div>
-<pre data-pos="476:1-482:1"><code>`toc:`
+<pre data-pos="501:1-507:1"><code>`toc:`
 `lof:`
 `abbrev: HLR`
 `math_inline: x = \frac{-b}{2a}`</code></pre>
-<h2 data-number="2.8" data-pos="483:1-484:1" id="SPEC-sec3.8"><span class="header-section-number">2.8</span> Disambiguation Rules</h2>
-<div data-pos="485:1-486:1">
+<h2 data-number="2.8" data-pos="508:1-509:1" id="SPEC-sec3.8"><span class="header-section-number">2.8</span> Disambiguation Rules</h2>
+<div data-pos="510:1-511:1">
 <p>CommonSpec reuses standard Markdown syntax. The following rules
 determine when a Markdown element is interpreted as a CommonSpec
 construct versus plain Markdown:</p>
 </div>
-<div data-pos="487:1-488:1">
+<div data-pos="512:1-513:1">
 <p><strong>Blockquote as Attribute vs. plain blockquote.</strong> A
-blockquote (<code data-pos="487:65-487:72">&gt; ...</code>) is
+blockquote (<code data-pos="512:65-512:72">&gt; ...</code>) is
 recognized as an attribute if and only if:</p>
 </div>
-<div data-pos="489:1-493:1">
+<div data-pos="514:1-518:1">
 <ol type="1">
-<li><div data-pos="489:1-490:1">
-Its first line matches the pattern <code data-pos="489:39-489:57">AttrName &quot;:&quot; ...</code>, where AttrName is a
+<li><div data-pos="514:1-515:1">
+Its first line matches the pattern <code data-pos="514:39-514:57">AttrName &quot;:&quot; ...</code>, where AttrName is a
 declared attribute name for the enclosing object’s type (own or
-inherited through the type’s <code data-pos="489:172-489:181">extends</code> chain; matching is
+inherited through the type’s <code data-pos="514:172-514:181">extends</code> chain; matching is
 case-insensitive).
 </div></li>
-<li><div data-pos="490:1-492:1">
+<li><div data-pos="515:1-517:1">
 It belongs to the most recently opened Specification or Spec Object
 header (it need not appear immediately after it). Each attribute is a
 separate Markdown blockquote, so distinct attributes must be separated
 by a blank line; every later line or paragraph within the same
-blockquote — including lines that themselves look like <code data-pos="490:331-490:343">key: value</code> — continues the first
+blockquote — including lines that themselves look like <code data-pos="515:331-515:343">key: value</code> — continues the first
 attribute’s value.
 </div></li>
 </ol>
 </div>
-<div data-pos="492:1-493:1">
+<div data-pos="517:1-518:1">
 <p>If the first condition fails, the blockquote is treated as plain body
-content. For example, <code data-pos="492:93-492:120">&gt; Note: this is important</code> is a plain
+content. For example, <code data-pos="517:93-517:120">&gt; Note: this is important</code> is a plain
 blockquote unless the model declares an attribute named “Note” for the
-enclosing object type; the compiler emits an <code data-pos="492:248-492:267">unknown_attribute</code> warning so mistyped
+enclosing object type; the compiler emits an <code data-pos="517:248-517:267">unknown_attribute</code> warning so mistyped
 attribute names are visible.</p>
 </div>
-<div data-pos="494:1-495:1">
+<div data-pos="519:1-520:1">
 <p><em>Specification-level exception.</em> Blockquotes belonging to the
-H1 header (document metadata such as <code data-pos="494:100-494:107">title</code>, <code data-pos="494:109-494:117">author</code>, <code data-pos="494:119-494:128">version</code>) are permissive: any <code data-pos="494:150-494:162">key: value</code> blockquote is stored as
-specification metadata, with an <code data-pos="494:219-494:243">unknown_spec_attribute</code> warning when
+H1 header (document metadata such as <code data-pos="519:100-519:107">title</code>, <code data-pos="519:109-519:117">author</code>, <code data-pos="519:119-519:128">version</code>) are permissive: any <code data-pos="519:150-519:162">key: value</code> blockquote is stored as
+specification metadata, with an <code data-pos="519:219-519:243">unknown_spec_attribute</code> warning when
 the key is not declared for the specification’s type.</p>
 </div>
-<div data-pos="496:1-497:1">
+<div data-pos="521:1-522:1">
 <p><strong>Fenced code block as Float vs. plain code block.</strong> A
 fenced code block is recognized as a spec float if and only if its info
-string matches the pattern <code data-pos="496:155-496:174">TypeRef &quot;:&quot; Label</code>, where TypeRef (or
+string matches the pattern <code data-pos="521:155-521:174">TypeRef &quot;:&quot; Label</code>, where TypeRef (or
 one of its aliases) is a declared float type. A code block with an info
-string like <code data-pos="496:278-496:293">```python</code> (no colon
+string like <code data-pos="521:278-521:293">```python</code> (no colon
 and label) is treated as a plain code block.</p>
 </div>
-<div data-pos="498:1-499:1">
+<div data-pos="523:1-524:1">
 <p><strong>Inline code as View vs. plain inline code.</strong> An inline
 code span is recognized as a spec view if and only if its content
-matches the pattern <code data-pos="498:144-498:157">TypeRef &quot;:&quot;</code>,
-where TypeRef is a declared view type. For example, <code data-pos="498:211-498:223">`toc:`</code> is a view, but <code data-pos="498:239-498:252">`x = 5`</code> is plain inline code.</p>
+matches the pattern <code data-pos="523:144-523:157">TypeRef &quot;:&quot;</code>,
+where TypeRef is a declared view type. For example, <code data-pos="523:211-523:223">`toc:`</code> is a view, but <code data-pos="523:239-523:252">`x = 5`</code> is plain inline code.</p>
 </div>
-<div data-pos="500:1-501:1">
+<div data-pos="525:1-526:1">
 <p><strong>Link as Spec Relation vs. plain link.</strong> A Markdown
-link <code data-pos="500:59-500:72">[text](url)</code> is recognized as
-a spec relation if and only if the URL starts with <code data-pos="500:141-500:144">@</code> or <code data-pos="500:148-500:151">#</code> and matches a declared selector.
-Links with other URL schemes (e.g., <code data-pos="500:221-500:231">https://</code>, <code data-pos="500:233-500:237">./</code>) are plain Markdown links.</p>
+link <code data-pos="525:59-525:72">[text](url)</code> is recognized as
+a spec relation if and only if the URL starts with <code data-pos="525:141-525:144">@</code> or <code data-pos="525:148-525:151">#</code> and matches a declared selector.
+Links with other URL schemes (e.g., <code data-pos="525:221-525:231">https://</code>, <code data-pos="525:233-525:237">./</code>) are plain Markdown links.</p>
 </div>
-<div data-pos="502:1-503:1">
+<div data-pos="527:1-528:1">
+<p><strong>Link inside diagram source vs. diagram syntax.</strong>
+Diagram float content is plain text, not Markdown, so links are found by
+a text scan. A sequence <code data-pos="527:149-527:167">[text](selector)</code> is recognized as a
+spec relation if and only if the float type declares <code data-pos="527:240-527:253">format_link</code>, the text is non-empty and
+contains no <code data-pos="527:293-527:296">[</code>, <code data-pos="527:298-527:301">]</code>, or newline, and the selector starts
+with <code data-pos="527:344-527:347">@</code> or <code data-pos="527:351-527:354">#</code> and contains no whitespace or <code data-pos="527:385-527:388">)</code>. The diagram tool’s own bracket
+syntax therefore never matches:</p>
+</div>
+<a id="csv-tbl-diagram-link-scan" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Diagram source link recognition</figcaption>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Diagram text</th>
+<th style="text-align: left;">Recognized</th>
+<th style="text-align: left;">Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>[SEC-2](@)</code></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Text without brackets, selector
+<code>@</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>[fig:overview](#)</code></td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Text without brackets, selector
+<code>#</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>[Component]</code></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">No <code>(selector)</code> follows</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>[[http://example.com label]]</code></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Text contains <code>[</code>, and no
+<code>(selector)</code> follows</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>-[#red]-&gt;</code></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;"><code>#red</code> is inside the brackets,
+not a selector</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>[a](https://example.com)</code></td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">Selector does not start with
+<code>@</code> or <code>#</code></td>
+</tr>
+</tbody>
+</table>
+<div data-pos="556:1-557:1">
+<p>The characters <code data-pos="556:16-556:19">[</code>, <code data-pos="556:21-556:24">]</code>, <code data-pos="556:26-556:29">{</code>, and <code data-pos="556:35-556:38">}</code> are removed from the display text
+inside a diagram, because they would end the PlantUML link early.</p>
+</div>
+<div data-pos="558:1-559:1">
 <p><strong>Heading level gaps.</strong> If a heading skips levels (e.g.,
 H2 followed by H4 with no intervening H3), the document is malformed.
 Processors should report an error; the missing intermediate level is not
 implicitly created.</p>
 </div>
-<h1 data-number="3" data-pos="504:1-505:1" id="SPEC-sec4"><span class="header-section-number">3</span> Type System</h1>
-<div data-pos="506:1-507:1">
+<h1 data-number="3" data-pos="560:1-561:1" id="SPEC-sec4"><span class="header-section-number">3</span> Type System</h1>
+<div data-pos="562:1-563:1">
 <p>CommonSpec is parameterized by a <strong>model</strong> — a type
 environment
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Γ</mi><annotation encoding="application/x-tex">\Gamma</annotation></semantics></math>
@@ -1174,172 +1291,172 @@ specification types, datatypes, and attributes exist. The language
 syntax is fixed; the model determines what types are valid and how they
 behave.</p>
 </div>
-<h2 data-number="3.1" data-pos="508:1-509:1" id="SPEC-sec4.1"><span class="header-section-number">3.1</span> Model Structure</h2>
-<div data-pos="510:1-511:1">
+<h2 data-number="3.1" data-pos="564:1-565:1" id="SPEC-sec4.1"><span class="header-section-number">3.1</span> Model Structure</h2>
+<div data-pos="566:1-567:1">
 <p>A model provides type definitions organized by category:</p>
 </div>
-<div data-pos="512:1-520:1">
+<div data-pos="568:1-576:1">
 <ul>
-<li><div data-pos="512:1-513:1">
+<li><div data-pos="568:1-569:1">
 <strong>Object types</strong> — spec object types (e.g., SECTION, HLR,
 LLR, VC).
 </div></li>
-<li><div data-pos="513:1-514:1">
+<li><div data-pos="569:1-570:1">
 <strong>Float types</strong> — float types with aliases and counter
 groups (e.g., FIGURE, TABLE, PLANTUML).
 </div></li>
-<li><div data-pos="514:1-515:1">
+<li><div data-pos="570:1-571:1">
 <strong>Relation types</strong> — relation types with selectors,
 resolvers, and constraints (e.g., PID_REF, VERIFIES).
 </div></li>
-<li><div data-pos="515:1-516:1">
+<li><div data-pos="571:1-572:1">
 <strong>View types</strong> — view types with parameters and
 materialization logic (e.g., TOC, LOF, ABBREV).
 </div></li>
-<li><div data-pos="516:1-517:1">
+<li><div data-pos="572:1-573:1">
 <strong>Specification types</strong> — document-level types (e.g., SRS,
 SDD, SVC).
 </div></li>
-<li><div data-pos="517:1-519:1">
+<li><div data-pos="573:1-575:1">
 <strong>Verification rules</strong> — constraint violation detectors
 that enforce model invariants (e.g., missing required attributes,
 invalid enum values, broken traceability).
 </div></li>
 </ul>
 </div>
-<h2 data-number="3.2" data-pos="519:1-520:1" id="SPEC-sec4.2"><span class="header-section-number">3.2</span> Type Definition Schema</h2>
-<div data-pos="521:1-522:1">
+<h2 data-number="3.2" data-pos="575:1-576:1" id="SPEC-sec4.2"><span class="header-section-number">3.2</span> Type Definition Schema</h2>
+<div data-pos="577:1-578:1">
 <p>Each type definition declares a schema with the following fields
 (using object types as an example):</p>
 </div>
-<div data-pos="523:1-531:1">
+<div data-pos="579:1-587:1">
 <ul>
-<li><div data-pos="523:1-524:1">
-<strong>id</strong> — the canonical type identifier (e.g., <code data-pos="523:51-523:56">HLR</code>).
+<li><div data-pos="579:1-580:1">
+<strong>id</strong> — the canonical type identifier (e.g., <code data-pos="579:51-579:56">HLR</code>).
 </div></li>
-<li><div data-pos="524:1-525:1">
+<li><div data-pos="580:1-581:1">
 <strong>long_name</strong> — human-readable name (e.g., “High-Level
 Requirement”).
 </div></li>
-<li><div data-pos="525:1-526:1">
+<li><div data-pos="581:1-582:1">
 <strong>extends</strong> — parent type for single inheritance (e.g.,
-<code data-pos="525:61-525:72">TRACEABLE</code>).
+<code data-pos="581:61-581:72">TRACEABLE</code>).
 </div></li>
-<li><div data-pos="526:1-527:1">
+<li><div data-pos="582:1-583:1">
 <strong>pid_prefix</strong> — prefix for auto-generated PIDs (e.g.,
-<code data-pos="526:60-526:65">HLR</code>).
+<code data-pos="582:60-582:65">HLR</code>).
 </div></li>
-<li><div data-pos="527:1-528:1">
+<li><div data-pos="583:1-584:1">
 <strong>pid_format</strong> — format string for PID numbering (e.g.,
-<code data-pos="527:61-527:67">%03d</code>).
+<code data-pos="583:61-583:67">%03d</code>).
 </div></li>
-<li><div data-pos="528:1-530:1">
+<li><div data-pos="584:1-586:1">
 <strong>attributes</strong> — list of attribute declarations, each with
-<code data-pos="528:64-528:70">name</code>, <code data-pos="528:72-528:78">type</code>, and optional constraints.
+<code data-pos="584:64-584:70">name</code>, <code data-pos="584:72-584:78">type</code>, and optional constraints.
 </div></li>
 </ul>
 </div>
-<div data-pos="530:1-531:1">
+<div data-pos="586:1-587:1">
 <p>Relation types additionally declare:</p>
 </div>
-<div data-pos="532:1-538:1">
+<div data-pos="588:1-594:1">
 <ul>
-<li><div data-pos="532:1-533:1">
+<li><div data-pos="588:1-589:1">
 <strong>link_selector</strong> — the selector string that triggers this
-type (e.g., <code data-pos="532:76-532:79">@</code>).
+type (e.g., <code data-pos="588:76-588:79">@</code>).
 </div></li>
-<li><div data-pos="533:1-534:1">
+<li><div data-pos="589:1-590:1">
 <strong>source_type_ref</strong> / <strong>target_type_ref</strong> —
 type constraints for inference.
 </div></li>
-<li><div data-pos="534:1-535:1">
+<li><div data-pos="590:1-591:1">
 <strong>source_attribute</strong> — attribute context constraint for
 inference.
 </div></li>
-<li><div data-pos="535:1-537:1">
+<li><div data-pos="591:1-593:1">
 <strong>resolve</strong> — the resolution strategy (inherited from the
-base type via <code data-pos="535:77-535:86">extends</code>).
+base type via <code data-pos="591:77-591:86">extends</code>).
 </div></li>
 </ul>
 </div>
-<h2 data-number="3.3" data-pos="537:1-538:1" id="SPEC-sec4.3"><span class="header-section-number">3.3</span> Type Inheritance</h2>
-<div data-pos="539:1-540:1">
-<p>Object types support single inheritance via <code data-pos="539:45-539:54">extends</code>. A child type inherits all
+<h2 data-number="3.3" data-pos="593:1-594:1" id="SPEC-sec4.3"><span class="header-section-number">3.3</span> Type Inheritance</h2>
+<div data-pos="595:1-596:1">
+<p>Object types support single inheritance via <code data-pos="595:45-595:54">extends</code>. A child type inherits all
 attributes from its parent. For example:</p>
 </div>
-<div data-pos="541:1-547:1">
+<div data-pos="597:1-603:1">
 <ul>
-<li><div data-pos="541:1-542:1">
+<li><div data-pos="597:1-598:1">
 <strong>SECTION</strong> — base structural container, no special
 attributes.
 </div></li>
-<li><div data-pos="542:1-543:1">
-<strong>TRACEABLE</strong> extends SECTION — adds <code data-pos="542:42-542:50">status</code> attribute (ENUM: Draft, Review,
+<li><div data-pos="598:1-599:1">
+<strong>TRACEABLE</strong> extends SECTION — adds <code data-pos="598:42-598:50">status</code> attribute (ENUM: Draft, Review,
 Approved, Implemented).
 </div></li>
-<li><div data-pos="543:1-544:1">
-<strong>HLR</strong> extends TRACEABLE — adds <code data-pos="543:38-543:49">rationale</code>, <code data-pos="543:51-543:61">priority</code>.
+<li><div data-pos="599:1-600:1">
+<strong>HLR</strong> extends TRACEABLE — adds <code data-pos="599:38-599:49">rationale</code>, <code data-pos="599:51-599:61">priority</code>.
 </div></li>
-<li><div data-pos="544:1-546:1">
-<strong>LLR</strong> extends TRACEABLE — adds <code data-pos="544:38-544:49">rationale</code>, <code data-pos="544:51-544:72">verification_method</code>, <code data-pos="544:74-544:88">traceability</code>.
+<li><div data-pos="600:1-602:1">
+<strong>LLR</strong> extends TRACEABLE — adds <code data-pos="600:38-600:49">rationale</code>, <code data-pos="600:51-600:72">verification_method</code>, <code data-pos="600:74-600:88">traceability</code>.
 </div></li>
 </ul>
 </div>
-<h2 data-number="3.4" data-pos="546:1-547:1" id="SPEC-sec4.4"><span class="header-section-number">3.4</span> Default Model</h2>
-<div data-pos="548:1-549:1">
+<h2 data-number="3.4" data-pos="602:1-603:1" id="SPEC-sec4.4"><span class="header-section-number">3.4</span> Default Model</h2>
+<div data-pos="604:1-605:1">
 <p>The default model provides basic types for general technical
 publishing:</p>
 </div>
-<div data-pos="550:1-556:1">
+<div data-pos="606:1-612:1">
 <ul>
-<li><div data-pos="550:1-551:1">
+<li><div data-pos="606:1-607:1">
 <strong>Objects:</strong> SECTION (default, composite), COVER,
 EXEC_SUMMARY, REFERENCES.
 </div></li>
-<li><div data-pos="551:1-552:1">
+<li><div data-pos="607:1-608:1">
 <strong>Floats:</strong> FIGURE, TABLE, CODE, MATH, PLANTUML, CHART,
 DIAGRAM.
 </div></li>
-<li><div data-pos="552:1-553:1">
+<li><div data-pos="608:1-609:1">
 <strong>Views:</strong> TOC, LOF, LOT, ABBREV, MATH_INLINE.
 </div></li>
-<li><div data-pos="553:1-555:1">
+<li><div data-pos="609:1-611:1">
 <strong>Specifications:</strong> A single default specification type.
 </div></li>
 </ul>
 </div>
-<h2 data-number="3.5" data-pos="555:1-556:1" id="SPEC-sec4.5"><span class="header-section-number">3.5</span> Domain Models</h2>
-<div data-pos="557:1-558:1">
+<h2 data-number="3.5" data-pos="611:1-612:1" id="SPEC-sec4.5"><span class="header-section-number">3.5</span> Domain Models</h2>
+<div data-pos="613:1-614:1">
 <p>Domain-specific models extend the default with specialized types. For
 example, a software documentation model may add:</p>
 </div>
-<div data-pos="559:1-566:1">
+<div data-pos="615:1-622:1">
 <ul>
-<li><div data-pos="559:1-560:1">
+<li><div data-pos="615:1-616:1">
 <strong>Objects:</strong> HLR, LLR, VC, NFR, FD, DD, CSC, CSU, TR — for
 software requirements, design, and verification.
 </div></li>
-<li><div data-pos="560:1-561:1">
+<li><div data-pos="616:1-617:1">
 <strong>Relations:</strong> VERIFIES, TRACES_TO, REALIZES, BELONGS — for
 traceability between requirements, design, and tests.
 </div></li>
-<li><div data-pos="561:1-562:1">
+<li><div data-pos="617:1-618:1">
 <strong>Specifications:</strong> SRS, SDD, SVC, TRR, SUM — for software
 documentation lifecycle.
 </div></li>
-<li><div data-pos="562:1-563:1">
+<li><div data-pos="618:1-619:1">
 <strong>Views:</strong> TRACEABILITY_MATRIX, REQUIREMENTS_SUMMARY,
 COVERAGE_SUMMARY — for analysis and reporting.
 </div></li>
-<li><div data-pos="563:1-565:1">
+<li><div data-pos="619:1-621:1">
 <strong>Verification views:</strong> Missing traceability coverage,
 invalid attribute values, duplicate PIDs.
 </div></li>
 </ul>
 </div>
-<h1 data-number="4" data-pos="565:1-566:1" id="SPEC-sec5"><span class="header-section-number">4</span> Datatypes</h1>
-<h2 data-number="4.1" data-pos="567:1-568:1" id="SPEC-sec5.1"><span class="header-section-number">4.1</span> Primitive Datatypes</h2>
-<div data-pos="569:1-570:1">
+<h1 data-number="4" data-pos="621:1-622:1" id="SPEC-sec5"><span class="header-section-number">4</span> Datatypes</h1>
+<h2 data-number="4.1" data-pos="623:1-624:1" id="SPEC-sec5.1"><span class="header-section-number">4.1</span> Primitive Datatypes</h2>
+<div data-pos="625:1-626:1">
 <p>CommonSpec defines seven primitive datatypes used for attribute
 values:</p>
 </div>
@@ -1391,77 +1508,77 @@ values:</p>
 </tr>
 </tbody>
 </table>
-<h2 data-number="4.2" data-pos="582:1-583:1" id="SPEC-sec5.2"><span class="header-section-number">4.2</span> Enum Definitions</h2>
-<div data-pos="584:1-585:1">
+<h2 data-number="4.2" data-pos="638:1-639:1" id="SPEC-sec5.2"><span class="header-section-number">4.2</span> Enum Definitions</h2>
+<div data-pos="640:1-641:1">
 <p>ENUM datatypes declare a fixed set of allowed values. Each value has
-a <code data-pos="584:72-584:77">key</code> (used in CommonSpec source)
-and a <code data-pos="584:112-584:122">sequence</code> (display order).
+a <code data-pos="640:72-640:77">key</code> (used in CommonSpec source)
+and a <code data-pos="640:112-640:122">sequence</code> (display order).
 For example, a status attribute might declare:</p>
 </div>
-<pre data-pos="586:1-589:1"><code>values: Draft, Review, Approved, Implemented</code></pre>
-<div data-pos="590:1-591:1">
+<pre data-pos="642:1-645:1"><code>values: Draft, Review, Approved, Implemented</code></pre>
+<div data-pos="646:1-647:1">
 <p>In CommonSpec source, the author writes:</p>
 </div>
-<pre data-pos="592:1-595:1"><code>&gt; status: Draft</code></pre>
-<div data-pos="596:1-597:1">
+<pre data-pos="648:1-651:1"><code>&gt; status: Draft</code></pre>
+<div data-pos="652:1-653:1">
 <p>An enum value that does not match one of the declared keys is a
 constraint violation.</p>
 </div>
-<h2 data-number="4.3" data-pos="598:1-599:1" id="SPEC-sec5.3"><span class="header-section-number">4.3</span> Attribute Type
+<h2 data-number="4.3" data-pos="654:1-655:1" id="SPEC-sec5.3"><span class="header-section-number">4.3</span> Attribute Type
 Declarations</h2>
-<div data-pos="600:1-601:1">
+<div data-pos="656:1-657:1">
 <p>Models declare which attributes each object type can have,
 including:</p>
 </div>
-<div data-pos="602:1-609:1">
+<div data-pos="658:1-665:1">
 <ul>
-<li><div data-pos="602:1-603:1">
+<li><div data-pos="658:1-659:1">
 <strong>name</strong> — the attribute key as written in CommonSpec
 (e.g., “status”, “rationale”).
 </div></li>
-<li><div data-pos="603:1-604:1">
+<li><div data-pos="659:1-660:1">
 <strong>type</strong> — one of the seven primitive datatypes.
 </div></li>
-<li><div data-pos="604:1-605:1">
+<li><div data-pos="660:1-661:1">
 <strong>min_occurs</strong> — 0 for optional, 1+ for required.
 </div></li>
-<li><div data-pos="605:1-606:1">
+<li><div data-pos="661:1-662:1">
 <strong>max_occurs</strong> — 1 for single-value, &gt;1 for multi-value.
 </div></li>
-<li><div data-pos="606:1-608:1">
+<li><div data-pos="662:1-664:1">
 <strong>min_value / max_value</strong> — bounds for INTEGER and REAL
 attributes.
 </div></li>
 </ul>
 </div>
-<h1 data-number="5" data-pos="608:1-609:1" id="SPEC-sec6"><span class="header-section-number">5</span> Summary</h1>
-<div data-pos="610:1-611:1">
+<h1 data-number="5" data-pos="664:1-665:1" id="SPEC-sec6"><span class="header-section-number">5</span> Summary</h1>
+<div data-pos="666:1-667:1">
 <p>CommonSpec is a six-construct extension of Markdown:</p>
 </div>
-<div data-pos="612:1-620:1">
+<div data-pos="668:1-676:1">
 <ol type="1">
-<li><div data-pos="612:1-613:1">
-<strong>Specification</strong> (<code data-pos="612:23-612:26">#</code>
+<li><div data-pos="668:1-669:1">
+<strong>Specification</strong> (<code data-pos="668:23-668:26">#</code>
 header) — root document container.
 </div></li>
-<li><div data-pos="613:1-614:1">
-<strong>Spec Object</strong> (<code data-pos="613:21-613:25">##</code>–<code data-pos="613:27-613:35">######</code> headers) — traceable elements.
+<li><div data-pos="669:1-670:1">
+<strong>Spec Object</strong> (<code data-pos="669:21-669:25">##</code>–<code data-pos="669:27-669:35">######</code> headers) — traceable elements.
 </div></li>
-<li><div data-pos="614:1-615:1">
-<strong>Spec Float</strong> (fenced code blocks with <code data-pos="614:44-614:56">type:label</code>) — numbered floats.
+<li><div data-pos="670:1-671:1">
+<strong>Spec Float</strong> (fenced code blocks with <code data-pos="670:44-670:56">type:label</code>) — numbered floats.
 </div></li>
-<li><div data-pos="615:1-616:1">
-<strong>Attribute</strong> (blockquotes with <code data-pos="615:36-615:50">&gt; key: value</code>) — typed metadata.
+<li><div data-pos="671:1-672:1">
+<strong>Attribute</strong> (blockquotes with <code data-pos="671:36-671:50">&gt; key: value</code>) — typed metadata.
 </div></li>
-<li><div data-pos="616:1-617:1">
-<strong>Spec Relation</strong> (links with <code data-pos="616:34-616:47">[target](@)</code> or <code data-pos="616:51-616:64">[target](#)</code>) — traceability links.
+<li><div data-pos="672:1-673:1">
+<strong>Spec Relation</strong> (links with <code data-pos="672:34-672:47">[target](@)</code> or <code data-pos="672:51-672:64">[target](#)</code>) — traceability links.
 </div></li>
-<li><div data-pos="617:1-619:1">
-<strong>Spec View</strong> (inline code with <code data-pos="617:36-617:54">`type:param`</code>) — dynamic content.
+<li><div data-pos="673:1-675:1">
+<strong>Spec View</strong> (inline code with <code data-pos="673:36-673:54">`type:param`</code>) — dynamic content.
 </div></li>
 </ol>
 </div>
-<div data-pos="619:1-620:1">
+<div data-pos="675:1-676:1">
 <p>The language is model-parameterized: the type environment determines
 what types, attributes, relations, and constraints are active. Any
 compliant processor that loads the same model will interpret the same

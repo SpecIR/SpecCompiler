@@ -371,6 +371,13 @@ type.</p>
 with <code data-pos="11:62-11:65">@</code> or <code data-pos="11:69-11:72">#</code>. Selectors are not hardcoded — they are
 defined by relation types in the model (e.g., <code data-pos="11:161-11:170">PID_REF</code> defines <code data-pos="11:179-11:182">@</code>, <code data-pos="11:184-11:195">LABEL_REF</code> defines <code data-pos="11:204-11:207">#</code>, <code data-pos="11:209-11:224">XREF_CITATION</code> defines <code data-pos="11:233-11:247">@cite,@citep</code>). Models can register any
 <code data-pos="11:274-11:280">@...</code> or <code data-pos="11:284-11:290">#...</code> selector.</p>
+<p><strong>Where links are found:</strong> In body text and attribute
+values, in the cells of TABLE floats, and in the raw source of floats
+whose type declares a <code data-pos="13:149-13:162">format_link</code>
+hook (default model: PLANTUML diagrams). A link inside a float belongs
+to the float’s parent object; a diagram link has no source attribute
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mi>⊥</mi></mrow><annotation encoding="application/x-tex">\alpha = \bot</annotation></semantics></math>)
+and is resolved and diagnosed exactly like a body link.</p>
 <p><strong>Full specification:</strong> See the CommonSpec Language
 Specification for the complete inference algorithm and examples.</p>
 </dd>
@@ -2060,11 +2067,129 @@ result handling in its descriptor.</p>
 <dl>
 <dt><strong>DESCRIPTION:</strong></dt>
 <dd>
-The descriptor shall set <code data-pos="91:41-91:78">schema.needs_external_render = true</code>. Its
-<code data-pos="91:84-91:91">hooks</code> table shall provide <code data-pos="91:112-91:126">prepare_task</code> and <code data-pos="91:131-91:146">handle_result</code>. The core shall prepare
-tasks, apply the render cache, run tasks, and dispatch results. A float
-shall not declare both <code data-pos="91:266-91:274">render</code> and
-external-render hooks.
+The
+
+descriptor
+
+shall
+
+set
+
+<code data-pos="91:41-91:78">schema.needs_external_render = true</code>
+.
+
+Its
+
+<code data-pos="91:84-91:91">hooks</code>
+
+table
+
+shall
+
+provide
+
+<code data-pos="91:112-91:126">prepare_task</code>
+
+and
+
+<code data-pos="91:131-91:146">handle_result</code>
+.
+
+The
+
+core
+
+shall
+
+prepare
+
+tasks,
+
+apply
+
+the
+
+render
+
+cache,
+
+run
+
+tasks,
+
+and
+
+dispatch
+
+results.
+
+A
+
+float
+
+shall
+
+not
+
+declare
+
+both
+
+<code data-pos="91:266-91:274">render</code>
+
+and
+
+external-render
+
+hooks.
+
+A
+
+float
+
+whose
+
+source
+
+carries
+
+CommonSpec
+
+links
+
+may
+
+also
+
+declare
+
+<code data-pos="91:365-91:378">format_link</code>
+,
+
+which
+
+returns
+
+a
+
+resolved
+
+link
+
+in
+
+the
+
+source’s
+
+native
+
+syntax
+
+(see
+
+<a href="#HLR-OUT-008" data-pos="91:445-91:461">Diagram Hyperlinks</a>
+).
 </dd>
 <dt><strong>RATIONALE:</strong></dt>
 <dd>
@@ -2410,8 +2535,8 @@ replaces CodeBlock placeholders (identified by float labels) with
 rendered Div elements containing:</p>
 <ol type="1">
 <li><div data-pos="39:3-40:1">
-<strong>Rendered content</strong>: The <code data-pos="39:32-39:46">resolved_ast</code> from <code data-pos="39:52-39:65">spec_floats</code> (SVG images for PlantUML,
-parsed tables for CSV, chart images for ECharts)
+<strong>Rendered content</strong>: The <code data-pos="39:32-39:46">resolved_ast</code> from <code data-pos="39:52-39:65">spec_floats</code> (SVG and PNG renditions for
+PlantUML, parsed tables for CSV, chart images for ECharts)
 </div></li>
 <li><div data-pos="40:3-41:1">
 <strong>Caption</strong>: A formatted caption with type prefix and
@@ -2660,14 +2785,10 @@ Full-Text Search Indexing</h4>
 </section>
 <div class="spec-object-body" data-custom-style="SpecObjectBody">
 <div data-pos="127:1-128:1" data-source-file="./requirements/output.md">
-<p>The system shall populate <a href="#full-text-search" data-pos="127:27-127:52">dic:full-text-search</a> virtual tables during
-the <a href="#emit-phase" data-pos="127:79-127:98">dic:emit-phase</a>
-phase to enable full-text search across specification content.</p>
-</div>
-<div data-pos="41:1-42:1">
-<p>Once documents are assembled and published, the system must also
-guarantee that its builds are reproducible and its processing is
-auditable. The following section addresses these integrity concerns.</p>
+<p>The system shall populate <a href="#TERM-FTS" data-pos="127:27-127:52">&lt;Full-Text Search&gt;</a> virtual tables
+during the <a href="#TERM-23" data-pos="127:79-127:98">&lt;EMIT
+Phase&gt;</a> phase to enable full-text search across specification
+content.</p>
 </div>
 </div>
 <div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
@@ -2701,6 +2822,74 @@ Tree&gt;</a> content is converted to plain text before indexing.</p>
 Full-text search enables users to find specification content across
 large document sets. FTS5 with Porter stemming provides standard
 information retrieval capabilities suitable for technical documentation.
+</dd>
+<dt><strong>STATUS:</strong></dt>
+<dd>
+Approved
+</dd>
+</dl>
+</div>
+</div>
+<div class="spec-object">
+<section id="HLR-OUT-008" class="unnumbered spec-object-header" data-custom-style="SpecObjectHeader">
+<h4 class="unnumbered" data-custom-style="SpecObjectHeader">HLR-OUT-008:
+Diagram Hyperlinks</h4>
+</section>
+<div class="spec-object-body" data-custom-style="SpecObjectBody">
+<div data-pos="144:1-145:1" data-source-file="./requirements/output.md">
+<p>The system shall resolve CommonSpec links written inside the source
+of a diagram <a href="#float" data-pos="144:82-144:96">dic:float</a>
+exactly like links in body text, and shall render them as working
+hyperlinks in HTML5 output.</p>
+</div>
+<div data-pos="41:1-42:1">
+<p>Once documents are assembled and published, the system must also
+guarantee that its builds are reproducible and its processing is
+auditable. The following section addresses these integrity concerns.</p>
+</div>
+</div>
+<div class="spec-object-attributes" data-custom-style="SpecObjectAttributes">
+<dl>
+<dt><strong>DESCRIPTION:</strong></dt>
+<dd>
+<p>A float type opts in by declaring a <code data-pos="146:52-146:65">format_link</code> hook (default model:
+PLANTUML). For such floats:</p>
+<ol type="1">
+<li><div data-pos="148:3-149:1">
+<strong>Registration</strong>: During the <a href="#TERM-19" data-pos="148:35-148:60">&lt;INITIALIZE Phase&gt;</a> phase, <code data-pos="148:68-148:81">[Target](@)</code> and <code data-pos="148:86-148:105">[prefix:label](#)</code> links in the float’s
+raw source are stored in <code data-pos="148:152-148:168">spec_relations</code> as links of the float’s
+parent object (no source attribute), at the exact source line of the
+link
+</div></li>
+<li><div data-pos="149:3-150:1">
+<strong>Resolution and diagnostics</strong>: Diagram links use the same
+resolvers, relation type inference, display text, and <code data-pos="149:119-149:140">unresolved_relation</code> diagnostics as
+body links
+</div></li>
+<li><div data-pos="150:3-151:1">
+<strong>Lowering</strong>: During the <a href="#TERM-22" data-pos="150:31-150:55">&lt;TRANSFORM Phase&gt;</a> phase, before the
+external render, each link is rewritten into the diagram tool’s own
+hyperlink syntax with the resolved target and display text. The render
+cache keys on the rewritten source
+</div></li>
+<li><div data-pos="151:3-152:1;152:2-153:1">
+<strong>Dual rendition</strong>: PlantUML renders SVG and PNG in one
+task. HTML5 output inlines the SVG so that its anchors navigate, in each
+per-specification page and in the single-page web application. DOCX,
+LaTeX, and Markdown use the PNG, which shows the resolved display text
+</div></li>
+</ol>
+<p>Citation selectors (<code data-pos="153:23-153:30">@cite</code>,
+<code data-pos="153:32-153:40">@citep</code>) inside diagram source are
+registered but left verbatim. A link is clickable only where the diagram
+tool supports hyperlinks.</p>
+</dd>
+<dt><strong>RATIONALE:</strong></dt>
+<dd>
+Architecture and sequence diagrams name the requirements, sections, and
+figures they depict. Authors expect those names to navigate like body
+links. One relation path keeps a single resolution policy, a single
+diagnostic policy, and complete traceability for links in both places.
 </dd>
 <dt><strong>STATUS:</strong></dt>
 <dd>
@@ -3368,10 +3557,10 @@ derived name <code data-pos="141:255-141:276">&lt;lower(id)&gt;_handler</code>, 
 runs once per phase with full pipeline context.
 </div></li>
 <li><div data-pos="142:3-143:1">
-<strong>Per-item hooks</strong> — RENDER hooks (<code data-pos="142:40-142:48">render</code>, <code data-pos="142:50-142:64">render_block</code>, <code data-pos="142:66-142:79">render_link</code>, <code data-pos="142:81-142:90">message</code>) and DATA hooks (<code data-pos="142:108-142:117">dataset</code>, <code data-pos="142:119-142:132">build_block</code>, <code data-pos="142:134-142:145">transform</code>, <code data-pos="142:147-142:156">resolve</code>, <code data-pos="142:158-142:172">prepare_task</code>, <code data-pos="142:174-142:189">handle_result</code>). The hook NAME selects
+<strong>Per-item hooks</strong> — RENDER hooks (<code data-pos="142:40-142:48">render</code>, <code data-pos="142:50-142:64">render_block</code>, <code data-pos="142:66-142:79">render_link</code>, <code data-pos="142:81-142:90">message</code>) and DATA hooks (<code data-pos="142:108-142:117">dataset</code>, <code data-pos="142:119-142:132">build_block</code>, <code data-pos="142:134-142:145">transform</code>, <code data-pos="142:147-142:156">resolve</code>, <code data-pos="142:158-142:172">prepare_task</code>, <code data-pos="142:174-142:189">handle_result</code>, <code data-pos="142:191-142:204">format_link</code>). The hook NAME selects
 one of two context tiers (a frozen render ctx or a frozen data ctx) and
-the return type the hook owes. Consumers resolve them via <code data-pos="142:344-142:364">get_hook_inherited</code>, which walks the
-<code data-pos="142:382-142:391">extends</code> chain.
+the return type the hook owes. Consumers resolve them via <code data-pos="142:359-142:379">get_hook_inherited</code>, which walks the
+<code data-pos="142:397-142:406">extends</code> chain.
 </div></li>
 </ul>
 </dd>

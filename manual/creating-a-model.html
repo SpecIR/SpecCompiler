@@ -259,10 +259,14 @@ type</a></li>
 </ul></li>
 <li><a href="#SPEC-sec10" id="toc-SPEC-sec10"><span class="toc-section-number">10</span> Extension checklist</a></li>
 <li><a href="#SPEC-sec11" id="toc-SPEC-sec11"><span class="toc-section-number">11</span> Analyze queries</a></li>
-<li><a href="#SPEC-sec12" id="toc-SPEC-sec12"><span class="toc-section-number">12</span> External renderers</a></li>
-<li><a href="#SPEC-sec13" id="toc-SPEC-sec13"><span class="toc-section-number">13</span> Project integration</a></li>
-<li><a href="#SPEC-sec14" id="toc-SPEC-sec14"><span class="toc-section-number">14</span> Troubleshooting</a></li>
-<li><a href="#SPEC-sec15" id="toc-SPEC-sec15"><span class="toc-section-number">15</span> Pointers</a></li>
+<li><a href="#SPEC-sec12" id="toc-SPEC-sec12"><span class="toc-section-number">12</span> External renderers</a>
+<ul>
+<li><a href="#SPEC-sec12.1" id="toc-SPEC-sec12.1"><span class="toc-section-number">12.1</span> Links in float source</a></li>
+</ul></li>
+<li><a href="#SPEC-sec13" id="toc-SPEC-sec13"><span class="toc-section-number">13</span> Migrating models</a></li>
+<li><a href="#SPEC-sec14" id="toc-SPEC-sec14"><span class="toc-section-number">14</span> Project integration</a></li>
+<li><a href="#SPEC-sec15" id="toc-SPEC-sec15"><span class="toc-section-number">15</span> Troubleshooting</a></li>
+<li><a href="#SPEC-sec16" id="toc-SPEC-sec16"><span class="toc-section-number">16</span> Pointers</a></li>
 </ul>
 </nav>
 <div id="SPEC" class="spec-title" data-custom-style="Title">
@@ -494,7 +498,8 @@ supports directories with an <code data-pos="148:106-148:116">init.lua</code> fi
 <td style="text-align: left;"><code>&quot;float&quot;</code></td>
 <td style="text-align: left;"><code>types/floats/figure.lua</code></td>
 <td style="text-align: left;"><code>transform</code>, or
-<code>prepare_task</code> + <code>handle_result</code></td>
+<code>prepare_task</code> + <code>handle_result</code> (optionally
+<code>format_link</code>, <code>mask_comments</code>)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Relation</td>
@@ -653,6 +658,25 @@ skip)</td>
 <code>.stderr</code>).</td>
 </tr>
 <tr class="even">
+<td style="text-align: left;"><code>format_link</code></td>
+<td style="text-align: left;">float</td>
+<td style="text-align: left;">data</td>
+<td style="text-align: left;">link in the source’s native syntax
+(string)</td>
+<td style="text-align: left;">TRANSFORM, before
+<code>prepare_task</code>, once per CommonSpec link in the float source
+(<code>ctx.subject.href</code>, <code>.display_text</code>).</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>mask_comments</code></td>
+<td style="text-align: left;">float</td>
+<td style="text-align: left;">data</td>
+<td style="text-align: left;">source with comments blanked (string)</td>
+<td style="text-align: left;">INITIALIZE, before links in the float
+source are registered (<code>ctx.subject.raw_content</code>,
+<code>.float</code>). Keep length and newlines.</td>
+</tr>
+<tr class="even">
 <td style="text-align: left;"><code>resolve</code></td>
 <td style="text-align: left;">relation</td>
 <td style="text-align: left;">data</td>
@@ -662,11 +686,11 @@ relation type (<code>ctx.subject.target_text</code>).</td>
 </tr>
 </tbody>
 </table>
-<div data-pos="261:1-262:1">
-<p>A float is internal <strong>or</strong> external: declaring <code data-pos="261:48-261:56">render</code> together with <code data-pos="261:71-261:85">prepare_task</code>/<code data-pos="261:86-261:101">handle_result</code> is a contradiction and
+<div data-pos="271:1-272:1">
+<p>A float is internal <strong>or</strong> external: declaring <code data-pos="271:48-271:56">render</code> together with <code data-pos="271:71-271:85">prepare_task</code>/<code data-pos="271:86-271:101">handle_result</code> is a contradiction and
 the host rejects it.</p>
 </div>
-<div data-pos="263:1-264:1">
+<div data-pos="273:1-274:1">
 <p><strong>Context fields</strong></p>
 </div>
 <a id="csv-tbl-model-ctx-fields" class="bookmark"></a>
@@ -726,19 +750,19 @@ tier.</td>
 </tr>
 </tbody>
 </table>
-<div data-pos="289:1-290:1">
+<div data-pos="299:1-300:1">
 <blockquote>
-<div data-pos="289:3-290:1">
-<p>Read the resolved element and its attributes from <code data-pos="289:53-289:66">ctx.subject</code>. Query the database only for
+<div data-pos="299:3-300:1">
+<p>Read the resolved element and its attributes from <code data-pos="299:53-299:66">ctx.subject</code>. Query the database only for
 data that the subject does not contain.</p>
 </div>
 </blockquote>
 </div>
-<h1 data-number="8" data-pos="291:1-292:1" id="SPEC-sec8"><span class="header-section-number">8</span> Five canonical templates</h1>
-<h2 data-number="8.1" data-pos="293:1-294:1" id="SPEC-sec8.1"><span class="header-section-number">8.1</span> Object type</h2>
-<div data-pos="295:1-296:1">
+<h1 data-number="8" data-pos="301:1-302:1" id="SPEC-sec8"><span class="header-section-number">8</span> Five canonical templates</h1>
+<h2 data-number="8.1" data-pos="303:1-304:1" id="SPEC-sec8.1"><span class="header-section-number">8.1</span> Object type</h2>
+<div data-pos="305:1-306:1">
 <p>Create an object type with required attributes and a custom render.
-The render hook reads its element and attributes from <code data-pos="295:123-295:136">ctx.subject</code>:</p>
+The render hook reads its element and attributes from <code data-pos="305:123-305:136">ctx.subject</code>:</p>
 </div>
 <a id="listing-src-model-template-object" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> types/objects/hlr.lua</figcaption>
@@ -781,7 +805,7 @@ The render hook reads its element and attributes from <code data-pos="295:123-29
 <span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
 <span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
 <span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<div data-pos="339:1-340:1">
+<div data-pos="349:1-350:1">
 <p>Usage:</p>
 </div>
 <a id="listing-src-model-template-object-usage" class="bookmark"></a>
@@ -793,15 +817,15 @@ The render hook reads its element and attributes from <code data-pos="295:123-29
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; rationale: Required by security policy section 4.2</span></span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>The system shall authenticate users via username and password.</span></code></pre></div>
-<div data-pos="351:1-352:1">
-<p>Most object types do not require a <code data-pos="351:36-351:44">render</code> hook. Without this hook, the host
-emits the standard PID, attributes, and body. Add <code data-pos="351:129-351:137">render</code> only for a different
+<div data-pos="361:1-362:1">
+<p>Most object types do not require a <code data-pos="361:36-361:44">render</code> hook. Without this hook, the host
+emits the standard PID, attributes, and body. Add <code data-pos="361:129-361:137">render</code> only for a different
 layout.</p>
 </div>
-<h2 data-number="8.2" data-pos="353:1-354:1" id="SPEC-sec8.2"><span class="header-section-number">8.2</span> Relation type</h2>
-<div data-pos="355:1-356:1">
+<h2 data-number="8.2" data-pos="363:1-364:1" id="SPEC-sec8.2"><span class="header-section-number">8.2</span> Relation type</h2>
+<div data-pos="365:1-366:1">
 <p>The common case is a simple subtype that narrows a base relation
-(<code data-pos="355:67-355:76">PID_REF</code> for <code data-pos="355:81-355:84">@</code> or <code data-pos="355:88-355:99">LABEL_REF</code> for <code data-pos="355:104-355:107">#</code>). No hooks needed — <code data-pos="355:128-355:137">extends</code> inherits the selector,
+(<code data-pos="365:67-365:76">PID_REF</code> for <code data-pos="365:81-365:84">@</code> or <code data-pos="365:88-365:99">LABEL_REF</code> for <code data-pos="365:104-365:107">#</code>). No hooks needed — <code data-pos="365:128-365:137">extends</code> inherits the selector,
 resolver, and default link display:</p>
 </div>
 <a id="listing-src-model-template-relation-simple" class="bookmark"></a>
@@ -817,15 +841,15 @@ resolver, and default link display:</p>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">target_type_ref</span> <span class="op">=</span> <span class="st">&quot;HLR&quot;</span><span class="op">,</span></span>
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<div data-pos="371:1-372:1">
-<p>The link <code data-pos="371:10-371:24">[HLR-001](@)</code> inside an
-LLR resolves as <code data-pos="371:51-371:62">TRACES_TO</code>.</p>
+<div data-pos="381:1-382:1">
+<p>The link <code data-pos="381:10-381:24">[HLR-001](@)</code> inside an
+LLR resolves as <code data-pos="381:51-381:62">TRACES_TO</code>.</p>
 </div>
-<div data-pos="373:1-374:1">
-<p>When the default display text (PID for objects, <code data-pos="373:49-373:71">&quot;&lt;caption&gt; &lt;number&gt;&quot;</code> for
-floats) isn’t right, add a <code data-pos="373:103-373:116">render_link</code> hook. It reads the
-pre-resolved target from <code data-pos="373:161-373:181">ctx.subject.target</code> and returns the
-display string (or <code data-pos="373:217-373:222">nil</code> to fall
+<div data-pos="383:1-384:1">
+<p>When the default display text (PID for objects, <code data-pos="383:49-383:71">&quot;&lt;caption&gt; &lt;number&gt;&quot;</code> for
+floats) isn’t right, add a <code data-pos="383:103-383:116">render_link</code> hook. It reads the
+pre-resolved target from <code data-pos="383:161-383:181">ctx.subject.target</code> and returns the
+display string (or <code data-pos="383:217-383:222">nil</code> to fall
 back to the base type):</p>
 </div>
 <a id="listing-src-model-template-relation-display" class="bookmark"></a>
@@ -841,24 +865,24 @@ back to the base type):</p>
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">target</span><span class="op">.</span><span class="va">pid</span></span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">end</span><span class="op">,</span></span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<div data-pos="389:1-390:1">
-<p><code data-pos="389:1-389:21">ctx.subject.target</code> contains the
+<div data-pos="399:1-400:1">
+<p><code data-pos="399:1-399:21">ctx.subject.target</code> contains the
 resolved target. Object targets contain the kind, PID, title, and type.
 Float targets contain the kind, caption, and number. Return a string to
-replace the display text. Return <code data-pos="389:212-389:217">nil</code> to use inherited behavior. <code data-pos="389:245-389:256">LABEL_REF</code> and <code data-pos="389:261-389:270">PID_REF</code> provide default link
+replace the display text. Return <code data-pos="399:212-399:217">nil</code> to use inherited behavior. <code data-pos="399:245-399:256">LABEL_REF</code> and <code data-pos="399:261-399:270">PID_REF</code> provide default link
 rendering.</p>
 </div>
-<div data-pos="391:1-392:1">
-<p>For custom relation resolution, declare a <code data-pos="391:43-391:52">resolve</code> data hook. It reads the target
-text and source identifier from <code data-pos="391:116-391:129">ctx.subject</code>. It returns <code data-pos="391:142-391:165">{ target, ambiguous }</code>. Subtypes of
-<code data-pos="391:179-391:188">PID_REF</code> and <code data-pos="391:193-391:204">LABEL_REF</code> inherit their resolvers.</p>
+<div data-pos="401:1-402:1">
+<p>For custom relation resolution, declare a <code data-pos="401:43-401:52">resolve</code> data hook. It reads the target
+text and source identifier from <code data-pos="401:116-401:129">ctx.subject</code>. It returns <code data-pos="401:142-401:165">{ target, ambiguous }</code>. Subtypes of
+<code data-pos="401:179-401:188">PID_REF</code> and <code data-pos="401:193-401:204">LABEL_REF</code> inherit their resolvers.</p>
 </div>
-<h2 data-number="8.3" data-pos="393:1-394:1" id="SPEC-sec8.3"><span class="header-section-number">8.3</span> Walkthrough custom view</h2>
-<div data-pos="395:1-396:1">
+<h2 data-number="8.3" data-pos="403:1-404:1" id="SPEC-sec8.3"><span class="header-section-number">8.3</span> Walkthrough custom view</h2>
+<div data-pos="405:1-406:1">
 <p>Backtick syntax invokes views. An <strong>inline</strong> view uses
-<code data-pos="395:56-395:64">render</code> and returns inlines. A
-<strong>block</strong> view uses <code data-pos="395:108-395:122">render_block</code> and returns a block. The
-<code data-pos="395:148-395:163">inline_prefix</code> and <code data-pos="395:168-395:177">aliases</code> fields select the view.</p>
+<code data-pos="405:56-405:64">render</code> and returns inlines. A
+<strong>block</strong> view uses <code data-pos="405:108-405:122">render_block</code> and returns a block. The
+<code data-pos="405:148-405:163">inline_prefix</code> and <code data-pos="405:168-405:177">aliases</code> fields select the view.</p>
 </div>
 <a id="listing-src-model-template-view" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> types/views/symbol.lua</figcaption>
@@ -881,15 +905,15 @@ text and source identifier from <code data-pos="391:116-391:129">ctx.subject</co
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
 <span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<div data-pos="419:1-420:1">
-<p>Usage: <code data-pos="419:8-419:33">The force is defined as</code>
-<code data-pos="419:34-419:56">`symbol: F = ma`</code>.</p>
+<div data-pos="429:1-430:1">
+<p>Usage: <code data-pos="429:8-429:33">The force is defined as</code>
+<code data-pos="429:34-429:56">`symbol: F = ma`</code>.</p>
 </div>
-<div data-pos="421:1-422:1">
+<div data-pos="431:1-432:1">
 <p>Database-backed views usually render a <strong>block</strong>. Extend
-<code data-pos="421:58-421:70">TABLE_VIEW</code> and declare a <code data-pos="421:85-421:98">build_block</code> data hook. The inherited
-<code data-pos="421:124-421:138">render_block</code> hook dispatches
-<code data-pos="421:155-421:168">build_block</code>. A <code data-pos="421:172-421:184">TABLE_VIEW</code> subtype without <code data-pos="421:201-421:214">build_block</code> causes a load error.</p>
+<code data-pos="431:58-431:70">TABLE_VIEW</code> and declare a <code data-pos="431:85-431:98">build_block</code> data hook. The inherited
+<code data-pos="431:124-431:138">render_block</code> hook dispatches
+<code data-pos="431:155-431:168">build_block</code>. A <code data-pos="431:172-431:184">TABLE_VIEW</code> subtype without <code data-pos="431:201-431:214">build_block</code> causes a load error.</p>
 </div>
 <a id="listing-src-model-template-view-block" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> A generated table view via build_block (types/views/traceability_matrix.lua)</figcaption>
@@ -935,14 +959,14 @@ text and source identifier from <code data-pos="391:116-391:129">ctx.subject</co
 <span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
 <span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
 <span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<div data-pos="468:1-469:1">
-<p>A view that supplies chart data declares a <code data-pos="468:44-468:53">dataset</code> hook. The hook returns <code data-pos="468:77-468:95">{ source = ... }</code> or the data shape
+<div data-pos="478:1-479:1">
+<p>A view that supplies chart data declares a <code data-pos="478:44-478:53">dataset</code> hook. The hook returns <code data-pos="478:77-478:95">{ source = ... }</code> or the data shape
 required by the chart type.</p>
 </div>
-<h2 data-number="8.4" data-pos="470:1-471:1" id="SPEC-sec8.4"><span class="header-section-number">8.4</span> Walkthrough custom float
+<h2 data-number="8.4" data-pos="480:1-481:1" id="SPEC-sec8.4"><span class="header-section-number">8.4</span> Walkthrough custom float
 type</h2>
-<div data-pos="472:1-473:1">
-<p>Most floats require only a <code data-pos="472:28-472:36">schema</code>:</p>
+<div data-pos="482:1-483:1">
+<p>Most floats require only a <code data-pos="482:28-482:36">schema</code>:</p>
 </div>
 <a id="listing-src-model-template-float" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> types/floats/sequence_diagram.lua</figcaption>
@@ -956,7 +980,7 @@ type</h2>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">aliases</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;seq&quot;</span><span class="op">,</span> <span class="st">&quot;sequence&quot;</span> <span class="op">},</span></span>
 <span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
 <span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<div data-pos="487:1-488:1">
+<div data-pos="497:1-498:1">
 <p>Usage:</p>
 </div>
 <a id="listing-src-model-template-float-usage" class="bookmark"></a>
@@ -964,16 +988,16 @@ type</h2>
 <div class="sourceCode" id="cb14"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="in">```seq:auth-flow{caption=&quot;User authentication flow&quot;}</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="in">sequence diagram content here</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code></pre></div>
-<div data-pos="495:1-496:1">
-<p>An internally rendered float can declare a <code data-pos="495:44-495:55">transform</code> data hook. The hook reads
-<code data-pos="495:82-495:107">ctx.subject.raw_content</code> and <code data-pos="495:112-495:131">ctx.subject.float</code>. It returns a
-resolved-AST string. See <a href="#SPEC-sec12" data-pos="495:171-495:202">12 External renderers</a> for process-based
+<div data-pos="505:1-506:1">
+<p>An internally rendered float can declare a <code data-pos="505:44-505:55">transform</code> data hook. The hook reads
+<code data-pos="505:82-505:107">ctx.subject.raw_content</code> and <code data-pos="505:112-505:131">ctx.subject.float</code>. It returns a
+resolved-AST string. See <a href="#SPEC-sec12" data-pos="505:171-505:202">12 External renderers</a> for process-based
 rendering.</p>
 </div>
-<h2 data-number="8.5" data-pos="497:1-498:1" id="SPEC-sec8.5"><span class="header-section-number">8.5</span> Specification type</h2>
-<div data-pos="499:1-500:1">
+<h2 data-number="8.5" data-pos="507:1-508:1" id="SPEC-sec8.5"><span class="header-section-number">8.5</span> Specification type</h2>
+<div data-pos="509:1-510:1">
 <p>Specification types define the top-level document kinds (SRS, SDD,
-STD, …). They are pure-data — no <code data-pos="499:101-499:108">hooks</code> at all:</p>
+STD, …). They are pure-data — no <code data-pos="509:101-509:108">hooks</code> at all:</p>
 </div>
 <a id="listing-src-model-template-spec" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> types/specifications/srs.lua</figcaption>
@@ -991,16 +1015,16 @@ STD, …). They are pure-data — no <code data-pos="499:101-499:108">hooks</cod
 <span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">},</span></span>
 <span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
 <span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<div data-pos="518:1-519:1">
-<p>Usage: <code data-pos="518:8-518:56"># srs: My Project Requirements @SRS-MYPROJ-001</code>
-at the top of a <code data-pos="518:73-518:78">.md</code> file.</p>
+<div data-pos="528:1-529:1">
+<p>Usage: <code data-pos="528:8-528:56"># srs: My Project Requirements @SRS-MYPROJ-001</code>
+at the top of a <code data-pos="528:73-528:78">.md</code> file.</p>
 </div>
-<h1 data-number="9" data-pos="520:1-521:1" id="SPEC-sec9"><span class="header-section-number">9</span> Schema field reference</h1>
-<div data-pos="522:1-523:1">
+<h1 data-number="9" data-pos="530:1-531:1" id="SPEC-sec9"><span class="header-section-number">9</span> Schema field reference</h1>
+<div data-pos="532:1-533:1">
 <p>The following tables define common schema fields. Some model hooks
 also read additional schema fields for rendering.</p>
 </div>
-<h2 data-number="9.1" data-pos="524:1-525:1" id="SPEC-sec9.1"><span class="header-section-number">9.1</span> Object schema</h2>
+<h2 data-number="9.1" data-pos="534:1-535:1" id="SPEC-sec9.1"><span class="header-section-number">9.1</span> Object schema</h2>
 <a id="csv-tbl-model-object-fields" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Object schema fields</figcaption>
 <table>
@@ -1095,7 +1119,7 @@ matching.</td>
 </tr>
 </tbody>
 </table>
-<h2 data-number="9.2" data-pos="584:1-585:1" id="SPEC-sec9.2"><span class="header-section-number">9.2</span> Attribute definitions</h2>
+<h2 data-number="9.2" data-pos="594:1-595:1" id="SPEC-sec9.2"><span class="header-section-number">9.2</span> Attribute definitions</h2>
 <a id="csv-tbl-model-attribute-fields" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Attribute definition fields</figcaption>
 <table>
@@ -1159,7 +1183,7 @@ For <code>ENUM</code> the default is
 </tr>
 </tbody>
 </table>
-<h2 data-number="9.3" data-pos="624:1-625:1" id="SPEC-sec9.3"><span class="header-section-number">9.3</span> Float schema</h2>
+<h2 data-number="9.3" data-pos="634:1-635:1" id="SPEC-sec9.3"><span class="header-section-number">9.3</span> Float schema</h2>
 <a id="csv-tbl-model-float-fields" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Float schema fields</figcaption>
 <table>
@@ -1219,7 +1243,7 @@ renderers</a>.</td>
 </tr>
 </tbody>
 </table>
-<h2 data-number="9.4" data-pos="664:1-665:1" id="SPEC-sec9.4"><span class="header-section-number">9.4</span> Relation schema</h2>
+<h2 data-number="9.4" data-pos="674:1-675:1" id="SPEC-sec9.4"><span class="header-section-number">9.4</span> Relation schema</h2>
 <a id="csv-tbl-model-relation-fields" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Relation schema fields</figcaption>
 <table>
@@ -1284,14 +1308,14 @@ instead of an explicit link.</td>
 </tr>
 </tbody>
 </table>
-<h2 data-number="9.5" data-pos="704:1-705:1" id="SPEC-sec9.5"><span class="header-section-number">9.5</span> Inference scoring</h2>
-<div data-pos="706:1-707:1">
+<h2 data-number="9.5" data-pos="714:1-715:1" id="SPEC-sec9.5"><span class="header-section-number">9.5</span> Inference scoring</h2>
+<div data-pos="716:1-717:1">
 <p>When multiple relation types match a link, the resolver scores each
 candidate. A matching constraint adds one point. A mismatch removes the
-candidate. A <code data-pos="706:154-706:159">nil</code> constraint adds
-no points. The highest score wins. A tie produces an <code data-pos="706:229-706:249">ambiguous_relation</code> diagnostic.</p>
+candidate. A <code data-pos="716:154-716:159">nil</code> constraint adds
+no points. The highest score wins. A tie produces an <code data-pos="716:229-716:249">ambiguous_relation</code> diagnostic.</p>
 </div>
-<h2 data-number="9.6" data-pos="708:1-709:1" id="SPEC-sec9.6"><span class="header-section-number">9.6</span> View schema</h2>
+<h2 data-number="9.6" data-pos="718:1-719:1" id="SPEC-sec9.6"><span class="header-section-number">9.6</span> View schema</h2>
 <a id="csv-tbl-model-view-fields" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> View schema fields</figcaption>
 <table>
@@ -1359,44 +1383,44 @@ renderers</a>.</td>
 </tr>
 </tbody>
 </table>
-<h1 data-number="10" data-pos="752:1-753:1" id="SPEC-sec10"><span class="header-section-number">10</span> Extension checklist</h1>
-<div data-pos="754:1-763:1">
+<h1 data-number="10" data-pos="762:1-763:1" id="SPEC-sec10"><span class="header-section-number">10</span> Extension checklist</h1>
+<div data-pos="764:1-773:1">
 <ol type="1">
-<li><div data-pos="754:1-755:1">
+<li><div data-pos="764:1-765:1">
 Pick a model name (lowercase, matches the directory name).
 </div></li>
-<li><div data-pos="755:1-756:1">
-Create <code data-pos="755:11-755:34">models/&lt;name&gt;/types/…</code>
+<li><div data-pos="765:1-766:1">
+Create <code data-pos="765:11-765:34">models/&lt;name&gt;/types/…</code>
 with the categories you need.
 </div></li>
-<li><div data-pos="756:1-757:1">
-Return one descriptor with <code data-pos="756:31-756:37">kind</code>,
-<code data-pos="756:39-756:47">schema</code>, and optional <code data-pos="756:62-756:69">hooks</code> fields.
+<li><div data-pos="766:1-767:1">
+Return one descriptor with <code data-pos="766:31-766:37">kind</code>,
+<code data-pos="766:39-766:47">schema</code>, and optional <code data-pos="766:62-766:69">hooks</code> fields.
 </div></li>
-<li><div data-pos="757:1-758:1">
+<li><div data-pos="767:1-768:1">
 Add only the hooks that implement required custom behavior.
 </div></li>
-<li><div data-pos="758:1-759:1">
-Set <code data-pos="758:8-758:26">template: &lt;name&gt;</code> in <code data-pos="758:30-758:44">project.yaml</code>.
+<li><div data-pos="768:1-769:1">
+Set <code data-pos="768:8-768:26">template: &lt;name&gt;</code> in <code data-pos="768:30-768:44">project.yaml</code>.
 </div></li>
-<li><div data-pos="759:1-760:1">
-Run <code data-pos="759:8-759:21">specc build</code> and inspect the
+<li><div data-pos="769:1-770:1">
+Run <code data-pos="769:8-769:21">specc build</code> and inspect the
 output.
 </div></li>
-<li><div data-pos="760:1-762:1">
+<li><div data-pos="770:1-772:1">
 Add an analyze descriptor if the domain has rules to enforce.
 </div></li>
 </ol>
 </div>
-<h1 data-number="11" data-pos="762:1-763:1" id="SPEC-sec11"><span class="header-section-number">11</span> Analyze queries</h1>
-<div data-pos="764:1-765:1">
+<h1 data-number="11" data-pos="772:1-773:1" id="SPEC-sec11"><span class="header-section-number">11</span> Analyze queries</h1>
+<div data-pos="774:1-775:1">
 <p>Analyze queries are SQL-based validation rules that run during
-ANALYZE. Each query uses a descriptor with <code data-pos="764:107-764:125">kind = &quot;analyze&quot;</code>. Its schema defines a
-SQL view. Its optional <code data-pos="764:171-764:180">message</code>
+ANALYZE. Each query uses a descriptor with <code data-pos="774:107-774:125">kind = &quot;analyze&quot;</code>. Its schema defines a
+SQL view. Its optional <code data-pos="774:171-774:180">message</code>
 hook converts a result row into a diagnostic.</p>
 </div>
-<div data-pos="766:1-767:1">
-<p>Place analyze descriptors under <code data-pos="766:33-766:65">models/&lt;name&gt;/analyze_queries/</code>.
+<div data-pos="776:1-777:1">
+<p>Place analyze descriptors under <code data-pos="776:33-776:65">models/&lt;name&gt;/analyze_queries/</code>.
 The loader scans all Lua files in this directory. Use the policy key as
 the file name when practical.</p>
 </div>
@@ -1431,27 +1455,30 @@ the file name when practical.</p>
 <span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
 <span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
 <span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<div data-pos="800:1-801:1">
-<p>The <code data-pos="800:5-800:17">policy_key</code> controls
+<div data-pos="810:1-811:1">
+<p>The <code data-pos="810:5-810:17">policy_key</code> controls
 diagnostic severity. An overlay descriptor with the same key replaces
-the earlier descriptor. A schema with <code data-pos="800:135-800:152">disabled = true</code> removes the key. Set a
-policy to <code data-pos="800:186-800:194">ignore</code> in <code data-pos="800:198-800:212">project.yaml</code> to suppress its
+the earlier descriptor. A schema with <code data-pos="810:135-810:152">disabled = true</code> removes the key. Set a
+policy to <code data-pos="810:186-810:194">ignore</code> in <code data-pos="810:198-810:212">project.yaml</code> to suppress its
 diagnostics:</p>
 </div>
 <a id="listing-src-model-suppress-verification-view" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Suppressing an analyze query</figcaption>
 <div class="sourceCode" id="cb17"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validation</span><span class="kw">:</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">traceability_vc_to_hlr</span><span class="kw">:</span><span class="at"> ignore</span></span></code></pre></div>
-<h1 data-number="12" data-pos="807:1-808:1" id="SPEC-sec12"><span class="header-section-number">12</span> External renderers</h1>
-<div data-pos="809:1-810:1">
-<p>Floats that require an external tool set <code data-pos="809:42-809:72">needs_external_render = true</code>. They
-declare <code data-pos="809:87-809:101">prepare_task</code> and <code data-pos="809:106-809:121">handle_result</code> data hooks. The pipeline
-collects tasks, runs processes, and dispatches each result.</p>
+<h1 data-number="12" data-pos="817:1-818:1" id="SPEC-sec12"><span class="header-section-number">12</span> External renderers</h1>
+<div data-pos="819:1-820:1">
+<p>Floats that require an external tool set <code data-pos="819:42-819:72">needs_external_render = true</code>. They
+declare <code data-pos="819:87-819:101">prepare_task</code> and <code data-pos="819:106-819:121">handle_result</code> data hooks. The pipeline
+collects tasks, runs processes, and dispatches each result. A float may
+also declare <code data-pos="819:232-819:245">format_link</code> to
+support CommonSpec links in its source (see <em>Links in float
+source</em> below).</p>
 </div>
-<div data-pos="811:1-812:1">
-<p>The <code data-pos="811:5-811:19">prepare_task</code> hook returns a
-task descriptor. The <code data-pos="811:56-811:71">handle_result</code>
-hook stores the resolved result. A float cannot declare <code data-pos="811:128-811:136">render</code> with either external-render
+<div data-pos="821:1-822:1">
+<p>The <code data-pos="821:5-821:19">prepare_task</code> hook returns a
+task descriptor. The <code data-pos="821:56-821:71">handle_result</code>
+hook stores the resolved result. A float cannot declare <code data-pos="821:128-821:136">render</code> with either external-render
 hook.</p>
 </div>
 <a id="listing-src-model-external-render" class="bookmark"></a>
@@ -1472,41 +1499,66 @@ hook.</p>
 <span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">hooks</span> <span class="op">=</span> <span class="op">{</span></span>
 <span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- DATA: build the spawn task. dctx.subject contains { float, build_dir }.</span></span>
 <span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- dctx.log is the logger. Return the task descriptor, or nil to skip.</span></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">prepare_task</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">dctx</span><span class="op">)</span></span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">float</span>     <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">float</span></span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">build_dir</span> <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">build_dir</span></span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">content</span>   <span class="op">=</span> <span class="va">float</span><span class="op">.</span><span class="va">raw_content</span> <span class="kw">or</span> <span class="st">&quot;&quot;</span></span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">hash</span>      <span class="op">=</span> <span class="va">pandoc</span><span class="op">.</span>sha1<span class="op">(</span><span class="va">content</span><span class="op">)</span></span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">diagrams</span>  <span class="op">=</span> <span class="va">build_dir</span> <span class="op">..</span> <span class="st">&quot;/diagrams&quot;</span></span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">puml_file</span> <span class="op">=</span> <span class="va">diagrams</span> <span class="op">..</span> <span class="st">&quot;/&quot;</span> <span class="op">..</span> <span class="va">hash</span> <span class="op">..</span> <span class="st">&quot;.puml&quot;</span></span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">png_file</span>  <span class="op">=</span> <span class="va">diagrams</span> <span class="op">..</span> <span class="st">&quot;/&quot;</span> <span class="op">..</span> <span class="va">hash</span> <span class="op">..</span> <span class="st">&quot;.png&quot;</span></span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>            <span class="va">task_runner</span><span class="op">.</span>ensure_dir<span class="op">(</span><span class="va">diagrams</span><span class="op">)</span></span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>            <span class="va">task_runner</span><span class="op">.</span>write_file<span class="op">(</span><span class="va">puml_file</span><span class="op">,</span> <span class="va">content</span><span class="op">)</span></span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="op">{</span></span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>                <span class="va">cmd</span> <span class="op">=</span> <span class="st">&quot;plantuml&quot;</span><span class="op">,</span></span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>                <span class="va">args</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;-tpng&quot;</span><span class="op">,</span> <span class="va">puml_file</span> <span class="op">},</span></span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>                <span class="va">opts</span> <span class="op">=</span> <span class="op">{</span> <span class="va">timeout</span> <span class="op">=</span> <span class="dv">30000</span> <span class="op">},</span></span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>                <span class="va">output_path</span> <span class="op">=</span> <span class="va">png_file</span><span class="op">,</span>   <span class="co">-- cache key: skipped when the file exists</span></span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>                <span class="va">context</span> <span class="op">=</span> <span class="op">{</span> <span class="va">float</span> <span class="op">=</span> <span class="va">float</span><span class="op">,</span> <span class="va">relative_path</span> <span class="op">=</span> <span class="st">&quot;diagrams/&quot;</span> <span class="op">..</span> <span class="va">hash</span> <span class="op">..</span> <span class="st">&quot;.png&quot;</span> <span class="op">},</span></span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
-<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
-<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- DATA: write the resolved AST. dctx.subject carries</span></span>
-<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- { task, success, stdout, stderr }. dctx.data is the SpecIR database.</span></span>
-<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>        <span class="va">handle_result</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">dctx</span><span class="op">)</span></span>
-<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">task</span> <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">task</span></span>
-<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">ctx</span>  <span class="op">=</span> <span class="va">task</span><span class="op">.</span><span class="va">context</span></span>
-<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">success</span> <span class="cf">then</span></span>
-<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>                <span class="va">dctx</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>warn<span class="op">(</span><span class="st">&quot;PlantUML failed: %s&quot;</span><span class="op">,</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">stderr</span><span class="op">)</span></span>
-<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span></span>
-<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
-<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">json</span> <span class="op">=</span> <span class="fu">string.format</span><span class="op">(</span><span class="st">&#39;{&quot;png_paths&quot;:[&quot;%s&quot;]}&#39;</span><span class="op">,</span> <span class="va">ctx</span><span class="op">.</span><span class="va">relative_path</span><span class="op">)</span></span>
-<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>            <span class="va">float_base</span><span class="op">.</span>update_resolved_ast<span class="op">(</span><span class="va">dctx</span><span class="op">.</span><span class="va">data</span><span class="op">,</span> <span class="va">ctx</span><span class="op">.</span><span class="va">float</span><span class="op">.</span><span class="va">id</span><span class="op">,</span> <span class="va">json</span><span class="op">)</span></span>
-<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
-<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
-<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Because this type declares format_link, float.raw_content arrives</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- with its CommonSpec links already rewritten to [[href{tip} text]].</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">prepare_task</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">dctx</span><span class="op">)</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">float</span>     <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">float</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">build_dir</span> <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">build_dir</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">content</span>   <span class="op">=</span> <span class="va">float</span><span class="op">.</span><span class="va">raw_content</span> <span class="kw">or</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">hash</span>      <span class="op">=</span> <span class="va">pandoc</span><span class="op">.</span>sha1<span class="op">(</span><span class="va">content</span><span class="op">)</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">diagrams</span>  <span class="op">=</span> <span class="va">build_dir</span> <span class="op">..</span> <span class="st">&quot;/diagrams&quot;</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">puml_file</span> <span class="op">=</span> <span class="va">diagrams</span> <span class="op">..</span> <span class="st">&quot;/&quot;</span> <span class="op">..</span> <span class="va">hash</span> <span class="op">..</span> <span class="st">&quot;.puml&quot;</span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">svg_file</span>  <span class="op">=</span> <span class="va">diagrams</span> <span class="op">..</span> <span class="st">&quot;/&quot;</span> <span class="op">..</span> <span class="va">hash</span> <span class="op">..</span> <span class="st">&quot;.svg&quot;</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>            <span class="va">task_runner</span><span class="op">.</span>ensure_dir<span class="op">(</span><span class="va">diagrams</span><span class="op">)</span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>            <span class="va">task_runner</span><span class="op">.</span>write_file<span class="op">(</span><span class="va">puml_file</span><span class="op">,</span> <span class="va">content</span><span class="op">)</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>            <span class="co">-- PNG (DOCX, LaTeX, Markdown) first, then SVG (clickable links in HTML)</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="op">{</span></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>                <span class="va">cmd</span> <span class="op">=</span> <span class="st">&quot;sh&quot;</span><span class="op">,</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>                <span class="va">args</span> <span class="op">=</span> <span class="op">{</span> <span class="st">&quot;-c&quot;</span><span class="op">,</span> <span class="st">&#39;plantuml -tpng &quot;$1&quot; &amp;&amp; plantuml -tsvg &quot;$1&quot;&#39;</span><span class="op">,</span> <span class="st">&quot;sh&quot;</span><span class="op">,</span> <span class="va">puml_file</span> <span class="op">},</span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>                <span class="va">opts</span> <span class="op">=</span> <span class="op">{</span> <span class="va">timeout</span> <span class="op">=</span> <span class="dv">30000</span> <span class="op">},</span></span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>                <span class="va">output_path</span> <span class="op">=</span> <span class="va">svg_file</span><span class="op">,</span>   <span class="co">-- cache key: written last, so both files exist</span></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>                <span class="va">context</span> <span class="op">=</span> <span class="op">{</span> <span class="va">float</span> <span class="op">=</span> <span class="va">float</span><span class="op">,</span> <span class="va">hash</span> <span class="op">=</span> <span class="va">hash</span> <span class="op">},</span></span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>            <span class="op">}</span></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- DATA: write the resolved AST. dctx.subject carries</span></span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- { task, success, stdout, stderr }. dctx.data is the SpecIR database.</span></span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>        <span class="va">handle_result</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">dctx</span><span class="op">)</span></span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">task</span> <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">task</span></span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">ctx</span>  <span class="op">=</span> <span class="va">task</span><span class="op">.</span><span class="va">context</span></span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">success</span> <span class="cf">then</span></span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>                <span class="va">dctx</span><span class="op">.</span><span class="va">log</span><span class="op">.</span>warn<span class="op">(</span><span class="st">&quot;PlantUML failed: %s&quot;</span><span class="op">,</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">stderr</span><span class="op">)</span></span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span></span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>            <span class="cf">end</span></span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">json</span> <span class="op">=</span> <span class="fu">string.format</span><span class="op">(</span></span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>                <span class="st">&#39;{&quot;png_paths&quot;:[&quot;diagrams/%s.png&quot;],&quot;svg_paths&quot;:[&quot;diagrams/%s.svg&quot;]}&#39;</span><span class="op">,</span></span>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>                <span class="va">ctx</span><span class="op">.</span><span class="va">hash</span><span class="op">,</span> <span class="va">ctx</span><span class="op">.</span><span class="va">hash</span><span class="op">)</span></span>
+<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a>            <span class="va">float_base</span><span class="op">.</span>update_resolved_ast<span class="op">(</span><span class="va">dctx</span><span class="op">.</span><span class="va">data</span><span class="op">,</span> <span class="va">ctx</span><span class="op">.</span><span class="va">float</span><span class="op">.</span><span class="va">id</span><span class="op">,</span> <span class="va">json</span><span class="op">)</span></span>
+<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- DATA: write one resolved CommonSpec link in PlantUML syntax.</span></span>
+<span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- dctx.subject carries { href, display_text }. Brackets and braces</span></span>
+<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- would end the PlantUML link early, and backslashes start escapes,</span></span>
+<span id="cb18-59"><a href="#cb18-59" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- so they are dropped or replaced; the URL ends at a space.</span></span>
+<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a>        <span class="va">format_link</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">dctx</span><span class="op">)</span></span>
+<span id="cb18-61"><a href="#cb18-61" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">text</span> <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">display_text</span><span class="op">:</span><span class="fu">gsub</span><span class="op">(</span><span class="st">&quot;[%[%]{}]&quot;</span><span class="op">,</span> <span class="st">&quot;&quot;</span><span class="op">):</span><span class="fu">gsub</span><span class="op">(</span><span class="st">&quot;</span><span class="sc">\\</span><span class="st">&quot;</span><span class="op">,</span> <span class="st">&quot;/&quot;</span><span class="op">)</span></span>
+<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">href</span> <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">href</span><span class="op">:</span><span class="fu">gsub</span><span class="op">(</span><span class="st">&quot; &quot;</span><span class="op">,</span> <span class="st">&quot;%%20&quot;</span><span class="op">)</span></span>
+<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="fu">string.format</span><span class="op">(</span><span class="st">&quot;[[%s{%s} %s]]&quot;</span><span class="op">,</span> <span class="va">href</span><span class="op">,</span> <span class="va">text</span><span class="op">,</span> <span class="va">text</span><span class="op">)</span></span>
+<span id="cb18-64"><a href="#cb18-64" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb18-65"><a href="#cb18-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-66"><a href="#cb18-66" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- DATA: blank out comments so links in them are not registered.</span></span>
+<span id="cb18-67"><a href="#cb18-67" aria-hidden="true" tabindex="-1"></a>        <span class="co">-- Keep length and newlines: link line numbers come from this text.</span></span>
+<span id="cb18-68"><a href="#cb18-68" aria-hidden="true" tabindex="-1"></a>        <span class="va">mask_comments</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">dctx</span><span class="op">)</span></span>
+<span id="cb18-69"><a href="#cb18-69" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="kw">function</span> blank<span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="cf">return</span> <span class="op">(</span><span class="va">s</span><span class="op">:</span><span class="fu">gsub</span><span class="op">(</span><span class="st">&quot;[^</span><span class="sc">\n</span><span class="st">]&quot;</span><span class="op">,</span> <span class="st">&quot; &quot;</span><span class="op">))</span> <span class="kw">end</span></span>
+<span id="cb18-70"><a href="#cb18-70" aria-hidden="true" tabindex="-1"></a>            <span class="kw">local</span> <span class="va">text</span> <span class="op">=</span> <span class="va">dctx</span><span class="op">.</span><span class="va">subject</span><span class="op">.</span><span class="va">raw_content</span><span class="op">:</span><span class="fu">gsub</span><span class="op">(</span><span class="st">&quot;/&#39;.-&#39;/&quot;</span><span class="op">,</span> <span class="va">blank</span><span class="op">)</span></span>
+<span id="cb18-71"><a href="#cb18-71" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="op">(</span><span class="va">text</span><span class="op">:</span><span class="fu">gsub</span><span class="op">(</span><span class="st">&quot;[^</span><span class="sc">\n</span><span class="st">]+&quot;</span><span class="op">,</span> <span class="kw">function</span><span class="op">(</span><span class="va">line</span><span class="op">)</span></span>
+<span id="cb18-72"><a href="#cb18-72" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="va">line</span><span class="op">:</span><span class="fu">match</span><span class="op">(</span><span class="st">&quot;^%s*&#39;&quot;</span><span class="op">)</span> <span class="cf">then</span> <span class="cf">return</span> blank<span class="op">(</span><span class="va">line</span><span class="op">)</span> <span class="cf">end</span></span>
+<span id="cb18-73"><a href="#cb18-73" aria-hidden="true" tabindex="-1"></a>            <span class="kw">end</span><span class="op">))</span></span>
+<span id="cb18-74"><a href="#cb18-74" aria-hidden="true" tabindex="-1"></a>        <span class="kw">end</span><span class="op">,</span></span>
+<span id="cb18-75"><a href="#cb18-75" aria-hidden="true" tabindex="-1"></a>    <span class="op">},</span></span>
+<span id="cb18-76"><a href="#cb18-76" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <a id="csv-tbl-model-task-descriptor" class="bookmark"></a>
 <figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> Task descriptor returned by prepare_task</figcaption>
 <table>
@@ -1538,7 +1590,126 @@ so input changes trigger a fresh render.</td>
 </tr>
 </tbody>
 </table>
-<h1 data-number="13" data-pos="881:1-882:1" id="SPEC-sec13"><span class="header-section-number">13</span> Project integration</h1>
+<div data-pos="916:1-917:1">
+<p>The <code data-pos="916:5-916:19">resolved_ast</code> of an image
+float lists <code data-pos="916:44-916:55">png_paths</code> and,
+optionally, <code data-pos="916:73-916:84">svg_paths</code>, relative to
+the build directory. EMIT uses the PNG for DOCX, LaTeX, and Markdown.
+When an SVG is present, the image carries its path in an <code data-pos="916:225-916:230">svg</code> attribute that only HTML output
+sees (the emitter removes it for every other format), and the HTML
+filter inlines the SVG so that links inside it navigate.</p>
+</div>
+<h2 data-number="12.1" data-pos="918:1-919:1" id="SPEC-sec12.1"><span class="header-section-number">12.1</span> Links in float source</h2>
+<div data-pos="920:1-921:1">
+<p>A float type whose source is plain text (not Markdown) can let
+authors write CommonSpec links in it, such as <code data-pos="920:110-920:136">Foo --&gt; Bar : [SEC-2](@)</code>. Declaring
+the <code data-pos="920:152-920:165">format_link</code> data hook turns
+this on. The pipeline then:</p>
+</div>
+<div data-pos="922:1-927:1">
+<ol type="1">
+<li><div data-pos="922:1-923:1">
+Registers each <code data-pos="922:19-922:33">[text](@...)</code> /
+<code data-pos="922:36-922:50">[text](#...)</code> in the source as a
+relation of the float’s parent object, at its exact line (INITIALIZE).
+</div></li>
+<li><div data-pos="923:1-924:1">
+Resolves it with the same rules and diagnostics as a body link
+(RESOLVE).
+</div></li>
+<li><div data-pos="924:1-926:1">
+Calls <code data-pos="924:10-924:23">format_link</code> once per link
+and replaces the link with the returned string, before <code data-pos="924:93-924:107">prepare_task</code> (TRANSFORM). The render
+cache therefore keys on the rewritten source.
+</div></li>
+</ol>
+</div>
+<a id="csv-tbl-model-format-link" class="bookmark"></a>
+<figcaption class="caption caption-table"><span class="caption-label">Table <span class="caption-num" data-counter="table"></span>: </span> The format_link hook contract</figcaption>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>ctx.subject.href</code></td>
+<td style="text-align: left;">Resolved target: <code>#anchor</code> in
+the same document, or <code>{spec}.ext#anchor</code> in another
+document. The output filter replaces <code>.ext</code> with the output
+extension. For an unresolved <code>@</code> or <code>#</code> link, it
+is the same fallback anchor a body link gets.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>ctx.subject.display_text</code></td>
+<td style="text-align: left;">The text a body link to the same target
+shows (e.g. “Figure 3”), with the specification prefix for another
+document. For an unresolved link, it is the authored text.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Return value</td>
+<td style="text-align: left;">A string in the tool’s own hyperlink
+syntax that replaces the link in the source.</td>
+</tr>
+</tbody>
+</table>
+<div data-pos="940:1-941:1">
+<p>Citation links (<code data-pos="940:17-940:24">@cite</code>, <code data-pos="940:26-940:34">@citep</code>) have no target anchor, so the
+pipeline leaves them verbatim and does not call the hook for them. A
+link preceded by <code data-pos="940:152-940:155">~</code> is literal
+text: it is neither registered nor rewritten (<code data-pos="940:213-940:216">~</code> is PlantUML’s escape, so the diagram
+shows the plain text). To ignore links inside the tool’s comments, also
+declare <code data-pos="940:334-940:349">mask_comments</code>;
+registration then scans its result.</p>
+</div>
+<h1 data-number="13" data-pos="942:1-943:1" id="SPEC-sec13"><span class="header-section-number">13</span> Migrating models</h1>
+<div data-pos="944:1-945:1">
+<p>Existing models keep working without changes. Use this list to check
+yours.</p>
+</div>
+<div data-pos="946:1-955:1">
+<ol type="1">
+<li><div data-pos="946:1-947:1">
+<strong>Override of PLANTUML with <code data-pos="946:32-946:44">hooks = {}</code>, or a type that <code data-pos="946:61-946:70">extends</code> PLANTUML:</strong> nothing to
+do. The type keeps or inherits every default hook, so it gets diagram
+links and the SVG rendition automatically.
+</div></li>
+<li><div data-pos="947:1-948:1">
+<strong>Override with your own <code data-pos="947:29-947:43">prepare_task</code> and <code data-pos="947:48-947:63">handle_result</code>:</strong> nothing breaks;
+output stays PNG, and the source already arrives with links rewritten.
+To get clickable links in HTML, also render an SVG and add <code data-pos="947:213-947:232">&quot;svg_paths&quot;:[...]</code> to the <code data-pos="947:240-947:254">resolved_ast</code>.
+</div></li>
+<li><div data-pos="948:1-949:1">
+<strong>Override of <code data-pos="948:18-948:32">prepare_task</code>
+only:</strong> keep <code data-pos="948:46-948:52">hash</code> and <code data-pos="948:57-948:72">diagrams_path</code> (and, optionally, <code data-pos="948:91-948:105">relative_dir</code> and <code data-pos="948:110-948:125">relative_path</code>) in <code data-pos="948:130-948:144">task.context</code>, and keep a PNG <code data-pos="948:161-948:174">output_path</code>. The default <code data-pos="948:188-948:203">handle_result</code> then still finds the
+PNG.
+</div></li>
+<li><div data-pos="949:1-950:1">
+<strong>Model <code data-pos="949:12-949:22">html.lua</code> that
+replaces the default filter:</strong> the diagram shows as the PNG. To
+get clickable links, port the default filter’s handling of images with
+an <code data-pos="949:166-949:171">svg</code> attribute (<code data-pos="949:183-949:195">inline_svg</code>).
+</div></li>
+<li><div data-pos="950:1-951:1">
+<strong>Model <code data-pos="950:12-950:22">base.css</code> or <code data-pos="950:26-950:38">sidebar.js</code> overrides:</strong> add the
+<code data-pos="950:60-950:121">svg.speccompiler-diagram { max-width: 100%; height: auto; }</code>
+rule, and find the clicked anchor with <code data-pos="950:161-950:175">closest(&#39;a&#39;)</code>, reading <code data-pos="950:185-950:191">href</code> or <code data-pos="950:195-950:207">xlink:href</code>.
+</div></li>
+<li><div data-pos="951:1-952:1">
+<strong>Traceability or coverage queries:</strong> a diagram link is an
+ordinary relation of the enclosing object, so it counts like a body
+link. Use <code data-pos="951:141-951:162">COUNT(DISTINCT ...)</code>
+where a body link and a diagram link to the same target must count once.
+</div></li>
+<li><div data-pos="952:1-954:1">
+<strong>Other source-based float types:</strong> declare <code data-pos="952:48-952:61">format_link</code> (and <code data-pos="952:67-952:82">mask_comments</code> for the tool’s comment
+syntax) to opt in.
+</div></li>
+</ol>
+</div>
+<h1 data-number="14" data-pos="954:1-955:1" id="SPEC-sec14"><span class="header-section-number">14</span> Project integration</h1>
 <a id="listing-src-model-project-yaml" class="bookmark"></a>
 <figcaption class="caption caption-listing"><span class="caption-label">Listing <span class="caption-num" data-counter="listing"></span>: </span> Using a custom model in project.yaml</figcaption>
 <div class="sourceCode" id="cb19"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">project</span><span class="kw">:</span></span>
@@ -1549,43 +1720,43 @@ so input changes trigger a fresh render.</td>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">doc_files</span><span class="kw">:</span></span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> srs.md</span></span></code></pre></div>
-<h1 data-number="14" data-pos="894:1-895:1" id="SPEC-sec14"><span class="header-section-number">14</span> Troubleshooting</h1>
-<div data-pos="896:1-897:1">
+<h1 data-number="15" data-pos="967:1-968:1" id="SPEC-sec15"><span class="header-section-number">15</span> Troubleshooting</h1>
+<div data-pos="969:1-970:1">
 <p><strong>A type does not load.</strong> Check the file location and
 returned descriptor. The kind must match its category directory.
 Type-load errors stop the build. View module load errors produce
 warnings.</p>
 </div>
-<div data-pos="898:1-899:1">
+<div data-pos="971:1-972:1">
 <p><strong>The host rejects a hook.</strong> Check that the hook is
-valid for the descriptor kind. Put all custom behavior in <code data-pos="898:111-898:118">hooks</code>.</p>
+valid for the descriptor kind. Put all custom behavior in <code data-pos="971:111-971:118">hooks</code>.</p>
 </div>
-<div data-pos="900:1-901:1">
+<div data-pos="973:1-974:1">
 <p><strong>An overlay does not replace a type.</strong> Use the same
-case-sensitive <code data-pos="900:69-900:80">schema.id</code> and kind
+case-sensitive <code data-pos="973:69-973:80">schema.id</code> and kind
 as the base descriptor.</p>
 </div>
-<div data-pos="902:1-903:1">
-<p><strong>A render hook produces no output.</strong> A <code data-pos="902:41-902:53">TABLE_VIEW</code> subtype must declare <code data-pos="902:75-902:88">build_block</code>. An object hook that returns
-<code data-pos="902:118-902:123">nil</code> retains the original
+<div data-pos="975:1-976:1">
+<p><strong>A render hook produces no output.</strong> A <code data-pos="975:41-975:53">TABLE_VIEW</code> subtype must declare <code data-pos="975:75-975:88">build_block</code>. An object hook that returns
+<code data-pos="975:118-975:123">nil</code> retains the original
 element. Return the generated blocks to replace it.</p>
 </div>
-<div data-pos="904:1-905:1">
+<div data-pos="977:1-978:1">
 <p><strong>An external renderer runs for unchanged input.</strong>
-Include the content hash in <code data-pos="904:80-904:93">output_path</code> to use the file cache.</p>
+Include the content hash in <code data-pos="977:80-977:93">output_path</code> to use the file cache.</p>
 </div>
-<h1 data-number="15" data-pos="906:1-907:1" id="SPEC-sec15"><span class="header-section-number">15</span> Pointers</h1>
-<div data-pos="908:1-911:1">
+<h1 data-number="16" data-pos="979:1-980:1" id="SPEC-sec16"><span class="header-section-number">16</span> Pointers</h1>
+<div data-pos="981:1-984:1">
 <ul>
-<li><div data-pos="908:1-909:1">
-<a href="../manual.md" data-pos="908:3-908:30">User manual</a> —
+<li><div data-pos="981:1-982:1">
+<a href="../manual.md" data-pos="981:3-981:30">User manual</a> —
 day-to-day authoring syntax.
 </div></li>
-<li><div data-pos="909:1-910:1">
-Engineering docs — the <a href="../../engineering_docs/architecture/type_system.md" data-pos="909:26-909:95">type system SDD</a> defines the contract. <a href="../../engineering_docs/architecture/type_discovery_design.md" data-pos="909:118-909:196">Type discovery</a> and <a href="../../engineering_docs/architecture/model_design.md" data-pos="909:201-909:268">model design</a> define internal behavior.
+<li><div data-pos="982:1-983:1">
+Engineering docs — the <a href="../../engineering_docs/architecture/type_system.md" data-pos="982:26-982:95">type system SDD</a> defines the contract. <a href="../../engineering_docs/architecture/type_discovery_design.md" data-pos="982:118-982:196">Type discovery</a> and <a href="../../engineering_docs/architecture/model_design.md" data-pos="982:201-982:268">model design</a> define internal behavior.
 </div></li>
-<li><div data-pos="910:1-911:1">
-<a href="../../engineering_docs/dictionary/concepts.md" data-pos="910:3-910:71">Concepts dictionary</a> — vocabulary reference.
+<li><div data-pos="983:1-984:1">
+<a href="../../engineering_docs/dictionary/concepts.md" data-pos="983:3-983:71">Concepts dictionary</a> — vocabulary reference.
 </div></li>
 </ul>
 </div>
