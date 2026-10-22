@@ -108,6 +108,15 @@ return function(actual_doc, helpers)
             "body link %s: expected display '%s', got '%s'", target, display, tostring(body_display[target])))
     end
 
+    -- PlantUML versions order <a> attributes differently (href first, or
+    -- target first), so match the href inside any <a> start tag
+    local function has_anchor(svg, href)
+        for tag in (svg or ""):gmatch("<a [^>]*>") do
+            if contains(tag, ' href="' .. href .. '"') then return true end
+        end
+        return false
+    end
+
     -- ------------------------------------------------------------------
     -- Emitted diagrams: Para/Image with the PNG (no wrapper Div and no svg
     -- attribute outside HTML); the SVG rendition sits next to it on disk
@@ -171,11 +180,11 @@ return function(actual_doc, helpers)
     -- ------------------------------------------------------------------
     if arch and arch.svg then
         for _, href in ipairs({ "#SEC-DET", "#SEC-OVR", "#SEC-DET-puml-seq" }) do
-            check(contains(arch.svg, '<a href="' .. href .. '"'), "arch SVG missing <a href=\"" .. href .. "\">")
+            check(has_anchor(arch.svg, href), "arch SVG missing <a href=\"" .. href .. "\">")
         end
     end
     if seq and seq.svg then
-        check(contains(seq.svg, '<a href="#SEC-OVR-puml-arch"'), "seq SVG missing <a href=\"#SEC-OVR-puml-arch\">")
+        check(has_anchor(seq.svg, "#SEC-OVR-puml-arch"), "seq SVG missing <a href=\"#SEC-OVR-puml-arch\">")
     end
 
     -- ------------------------------------------------------------------

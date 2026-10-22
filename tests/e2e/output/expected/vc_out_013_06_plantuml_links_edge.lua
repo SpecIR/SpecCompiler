@@ -122,7 +122,10 @@ return function(_, helpers)
             "escaped link must render literally without the ~")
         check(contains(src, 'participant "Foo\\nBox" as Foo [[#SEC-2{Details} Details]]'),
             "participant link not lowered after the alias:\n" .. src)
-        local box = svg:match('<a href="#SEC%-2"[^>]*>(.-)</a>')
+        local box  -- <a> attribute order differs across PlantUML versions
+        for tag, inner in svg:gmatch("(<a [^>]*>)(.-)</a>") do
+            if contains(tag, ' href="#SEC-2"') then box = inner break end
+        end
         check(box and box:find("<rect") and box:find(">Foo<") and box:find(">Box<"),
             "participant box (rect + authored name) is not wrapped by the link")
     end

@@ -151,7 +151,10 @@ return function(actual_doc, helpers)  -- luacheck: ignore actual_doc
         .. 'contentStyleType="text/css" height="120px" preserveAspectRatio="none" '
         .. 'style="width:236px;height:120px;background:#FFFFFF;" version="1.1" viewBox="0 0 236 120" width="236px">'
         .. '<a href="b.ext#X" target="_top" title="b: X" xlink:href="b.ext#X" xlink:show="new">'
-        .. '<text>b: X</text></a></svg>'))
+        .. '<text>b: X</text></a>'
+        -- PlantUML 1.2026+ writes target before href
+        .. '<a target="_top" href="b.ext#Y" xlink:href="b.ext#Y" xlink:show="new" title="b: Y">'
+        .. '<text>b: Y</text></a></svg>'))
     local function image_doc(attrs)
         return pandoc.Pandoc({ pandoc.Para({
             pandoc.Image({}, "diagrams/d.png", "", pandoc.Attr("", {}, attrs)) }) })
@@ -171,6 +174,8 @@ return function(actual_doc, helpers)  -- luacheck: ignore actual_doc
         check(not contains(svg, "<?xml"), "XML prolog kept")
         check(contains(svg, 'href="b.html#X"') and contains(svg, 'xlink:href="b.html#X"'),
             ".ext placeholder not replaced in href/xlink:href")
+        check(contains(svg, '<a href="b.html#Y" xlink:href="b.html#Y"'),
+            "target-first <a> (PlantUML 1.2026+) not normalised: " .. svg)
         check(not contains(svg, ".ext#"), ".ext placeholder left in svg")
         check(not contains(svg, 'target="_top"') and not contains(svg, 'xlink:show="new"'),
             "target/xlink:show not removed")
