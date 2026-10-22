@@ -86,13 +86,13 @@ Compatibility) normalizes Pandoc source position data across API versions.
 skinparam backgroundColor #FFFFFF
 skinparam sequenceMessageAlign center
 
-participant "CSU Build Engine" as E
-participant "CSU Pipeline\nOrchestrator" as P
-participant "CSC-010 Initialize\nHandlers" as INIT
-participant "CSC-008 Analyze\nHandlers" as ANLZ
-participant "CSC-012 Transform\nHandlers" as XFRM
-participant "CSC-009 Emit\nHandlers" as EMIT_H
-participant "CSU Data Manager" as DB
+participant "CSU Build Engine" as E [CSU-005](@)
+participant "CSU Pipeline\nOrchestrator" as P [CSU-006](@)
+participant "CSC-010 Initialize\nHandlers" as INIT [CSC-010](@)
+participant "CSC-008 Analyze\nHandlers" as ANLZ [CSC-008](@)
+participant "CSC-012 Transform\nHandlers" as XFRM [CSC-012](@)
+participant "CSC-009 Emit\nHandlers" as EMIT_H [CSC-009](@)
+participant "CSU Data Manager" as DB [CSU-012](@)
 
 E -> P: execute(walkers)
 

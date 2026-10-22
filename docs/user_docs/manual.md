@@ -422,6 +422,34 @@ Active --> Inactive
 ```
 ````
 
+##### Links inside diagrams
+
+PlantUML diagrams can contain the same links as body text. Write `[PID](@)` or `[type:label](#)` wherever PlantUML accepts text, such as a message, a note, or a label:
+
+````src.markdown:src-plantuml-links{caption="Links inside a PlantUML diagram"}
+```puml:arch{caption="Architecture"}
+@startuml
+Client --> Server : see [SEC-2](@)
+note right of Server : [fig:overview](#) and [SRS-001](@)
+@enduml
+```
+````
+
+The links resolve like body links. They use the same targets, the same display text (for example "Figure 2" for a float, or a section title, prefixed with the specification name when the target is in another document), and the same cross-document behaviour. SpecCompiler writes each resolved link into PlantUML's `[[...]]` hyperlink syntax before rendering, so the diagram shows the display text.
+
+- **HTML5**: The diagram is an inline SVG. Each link navigates to its target, both in the per-specification page and in the web application (`index.html`).
+- **DOCX, LaTeX, Markdown**: The diagram is a PNG image. It shows the display text, but the links are not clickable.
+
+Limitations:
+
+- A link is clickable only where PlantUML supports its `[[...]]` hyperlink syntax.
+- To make a sequence-diagram participant (a column) clickable, put the link after its alias: `participant "Data\nManager" as DB [CSU-012](@)`. The whole box becomes the link and keeps its name. Writing the link as the name itself (`participant "[CSU-012](@)" as DB`) also works, but only the text is clickable and the box shows the resolved title.
+- Citations (`[key](@cite)`, `[key](@citep)`) are not resolved inside diagrams. Their text stays verbatim.
+- The link text cannot contain brackets or line breaks. The characters `[`, `]`, `{`, and `}` are removed from the displayed text, and `\` is shown as `/`.
+- An unresolved link raises `unresolved_relation` at the exact line of the link in the `.md` file, with the same severity as in body text.
+- Links inside PlantUML comments (`' ...` and `/' ... '/`) are ignored, like links inside HTML comments in body text.
+- To write text that only looks like a link, prefix it with `~` (PlantUML's escape): `~[click here](#)` is shown as `[click here](#)` and is not checked.
+
 #### Mermaid Diagram
 
 ````src.markdown:src-mermaid-float-syntax{caption="Mermaid float syntax"}
@@ -1095,6 +1123,16 @@ Analyze-query diagnostics default to `error`. Set a key to `warn` to continue th
 specc clean
 specc build
 ```
+
+### Upgrading to SVG Diagrams
+
+Versions before diagram links rendered PlantUML only to PNG. After upgrading:
+
+1. Delete the `build/` directory once (at least `build/specir.db` and `build/diagrams/`). Unchanged documents are otherwise served from the build cache with their old PNG-only diagrams until they are edited.
+2. Check diagrams for text that looks like a link but is not one, such as `[click here](#)`. It is now resolved, and an unresolved link stops the build. Prefix it with `~`.
+3. Expect traceability and coverage views to count links written inside diagrams, exactly like body links.
+
+Model authors: see *Migrating models* in the model creation guide.
 
 ## Type System and Models
 

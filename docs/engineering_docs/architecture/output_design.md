@@ -4,7 +4,7 @@
 
 > traceability: [SF-004](@)
 
-**Allocation:** Realized by [CSC-012](@) (Transform Handlers) and [CSC-009](@) (Emit Handlers) through [CSU-060](@) (External Render Handler) and [CSU-037](@) (Emitter Orchestrator). Output infrastructure is provided by [CSC-004](@) (Infrastructure), with format-specific utilities in [CSC-013](@) (Format Utilities), DOCX generation in [CSC-014](@) (DOCX Generation), I/O operations in [CSC-015](@) (I/O Utilities), and external process management in [CSC-016](@) (Process Management).
+**Allocation:** Realized by [CSC-012](@) (Transform Handlers) and [CSC-009](@) (Emit Handlers) through [CSU-060](@) (External Render Handler) and [CSU-037](@) (Emitter Orchestrator). Output infrastructure is provided by [CSC-004](@) (Infrastructure), with format-specific utilities in [CSC-013](@) (Format Utilities), DOCX generation in [CSC-014](@) (DOCX Generation), I/O operations in [CSC-015](@) (I/O Utilities), and external process management in [CSC-016](@) (Process Management). Links inside diagram float source are resolved through [CSU-165](@) (Relation Lookup) and [CSU-166](@) (Source Links) in [CSC-011](@) (Shared Pipeline Utilities).
 
 The multi-format publication function encompasses the TRANSFORM and EMIT pipeline phases,
 covering content rendering, external subprocess rendering,
@@ -23,7 +23,9 @@ on the serialized render input.
 - [CSU-060](@): Coordinates parallel subprocess rendering for float types
   requiring external tools (PlantUML, ECharts, Math). Prepares tasks via renderer callbacks,
   checks output cache for hits, and spawns remaining tasks in parallel via luv `spawn_batch()`.
-  Results update `resolved_ast` with output paths.
+  Results update `resolved_ast` with output paths. Before preparing a task for a float type
+  that declares a `format_link` hook, it lowers the CommonSpec links in the float source into
+  the type's native hyperlink syntax (see Diagram Hyperlinks below).
 
 - [CSU-062](@): Invokes type-specific handlers for each spec_object
   (ordered by file_seq). Type handlers provide `header()` and `body()` functions dispatched
@@ -74,6 +76,20 @@ fulfilling multi-format output requirements:
   JSON files after generation completes. Format-specific postprocessors run after Pandoc
   generation: DOCX postprocessing applies style fixups via OOXML manipulation, and HTML5
   postprocessing bundles assets for web application deployment.
+
+**Diagram Hyperlinks**: CommonSpec links written inside a diagram float's source
+(e.g. `Foo --> Bar : see [SEC-2](@)` in a PlantUML block) travel the same relation path as
+body links. [CSU-048](@) registers them in INITIALIZE as links of the float's parent object,
+using [CSU-166](@) to find them in the raw text. The type's optional `mask_comments` hook
+blanks the tool's comments first, and a link preceded by `~` is literal text. RESOLVE treats
+the links like any other link. In TRANSFORM, [CSU-060](@) looks each link up in [CSU-165](@)
+(the lookup that [CSU-162](@) uses for body links) and replaces it with the output of the
+type's `format_link` hook. PlantUML ([CSU-112](@)) emits `[[href{tooltip} label]]` and
+renders the rewritten source to PNG and then SVG. In EMIT, [CSU-040](@) and [CSU-035](@)
+keep the float as the PNG image and add the SVG path as the image's `svg` attribute.
+[CSU-037](@) removes that attribute for every non-HTML format, and the HTML filter
+([CSU-084](@)) replaces the image with the inline SVG so its anchors navigate.
+The rationale is recorded in [DD-CORE-008](@).
 
 **Infrastructure Support**: The Pandoc CLI wrapper ([CSU-079](@)) builds command arguments for multiple
 output formats (docx, html5, markdown, json) with reference document, bibliography, and
@@ -135,58 +151,67 @@ and batch Pandoc output generation.
 skinparam backgroundColor #FFFFFF
 skinparam sequenceMessageAlign center
 
-participant "CSU Pipeline\nOrchestrator" as P
-participant "CSC Pipeline Handlers" as H
-participant "CSU Data Manager" as DB
-participant "CSU Task Runner" as T
-participant "CSU Pandoc CLI\nBuilder" as PC
+participant "Pipeline\nOrchestrator" as P [CSU-006](@)
+participant "Pipeline\nHandlers" as H [CSC-003](@)
+participant "Data\nManager" as DB [CSU-012](@)
+participant "Task\nRunner" as T [CSU-080](@)
+participant "Pandoc CLI\nBuilder" as PC [CSU-079](@)
 
 == TRANSFORM Phase ==
-P -> H: CSU View Materializer
-H -> DB: SELECT/UPDATE spec_views
-note right: Pre-compute TOC, LOF,\nabbrev lists as JSON
+P -> H: [CSU-039](@)
+H -> DB: UPDATE spec_floats SET number
+note right: First: link display text\n("Figure 3") needs the numbers
 
-P -> H: CSU Float Transformer
+P -> H: [CSU-061](@)
 H -> DB: UPDATE spec_floats.resolved_ast
 
-P -> H: CSU External Render Handler
-H -> T: spawn_batch(plantuml, echarts, math)
+P -> H: [CSU-060](@)
+H -> DB: SELECT resolved relations ([CSU-165](@))
+H -> H: rewrite diagram links ([CSU-166](@))
+note right: Diagram links lowered before render:\n[HLR-OUT-008](@), [DD-CORE-008](@)
+H -> T: spawn_batch(plantuml -tpng && -tsvg, ...)
 T --> H: results[]
-H -> DB: UPDATE resolved_ast with output paths
+H -> DB: UPDATE resolved_ast (png_paths, svg_paths)
 
-P -> H: CSU Specification Render Handler
-H -> DB: UPDATE specifications.header_ast
+P -> H: [CSU-162](@)
+H -> DB: UPDATE object, attribute, float ASTs (rewrite links)
 
-P -> H: CSU Object Render Handler
-H -> DB: SELECT spec_objects ORDER BY file_seq
+P -> H: [CSU-062](@)
 loop for each object
-    H -> H: type_handler.header() + body()
+    H -> H: type render hook (header + body)
     H -> DB: UPDATE spec_objects.ast
 end
 
-P -> H: CSU Relation Link Rewriter
-H -> DB: UPDATE spec_objects.ast (rewrite links)
+P -> H: [CSU-063](@)
+H -> DB: UPDATE specifications.header_ast
+
+P -> H: [CSU-114](@)
+H -> DB: UPDATE ASTs (citation links to Cite)
+
+== ANALYZE Phase ==
+P -> H: [CSU-031](@)
+H -> DB: SELECT verification views
+note right: Errors abort before EMIT
 
 == EMIT Phase ==
-P -> H: CSU FTS Indexer
+P -> H: [CSU-041](@)
 H -> DB: INSERT INTO fts_objects, fts_attributes, fts_floats
 
-P -> H: CSU Float Numbering
-H -> DB: UPDATE spec_floats SET number
-
-P -> H: CSU Emitter Orchestrator (batch)
+P -> H: [CSU-037](@)
 loop for each specification
-    H -> H: assemble_document(spec_id)
-    H -> H: resolve_floats + transform_floats
-    H -> H: apply format filters
+    H -> H: assemble document ([CSU-034](@))
+    H -> H: resolve and emit floats ([CSU-040](@), [CSU-035](@))
+    H -> H: render views live ([CSU-036](@))
+    H -> H: drop svg attribute for non-HTML,\napply format filters ([CSU-084](@))
 end
 
 H -> T: spawn_batch(pandoc tasks)
 note right: Parallel output\ngeneration via luv
-T -> PC: pandoc convert (docx, html5)
+T -> PC: pandoc convert (docx, html5, ...)
 PC --> T: output files
 
-H -> H: run postprocessors
+H -> H: run postprocessors ([CSU-125](@))
+note right: Phase order: [puml:fd-001-pipeline](#)
 @enduml
 ```
 
@@ -310,6 +335,54 @@ Given [dic:spec-object](#) body [dic:abstract-syntax-tree](#), [csu:fts-indexer]
 
 > traceability: [HLR-OUT-007](@)
 
+#### LLR: Diagram Source Link Registration @LLR-OUT-013-01
+
+Given a [dic:spec-float](#) whose type resolves a `format_link` hook through its `extends` chain and that has a parent object, [csu:relation-parser](#) shall scan the float's raw source with [csu:source-links](#). It shall insert one `spec_relations` row per distinct (selector, link text) pair, with the parent object as source, a NULL source attribute, the float's source file, and a link line equal to the fence line plus the link's 1-based line within the content. A link matches only when its text contains no bracket or newline and its selector starts with `@` or `#`. A link preceded by `~` (PlantUML's escape) is literal text and shall not match. When the type also resolves a `mask_comments` hook, the scan shall run on its result, so links inside the diagram tool's comments are not registered, as Markdown ignores links in HTML comments. Floats without a parent object shall be skipped.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-008](@)
+
+#### LLR: Diagram Link Lowering Before Render @LLR-OUT-013-02
+
+Given a float whose type declares `format_link`, [csu:external-render-handler](#) shall run after float numbering. Before calling `prepare_task`, it shall replace each link in the float source with the return value of `format_link`. The hook receives `subject.href` and `subject.display_text` from [csu:relation-lookup](#), the same lookup that [csu:relation-link-rewriter](#) uses for body links. Same-document targets are `#anchor`, and cross-document targets are `{spec}.ext#anchor`. An unresolved `@` or `#` link shall fall back to the base-selector target and keep the authored text. A link with an extended selector that has no fallback (citations) shall stay verbatim. `prepare_task` shall receive the rewritten source, so the content-addressed render cache keys on the resolved targets and display text.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-008](@)
+
+#### LLR: PlantUML Hyperlink Syntax and Dual Rendition @LLR-OUT-013-03
+
+[csu:plantuml-float-type](#) shall implement `format_link` as `[[href{text} text]]`, with `[`, `]`, `{`, and `}` removed from the display text, `\` replaced by `/`, and spaces in the href encoded as `%20`. It shall implement `mask_comments` by blanking `'` line comments and `/' ... '/` block comments while keeping every newline. It shall render the source to PNG and then to SVG in one task whose `output_path` is the SVG, so a cache hit means both renditions exist and build directories from PNG-only versions re-render once. Its `resolved_ast` shall record `png_paths` and `svg_paths`.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-008](@)
+
+#### LLR: Inline SVG in HTML5 Output @LLR-OUT-013-04
+
+Given an image float result with `svg_paths`, [csu:float-resolver](#) shall pass the SVG paths to [csu:float-emitter](#). The emitter shall add an `svg` attribute holding the SVG path under the build directory to the PNG image, keeping the float's block structure unchanged. [csu:html-filter](#) shall replace that image with the inline `<svg>` markup. It shall strip the XML prolog and doctype, add class `speccompiler-diagram` to the root element, drop the renderer's fixed size, and write the float's `width`/`height` into the root's inline style. It shall rewrite `.ext#` hrefs to `.html#` and remove `target="_top"` and `xlink:show="new"`. When the SVG file cannot be read, the filter shall keep the PNG image.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-008](@)
+
+#### LLR: Web Application Intercepts Diagram Anchors @LLR-OUT-013-05
+
+The cross-document click handler of the single-page web application (`models/default/html/js/sidebar.js`) shall find the clicked anchor with `closest('a')`, read its `href` or `xlink:href` attribute, and decode the document id with `decodeURIComponent`. An `<a>` inside an inline SVG shall therefore navigate between specifications like a body link.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-008](@)
+
+#### LLR: Non-HTML Formats Keep the PNG Rendition @LLR-OUT-013-06
+
+For every output format other than HTML, [csu:emitter-orchestrator](#) shall remove the image's `svg` attribute before the format filter runs. DOCX, LaTeX, Markdown, and JSON output, and every model filter, therefore see the same image element as before the feature. The float renders as the PNG image, which shows the resolved display text.
+
+> verification_method: Test
+
+> traceability: [HLR-OUT-008](@)
+
 ---
 
 ### DD: NDJSON Logging @DD-INFRA-001
@@ -384,3 +457,27 @@ Selected Pandoc as the document parsing and output generation engine.
 > - `--lua-filter` support enables format-specific transformations (docx.lua, html.lua)
 > - Native bibliography support (--bibliography, --csl) for citation processing
 > - Broad ecosystem adoption provides stability and community support
+
+---
+
+### DD: Diagram Links Lowered to Native Hyperlink Syntax @DD-CORE-008
+
+Selected CommonSpec link syntax in diagram source, resolved by the relation infrastructure and lowered into the diagram tool's native hyperlink syntax before rendering, with dual SVG and PNG output.
+
+> rationale: One link syntax and one relation path for body text and diagrams:
+>
+> - Authors write the same `[Target](@)` / `[prefix:label](#)` syntax inside a diagram float. The links are stored as ordinary relations of the float's parent object, so resolution, type inference, display text, cross-document targets, `unresolved_relation` diagnostics, and traceability are identical to body links
+> - A float type opts in by declaring the `format_link` data hook. The host learns nothing diagram-specific, and a model can add the behaviour to another source-based float type
+> - Lowering happens before the render, so the diagram tool lays out the resolved display text ("Figure 3", "b: Remote"). The PNG shows the same text, and the content-addressed render cache invalidates when a target or display text changes
+> - Links inside the diagram tool's comments are ignored, through the optional `mask_comments` hook, as Markdown ignores links in HTML comments. Text that only looks like a link is escaped with PlantUML's own `~`, so authors keep an opt-out without a new attribute
+> - The SVG path travels as an attribute of the PNG image, and the emitter strips it for non-HTML formats. Model filters for every other format see the pre-feature document unchanged
+> - The render task writes the SVG last and the cache checks the SVG. A cache hit then means both renditions exist, and build directories from PNG-only versions re-render once
+> - The only SVG post-processing at HTML emit is layout-safe: href `.ext` to `.html`, removal of `target`/`xlink:show`, and sizing. The SVG is inlined because links in an `<img>` never fire, `--embed-resources` turns SVG images into `data:` URIs, and `<object>` resolves `#anchor` against the SVG file
+> - Consequence: a diagram link counts for type-agnostic traceability checks exactly like a body link (e.g. `traceability_csu_to_fd` counts any FD to CSU relation). Provenance stays recoverable from `from_file` and `link_line`, which fall inside the float's lines
+> - Alternative of PlantUML-native links written by the author (`[[#REQ-001]]`) rejected: it bypasses the relation infrastructure (no resolution, validation, diagnostics, display text, cross-document `.ext` targets, or traceability) and differs from CommonSpec syntax
+> - Alternative of post-processing the generated SVG (wrapping `[X](@)` text nodes in `<a>`) rejected: PlantUML sizes the literal Markdown text, so replacing it with the display text misaligns or overflows the layout. The text is split across `<text>` elements, Creole markup, and wrapped lines. PNG, DOCX, and LaTeX would show the raw link syntax, and the approach breaks when PlantUML's SVG output changes. Its only advantage, a render independent of resolution, does not outweigh these costs
+> - Alternative of EMIT-time href injection through placeholder URLs rejected for now: the display text must be known before layout anyway, and body links are also resolved at TRANSFORM, so cached specifications have the same staleness semantics as Markdown
+> - Alternative of a new relation type (e.g. `DIAGRAM_REF`) rejected: relation types encode what a link means (the selector, source attribute, source type, and target type used by inference), not where it was written. No inference dimension distinguishes a diagram, so the type would need a fake source attribute or selector. It would lose the `XREF_FIGURE`/`XREF_SEC` display text, could not cover both the `@` and `#` resolvers, and gives traceability consumers nothing
+> - Alternative of a marker Div wrapping the PNG paragraph rejected: it changes the float's block structure for every format. It broke the ACM LaTeX filter, which pairs the caption Div with the `Para[Image]` beside it to build `figure*`, `\caption`, and `\label`, and it leaked into gfm and commonmark output
+> - Alternative of caching on the PNG rejected: a build directory from a PNG-only version would count as a hit, so diagrams without links would never gain an SVG until a clean build
+> - Alternative of SVG-only output rejected: DOCX SVG embedding needs `rsvg-convert` for its raster fallback, which the image does not ship, and LaTeX models cannot `\includegraphics` an SVG. The cost of dual output is two PlantUML runs per changed diagram, still parallel across diagrams

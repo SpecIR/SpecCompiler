@@ -246,6 +246,14 @@ M.select_floats_needing_external_render = [[
       AND f.resolved_ast IS NULL
 ]]
 
+-- Where a float's in-source links resolve from: its specification and the
+-- object it sits under (the links' source object)
+M.select_float_link_scope = [[
+    SELECT specification_ref, parent_object_id
+    FROM spec_floats
+    WHERE id = :id
+]]
+
 -- Get views needing external render (resolved_ast is NULL)
 M.select_views_needing_external_render = [[
     SELECT v.id, v.raw_ast, v.view_type_ref as type_ref

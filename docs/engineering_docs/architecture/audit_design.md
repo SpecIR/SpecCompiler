@@ -177,12 +177,12 @@ ambiguous float references.
 skinparam backgroundColor #FFFFFF
 skinparam sequenceMessageAlign center
 
-participant "CSU Build Engine" as E
-participant "CSU Hash Utilities" as H
-participant "CSU Analyze Query Loader" as PL
-participant "CSU Analyze Handler" as VH
-participant "CSU Validation\nPolicy" as VP
-participant "CSU Data Manager" as DB
+participant "CSU Build Engine" as E [CSU-005](@)
+participant "CSU Hash Utilities" as H [CSU-065](@)
+participant "CSU Analyze Query Loader" as PL [CSU-007](@)
+participant "CSU Analyze Handler" as VH [CSU-031](@)
+participant "CSU Validation\nPolicy" as VP [CSU-009](@)
+participant "CSU Data Manager" as DB [CSU-012](@)
 
 == Document Hash Check ==
 E -> H: sha1_file(document_path)

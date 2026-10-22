@@ -80,13 +80,13 @@ font selections for Word output. [csu:html-style-preset](#) (HTML Style Preset) 
 skinparam backgroundColor #FFFFFF
 skinparam sequenceMessageAlign center
 
-participant "CSU Build Engine" as E
-participant "CSU Type Loader" as TL
-participant "CSC-017 Default\nModel" as DM
-participant "CSC-018 Default\nFilters" as FL
-participant "CSC-019 Default\nPostprocessors" as PP
-participant "CSU Data Manager" as DB
-participant "CSU Pipeline" as PL
+participant "CSU Build Engine" as E [CSU-005](@)
+participant "CSU Type Loader" as TL [CSU-008](@)
+participant "CSC-017 Default\nModel" as DM [CSC-017](@)
+participant "CSC-018 Default\nFilters" as FL [CSC-018](@)
+participant "CSC-019 Default\nPostprocessors" as PP [CSC-019](@)
+participant "CSU Data Manager" as DB [CSU-012](@)
+participant "CSU Pipeline" as PL [CSU-006](@)
 
 == Type Loading (overlay default then each model) ==
 E -> TL: load_model(data, pipeline, "default")

@@ -209,6 +209,12 @@ img {
   display: block;
 }
 
+svg.speccompiler-diagram {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 figure {
   margin: 1.5rem 0;
   text-align: center;

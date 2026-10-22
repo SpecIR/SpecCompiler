@@ -11,13 +11,16 @@
 ---@module external_render_handler
 local M = {
     name = "external_render_handler",
-    prerequisites = {"spec_floats_transform"}  -- Runs after spec_floats_transform in TRANSFORM
+    -- float_numbering: in-source links render resolved display text ("Figure 3")
+    prerequisites = {"spec_floats_transform", "float_numbering"}
 }
 
 local task_runner = require("infra.process.task_runner")
 local logger = require("infra.logger")
 local Queries = require("db.queries")
 local hook_ctx = require("pipeline.shared.hook_ctx")
+local relation_lookup = require("pipeline.shared.relation_lookup")
+local source_links = require("pipeline.shared.source_links")
 
 local registry = require("contract.registry")
 
@@ -40,6 +43,36 @@ local function host_renderer(type_ref)
         end
     end
     return nil
+end
+
+---Rewrite the CommonSpec links in a float's source into the type's native
+---link syntax (format_link hook), using the same resolved relations as
+---Markdown links. Resolution happens before the render so the external tool
+---lays out the resolved display text; the render cache keys on the rewritten
+---source, so a changed target re-renders.
+---@param raw_content string Float source
+---@param scope table {specification_ref, parent_object_id} of the float
+---@param format_link function The type's format_link hook
+---@param lookup table Relation lookup for the float's specification
+---@param build_ctx function build_ctx(subject, spec_id) -> hook ctx
+---@return string raw_content Rewritten source
+local function rewrite_source_links(raw_content, scope, format_link, lookup, build_ctx)
+    local spec_id = scope.specification_ref
+    return source_links.replace(raw_content or "", function(content_text, selector)
+        local resolved = relation_lookup.find(lookup, scope.parent_object_id, selector, content_text)
+        local href, display_text
+        if resolved then
+            href = relation_lookup.link_target(resolved, spec_id)
+            display_text = resolved.display_text or content_text
+        else
+            -- Same fallback as Markdown links; extended selectors
+            -- (citations) stay verbatim
+            href = relation_lookup.fallback_target(selector, content_text)
+            display_text = content_text
+        end
+        if not href then return nil end
+        return format_link(build_ctx({ href = href, display_text = display_text }, spec_id))
+    end)
 end
 
 ---TRANSFORM phase: Spawn all external renders in parallel.
@@ -83,11 +116,39 @@ function M.on_transform(data, contexts, diagnostics)
             { task = task, success = success, stdout = stdout, stderr = stderr }, "handle_result")
     end
 
+    -- Relation lookups per specification, built on first use
+    local lookups = {}
+    local function lookup_for(spec_id)
+        if not lookups[spec_id] then
+            local pctx = ctx
+            for _, c in ipairs(contexts) do
+                if c.spec_id == spec_id then pctx = c; break end
+            end
+            lookups[spec_id] = relation_lookup.build(data, spec_id, pctx, diagnostics)
+        end
+        return lookups[spec_id]
+    end
+    local function link_ctx(subject, spec_id)
+        return hook_ctx.build_data({ log = log, model = model_name }, data, diagnostics,
+            subject, "format_link", spec_id)
+    end
+
     -- Prepare tasks for floats and views (identical handling; only the warn label differs)
     local function process_items(items, kind_label)
         for _, item in ipairs(items) do
             local renderer = host_renderer(item.type_ref)
             if renderer then
+                local format_link = kind_label == "float"
+                    and registry.current():get_hook_inherited("float", item.type_ref:upper(), "format_link")
+                local scope = format_link
+                    and data:query_one(Queries.content.select_float_link_scope, { id = item.id })
+                if scope then
+                    local record = {}
+                    for k, v in pairs(item) do record[k] = v end
+                    record.raw_content = rewrite_source_links(item.raw_content, scope, format_link,
+                        lookup_for(scope.specification_ref), link_ctx)
+                    item = record
+                end
                 local task = renderer.prepare_task(prep_ctx(item))
                 if task then
                     -- Cache check: skip if output already exists

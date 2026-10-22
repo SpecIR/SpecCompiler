@@ -206,6 +206,16 @@ function M.transform_floats_in_doc(doc, float_results, data, spec_id, log, prese
                     img_attrs = float_base.decode_image_attrs(result.float)
                 end
 
+                -- An SVG rendition (with clickable links) rides along as an
+                -- image attribute: the HTML filter inlines it, the emitter
+                -- strips it for every other format. The filter runs in the
+                -- pandoc CLI, which shares this process's working directory
+                -- but not the build dir, so the path is resolved here.
+                if result.svg_paths and result.svg_paths[1] then
+                    local build_dir = (pctx and pctx.build_dir or "build"):gsub("/+$", "")
+                    table.insert(img_attrs, {"svg", build_dir .. "/" .. result.svg_paths[1]})
+                end
+
                 -- Create image element with attributes
                 local img = pandoc.Image(
                     {},  -- alt text handled by caption

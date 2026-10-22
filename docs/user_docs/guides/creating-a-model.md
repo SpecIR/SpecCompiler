@@ -164,7 +164,7 @@ The loader supports single files such as `types/floats/figure.lua`. It also supp
 * - Float
   - `"float"`
   - `types/floats/figure.lua`
-  - `transform`, or `prepare_task` + `handle_result`
+  - `transform`, or `prepare_task` + `handle_result` (optionally `format_link`, `mask_comments`)
 * - Relation
   - `"relation"`
   - `types/relations/traces_to.lua`
@@ -251,6 +251,16 @@ The hook name determines the context tier and return type. During model loading,
   - data
   - (writes resolved AST)
   - After the external tool finishes (`ctx.subject.task`, `.success`, `.stderr`).
+* - `format_link`
+  - float
+  - data
+  - link in the source's native syntax (string)
+  - TRANSFORM, before `prepare_task`, once per CommonSpec link in the float source (`ctx.subject.href`, `.display_text`).
+* - `mask_comments`
+  - float
+  - data
+  - source with comments blanked (string)
+  - INITIALIZE, before links in the float source are registered (`ctx.subject.raw_content`, `.float`). Keep length and newlines.
 * - `resolve`
   - relation
   - data
@@ -806,7 +816,7 @@ validation:
 
 ## External renderers
 
-Floats that require an external tool set `needs_external_render = true`. They declare `prepare_task` and `handle_result` data hooks. The pipeline collects tasks, runs processes, and dispatches each result.
+Floats that require an external tool set `needs_external_render = true`. They declare `prepare_task` and `handle_result` data hooks. The pipeline collects tasks, runs processes, and dispatches each result. A float may also declare `format_link` to support CommonSpec links in its source (see *Links in float source* below).
 
 The `prepare_task` hook returns a task descriptor. The `handle_result` hook stores the resolved result. A float cannot declare `render` with either external-render hook.
 
@@ -827,6 +837,8 @@ return {
     hooks = {
         -- DATA: build the spawn task. dctx.subject contains { float, build_dir }.
         -- dctx.log is the logger. Return the task descriptor, or nil to skip.
+        -- Because this type declares format_link, float.raw_content arrives
+        -- with its CommonSpec links already rewritten to [[href{tip} text]].
         prepare_task = function(dctx)
             local float     = dctx.subject.float
             local build_dir = dctx.subject.build_dir
@@ -834,17 +846,18 @@ return {
             local hash      = pandoc.sha1(content)
             local diagrams  = build_dir .. "/diagrams"
             local puml_file = diagrams .. "/" .. hash .. ".puml"
-            local png_file  = diagrams .. "/" .. hash .. ".png"
+            local svg_file  = diagrams .. "/" .. hash .. ".svg"
 
             task_runner.ensure_dir(diagrams)
             task_runner.write_file(puml_file, content)
 
+            -- PNG (DOCX, LaTeX, Markdown) first, then SVG (clickable links in HTML)
             return {
-                cmd = "plantuml",
-                args = { "-tpng", puml_file },
+                cmd = "sh",
+                args = { "-c", 'plantuml -tpng "$1" && plantuml -tsvg "$1"', "sh", puml_file },
                 opts = { timeout = 30000 },
-                output_path = png_file,   -- cache key: skipped when the file exists
-                context = { float = float, relative_path = "diagrams/" .. hash .. ".png" },
+                output_path = svg_file,   -- cache key: written last, so both files exist
+                context = { float = float, hash = hash },
             }
         end,
 
@@ -857,8 +870,30 @@ return {
                 dctx.log.warn("PlantUML failed: %s", dctx.subject.stderr)
                 return
             end
-            local json = string.format('{"png_paths":["%s"]}', ctx.relative_path)
+            local json = string.format(
+                '{"png_paths":["diagrams/%s.png"],"svg_paths":["diagrams/%s.svg"]}',
+                ctx.hash, ctx.hash)
             float_base.update_resolved_ast(dctx.data, ctx.float.id, json)
+        end,
+
+        -- DATA: write one resolved CommonSpec link in PlantUML syntax.
+        -- dctx.subject carries { href, display_text }. Brackets and braces
+        -- would end the PlantUML link early, and backslashes start escapes,
+        -- so they are dropped or replaced; the URL ends at a space.
+        format_link = function(dctx)
+            local text = dctx.subject.display_text:gsub("[%[%]{}]", ""):gsub("\\", "/")
+            local href = dctx.subject.href:gsub(" ", "%%20")
+            return string.format("[[%s{%s} %s]]", href, text, text)
+        end,
+
+        -- DATA: blank out comments so links in them are not registered.
+        -- Keep length and newlines: link line numbers come from this text.
+        mask_comments = function(dctx)
+            local function blank(s) return (s:gsub("[^\n]", " ")) end
+            local text = dctx.subject.raw_content:gsub("/'.-'/", blank)
+            return (text:gsub("[^\n]+", function(line)
+                if line:match("^%s*'") then return blank(line) end
+            end))
         end,
     },
 }
@@ -877,6 +912,44 @@ return {
 * - `context`
   - Arbitrary table passed through to `handle_result` (read as `task.context`).
 ```
+
+The `resolved_ast` of an image float lists `png_paths` and, optionally, `svg_paths`, relative to the build directory. EMIT uses the PNG for DOCX, LaTeX, and Markdown. When an SVG is present, the image carries its path in an `svg` attribute that only HTML output sees (the emitter removes it for every other format), and the HTML filter inlines the SVG so that links inside it navigate.
+
+### Links in float source
+
+A float type whose source is plain text (not Markdown) can let authors write CommonSpec links in it, such as `Foo --> Bar : [SEC-2](@)`. Declaring the `format_link` data hook turns this on. The pipeline then:
+
+1. Registers each `[text](@...)` / `[text](#...)` in the source as a relation of the float's parent object, at its exact line (INITIALIZE).
+2. Resolves it with the same rules and diagnostics as a body link (RESOLVE).
+3. Calls `format_link` once per link and replaces the link with the returned string, before `prepare_task` (TRANSFORM). The render cache therefore keys on the rewritten source.
+
+```list-table:tbl-model-format-link{caption="The format_link hook contract"}
+> header-rows: 1
+> aligns: l,l
+
+* - Field
+  - Meaning
+* - `ctx.subject.href`
+  - Resolved target: `#anchor` in the same document, or `{spec}.ext#anchor` in another document. The output filter replaces `.ext` with the output extension. For an unresolved `@` or `#` link, it is the same fallback anchor a body link gets.
+* - `ctx.subject.display_text`
+  - The text a body link to the same target shows (e.g. "Figure 3"), with the specification prefix for another document. For an unresolved link, it is the authored text.
+* - Return value
+  - A string in the tool's own hyperlink syntax that replaces the link in the source.
+```
+
+Citation links (`@cite`, `@citep`) have no target anchor, so the pipeline leaves them verbatim and does not call the hook for them. A link preceded by `~` is literal text: it is neither registered nor rewritten (`~` is PlantUML's escape, so the diagram shows the plain text). To ignore links inside the tool's comments, also declare `mask_comments`; registration then scans its result.
+
+## Migrating models
+
+Existing models keep working without changes. Use this list to check yours.
+
+1. **Override of PLANTUML with `hooks = {}`, or a type that `extends` PLANTUML:** nothing to do. The type keeps or inherits every default hook, so it gets diagram links and the SVG rendition automatically.
+2. **Override with your own `prepare_task` and `handle_result`:** nothing breaks; output stays PNG, and the source already arrives with links rewritten. To get clickable links in HTML, also render an SVG and add `"svg_paths":[...]` to the `resolved_ast`.
+3. **Override of `prepare_task` only:** keep `hash` and `diagrams_path` (and, optionally, `relative_dir` and `relative_path`) in `task.context`, and keep a PNG `output_path`. The default `handle_result` then still finds the PNG.
+4. **Model `html.lua` that replaces the default filter:** the diagram shows as the PNG. To get clickable links, port the default filter's handling of images with an `svg` attribute (`inline_svg`).
+5. **Model `base.css` or `sidebar.js` overrides:** add the `svg.speccompiler-diagram { max-width: 100%; height: auto; }` rule, and find the clicked anchor with `closest('a')`, reading `href` or `xlink:href`.
+6. **Traceability or coverage queries:** a diagram link is an ordinary relation of the enclosing object, so it counts like a body link. Use `COUNT(DISTINCT ...)` where a body link and a diagram link to the same target must count once.
+7. **Other source-based float types:** declare `format_link` (and `mask_comments` for the tool's comment syntax) to opt in.
 
 ## Project integration
 

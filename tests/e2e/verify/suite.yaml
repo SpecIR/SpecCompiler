@@ -19,3 +19,4 @@ expect_errors: true
 # - vc_verify_004_views.md        -> no view diagnostics for unregistered or valid view syntax
 # - vc_verify_005_spec_missing_required.md -> spec_missing_required (Specification missing required attribute)
 # - vc_verify_006_invalid_spec_type.md     -> spec_invalid_type (Invalid specification type)
+# - vc_out_013_04_plantuml_link_unresolved.md -> unresolved_relation at the diagram line (VC-OUT-013)

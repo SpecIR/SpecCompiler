@@ -14,3 +14,4 @@ output_format: json
 # - vc_ext_023_model_path_resolution.md       -> VC-023 (Model Path Resolution)
 # - vc_ext_013_01_pid_scheme_validation.md    -> VC-EXT-013 (pid_scheme registration contract)
 # - vc_ext_014_01_dangling_extends.md         -> VC-EXT-014 (extends target must exist at finalize)
+# - vc_out_013_05_plantuml_hook_contract.md -> VC-OUT-013 (format_link/mask_comments hook contract, overrides, HTML inline SVG)

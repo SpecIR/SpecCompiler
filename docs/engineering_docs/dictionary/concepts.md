@@ -139,7 +139,7 @@ A **named hook** that a type descriptor contributes to the pipeline, indexed by 
 > **Structure:** Two kinds of contributions, both keyed by hook name:
 >
 > - **Phase participation** — `on_<phase>` functions (`on_initialize`, `on_analyze`, `on_transform`, `on_verify`, `on_emit`) declared in `hooks` beside the behavior hooks; the host synthesizes them into `pipeline:register_handler` under the derived name `<lower(id)>_handler`, ordered via `schema.phase_prerequisites`. Each runs once per phase with full pipeline context.
-> - **Per-item hooks** — RENDER hooks (`render`, `render_block`, `render_link`, `message`) and DATA hooks (`dataset`, `build_block`, `transform`, `resolve`, `prepare_task`, `handle_result`). The hook NAME selects one of two context tiers (a frozen render ctx or a frozen data ctx) and the return type the hook owes. Consumers resolve them via `get_hook_inherited`, which walks the `extends` chain.
+> - **Per-item hooks** — RENDER hooks (`render`, `render_block`, `render_link`, `message`) and DATA hooks (`dataset`, `build_block`, `transform`, `resolve`, `prepare_task`, `handle_result`, `format_link`). The hook NAME selects one of two context tiers (a frozen render ctx or a frozen data ctx) and the return type the hook owes. Consumers resolve them via `get_hook_inherited`, which walks the `extends` chain.
 
 ### DIC: INITIALIZE Phase @TERM-19
 

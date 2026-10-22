@@ -174,9 +174,21 @@ local function prepare_output_task(d, output, json_dir, output_cache, log)
     local output_path = output.path:gsub("{spec_id}", d.spec_id)
 
     local work_doc = d.doc
+    -- Inline SVG renditions (Image `svg` attribute) are HTML-only; every
+    -- other writer and model filter sees the plain image as before
+    if not output.format:match("^html") then
+        work_doc = work_doc:walk({
+            Image = function(img)
+                if img.attributes.svg then
+                    img.attributes.svg = nil
+                    return img
+                end
+            end
+        })
+    end
     local filter = Writer.load_filter(d.config.template, output.format)
     if filter and filter.apply then
-        local filter_ok, filtered = pcall(filter.apply, d.doc, d.config, log)
+        local filter_ok, filtered = pcall(filter.apply, work_doc, d.config, log)
         if filter_ok and filtered then
             work_doc = filtered
             log.debug("[EMIT] Applied filter: %s/%s", d.config.template or "default", output.format)

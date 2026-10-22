@@ -10,4 +10,6 @@ A **Spec Relation** represents a traceability link between specification element
 >
 > **Syntax:** `[Target](selector)` where the URL starts with `@` or `#`. Selectors are not hardcoded --- they are defined by relation types in the model (e.g., `PID_REF` defines `@`, `LABEL_REF` defines `#`, `XREF_CITATION` defines `@cite,@citep`). Models can register any `@...` or `#...` selector.
 >
+> **Where links are found:** In body text and attribute values, in the cells of TABLE floats, and in the raw source of floats whose type declares a `format_link` hook (default model: PLANTUML diagrams). A link inside a float belongs to the float's parent object; a diagram link has no source attribute (`$: alpha = bot`) and is resolved and diagnosed exactly like a body link.
+>
 > **Full specification:** See the CommonSpec Language Specification for the complete inference algorithm and examples.

@@ -88,7 +88,7 @@ The system shall resolve and load models as ordered overlays.
 
 An externally rendered float shall declare task preparation and result handling in its descriptor.
 
-> description: The descriptor shall set `schema.needs_external_render = true`. Its `hooks` table shall provide `prepare_task` and `handle_result`. The core shall prepare tasks, apply the render cache, run tasks, and dispatch results. A float shall not declare both `render` and external-render hooks.
+> description: The descriptor shall set `schema.needs_external_render = true`. Its `hooks` table shall provide `prepare_task` and `handle_result`. The core shall prepare tasks, apply the render cache, run tasks, and dispatch results. A float shall not declare both `render` and external-render hooks. A float whose source carries CommonSpec links may also declare `format_link`, which returns a resolved link in the source's native syntax (see [HLR-OUT-008](@)).
 
 > rationale: The hook pair separates type-specific rendering from process scheduling and cache control.
 

@@ -416,6 +416,31 @@ For example, a link `[HLR-001](@)` in a VC object's `traceability` attribute pro
 
 VERIFIES wins with the highest specificity (4 non-NULL constraints matched).
 
+#### Links in Diagram Source
+
+A spec relation may also be written inside the content of a diagram float. This applies only to float types that declare a `format_link` hook. In the default model, that is **PLANTUML**. Other floats, such as listings, keep their content verbatim.
+
+````
+```puml:arch{caption="Architecture"}
+@startuml
+Foo --> Bar : see [SEC-2](@)
+note right of Bar : [fig:overview](#) and [SRS-001](@)
+@enduml
+```
+````
+
+A diagram link forms the same 4-tuple as a body link:
+
+- `$: s` is the spec object that encloses the float (the float's parent object). A float outside any spec object contributes no relations.
+- `$: alpha = bot`, because the link is not inside an attribute.
+- `$: sigma` and the target are read from the link exactly as in body text.
+
+Resolution, type inference, display text, and diagnostics are therefore identical to body links. An unresolved `@` or `#` link is reported at its line in the source file. The processor rewrites each resolved link into the diagram tool's hyperlink syntax before rendering, so the diagram shows the resolved display text (for example "Figure 2"). In HTML output the link navigates to its target. Where the diagram tool has no hyperlink syntax at a position, the link is not clickable.
+
+Citations (`@cite`, `@citep`) inside diagram source are registered but not rendered as citations. Their text stays verbatim in the diagram.
+
+Two further rules separate links from diagram text. A link preceded by `~`, the diagram tool's escape character, is literal text and forms no relation. A float type may also declare a `mask_comments` hook; links inside the comments it blanks out (for PLANTUML, `' ...` and `/' ... '/`) form no relation, just as links inside HTML comments in body text form none.
+
 #### Examples
 
 PID references in an attribute:
@@ -498,6 +523,37 @@ If the first condition fails, the blockquote is treated as plain body content. F
 **Inline code as View vs. plain inline code.** An inline code span is recognized as a spec view if and only if its content matches the pattern `TypeRef ":"`, where TypeRef is a declared view type. For example, `` `toc:` `` is a view, but `` `x = 5` `` is plain inline code.
 
 **Link as Spec Relation vs. plain link.** A Markdown link `[text](url)` is recognized as a spec relation if and only if the URL starts with `@` or `#` and matches a declared selector. Links with other URL schemes (e.g., `https://`, `./`) are plain Markdown links.
+
+**Link inside diagram source vs. diagram syntax.** Diagram float content is plain text, not Markdown, so links are found by a text scan. A sequence `[text](selector)` is recognized as a spec relation if and only if the float type declares `format_link`, the text is non-empty and contains no `[`, `]`, or newline, and the selector starts with `@` or `#` and contains no whitespace or `)`. The diagram tool's own bracket syntax therefore never matches:
+
+```list-table:tbl-diagram-link-scan{caption="Diagram source link recognition"}
+> header-rows: 1
+> aligns: l,l,l
+
+* - Diagram text
+  - Recognized
+  - Reason
+* - `[SEC-2](@)`
+  - Yes
+  - Text without brackets, selector `@`
+* - `[fig:overview](#)`
+  - Yes
+  - Text without brackets, selector `#`
+* - `[Component]`
+  - No
+  - No `(selector)` follows
+* - `[[http://example.com label]]`
+  - No
+  - Text contains `[`, and no `(selector)` follows
+* - `-[#red]->`
+  - No
+  - `#red` is inside the brackets, not a selector
+* - `[a](https://example.com)`
+  - No
+  - Selector does not start with `@` or `#`
+```
+
+The characters `[`, `]`, `{`, and `}` are removed from the display text inside a diagram, because they would end the PlantUML link early.
 
 **Heading level gaps.** If a heading skips levels (e.g., H2 followed by H4 with no intervening H3), the document is malformed. Processors should report an error; the missing intermediate level is not implicitly created.
 

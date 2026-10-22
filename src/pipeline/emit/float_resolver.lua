@@ -47,6 +47,7 @@ local function process_float(float, build_dir, log)
                 return {
                     type = "image",
                     paths = result.png_paths,
+                    svg_paths = result.svg_paths,
                     float = float,
                     resolved = resolved,
                 }

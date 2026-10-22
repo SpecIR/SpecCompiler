@@ -352,7 +352,9 @@ local ALLOWED_HOOKS = {
     float         = { render        = { tier = "render", returns = "ast" },
                       transform     = { tier = "data", returns = "string" },
                       prepare_task  = { tier = "data", returns = "ast" },     -- task table
-                      handle_result = { tier = "data" } },                    -- return unused
+                      handle_result = { tier = "data" },                      -- return unused
+                      format_link   = { tier = "data", returns = "string" },  -- link in native source syntax
+                      mask_comments = { tier = "data", returns = "string" } },-- source with comments blanked
     view          = { render       = { tier = "render", returns = "ast" },   -- inlines
                       render_block = { tier = "render", returns = "ast" },   -- one block
                       dataset      = { tier = "data", returns = "ast" },     -- dataset table

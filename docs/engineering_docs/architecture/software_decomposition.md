@@ -447,7 +447,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Transforms Pandoc documents during EMIT by replacing float CodeBlock elements with their rendered content (images, tables, charts) and adding captions and bookmarks.
+> description: Transforms Pandoc documents during EMIT by replacing float CodeBlock elements with their rendered content (images, tables, charts) and adding captions and bookmarks. An image result with an SVG rendition keeps its block structure; the image carries the SVG path in an `svg` attribute for the HTML filter.
 
 > traceability: [CSC-009](@)
 
@@ -497,7 +497,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Collects floats with their resolved_ast and categorizes them for EMIT phase processing, distinguishing between image-producing floats and handler-dispatched floats.
+> description: Collects floats with their resolved_ast and categorizes them for EMIT phase processing, distinguishing between image-producing floats (PNG paths plus optional SVG paths) and handler-dispatched floats.
 
 > traceability: [CSC-009](@)
 
@@ -587,7 +587,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: INITIALIZE phase handler that extracts link-based relations (`[PID](@)` and `[PID](#)`) from object ASTs and stores them in spec_relations. Type inference and link rewriting are delegated to relation_type_inferrer (RESOLVE) and relation_link_rewriter (TRANSFORM).
+> description: INITIALIZE phase handler that extracts link-based relations (`[PID](@)` and `[PID](#)`) from object ASTs, TABLE float cells, and the raw source of floats whose type declares a `format_link` hook, and stores them in spec_relations. Type inference and link rewriting are delegated to relation_type_inferrer (RESOLVE) and relation_link_rewriter (TRANSFORM).
 
 > traceability: [CSC-010](@)
 
@@ -711,6 +711,26 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > traceability: [CSC-011](@)
 
+##### CSU: Relation Lookup @CSU-165
+
+> file_path: src/pipeline/shared/relation_lookup.lua
+
+> language: Lua
+
+> description: Builds the per-specification map from an authored link (source object, selector, link text, with float alias variants) to its resolved anchor and display text, using relation render_link hooks and the cross-document specification prefix. Provides lookup with language-qualified fallback, same- or cross-document link targets (`#anchor` / `{spec}.ext#anchor`), and the unresolved base-selector fallback. Shared by relation_link_rewriter and external_render_handler so that a link resolves identically in body text and in diagram source.
+
+> traceability: [CSC-011](@)
+
+##### CSU: Source Links @CSU-166
+
+> file_path: src/pipeline/shared/source_links.lua
+
+> language: Lua
+
+> description: Finds CommonSpec links in the raw text of a non-Markdown float source and reports each link's text, selector, and 1-based line, or replaces each link through a callback. Link text may not contain brackets or a newline and the selector must start with `@` or `#`, so PlantUML's own bracket syntax never matches.
+
+> traceability: [CSC-011](@)
+
 ##### Transform Handlers Package
 
 #### CSC: Transform Handlers @CSC-012
@@ -727,7 +747,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: TRANSFORM phase handler that orchestrates parallel rendering of external float and view types (PlantUML, charts, math) by batching tasks and dispatching to registered renderer callbacks.
+> description: TRANSFORM phase handler that orchestrates parallel rendering of external float and view types (PlantUML, charts, math) by batching tasks and dispatching to registered renderer callbacks. Runs after float numbering; for float types with a `format_link` hook it rewrites CommonSpec links in the source to the type's native link syntax before `prepare_task`, so the render cache keys on the rewritten source.
 
 > traceability: [CSC-012](@)
 
@@ -747,7 +767,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: TRANSFORM phase handler that rewrites `@` and `#` links in stored spec_object AST JSON, replacing them with resolved anchor targets using the relation lookup built from spec_relations.
+> description: TRANSFORM phase handler that rewrites `@` and `#` links in stored spec_object AST JSON, replacing them with resolved anchor targets using the relation lookup that relation_lookup builds from spec_relations.
 
 > traceability: [CSC-012](@)
 
@@ -1041,7 +1061,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Pandoc Lua filter for HTML5 output that converts speccompiler-format markers into semantic HTML elements with Bootstrap-compatible styling.
+> description: Pandoc Lua filter for HTML5 output that converts speccompiler-format markers into semantic HTML elements with Bootstrap-compatible styling, including replacing an image that carries an `svg` attribute with the inline SVG so diagram links navigate.
 
 > traceability: [CSC-018](@)
 
@@ -1331,7 +1351,7 @@ This chapter defines decomposition and design allocation using MIL-STD-498 nomen
 
 > language: Lua
 
-> description: Defines the PLANTUML float type for PlantUML diagrams rendered to PNG; shares the FIGURE counter group and requires external rendering.
+> description: Defines the PLANTUML float type for PlantUML diagrams rendered to SVG and PNG in one task; shares the FIGURE counter group and requires external rendering. Its `format_link` hook writes resolved CommonSpec links as PlantUML `[[href{tooltip} label]]` hyperlinks.
 
 > traceability: [CSC-022](@)
 

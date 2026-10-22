@@ -4,6 +4,7 @@ local hash_utils = require("infra.hash_utils")
 local cache_registry = require("pipeline.shared.cache_registry")
 local registry = require("contract.registry")
 local hook_ctx = require("pipeline.shared.hook_ctx")
+local source_links = require("pipeline.shared.source_links")
 
 local M = {
     name = "spec_relations",
@@ -411,6 +412,68 @@ local function process_table_float_links(data, ctx, spec_id, diagnostics)
     return relation_count
 end
 
+---Register links written inside the raw text of floats whose type declares a
+---`format_link` hook (e.g. PlantUML). The source is not Markdown, so links are
+---found by text scan; each is parsed and stored exactly like a body link of
+---the float's parent object, so RESOLVE treats both identically. A type's
+---optional `mask_comments` hook hides links in its comments.
+local function process_source_float_links(data, ctx, spec_id, diagnostics)
+    local host = registry.current()
+    if not host then return 0 end
+
+    local floats = data:query_all([[
+        SELECT id, type_ref, from_file, start_line, raw_content, parent_object_id
+        FROM spec_floats
+        WHERE specification_ref = :spec_id
+          AND raw_content IS NOT NULL
+          AND raw_content != ''
+          AND parent_object_id IS NOT NULL
+    ]], { spec_id = spec_id }) or {}
+
+    local relation_count = 0
+
+    for _, float in ipairs(floats) do
+        if host:get_hook_inherited("float", float.type_ref, "format_link") then
+            local text = float.raw_content
+            local mask_comments = host:get_hook_inherited("float", float.type_ref, "mask_comments")
+            if mask_comments then
+                text = mask_comments(hook_ctx.build_data({ log = ctx.log or logger }, data, diagnostics,
+                    { raw_content = text, float = float }, "mask_comments", spec_id))
+            end
+            local seen_float_links = {}
+            source_links.each(text, function(content_text, selector, line_offset)
+                local raw_key = selector .. "|" .. content_text
+                if seen_float_links[raw_key] then return end
+                seen_float_links[raw_key] = true
+
+                local target_text, _, prefix, explicit_scope, link_selector = parse_link_syntax({
+                    t = "Link",
+                    target = selector,
+                    content = content_text,
+                    classes = {},
+                    attributes = {},
+                }, data)
+                if target_text then
+                    relation_count = relation_count + 1
+                    insert_relation(
+                        data,
+                        spec_id,
+                        float.parent_object_id,
+                        build_stored_target_text(target_text, prefix, explicit_scope),
+                        nil,
+                        float.from_file or (ctx.doc and ctx.doc.source_path or "unknown"),
+                        (float.start_line or 0) + line_offset,  -- fence line + line within the block
+                        nil,
+                        link_selector
+                    )
+                end
+            end)
+        end
+    end
+
+    return relation_count
+end
+
 ---@param data DataManager
 ---@param contexts Context[]
 ---@param diagnostics Diagnostics
@@ -440,6 +503,7 @@ function M.on_initialize(data, contexts, diagnostics)
             relation_count = relation_count + process_document_links(data, doc, spec_id, attr_relation_keys)
         end
         relation_count = relation_count + process_table_float_links(data, ctx, spec_id, diagnostics)
+        relation_count = relation_count + process_source_float_links(data, ctx, spec_id, diagnostics)
 
         -- Log summary
         if attr_link_count > 0 then

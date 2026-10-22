@@ -1,5 +1,5 @@
 # E2E Test Suite: Output
-# Verifies: VC-OUT-001, VC-OUT-002
+# Verifies: VC-OUT-001, VC-OUT-002, VC-OUT-013
 
 project:
   code: TEST_OUTPUT
@@ -22,3 +22,7 @@ html5:
 # - vc_out_001_formats.md    -> VC-OUT-001 (DOCX and Multi-Format Output)
 # - vc_out_002_bibliography.md -> VC-OUT-002 (Bibliography and Incremental Builds)
 # - vc_out_003_html_options.md -> VC-OUT-003 (HTML option and filter path exercise)
+# - vc_out_013_01_plantuml_links.md      -> VC-OUT-013 (PlantUML diagram links: relations, lowering, SVG)
+# - vc_out_013_02_plantuml_links_html.md -> VC-OUT-013 (PlantUML diagram links: inline SVG in HTML, PNG in DOCX/Markdown)
+# - vc_out_013_03_plantuml_links_cache.md -> VC-OUT-013 (PlantUML diagram links: render cache invalidation)
+# - vc_out_013_06_plantuml_links_edge.md  -> VC-OUT-013 (PlantUML diagram links: comments, ~ escape, %20 hrefs, % width, PNG-only upgrade)

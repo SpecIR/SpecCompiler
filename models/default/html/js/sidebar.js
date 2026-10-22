@@ -457,23 +457,19 @@ var SpecCompiler = SpecCompiler || {};
    */
   function setupCrossDocLinks() {
     document.addEventListener('click', function(e) {
-      var target = e.target;
-
-      // Find closest anchor
-      while (target && target.tagName !== 'A') {
-        target = target.parentElement;
-      }
+      // Find closest anchor (inline SVG <a> reports a lowercase tagName)
+      var target = e.target.closest ? e.target.closest('a') : null;
 
       if (!target) return;
 
-      var href = target.getAttribute('href');
+      var href = target.getAttribute('href') || target.getAttribute('xlink:href');
       if (!href) return;
 
       // Match pattern: xxx.html#yyy or xxx.html
       var match = href.match(/^([^.]+)\.html(?:#(.+))?$/);
       if (match) {
         e.preventDefault();
-        var docId = match[1];
+        var docId = decodeURIComponent(match[1]);
         var elementId = match[2];
 
         if (SpecCompiler.Router) {

@@ -33,10 +33,10 @@ Verify floats are resolved with rendered content.
 > approach:
 > - Process document with PlantUML float
 > - Run float_resolver
-> - Verify resolved_ast contains SVG image
+> - Verify resolved_ast contains PNG and SVG paths
 
 > pass_criteria:
-> - PlantUML code blocks converted to SVG images
+> - PlantUML code blocks converted to PNG and SVG images
 > - ECharts blocks converted to PNG images
 > - Math blocks converted to OMML or MathML
 > - resolved_ast non-NULL after resolution
@@ -346,3 +346,35 @@ Verify that heading depth, hierarchical PID depth, and the attribute card anchor
 > - SECTION PIDs run `sec1`, `sec2`, `sec2.1`, `sec3`, `sec4` in document order; the generated counter skips the slot taken by the explicit `MAN-PIDS-sec3`
 
 > traceability: [HLR-OUT-001](@), [HLR-PIPE-008](@), [HLR-PIPE-009](@)
+
+
+### VC: Diagram Hyperlinks @VC-OUT-013
+
+Verify that CommonSpec links written inside a PlantUML float are registered, resolved, and rendered as working hyperlinks, while PNG-based formats keep working.
+
+> objective: Confirm that links inside diagram source become ordinary relations of the float's parent object at the exact source line, are lowered into PlantUML `[[href{tooltip} label]]` syntax with the same display text as body links before rendering, render as anchors in an inline SVG in HTML5, and leave PlantUML's own bracket syntax and citations verbatim.
+
+> verification_method: Test
+
+> approach:
+> - Build a document whose PlantUML floats contain `@` and `#` links (same-document section and float targets, a float alias prefix), PlantUML bracket syntax (`[Component]`, `[[url label]]`, `-[#red]->`), and a citation; the same targets are also linked from body text
+> - Query `spec_relations` for the diagram links and compare their source object, source attribute, and link line with the `.md` source
+> - Inspect the lowered `.puml` source, the `resolved_ast` paths, and the rendered SVG anchors
+> - Unit-check `source_links.each` / `source_links.replace` and the PLANTUML `format_link` hook
+> - Inspect HTML5 output for the inline SVG and its anchors, and non-HTML output for the PNG image
+> - Build edge cases: links in PlantUML comments, a `~`-escaped link, a cross-document target in a specification whose file name has a space, a percent width, and a build directory whose SVG was deleted (PNG-only upgrade)
+> - Check the host contract: `format_link` / `mask_comments` return contracts, a PLANTUML override with `hooks = {}`, a type extending PLANTUML, and `handle_result` for a model that overrides only `prepare_task`; unit-check the HTML filter's inline SVG (sizing, href rewriting, fallback)
+
+> pass_criteria:
+> - Each diagram link is stored once per float with the float's parent object as source, NULL source attribute, and a link line equal to the link's line in the `.md` file
+> - Diagram links resolve to the same targets and display text as body links to the same targets
+> - The rendered source contains `[[#anchor{display} display]]` for each resolved link; bracket syntax and the citation are unchanged
+> - `resolved_ast` lists both `png_paths` and `svg_paths`, and the SVG contains `<a href="#anchor">` for each resolved link
+> - The render cache keys on the lowered source, so a changed target or display text triggers a new render
+> - HTML5 output contains an inline `<svg class="speccompiler-diagram">` with `.html#` cross-document hrefs and without `target="_top"`; a requested width or height (including `50%`) is applied as the root's inline style; an unreadable SVG falls back to the PNG image
+> - DOCX, Markdown, and JSON output contain the PNG image with the pre-feature structure: no wrapper Div and no `svg` attribute
+> - Links in PlantUML comments and `~`-escaped links form no relation and raise no diagnostic; the escaped text renders without the `~`; spaces in a cross-document href are encoded as `%20`
+> - Deleting a cached SVG makes the next build re-render it; model overrides and subtypes of PLANTUML keep the link hooks, and a `prepare_task`-only override still yields its PNG
+> - An unresolved `@` or `#` link inside a diagram raises `unresolved_relation` at the link's exact source line
+
+> traceability: [HLR-OUT-008](@), [LLR-OUT-013-01](@), [LLR-OUT-013-02](@), [LLR-OUT-013-03](@), [LLR-OUT-013-04](@), [LLR-OUT-013-05](@), [LLR-OUT-013-06](@)

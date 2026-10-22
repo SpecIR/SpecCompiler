@@ -11,6 +11,7 @@
 ---  - Converts native pandoc.Math elements to RawInline HTML with inline <math> payload
 ---  - Converts speccompiler-caption Div to HTML figure caption
 ---  - Converts speccompiler-numbered-equation Div to HTML equation with number
+---  - Replaces images carrying an `svg` rendition with the inline <svg> (links stay clickable)
 ---  - Converts RawInline("speccompiler", "view:NAME:CONTENT") to HTML placeholder
 ---  - Converts semantic cover-* Divs to Bootstrap-compatible styled HTML
 ---
@@ -399,6 +400,59 @@ local function math_to_mathml_inline(math_elt)
 end
 
 -- ============================================================================
+-- Inline SVG (diagrams with clickable links)
+-- ============================================================================
+
+---Prepare rendered SVG markup for inlining into the page.
+---Links keep working only when the SVG is part of the page DOM (not <img>).
+---@param svg string SVG file content
+---@param width string|nil Requested width (float attribute)
+---@param height string|nil Requested height (float attribute)
+---@return string svg Inline-ready markup
+local function inline_svg(svg, width, height)
+    svg = svg:gsub("^%s*<%?xml.-%?>", ""):gsub("^%s*<!DOCTYPE.->", "")
+
+    -- Root element: scale with the page instead of the fixed renderer size.
+    -- User values are concatenated, never used as gsub replacement strings
+    -- ("50%" would be an invalid capture reference).
+    svg = svg:gsub("<svg[^>]*>", function(root)
+        root = root:gsub('%s+preserveAspectRatio="none"', "")
+        root = root:gsub('(%sstyle=")([^"]*)', function(prefix, style)
+            return prefix .. style:gsub("width:[^;\"]*;?", ""):gsub("height:[^;\"]*;?", "")
+        end)
+        -- A requested size goes in the inline style, as pandoc does for <img>,
+        -- so it wins over the stylesheet's height:auto
+        local size = (width and ("width:" .. width .. ";") or "")
+            .. (height and ("height:" .. height .. ";") or "")
+        if size ~= "" then
+            local s, e = root:find('%sstyle="')
+            if s then
+                root = root:sub(1, e) .. size .. root:sub(e + 1)
+            else
+                root = '<svg style="' .. size .. '"' .. root:sub(5)
+            end
+        end
+        return '<svg class="speccompiler-diagram"' .. root:sub(5)
+    end, 1)
+
+    -- Links: same .ext placeholder replacement as Link elements; open in place
+    svg = svg:gsub('(href="[^"]-)%.ext#', "%1.html#")
+    svg = svg:gsub('%s+target="_top"', ""):gsub('%s+xlink:show="new"', "")
+    return svg
+end
+
+---Replace an image that carries an SVG rendition with the inline SVG.
+---@param img pandoc.Image Image with an `svg` attribute (file path)
+---@return pandoc.RawInline|nil Inline SVG, or nil when it cannot be read
+local function inline_svg_image(img)
+    local f = io.open(img.attributes.svg, "r")
+    if not f then return nil end
+    local svg = f:read("a")
+    f:close()
+    return pandoc.RawInline("html", inline_svg(svg, img.attributes.width, img.attributes.height))
+end
+
+-- ============================================================================
 -- Filter Tables
 -- ============================================================================
 
@@ -475,6 +529,11 @@ local FILTER_PASS2 = {
     end,
 
     Image = function(img)
+        if img.attributes.svg then
+            local svg = inline_svg_image(img)
+            if svg then return svg end
+            img.attributes.svg = nil  -- unreadable: keep the PNG
+        end
         if img.src and not img.src:match("^%.%.")
                     and not img.src:match("^/")
                     and not img.src:match("^https?://")

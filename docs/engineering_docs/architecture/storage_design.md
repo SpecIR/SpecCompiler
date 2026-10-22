@@ -93,11 +93,11 @@ external tools.
 skinparam backgroundColor #FFFFFF
 skinparam sequenceMessageAlign center
 
-participant "CSU Build Engine" as E
-participant "CSU Data Manager" as DB
-participant "CSC-006 DB Schema" as SCH
-participant "CSC-007 DB Views" as VW
-participant "CSC-005 DB Queries" as QRY
+participant "CSU Build Engine" as E [CSU-005](@)
+participant "CSU Data Manager" as DB [CSU-012](@)
+participant "CSC-006 DB Schema" as SCH [CSC-006](@)
+participant "CSC-007 DB Views" as VW [CSC-007](@)
+participant "CSC-005 DB Queries" as QRY [CSC-005](@)
 participant "SQLite" as SQL
 
 == Schema Initialization ==

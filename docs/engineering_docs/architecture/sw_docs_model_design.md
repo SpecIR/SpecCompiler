@@ -92,12 +92,12 @@ navigation, and SQLite-WASM full-text search from the SpecIR database.
 skinparam backgroundColor #FFFFFF
 skinparam sequenceMessageAlign center
 
-participant "CSU Build Engine" as E
-participant "CSU Type Loader" as TL
-participant "CSC-017 Default\nModel" as DEF
-participant "CSC-025 SW Docs\nModel" as SW
-participant "CSU Analyze Query Loader" as PL
-participant "CSU Data Manager" as DB
+participant "CSU Build Engine" as E [CSU-005](@)
+participant "CSU Type Loader" as TL [CSU-008](@)
+participant "CSC-017 Default\nModel" as DEF [CSC-017](@)
+participant "CSC-025 SW Docs\nModel" as SW [CSC-025](@)
+participant "CSU Analyze Query Loader" as PL [CSU-007](@)
+participant "CSU Data Manager" as DB [CSU-012](@)
 
 == Default Model Loading ==
 E -> TL: load_model(data, pipeline, "default")
@@ -146,7 +146,7 @@ PL -> DB: create default analyze queries
 
 E -> PL: load_model("sw_docs")
 PL -> SW: scan analyze_queries/
-SW --> PL: fd_missing_csc, fd_missing_csu,\ncsc_missing_fd, csu_missing_fd,\nhlr_missing_vc, vc_missing_hlr,\ntr_missing_vc
+SW --> PL: [csu:fd-missing-csc-traceability](#), [csu:fd-missing-csu-traceability](#),\n[csu:csc-missing-fd-allocation](#), [csu:csu-missing-fd-allocation](#),\n[csu:hlr-missing-vc-coverage](#), [csu:vc-missing-hlr-traceability](#),\n[csu:tr-missing-vc-traceability](#)
 loop for each domain analyze query
     PL -> DB: CREATE VIEW {analyze_query.view}
     note right: Domain-specific\ntraceability constraints

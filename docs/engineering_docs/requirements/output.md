@@ -36,7 +36,7 @@ The system shall replace [dic:float](#) placeholder blocks in the assembled docu
 
 > description: After document assembly, the float emitter walks all blocks and replaces CodeBlock placeholders (identified by float labels) with rendered Div elements containing:
 >
-> 1. **Rendered content**: The `resolved_ast` from `spec_floats` (SVG images for PlantUML, parsed tables for CSV, chart images for ECharts)
+> 1. **Rendered content**: The `resolved_ast` from `spec_floats` (SVG and PNG renditions for PlantUML, parsed tables for CSV, chart images for ECharts)
 > 2. **Caption**: A formatted caption with type prefix and sequential number (e.g., "Figure 1 -- Diagram Title")
 > 3. **Semantic classes**: CSS classes (`speccompiler-float`, `speccompiler-caption`, type-specific class) for format-specific styling
 > 4. **Bookmark anchor**: An identifier anchor for cross-reference navigation
@@ -138,3 +138,20 @@ The system shall populate [dic:full-text-search](#) virtual tables during the [d
 
 > status: Approved
 
+
+#### HLR: Diagram Hyperlinks @HLR-OUT-008
+
+The system shall resolve CommonSpec links written inside the source of a diagram [dic:float](#) exactly like links in body text, and shall render them as working hyperlinks in HTML5 output.
+
+> description: A float type opts in by declaring a `format_link` hook (default model: PLANTUML). For such floats:
+>
+> 1. **Registration**: During the [dic:initialize-phase](#) phase, `[Target](@)` and `[prefix:label](#)` links in the float's raw source are stored in `spec_relations` as links of the float's parent object (no source attribute), at the exact source line of the link
+> 2. **Resolution and diagnostics**: Diagram links use the same resolvers, relation type inference, display text, and `unresolved_relation` diagnostics as body links
+> 3. **Lowering**: During the [dic:transform-phase](#) phase, before the external render, each link is rewritten into the diagram tool's own hyperlink syntax with the resolved target and display text. The render cache keys on the rewritten source
+> 4. **Dual rendition**: PlantUML renders SVG and PNG in one task. HTML5 output inlines the SVG so that its anchors navigate, in each per-specification page and in the single-page web application. DOCX, LaTeX, and Markdown use the PNG, which shows the resolved display text
+>
+> Citation selectors (`@cite`, `@citep`) inside diagram source are registered but left verbatim. A link is clickable only where the diagram tool supports hyperlinks.
+
+> rationale: Architecture and sequence diagrams name the requirements, sections, and figures they depict. Authors expect those names to navigate like body links. One relation path keeps a single resolution policy, a single diagnostic policy, and complete traceability for links in both places.
+
+> status: Approved

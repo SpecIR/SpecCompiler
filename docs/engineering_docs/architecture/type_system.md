@@ -125,6 +125,12 @@ Each hook accepts one frozen context table. The polymorphic `subject` field cont
 * - prepare_task, handle_result
   - data context with task or result fields
   - task table / DB write
+* - format_link
+  - data context with `subject.href` and `subject.display_text`
+  - link in the float source's native syntax (string)
+* - mask_comments
+  - data context with `subject.raw_content` and `subject.float`
+  - source with comments blanked, same length and newlines (string)
 ```
 
 A render hook receives the render core and its subject. A data hook receives `data`, `spec_id`, `log`, and its subject. The host checks required context fields. It prevents assignment to top-level context fields. Each hook must return its documented type.
